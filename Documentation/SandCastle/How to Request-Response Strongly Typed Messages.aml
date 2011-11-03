@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="10a9ac12-1cc8-4980-8649-aff89288a48f" revisionNumber="1">
+  <developerHowToDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--
+    <summary>
+      <para>Optional summary abstract</para>
+    </summary>
+    -->
+    <introduction>
+      <para>
+      The example shows how to use strongly typed messages in the request-response
+      communication.
+      The sender sends strongly typed messages and receives strongly typed response messages.
+      The receiver gets strongly typed messages and sends strongly typed responses.
+      </para>
+      <markup>
+		<img src="../media/TypedRequestResponseCommunication.gif" width="100%"/>
+	  </markup>
+      
+    </introduction>
+    
+    <codeExample>
+    
+    The data type known for both sides:
+	<code language="C#">
+[Serializable]
+public class Person
+{
+    public string Name { get; set; }
+    public int NumberOfItems { get; set; }
+}
+	</code>
+    
+    The receiver code:
+    <code language="C#">
+using System;
+using CommonTypes;
+using Eneter.Messaging.EndPoints.TypedMessages;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem;
+
+namespace DuplexTypedMessageServer
+{
+    internal class DuplexPersonReceiver
+    {
+        public DuplexPersonReceiver()
+        {
+            // Create duplex typed message receiver.
+            IDuplexTypedMessagesFactory aDuplexTypedMessagesFactory = new DuplexTypedMessagesFactory();
+            myMessageReceiver = aDuplexTypedMessagesFactory.CreateDuplexTypedMessageReceiver&lt;string, Person&gt;();
+            myMessageReceiver.MessageReceived += OnMessageReceived;
+        }
+
+        public void StartReceiving()
+        {
+            // Create factory to create input channel based on Named Pipes
+            IMessagingSystemFactory aMessagingSystemFactory = new NamedPipeMessagingSystemFactory();
+            IDuplexInputChannel anDuplexInputChannel = aMessagingSystemFactory.CreateDuplexInputChannel("net.pipe://127.0.0.1/MyPipeName3/");
+
+            // Attach the input channel to the string message receiver and start listening.
+            myMessageReceiver.AttachDuplexInputChannel(anDuplexInputChannel);
+        }
+
+        private void OnMessageReceived(object sender, TypedRequestReceivedEventArgs&lt;Person&gt; e)
+        {
+            Console.WriteLine("Name: " + e.RequestMessage.Name);
+            Console.WriteLine("Number of items: " + e.RequestMessage.NumberOfItems.ToString());
+            Console.WriteLine();
+
+            if (e.RequestMessage.Name != "bye")
+            {
+                myMessageReceiver.SendResponseMessage(e.ResponseReceiverId, "Thanks for your message.");
+            }
+        }
+
+
+        // Duplex typed message receicer that receives type Person and responses type string.
+        private IDuplexTypedMessageReceiver&lt;string, Person&gt; myMessageReceiver;
+    }
+}
+
+    </code>
+    
+    The sender code:
+    <code language="C#">
+using System;
+using CommonTypes;
+using Eneter.Messaging.EndPoints.TypedMessages;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem;
+
+namespace DuplexTypedMessageClient
+{
+    internal class DuplexPersonSender
+    {
+        public DuplexPersonSender()
+        {
+            IDuplexTypedMessagesFactory aTypedMessagesFactory = new DuplexTypedMessagesFactory();
+            myMessageSender = aTypedMessagesFactory.CreateDuplexTypedMessageSender&lt;string, Person&gt;();
+            myMessageSender.ResponseReceived += OnResponseReceived;
+
+            // Create factory to create input channel based on Named Pipes
+            IMessagingSystemFactory aMessagingSystemFactory = new NamedPipeMessagingSystemFactory();
+            IDuplexOutputChannel anOutputChannel = aMessagingSystemFactory.CreateDuplexOutputChannel("net.pipe://127.0.0.1/MyPipeName3/");
+
+            myMessageSender.AttachDuplexOutputChannel(anOutputChannel);
+        }
+
+        public void Close()
+        {
+            myMessageSender.DetachDuplexOutputChannel();
+        }
+
+        public void SendPersonalInfo(string name, int numberOfItems)
+        {
+            Person aPerson = new Person { Name = name, NumberOfItems = numberOfItems };
+
+            // Send the type Person.
+            myMessageSender.SendRequestMessage(aPerson);
+        }
+
+        private void OnResponseReceived(object sender, TypedResponseReceivedEventArgs&lt;string&gt; e)
+        {
+            Console.WriteLine(e.ResponseMessage);
+        }
+
+        private IDuplexTypedMessageSender&lt;string, Person&gt; myMessageSender;
+    }
+}
+
+    </code>
+    
+    </codeExample>
+    
+    <!-- <buildInstructions>Optional instructions for building a
+         code example.</buildInstructions> -->
+    <!-- <robustProgramming>Optional discussion of error handling and other
+         issues related to writing solid code.</robustProgramming> -->
+    <!-- <security>Optional discussion of security issues.</security> -->
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID">Link text</link>
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerHowToDocument>
+</topic>

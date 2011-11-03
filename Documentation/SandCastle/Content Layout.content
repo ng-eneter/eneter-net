@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Topics defaultTopic="539fb726-b358-41a2-bcbf-df92ada3b8da">
+  <Topic id="539fb726-b358-41a2-bcbf-df92ada3b8da" visible="True" title="Eneter Messaging Introduction" />
+  <Topic id="c561ace9-bf6e-44d3-aac3-1e25a78387d6" visible="True" title="Software License" />
+  <Topic id="46dcea8c-46d2-47cf-8e07-73217bccb73e" visible="True" noFile="True" title="Examples">
+    <Topic id="208c8dd5-649f-4b92-b3c1-a7f88b0ee3d6" visible="True" title="How to: Send and Receive String Messages" />
+    <Topic id="78e50ee0-33d0-4991-8c6d-def6f23a34f2" visible="True" title="How to: Send and Receive Strongly Typed Messages" />
+    <Topic id="4df36e2e-281e-444f-a18b-837bf30bec14" visible="True" title="How to: Request-Response String Messages" />
+    <Topic id="10a9ac12-1cc8-4980-8649-aff89288a48f" visible="True" title="How to: Request-Response Strongly Typed Messages" />
+    <Topic id="e8279fcd-7c51-463e-8708-07738a89e25e" visible="True" title="How to: Use Commands" />
+    <Topic id="f6b44c4e-d4fb-4db2-a81f-a706e6fc9831" visible="True" title="How to: Use Broker" />
+    <Topic id="18a24899-06a4-4756-97ce-18d853815b5b" visible="True" title="How to: Use Dispatcher" />
+    <Topic id="c61300a1-46a8-4978-b403-aa5f6e8b8548" visible="True" title="How to: Use Channel Wrapper-Unwrapper" />
+    <Topic id="a633abb5-837d-49eb-a902-46f82db1c8a1" visible="True" title="How to: Communicate between Silverlight and Asp Server" />
+    <Topic id="f40e508d-9ae8-45dc-96e7-462b9f1e9197" visible="True" title="How to: Communicate between Silverlight and Tcp Server" />
+    <Topic id="b491c848-1677-482a-b248-8606b4df0f2d" visible="True" title="How to: Communicate between Silverlight and Http Server" />
+    <Topic id="890c173d-ef10-4c52-8de9-1fb7aeaac4aa" visible="True" title="How to: Communicate between Windows Phone 7 and Http Server" />
+    <Topic id="9a961e93-8bb7-4d1e-940d-2fde845a5f55" visible="True" title="How to: Communicate Across Unstable Network" />
+    <Topic id="18b7915d-25ec-48e5-b8d0-1a07bb972381" visible="True" title="How to: Encrypt Communication with AES" />
+    <Topic id="cb91084a-03f6-44b4-9995-8d7d1f23e3eb" visible="True" title="How to: Implement Acknowledged Communication" />
+  </Topic>
+</Topics>

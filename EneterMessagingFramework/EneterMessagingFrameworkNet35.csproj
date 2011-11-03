@@ -1,0 +1,548 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9E2995F5-CC0A-4E5E-A510-E8613864DB47}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Eneter.Messaging</RootNamespace>
+    <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Net35\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Net35\Debug\Eneter.Messaging.Framework.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Net35\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Net35\Release\Eneter.Messaging.Framework.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EneterMessagingFrameworkKey.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataProcessing\Serializing\AesSerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\CryptoSerializerProvider.cs" />
+    <Compile Include="DataProcessing\Serializing\GZipSerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\RijndaelSerializer.cs" />
+    <Compile Include="Diagnostic\ErrorHandler.cs" />
+    <Compile Include="EndPoints\Commands\IReliableCommand.cs" />
+    <Compile Include="EndPoints\Commands\IReliableCommandContext.cs" />
+    <Compile Include="EndPoints\Commands\IReliableCommandsFactory.cs" />
+    <Compile Include="EndPoints\Commands\IReliableCommandProxy.cs" />
+    <Compile Include="EndPoints\Commands\ReliableCommand.cs" />
+    <Compile Include="EndPoints\Commands\ReliableCommandsFactory.cs" />
+    <Compile Include="EndPoints\Commands\ReliableCommandItem.cs" />
+    <Compile Include="EndPoints\Commands\ReliableCommandProxy.cs" />
+    <Compile Include="EndPoints\Commands\_NamespaceDoc.cs" />
+    <Compile Include="EndPoints\StringMessages\IReliableStringMessageReceiver.cs" />
+    <Compile Include="EndPoints\StringMessages\IReliableStringMessageSender.cs" />
+    <Compile Include="EndPoints\StringMessages\IReliableStringMessagesFactory.cs" />
+    <Compile Include="EndPoints\StringMessages\ReliableDuplexStringMessageReceiver.cs" />
+    <Compile Include="EndPoints\StringMessages\ReliableDuplexStringMessageSender.cs" />
+    <Compile Include="EndPoints\StringMessages\ReliableStringMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\ReliableDuplexTypedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedMessages\ReliableDuplexTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\ReliableTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\IReliableTypedSequencedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\IReliableTypedSequencedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\IReliableTypedSequencedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\ReliableDuplexTypedSequencedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\ReliableDuplexTypedSequencedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\ReliableTypedSequencedMessagesFactory.cs" />
+    <Compile Include="Infrastructure\Attachable\AttachableMultipleDuplexInputChannelsBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Infrastructure\Attachable\AttachableReliableInputChannelBase.cs" />
+    <Compile Include="Infrastructure\Attachable\AttachableReliableOutputChannelBase.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableReliableInputChannel.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableReliableOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\Composites\ICompositeDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\ICompositeDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\ICompositeOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseMessageSender.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseReceiverContext.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableBufferedMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableBufferedMonitoredMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\IReliableMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\ReliableDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\ReliableDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\ReliableMessage.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\ReliableMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\SentMessageItem.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitorChannelMessage.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\Reconnecter.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\IReliableDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\IReliableDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\MessageIdEventArgs.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMessagingComposit\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\Composites\ReliableMonitoredMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpPolicyServer.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker_Silverlight.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\DuplexChannelEventArgs.cs" />
+    <Compile Include="DataProcessing\MessageQueueing\MessageQueue.cs" />
+    <Compile Include="DataProcessing\MessageQueueing\_NamespaceDoc.cs" />
+    <Compile Include="DataProcessing\Sequencing\DataFragment.cs" />
+    <Compile Include="DataProcessing\Sequencing\Fragment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\FragmentDataFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\FragmentFinalizer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\FragmentSequencer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\IFragment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\IFragmentProcessor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\IMultiInstanceFragmentProcessor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\MultiInstanceFragmentProcessor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Sequencing\_NamespaceDoc.cs" />
+    <Compile Include="DataProcessing\Serializing\BinarySerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\DataContractXmlStringSerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\ISerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\XmlStringSerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\_NamespaceDoc.cs" />
+    <Compile Include="DataProcessing\Streaming\DynamicStream.cs" />
+    <Compile Include="DataProcessing\Streaming\MessageStreamer.cs" />
+    <Compile Include="DataProcessing\Streaming\_NamespaceDoc.cs" />
+    <Compile Include="DataProcessing\Wrapping\DataWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\Wrapping\_NamespaceDoc.cs" />
+    <Compile Include="DataProcessing\Wrapping\WrappedData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Diagnostic\EneterTrace.cs" />
+    <Compile Include="Diagnostic\_NamespaceDoc.cs" />
+    <Compile Include="EndPoints\Commands\Command.cs" />
+    <Compile Include="EndPoints\Commands\CommandInputData.cs" />
+    <Compile Include="EndPoints\Commands\CommandItem.cs" />
+    <Compile Include="EndPoints\Commands\CommandProxy.cs" />
+    <Compile Include="EndPoints\Commands\CommandReceivingErrorEventArgs.cs" />
+    <Compile Include="EndPoints\Commands\CommandRequestEventArgs.cs" />
+    <Compile Include="EndPoints\Commands\CommandResponseReceivedEventArgs.cs" />
+    <Compile Include="EndPoints\Commands\CommandReturnData.cs" />
+    <Compile Include="EndPoints\Commands\CommandsFactory.cs" />
+    <Compile Include="EndPoints\Commands\ECommandRequest.cs" />
+    <Compile Include="EndPoints\Commands\ECommandState.cs" />
+    <Compile Include="EndPoints\Commands\EProcessingStrategy.cs" />
+    <Compile Include="EndPoints\Commands\ICommand.cs" />
+    <Compile Include="EndPoints\Commands\ICommandContext.cs" />
+    <Compile Include="EndPoints\Commands\ICommandProxy.cs" />
+    <Compile Include="EndPoints\Commands\ICommandsFactory.cs" />
+    <Compile Include="EndPoints\StringMessages\IStringMessageReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\IStringMessageSender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\IStringMessagesFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\StringMessageEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\StringMessagesFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\StringMessageReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\StringMessageSender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringMessages\_NamespaceDoc.cs" />
+    <Compile Include="EndPoints\StringMessages\IDuplexStringMessageSender.cs" />
+    <Compile Include="EndPoints\StringMessages\IDuplexStringMessagesFactory.cs" />
+    <Compile Include="EndPoints\StringMessages\IDuplexStringMessageReceiver.cs" />
+    <Compile Include="EndPoints\StringMessages\DuplexStringMessageSender.cs" />
+    <Compile Include="EndPoints\StringMessages\StringRequestReceivedEventArgs.cs" />
+    <Compile Include="EndPoints\StringMessages\DuplexStringMessagesFactory.cs" />
+    <Compile Include="EndPoints\StringMessages\DuplexStringMessageReceiver.cs" />
+    <Compile Include="EndPoints\StringMessages\StringResponseReceivedEventArgs.cs" />
+    <Compile Include="EndPoints\TypedMessages\ITypedMessageReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\ITypedMessageSender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\ITypedMessagesFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\_NamespaceDoc.cs" />
+    <Compile Include="EndPoints\TypedMessages\TypedMessageReceivedEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\TypedMessageReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\TypedMessageSender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\TypedMessagesFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedMessages\IDuplexTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\IDuplexTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\IDuplexTypedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedMessages\DuplexTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\TypedRequestReceivedEventArgs.cs" />
+    <Compile Include="EndPoints\TypedMessages\DuplexTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\DuplexTypedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedMessages\TypedResponseReceivedEventArgs.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\ITypedSequencedMessageReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\ITypedSequencedMessageSender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\ITypedSequencedMessagesFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\_NamespaceDoc.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedMessageFragment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedSequencedMessagesFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedSequencedMessageReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedSequencedMessageSender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedSeuencedMessageReceivedEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedSequencedMessages\IDuplexTypedSequencedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\IDuplexTypedSequencedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\IDuplexTypedSequencedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\RequestMessageFragment.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\ResponseMessageFragment.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\DuplexTypedSequencedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedSequencedRequestReceivedEventArgs.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\DuplexTypedSequencedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\DuplexTypedSequencedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedSequencedMessages\TypedSequencedResponseReceivedEventArgs.cs" />
+    <Compile Include="Infrastructure\Attachable\AttachableDuplexInputChannelBase.cs" />
+    <Compile Include="Infrastructure\Attachable\AttachableDuplexOutputChannelBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Infrastructure\Attachable\IAttachableDuplexInputChannel.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableDuplexOutputChannel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Infrastructure\Attachable\IAttachableMultipleDuplexInputChannels.cs" />
+    <Compile Include="Infrastructure\Attachable\_NamespaceDoc.cs" />
+    <Compile Include="Infrastructure\ConnectionProvider\ConnectionProvider.cs" />
+    <Compile Include="Infrastructure\ConnectionProvider\ConnectionProviderFactory.cs" />
+    <Compile Include="Infrastructure\ConnectionProvider\IConnectionProvider.cs" />
+    <Compile Include="Infrastructure\ConnectionProvider\IConnectionProviderFactory.cs" />
+    <Compile Include="Infrastructure\Attachable\AttachableInputChannelBase.cs" />
+    <Compile Include="Infrastructure\Attachable\AttachableOutputChannelBase.cs" />
+    <Compile Include="Infrastructure\ConnectionProvider\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpDuplexOutputChannel_Silverlight.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpInputChannel.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpInputChannelBase.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputChannel.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputChannel_Silverlight.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\ServerUri_Silverlight.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\ChannelMessageEventArgs.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableInputChannel.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableMultipleInputChannels.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableMultipleOutputChannels.cs" />
+    <Compile Include="Infrastructure\Attachable\IAttachableOutputChannel.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\DuplexChannelMessageEventArgs.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\IDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\IDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\IInputChannel.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\IMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\IOutputChannel.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\ResponseReceiverEventArgs.cs" />
+    <Compile Include="MessagingSystems\MessagingSystemBase\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\ListeningInstance.cs" />
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeInputChannel.cs" />
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeOutputChannel.cs" />
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryInputChannel.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryOutputChannel.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\ILocalMessageReceiver.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\ILocalMessageSender.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\ILocalSenderReceiverFactory.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightFragmentMessage.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputChannel.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightLocalMessageReceiver.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightLocalMessageSender.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightLocalSenderReceiverFactory.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputChannel.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\TestingLocalMessageReceiver.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\TestingLocalMessageSender.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\TestingLocalSenderReceiverFactory.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IMessagingSystemBase.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IMessagingProvider.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\MessageWithResponseReceiverId.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SimpleDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SimpleDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SimpleInputChannel.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SimpleMessagingSystem.cs" />
+    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SimpleOutputChannel.cs" />
+    <Compile Include="MessagingSystems\SynchronousMessagingSystem\SynchronousMessagingProvider.cs" />
+    <Compile Include="MessagingSystems\SynchronousMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SynchronousMessagingSystem\SynchronousMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientNegotiateFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientSslFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ISecurityFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ServerNegotiateFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ServerSslFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpDuplexOutputChannel_Silverlight.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpInputChannel.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpInputChannelBase.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputChannel.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputChannel_Silverlight.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpPolicyServer.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\ThreadMessagingSystem\ThreadMessagingSystemFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataProcessing\MessageQueueing\WorkingThread.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\ThreadMessagingSystem\ThreadMessagingProvider.cs" />
+    <Compile Include="MessagingSystems\ThreadMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\ThreadPoolMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\ThreadPoolMessagingProvider.cs" />
+    <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\Bridge\Bridge.cs" />
+    <Compile Include="Nodes\Bridge\BridgeFactory.cs" />
+    <Compile Include="Nodes\Bridge\DuplexBridge.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Bridge\IBridge.cs" />
+    <Compile Include="Nodes\Bridge\IBridgeFactory.cs" />
+    <Compile Include="Nodes\Bridge\IDuplexBridge.cs" />
+    <Compile Include="Nodes\Bridge\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\Broker\DuplexBroker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\DuplexBrokerClient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\DuplexBrokerFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\BrokerNotifyMessage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\BrokerMessageReceivedEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\BrokerRequestMessage.cs" />
+    <Compile Include="Nodes\Broker\IDuplexBroker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\IDuplexBrokerClient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\IDuplexBrokerFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Broker\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\ChannelUnwrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\ChannelWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\ChannelWrapperFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\DuplexChannelUnwrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\DuplexChannelWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\IChannelUnwrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\IChannelWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\IChannelWrapperFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\IDuplexChannelUnwrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\IDuplexChannelWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\ChannelWrapper\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Dispatcher\Dispatcher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Dispatcher\DispatcherFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Dispatcher\DuplexDispatcher.cs" />
+    <Compile Include="Nodes\Dispatcher\DuplexDispatcherFactory.cs" />
+    <Compile Include="Nodes\Dispatcher\IDispatcher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Dispatcher\IDispatcherFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Dispatcher\IDuplexDispatcher.cs" />
+    <Compile Include="Nodes\Dispatcher\IDuplexDispatcherFactory.cs" />
+    <Compile Include="Nodes\Dispatcher\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\LoadBalancer\ILoadBalancer.cs" />
+    <Compile Include="Nodes\LoadBalancer\ILoadBalancerFactory.cs" />
+    <Compile Include="Nodes\LoadBalancer\RoundRobinBalancer.cs" />
+    <Compile Include="Nodes\LoadBalancer\RoundRobinBalancerFactory.cs" />
+    <Compile Include="Nodes\LoadBalancer\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\Router\DuplexRouter.cs" />
+    <Compile Include="Nodes\Router\DuplexRouterFactory.cs" />
+    <Compile Include="Nodes\Router\IDuplexRouter.cs" />
+    <Compile Include="Nodes\Router\IDuplexRouterFactory.cs" />
+    <Compile Include="Nodes\Router\IRouter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Router\IRouterFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Router\Router.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Router\RouterFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\Router\_NamespaceDoc.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemCollections\HashSet.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EneterMessagingFrameworkKey.pfx" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

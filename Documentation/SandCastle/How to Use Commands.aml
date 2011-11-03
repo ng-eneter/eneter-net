@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="e8279fcd-7c51-463e-8708-07738a89e25e" revisionNumber="1">
+  <developerHowToDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--
+    <summary>
+      <para>Optional summary abstract</para>
+    </summary>
+    -->
+    <introduction>
+      <para>
+      The example shows how to use commands to execute, pause, resume or cancel requests.
+      </para>
+      <markup>
+    	<img src="../media/CommandCommunication.gif" width="100%"/>
+      </markup>
+    </introduction>
+    <!-- Optional procedures followed by optional code example but must have
+         at least one procedure or code example -->
+    
+    <codeExample>
+    The command receiver shows the implementation of a method performing the command.
+    The method is called to perform the command. It uses the command context
+    to check requests (i.e. pause, resume, cancel) and to response the command state.
+    <code language="C#">
+using System;
+using System.Threading;
+using Eneter.Messaging.DataProcessing.Sequencing;
+using Eneter.Messaging.EndPoints.Commands;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+
+namespace WorkingThread
+{
+    internal class CommandReceiver
+    {
+        public CommandReceiver()
+        {
+            // Create command.
+            ICommandsFactory aCommandsFactory = new CommandsFactory();
+            myCommand = aCommandsFactory.CreateCommand&lt;int, bool&gt;(CommandProcessingMethod, EProcessingStrategy.SingleThread);
+        }
+
+        // Starts listening to commands.
+        public void StartCommandReceiver(IDuplexInputChannel duplexInputChannel)
+        {
+            // Attach the duplex input channel to the command - the command starts the listening.
+            myCommand.AttachDuplexInputChannel(duplexInputChannel);
+        }
+
+        // Stops listening.
+        public void StopCommandReceiver()
+        {
+            // Detach the input channel from the command.
+            // Note: If the input channel is not detached the thread processing command requests would leak
+            //       and prevent the closing the application.
+            myCommand.DetachDuplexInputChannel();
+        }
+
+        // This method is called when the command is executed.
+        private void CommandProcessingMethod(ICommandContext&lt;int, bool&gt; commandContext)
+        {
+            try
+            {
+                // Read the input data.
+                DataFragment&lt;bool&gt; anInputDataFragment = commandContext.DequeueInputData();
+                bool anInputData = anInputDataFragment.Data;
+
+                for (int i = 0; i &lt; 100; ++i)
+                {
+                    // Simulate some work.
+                    Thread.Sleep(100);
+
+                    // Wait if pause is requested.
+                    if (commandContext.CurrentRequest == ECommandRequest.Pause)
+                    {
+                        // Notify the command proxy that the command was paused.
+                        commandContext.ResponsePause();
+
+                        // Wait until resumed or canceled.
+                        commandContext.WaitIfPause();
+                    }
+
+                    // If the cancel is requested then stop the command.
+                    if (commandContext.CurrentRequest == ECommandRequest.Cancel)
+                    {
+                        // Notify the command proxy that the command was canceled.
+                        commandContext.ResponseCancel();
+                        return;
+                    }
+
+                    // Notify the progress.
+                    ECommandState aState = (i == 99) ? ECommandState.Completed : ECommandState.InProgress;
+                    commandContext.Response(aState, i + 1);
+                }
+            }
+            catch (Exception err)
+            {
+                commandContext.ResponseFailure(err.Message);
+            }
+        }
+
+        private ICommand&lt;int, bool&gt; myCommand;
+    }
+}
+    </code>
+    
+    The command proxy executes the command. It has a possibility to
+    pause, resume or cancel the running command.
+    <code language="C#">
+using System;
+using System.Windows.Forms;
+using Eneter.Messaging.EndPoints.Commands;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
+
+namespace WorkingThread
+{
+    public partial class myCommandForm : Form
+    {
+        public myCommandForm()
+        {
+            InitializeComponent();
+
+            // Create command proxy
+            ICommandsFactory aCommandsFactory = new CommandsFactory();
+            myCommandProxy = aCommandsFactory.CreateCommandProxy&lt;int, bool&gt;();
+            myCommandProxy.CommandResponseReceived += OnCommandResponseReceived;
+
+            // Create messaging system to send messages to the command.
+            // Note: It can be any messaging system but in this case is the fastest one is Synchronous.
+            IMessagingSystemFactory aMessaging = new SynchronousMessagingSystemFactory();
+            
+            // Create the input channel that will be used by the command to receive requests.
+            IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("MyChannelId");
+
+            // Create the output channel that will be used by the command proxy to invoke
+            // requests in another working thread.
+            IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("MyChannelId");
+
+            // Start the command receiver.
+            myCommandReceiver = new CommandReceiver();
+            myCommandReceiver.StartCommandReceiver(anInputChannel);
+
+            // Attach the output channel to the command proxy.
+            myCommandProxy.AttachDuplexOutputChannel(anOutputChannel);
+        }
+
+        // Is called when the form was closed.
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
+        {
+            // Detach the output channel from the command proxy.
+            myCommandProxy.DetachDuplexOutputChannel();
+
+            // Stop the command receiver.
+            myCommandReceiver.StopCommandReceiver();
+        }
+
+        private void OnExecuteButtonClick(object sender, EventArgs e)
+        {
+            // Disable Execute
+            myExecuteTaskButton.Enabled = false;
+
+            // Enable Pause, Resume and Cancel
+            myPauseButton.Enabled = true;
+            myResumeButton.Enabled = true;
+            myCancelButton.Enabled = true;
+
+            // Execute the command
+            myCommandProxy.Execute("MyCommandId");
+        }
+
+        private void OnPauseButtonClick(object sender, EventArgs e)
+        {
+            myCommandProxy.Pause("MyCommandId");
+        }
+
+        private void OnResumeButtonClick(object sender, EventArgs e)
+        {
+            myCommandProxy.Resume("MyCommandId");
+        }
+
+        private void OnCancelButtonClick(object sender, EventArgs e)
+        {
+            myCommandProxy.Cancel("MyCommandId");
+        }
+
+
+        // The method is called when the command proxy receives a response from the command.
+        private void OnCommandResponseReceived(object sender, CommandResponseReceivedEventArgs&lt;int&gt; e)
+        {
+            // We need to set UI controls, therefore we must do it in the main UI thread.
+            InvokeInUIThread(() =&gt;
+                {
+                    if (e.CommandState == ECommandState.InProgress)
+                    {
+                        myProgressBar.Value = e.ReturnData;
+                    }
+                    else if (e.CommandState == ECommandState.Canceled ||
+                             e.CommandState == ECommandState.Completed)
+                    {
+                        myProgressBar.Value = 0;
+
+                        // Disable Pause, Resume and Cancel
+                        myPauseButton.Enabled = false;
+                        myResumeButton.Enabled = false;
+                        myCancelButton.Enabled = false;
+
+                        // Enable Execute
+                        myExecuteTaskButton.Enabled = true;
+                    }
+                });
+        }
+
+        // Helper method to invoke UI always in the correct thread.
+        private void InvokeInUIThread(Action action)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(action);
+            }
+            else
+            {
+                action.Invoke();
+            }
+        }
+
+        private ICommandProxy&lt;int, bool&gt; myCommandProxy;
+
+        // Represents the logic of the command. It can be executed, paused, resumed or canceled.
+        private CommandReceiver myCommandReceiver;
+    }
+}
+    </code>
+    
+    
+    </codeExample>
+    <!-- <buildInstructions>Optional instructions for building a
+         code example.</buildInstructions> -->
+    <!-- <robustProgramming>Optional discussion of error handling and other
+         issues related to writing solid code.</robustProgramming> -->
+    <!-- <security>Optional discussion of security issues.</security> -->
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID">Link text</link>
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerHowToDocument>
+</topic>

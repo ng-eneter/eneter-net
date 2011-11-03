@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="c61300a1-46a8-4978-b403-aa5f6e8b8548" revisionNumber="1">
+  <developerHowToDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--
+    <summary>
+      <para>Optional summary abstract</para>
+    </summary>
+    -->
+    <introduction>
+      <para>
+      The channel wrapper and unwrapper are components allowing to send and receive various type
+      of messages via one channel (i.e. on one address).
+      </para>
+      <para>
+      The example bellow implements a simple calculator service receiving four types of messages:
+      'Sum', 'Sub', 'Mul' and 'Div'.
+      </para>
+      <para>
+      The channel wrapper has attached more input channels and one output channel. The symmetric component
+	  the channel unwrapper has attached one input channel and more output channels.
+	  When the wrapper receives a message (from one of input channels) it wraps the message preserving the original channel id
+	  and forwards it to the output channel. The unwrapper on the other side receives the message, unwraps it and
+	  base on the preserved channel id it forwards the message to the correct output channel.
+      </para>
+      <markup>
+		<img src="../media/WrapperRequestResponseCommunication.gif" width="100%"/>
+	  </markup>
+    </introduction>
+    <!-- Optional procedures followed by optional code example but must have
+         at least one procedure or code example -->
+    
+    <codeExample>
+    
+    Common data:
+    <code language="C#">
+// Input parameters for the calculator
+public class CalculatorInputData
+{
+    public double Number1 { get; set; }
+    public double Number2 { get; set; }
+}
+
+// Return data from the calculator.
+public class CalculatorOutputData
+{
+    public double Result { get; set; }
+} 
+    </code>
+    
+    Channel wrapper side:
+    <code language="C#">
+using System;
+using System.Windows.Forms;
+using CommonCalculator2Data;
+using Eneter.Messaging.EndPoints.Commands;
+using Eneter.Messaging.Infrastructure.ConnectionProvider;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+using Eneter.Messaging.Nodes.ChannelWrapper;
+
+namespace CalculatorClient2
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+
+            // Proxies will be connected with duplex channel wrapper via the fast synchronous messaging.
+            IMessagingSystemFactory anInternalMessaging = new SynchronousMessagingSystemFactory();
+
+
+            // Let's use this helper class to minimize coding to connect mothod proxies with the duplex channel wrapper.
+            IConnectionProviderFactory aConnectionProviderFactory = new ConnectionProviderFactory();
+            IConnectionProvider aConnectionProvider = aConnectionProviderFactory.CreateConnectionProvider(anInternalMessaging);
+
+            // Create the duplex channel wrapper.
+            IChannelWrapperFactory aChannelWrapperFactory = new ChannelWrapperFactory();
+            myDuplexChannelWrapper = aChannelWrapperFactory.CreateDuplexChannelWrapper();
+
+           
+            // Create method proxies and connect them to the duplex channel wrapper.
+            ICommandsFactory aCommandsFactory = new CommandsFactory();
+
+            // Proxy for sum of two numbers.
+            mySumProxy = aCommandsFactory.CreateCommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            mySumProxy.CommandResponseReceived += OnResultResponse;
+            aConnectionProvider.Connect(myDuplexChannelWrapper, mySumProxy, "Sum");
+
+            // Proxy for subtraction of two numbers.
+            mySubProxy = aCommandsFactory.CreateCommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            mySubProxy.CommandResponseReceived += OnResultResponse;
+            aConnectionProvider.Connect(myDuplexChannelWrapper, mySubProxy, "Sub");
+
+            // Proxy for multiplying of two numbers.
+            myMulProxy = aCommandsFactory.CreateCommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            myMulProxy.CommandResponseReceived += OnResultResponse;
+            aConnectionProvider.Connect(myDuplexChannelWrapper, myMulProxy, "Mul");
+
+            // Proxy for dividing of two numbers.
+            myDivProxy = aCommandsFactory.CreateCommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            myDivProxy.CommandResponseReceived += OnResultResponse;
+            aConnectionProvider.Connect(myDuplexChannelWrapper, myDivProxy, "Div");
+
+            // Create output channel for sending requests.
+            // Let's connect via Tcp
+            IMessagingSystemFactory aMessagingSystem = new TcpMessagingSystemFactory();
+            IDuplexOutputChannel anOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("tcp://127.0.0.1:8091/");
+
+            // Attach the duplex channel wrapper with the outside world.
+            // Note: The server will have the coresponding unwrapper.
+            myDuplexChannelWrapper.AttachDuplexOutputChannel(anOutputChannel);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            // Stop listening by detaching the input channel.
+            myDuplexChannelWrapper.DetachDuplexOutputChannel();
+        }
+
+
+        private void OnResultResponse(object sender, CommandResponseReceivedEventArgs&lt;CalculatorOutputData&gt; e)
+        {
+            // If everything is ok then display the result.
+            if (e.ReceivingError == null)
+            {
+                // The response does not come in main UI thread.
+                // Therefore we should transfer it to the main UI thread.
+                InvokeInUIThread(() =&gt; ResultLabel.Text = e.ReturnData.Result.ToString() );
+            }
+        }
+
+        // Handles click on the claculate button.
+        private void CalculateButton_Click(object sender, EventArgs e)
+        {
+            // Prepare input data for the calculator.
+            CalculatorInputData anInputForCalculator = new CalculatorInputData();
+            anInputForCalculator.Number1 = double.Parse(Number1TextBox.Text);
+            anInputForCalculator.Number2 = double.Parse(Number2TextBox.Text);
+
+            // Invoke request to the calculator.
+            mySumProxy.Execute(anInputForCalculator);
+        }
+
+        private void SubtractButton_Click(object sender, EventArgs e)
+        {
+            // Prepare input data for the calculator.
+            CalculatorInputData anInputForCalculator = new CalculatorInputData();
+            anInputForCalculator.Number1 = double.Parse(Number1TextBox.Text);
+            anInputForCalculator.Number2 = double.Parse(Number2TextBox.Text);
+
+            // Invoke request to the calculator.
+            mySubProxy.Execute(anInputForCalculator);
+        }
+
+        private void MultiplyButton_Click(object sender, EventArgs e)
+        {
+            // Prepare input data for the calculator.
+            CalculatorInputData anInputForCalculator = new CalculatorInputData();
+            anInputForCalculator.Number1 = double.Parse(Number1TextBox.Text);
+            anInputForCalculator.Number2 = double.Parse(Number2TextBox.Text);
+
+            // Invoke request to the calculator.
+            myMulProxy.Execute(anInputForCalculator);
+        }
+
+        private void DivideButton_Click(object sender, EventArgs e)
+        {
+            // Prepare input data for the calculator.
+            CalculatorInputData anInputForCalculator = new CalculatorInputData();
+            anInputForCalculator.Number1 = double.Parse(Number1TextBox.Text);
+            anInputForCalculator.Number2 = double.Parse(Number2TextBox.Text);
+
+            // Invoke request to the calculator.
+            myDivProxy.Execute(anInputForCalculator);
+        }
+
+        // Helper method to invoke UI always in the correct thread.
+        private void InvokeInUIThread(Action action)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(action);
+            }
+            else
+            {
+                action.Invoke();
+            }
+        }
+
+
+        private IDuplexChannelWrapper myDuplexChannelWrapper;
+
+        private ICommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt; mySumProxy;
+        private ICommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt; mySubProxy;
+        private ICommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt; myMulProxy;
+        private ICommandProxy&lt;CalculatorOutputData, CalculatorInputData&gt; myDivProxy;
+    }
+}
+    </code>
+    
+    Channel unwrapper side:
+    <code language="C#">
+using System;
+using CommonCalculator2Data;
+using Eneter.Messaging.EndPoints.Commands;
+using Eneter.Messaging.Infrastructure.ConnectionProvider;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+using Eneter.Messaging.MessagingSystems.ThreadMessagingSystem;
+using Eneter.Messaging.Nodes.ChannelWrapper;
+
+namespace ServerCalculator2
+{
+    internal class Calculator
+    {
+        public Calculator()
+        {
+            // Every command will work in its own thread.
+            // So that different requests are not blocked.
+            IMessagingSystemFactory anInternalMessaging = new ThreadMessagingSystemFactory();
+
+            // Create the duplex channel unwrapper.
+            // Note: It needs to know the messaging system that shall be used to create duplex output channels
+            //       for unwrapped messages.
+            IChannelWrapperFactory aChannelWrapperFactory = new ChannelWrapperFactory();
+            myDuplexChannelUnwrapper = aChannelWrapperFactory.CreateDuplexChannelUnwrapper(anInternalMessaging);
+
+            // Let's use this helper class to minimize coding to attach methods to duplex input channels.
+            IConnectionProviderFactory aConnectionProviderFactory = new ConnectionProviderFactory();
+            IConnectionProvider aConnectionProvider = aConnectionProviderFactory.CreateConnectionProvider(anInternalMessaging);
+
+            // Factory to create commands.
+            ICommandsFactory aCommandFactory = new CommandsFactory();
+
+            // Create method to sum two numbers.
+            mySumCmd = aCommandFactory.CreateCommand&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            mySumCmd.ExecuteRequested += OnSumExecuted;
+            aConnectionProvider.Attach(mySumCmd, "Sum");
+
+            // Command for subtraction.
+            mySubtractCmd = aCommandFactory.CreateCommand&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            mySubtractCmd.ExecuteRequested += OnSubExecuted;
+            aConnectionProvider.Attach(mySubtractCmd, "Sub");
+
+            // Command for multiplying.
+            myMultiplyCmd = aCommandFactory.CreateCommand&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            myMultiplyCmd.ExecuteRequested += OnMulExecuted;
+            aConnectionProvider.Attach(myMultiplyCmd, "Mul");
+
+            // Command for divifding
+            myDivideCmd = aCommandFactory.CreateCommand&lt;CalculatorOutputData, CalculatorInputData&gt;();
+            myDivideCmd.ExecuteRequested += OnDivExecuted;
+            aConnectionProvider.Attach(myDivideCmd, "Div");
+        }
+
+
+        public void StartCalculatorService()
+        {
+            // Let's use Tcp for the communication.
+            IMessagingSystemFactory aServiceMessagingSystem = new TcpMessagingSystemFactory();
+
+            // Create input channel of the calculator (it represents the address of the service)
+            IDuplexInputChannel aGlobalInputChannel = aServiceMessagingSystem.CreateDuplexInputChannel("tcp://127.0.0.1:8091/");
+
+            // Attach the input channel to the unwrapper and start to listening.
+            myDuplexChannelUnwrapper.AttachDuplexInputChannel(aGlobalInputChannel);
+        }
+
+        // It is called when a request to sum two numbers was received.
+        private void OnSumExecuted(object sender, CommandExecuteRequestedEventArgs&lt;CalculatorInputData&gt; e)
+        {
+            CalculatorOutputData aReturn = new CalculatorOutputData();
+            aReturn.Result = e.InputData.Number1 + e.InputData.Number2;
+
+            Console.WriteLine("{0} + {1} = {2}", e.InputData.Number1, e.InputData.Number2, aReturn.Result);
+
+            mySumCmd.Response(e.CommandProxyId, ECommandState.Completed, aReturn);
+        }
+
+        // It is called when a request to subtract two numbers was received.
+        private void OnSubExecuted(object sender, CommandExecuteRequestedEventArgs&lt;CalculatorInputData&gt; e)
+        {
+            CalculatorOutputData aReturn = new CalculatorOutputData();
+            aReturn.Result = e.InputData.Number1 - e.InputData.Number2;
+
+            Console.WriteLine("{0} - {1} = {2}", e.InputData.Number1, e.InputData.Number2, aReturn.Result);
+
+            mySumCmd.Response(e.CommandProxyId, ECommandState.Completed, aReturn);
+        }
+
+        // It is called when a request to multiply two numbers was received.
+        private void OnMulExecuted(object sender, CommandExecuteRequestedEventArgs&lt;CalculatorInputData&gt; e)
+        {
+            CalculatorOutputData aReturn = new CalculatorOutputData();
+            aReturn.Result = e.InputData.Number1 * e.InputData.Number2;
+
+            Console.WriteLine("{0} x {1} = {2}", e.InputData.Number1, e.InputData.Number2, aReturn.Result);
+
+            mySumCmd.Response(e.CommandProxyId, ECommandState.Completed, aReturn);
+        }
+
+        // It is called when a request to divide two numbers was received.
+        private void OnDivExecuted(object sender, CommandExecuteRequestedEventArgs&lt;CalculatorInputData&gt; e)
+        {
+            CalculatorOutputData aReturn = new CalculatorOutputData();
+            aReturn.Result = e.InputData.Number1 / e.InputData.Number2;
+
+            Console.WriteLine("{0} / {1} = {2}", e.InputData.Number1, e.InputData.Number2, aReturn.Result);
+
+            mySumCmd.Response(e.CommandProxyId, ECommandState.Completed, aReturn);
+        }
+
+
+        // Block is the helper to create the infrastructure with less code.
+        private IDuplexChannelUnwrapper myDuplexChannelUnwrapper;
+
+        private ICommand&lt;CalculatorOutputData, CalculatorInputData&gt; mySumCmd;
+        private ICommand&lt;CalculatorOutputData, CalculatorInputData&gt; mySubtractCmd;
+        private ICommand&lt;CalculatorOutputData, CalculatorInputData&gt; myMultiplyCmd;
+        private ICommand&lt;CalculatorOutputData, CalculatorInputData&gt; myDivideCmd;
+    }
+}
+    </code>
+    
+    </codeExample>
+    <!-- <buildInstructions>Optional instructions for building a
+         code example.</buildInstructions> -->
+    <!-- <robustProgramming>Optional discussion of error handling and other
+         issues related to writing solid code.</robustProgramming> -->
+    <!-- <security>Optional discussion of security issues.</security> -->
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID">Link text</link>
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerHowToDocument>
+</topic>

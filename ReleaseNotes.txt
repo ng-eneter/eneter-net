@@ -1,0 +1,89 @@
+Eneter.Messaging.Framework
+
+Version 3.0
+Release Notes
+
+Supported Platforms:
+
+    * .Net 3.5, .Net 4.0, Silverlight 3, Silverlight 4, Windows Phone 7 and Mono 2.6.4
+
+New Features:
+
+    * Interprocess communication via shared memory (faster than Named Pipes)
+    * Named Pipes based messaging supports security settings.
+    * GZip Serializer to compress long messages
+    * Clients can use regular expressions to subscribe for messages in the broker
+    * Load Balancer for distributing the workload
+    * Significantly improved tracing
+
+Changes in behavior:
+
+    * The Broker is not compatible with brokers from previous vesrions.
+      The API is still the same, but the messages subscribing clients were modified in order to support regular expressions.
+
+Fixed bugs:
+    * 0000012 - DataContractXmlStringSerializer in Silverlight is not compatible with DataContractXmlStringSerializer in desktop application.
+    * 0000011 - DuplexBrokerClient incorectly detects if the duplex output channel is attached.
+    * 0000009 - Uri address cannot end with '/' in case of named pipes.
+    * 0000008 - Opening of HTTP connection sometimes hangs on Windows Phone 7.
+
+Silverlight 3, Silverlight 4
+
+    * Named Pipes are not supported
+    * TCP and HTTP listener is not supported (only receiving of response messages is supported)
+    * If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
+    * SSL is not supported for the TCP communication
+    * BinarySerializer is not supported
+    * Encrypted Rijndael serializer is not supported
+    * GZip serializer is not supported
+    * Load Balancer is not supported
+
+Windows Phone 7
+
+    * Named Pipes are not supported
+    * TCP is not supported
+    * HTTP listener is not supported (only receiving of response messages is supported)
+    * BinarySerializer is not supported
+    * Encrypted Rijndael serializer is not supported
+    * GZip serializer is not supported
+    * Load Balancer is not supported
+
+Mono 2.6.4
+
+    * Named Pipes are not supported
+    * SSL is not supported
+    * DataContractXmlStringSerializer is not supported
+    * BinarySerializer is not supported
+    * Mono platform is less stable as .Net platform
+    * GZip serializer is not supported
+
+
+Version 2.0
+Release Notes
+
+Supported Platforms:
+
+    * .Net 3.5, .Net 4.0, Silverlight 3 and Silverlight 4
+    * new supported platforms Windows Phone 7 and Mono 2.6.4
+
+New Features:
+
+    * Connection monitoring
+    * Buffering of sent messages in case of a disconnection
+    * Automatic reconnect in case of a disconnection
+    * Acknowledged communication (when the message is delivered the receiver sends the acknowledge message)
+    * TCP based messaging supports SSL
+    * HTTP policy server added for the communication between the Silverlight application and the HTTP server
+    * Encrypted serialization (AES and Rijndael encryption)
+    * Service can disconnect a certain client
+
+Changes in behavior:
+
+    * If the serializer is not specified, then XmlStringSerializer is always used by default.
+      The version 1.0 used BinarySerializer by default in .Net environment and XmlStringSerializer in Silverlight.
+    * If the duplex output channel is attached, it does not mean, the channel is listening to response messages.
+
+Fixed bugs:
+    * 0000007 - Memory leak in Silverlight client when the Tcp connection is closed.
+    * 0000006 - The application sending messages via Tcp is not closed properly if the.
+
