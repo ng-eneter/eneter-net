@@ -61,8 +61,28 @@
       <PlugInConfig id="Additional Content Only" enabled="False">
         <configuration />
       </PlugInConfig>
-<PlugInConfig id="Version Builder" enabled="True"><configuration><currentProject label=".NET" version=".NET 4.5, .NET 4.0" ripOldApis="False" /><versions><version label=".NET" version=".NET 3.5" helpFileProject="OtherPlatforms\Net35.shfbproj" /><version label="Compact Framework" version="Compact Framework 2.0" helpFileProject="OtherPlatforms\CompactFramework20.shfbproj" /><version label="Compact Framework" version="Compact Framework 3.5" helpFileProject="OtherPlatforms\CompactFramework35.shfbproj" /><version label="Mono" version="Mono 2.6.4" helpFileProject="OtherPlatforms\Mono264.shfbproj" /><version label="Silverlight" version="Silverlight 3" helpFileProject="OtherPlatforms\Silverlight3.shfbproj" /><version label="Silverlight" version="Silverlight 4" helpFileProject="OtherPlatforms\Silverlight4.shfbproj" /><version label="Silverlight" version="Silverlight 5" helpFileProject="OtherPlatforms\Silverlight5.shfbproj" /><version label="Windows Phone" version="Windows Phone 7" helpFileProject="OtherPlatforms\Phone7.shfbproj" /><version label="Windows Phone" version="Windows Phone 7.1" helpFileProject="OtherPlatforms\Phone71.shfbproj" /></versions></configuration></PlugInConfig>
-<PlugInConfig id="Hierarchical Table of Contents" enabled="True"><configuration><toc minParts="3" insertBelow="False" /></configuration></PlugInConfig></PlugInConfigurations>
+      <PlugInConfig id="Version Builder" enabled="True">
+        <configuration>
+          <currentProject label=".NET" version=".NET 4.5, .NET 4.0" ripOldApis="False" />
+          <versions>
+            <version label=".NET" version=".NET 3.5" helpFileProject="OtherPlatforms\Net35.shfbproj" />
+            <version label="Compact Framework" version="Compact Framework 2.0" helpFileProject="OtherPlatforms\CompactFramework20.shfbproj" />
+            <version label="Compact Framework" version="Compact Framework 3.5" helpFileProject="OtherPlatforms\CompactFramework35.shfbproj" />
+            <version label="Mono" version="Mono 2.6.4" helpFileProject="OtherPlatforms\Mono264.shfbproj" />
+            <version label="Silverlight" version="Silverlight 3" helpFileProject="OtherPlatforms\Silverlight3.shfbproj" />
+            <version label="Silverlight" version="Silverlight 4" helpFileProject="OtherPlatforms\Silverlight4.shfbproj" />
+            <version label="Silverlight" version="Silverlight 5" helpFileProject="OtherPlatforms\Silverlight5.shfbproj" />
+            <version label="Windows Phone" version="Windows Phone 7" helpFileProject="OtherPlatforms\Phone7.shfbproj" />
+            <version label="Windows Phone" version="Windows Phone 7.1" helpFileProject="OtherPlatforms\Phone71.shfbproj" />
+          </versions>
+        </configuration>
+      </PlugInConfig>
+      <PlugInConfig id="Hierarchical Table of Contents" enabled="True">
+        <configuration>
+          <toc minParts="3" insertBelow="False" />
+        </configuration>
+      </PlugInConfig>
+    </PlugInConfigurations>
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
     <HtmlHelp2xCompilerPath />
@@ -93,6 +113,10 @@
     <IncludeStopWordList>True</IncludeStopWordList>
     <RootNamespaceTitle>Eneter Library</RootNamespaceTitle>
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
+    <SccProjectName>Svn</SccProjectName>
+    <SccProvider>SubversionScc</SccProvider>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccLocalPath>Svn</SccLocalPath>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional

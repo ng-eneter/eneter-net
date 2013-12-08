@@ -7,10 +7,10 @@
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
-"SccProjectName" = "8:"
-"SccLocalPath" = "8:"
-"SccAuxPath" = "8:"
-"SccProvider" = "8:"
+"SccProjectName" = "8:Svn"
+"SccLocalPath" = "8:Svn"
+"SccAuxPath" = "8:Svn"
+"SccProvider" = "8:SubversionScc"
     "Hierarchy"
     {
         "Entry"
@@ -703,14 +703,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0B0A8610E3444395B020F60B07A02A3A"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Debug\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -734,14 +729,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0B8205635A1B4982B9039592E3576B76"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight3\\Debug\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -828,11 +818,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0E2E58A3136745B796FF0A7137918F70"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.CF.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Release\\Eneter.Messaging.Framework.CF.dll"
             "TargetName" = "8:"
@@ -859,11 +844,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0E977859D09B44D7B4E5E816A08DFB5C"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.CF.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework35\\Debug\\Eneter.Messaging.Framework.CF.dll"
             "TargetName" = "8:"
@@ -890,11 +870,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0EC28F614D444D78BDFEED9D7983AC02"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Phone.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone71\\Release\\Eneter.Messaging.Framework.Phone.dll"
             "TargetName" = "8:"
@@ -941,11 +916,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_15936F18AD164E22B744EE4DAE5F2039"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net40\\Release\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -992,11 +962,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_19D07B5F70A2411BA113C0F7CAA2EA15"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net45\\Release\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -1260,14 +1225,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_4EF1EDD31C624188B11F49C2D557F478"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net40\\Debug\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -1394,11 +1354,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_5A5252413F1E4343963430B8C2979562"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Release\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -1422,14 +1377,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_5C63F5F030964029BB101A4F68E2C055"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Phone.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone71\\Debug\\Eneter.Messaging.Framework.Phone.dll"
             "TargetName" = "8:"
@@ -1556,11 +1506,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_798F11F3D3C549C5B2EE0F97F40956FC"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight3\\Release\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -1584,14 +1529,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_7B54EE940191442D8EB00148326E7E8C"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Mono.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Mono264\\Debug\\Eneter.Messaging.Framework.Mono.dll"
             "TargetName" = "8:"
@@ -1618,11 +1558,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_7C731674FEC146DF8EC1B4DE951E393C"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Phone.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Release\\Eneter.Messaging.Framework.Phone.dll"
             "TargetName" = "8:"
@@ -1729,11 +1664,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_90CE9BCF3ABA428AB4F746AAEA10F763"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net45\\Debug\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -1777,14 +1707,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_A756B5A1134D4333BA06DE54C7E50C6C"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net35\\Debug\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -1868,14 +1793,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_B5EEB4DA440C42F580651AA2C9371038"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Debug\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -1922,11 +1842,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_C27FDCCBD8CF45358A35BDEB4ABB741D"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Mono.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Mono264\\Release\\Eneter.Messaging.Framework.Mono.dll"
             "TargetName" = "8:"
@@ -1993,11 +1908,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_CDD5C4C56ECA41D0AC5A4C920F154BCA"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Release\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -2024,11 +1934,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D36AE16CF7A04BD29A5221DD27A76130"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net35\\Release\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -2175,11 +2080,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_ED70ADD82EC74E848DA98C20CF574A82"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.CF.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Debug\\Eneter.Messaging.Framework.CF.dll"
             "TargetName" = "8:"
@@ -2206,11 +2106,6 @@
             "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_F33AB371A1734538BF4A13605AF58F55"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.CF.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework35\\Release\\Eneter.Messaging.Framework.CF.dll"
             "TargetName" = "8:"
@@ -2234,14 +2129,9 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_F5C6B2FCD4F3440C8747C5B377403C77"
-                    {
-                    "Name" = "8:Eneter.Messaging.Framework.Phone.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Debug\\Eneter.Messaging.Framework.Phone.dll"
             "TargetName" = "8:"
