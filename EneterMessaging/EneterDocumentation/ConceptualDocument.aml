@@ -1,0 +1,1383 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="539fb726-b358-41a2-bcbf-df92ada3b8da" revisionNumber="1">
+  <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <summary>
+      <para>
+      </para>
+    </summary>
+    
+    <introduction>
+      <para>
+        <literal>Eneter Messaging Framework</literal> is a cross-platform middleware offering functionality for the interprocess communication.
+      </para>
+      <para>
+        The goal of the framework is to provide a <literal>lightweight</literal> and <literal>easy to use library</literal> that will work the same way on various platforms.
+        The idea of the framework is to have well defined components that can be composed into desired communication scenarios.
+      </para>
+      <autoOutline/>
+    </introduction>
+    
+    <section address="ComponentsAndChannels">
+		<title>Components and Channels</title>
+      	<content>
+      		<para>
+            In general the framework consists of three categories of components:
+      		</para>
+          <list class="bullet">
+            <listItem><para><literal>End Points</literal> - message senders and receivers places at the beginning or at
+              the end of the communication path.
+            </para></listItem>
+            <listItem><para><literal>Communication Nodes</literal> - components that can be placed on the communication path to
+              control the routing of messages. E.g. Broker for publish-subscribe scenario, Load Balancer to control the workload,
+              Dispatcher to implement a service listening to TCP and Named Pipe at the same time.
+            </para></listItem>
+            <listItem>
+              <para>
+                <literal>Communication Channels</literal> - transport messages on the communication path.
+                  The represent a connection between communication components on the communication path.
+                They use a protocol (e.g. TCP or HTTP) or some other mechanism
+                (e.g. Silverlight Messaging or Shared Memory) to transport messages. All communication channels implement
+                same interfaces. Therefore, it is not visible to communication components what protocol or mechanism is used.
+                When you decide to change the protocol your application logic is not affected all.
+              </para>
+            </listItem>
+          </list>
+      		<para>
+      		</para>
+          <para>
+          <markup>
+      			<img src="../media/EneterComponents.gif" width="100%" title="Download" alt="Download" />
+      		</markup>
+      		</para>
+      		
+			<list class="bullet">
+			
+  				<listItem><legacyBold>End Points</legacyBold> - Components laying on ends
+  				    of the communication path.
+  				    It can be a message sender sending messages to an address or a message receiver listening to
+  				    the address to get messages.
+					<table>
+					<title>
+					Message senders/receivers:
+					</title>
+  					<tableHeader>
+    					<row>
+      					<entry>Message Type</entry>
+      					<entry>Description</entry>
+    					</row>
+  					</tableHeader>
+  					<row>
+    					<entry><link xlink:href="#StringMessages">String Messages</link></entry>
+    					<entry>
+    					Sending/receiving of text messages.
+    					Supported is one-way and request-response communication.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#TypedMessages">Typed Messages</link></entry>
+    					<entry>
+    					Sending/receiving of strongly typed messages.
+    					Supported is one-way and request-response communication.
+              It also supports reliable communication (acknowledged messages informing whether the message was delivered or not).
+    					</entry>
+  					</row>
+					</table>
+				</listItem>
+				
+  				<listItem><legacyBold>Communication Nodes</legacyBold> - Optional components located on the communication path
+  				    used to control the routing of messages.
+					<table>
+					<title>
+					Communication Nodes:
+					</title>
+  					<tableHeader>
+    					<row>
+      					<entry>Node</entry>
+      					<entry>Description</entry>
+    					</row>
+  					</tableHeader>
+  					<row>
+    					<entry><link xlink:href="#Broker">Broker</link></entry>
+    					<entry>
+    					Is intended for publish-subscribe scenarios.<br/>
+    					E.g. If a service wants to notify a state, it sends the message to the broker.
+    					The broker then forwards the message to clients subscribed for this message.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#Router">Router</link></entry>
+    					<entry>
+    					Receives messages and routes them to a different preconfigured address.
+    					</entry>
+  					</row>
+            <row>
+    					<entry><link xlink:href="#BackupRouter">Backup Router</link></entry>
+    					<entry>
+    					Routes messages to the specified backup service if the service is not available.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#Dispatcher">Dispatcher</link></entry>
+    					<entry>
+    					Receives messages and forwards them to all receivers. The message is then processed by
+    					more services in parallel.<br/>
+    					E.g. If a client needs to evaluate results from more different services.<br/>
+              E.g. If a service needs to listen to TCP, Shared Memory and WebSockets at the same time.
+              (Dispatcher listens to multiple input channels and routs everything to one output channel.)
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#LoadBalancer">Load Balancer</link></entry>
+    					<entry>
+    					Balances the workload between more computers.<br/>
+    					E.g. As the workload increases, new services (located on different computers) can be added to the pool.
+    					The load balancer then distributes the workload between services in the pool.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#ChannelWrapper">Channel Wrapper</link></entry>
+    					<entry>
+    					It receives messages (from more input channels) wraps them and forwards them through
+    					the only output channel.
+    					E.g. If the service receives various messages on the same address.
+    					If the Channel Wrapper/Unwrapper is used, then you do not need to use long <legacyItalic>if ... then</legacyItalic>
+    					statements to recognize between messages.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#ChannelUnwrapper">Channel Unwrapper</link></entry>
+    					<entry>
+    					Receives wrapped messages from the only input channel unwraps them and forwards
+    					to correct receivers.
+    					E.g. If the service receives various messages on the same address.
+    					If the Channel Wrapper/Unwrapper is used, then you do not need to use long <legacyItalic>if ... then</legacyItalic>
+    					statements to recognize between messages.
+    					</entry>
+  					</row>
+					</table>
+				</listItem>
+				
+				<listItem><legacyBold>Messaging Systems</legacyBold> - Components responsible for transferring messages across various borders.
+				    In general, the framework recognizes the interporcess communication and the communication inside the process.
+					<table>
+					<title>
+					Interprocess Communication
+					</title>
+  					<tableHeader>
+    					<row>
+      					<entry>Messaging</entry>
+      					<entry>Description</entry>
+    					</row>
+  					</tableHeader>
+  					<row>
+    					<entry><link xlink:href="#SharedMemoryMessagingSystem">Shared Memory Messaging</link></entry>
+    					<entry>Very fast messaging using the shared memory. (Shared memory is faster than named pipes.)</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#NamedPipeMessagingSystem">Named Pipe Messaging</link></entry>
+    					<entry>Delivers messages using named pipes.</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#TcpMessagingSystem">Tcp Messaging</link></entry>
+    					<entry>Delivers messages using Tcp.</entry>
+  					</row>
+            <row>
+              <entry><link xlink:href="#WebSocketMessagingSystem">Websocket Messaging</link></entry>
+              <entry>Delivers messages using Websockets.</entry>
+            </row>
+  					<row>
+    					<entry><link xlink:href="#HttpMessagingSystem">Http Messaging</link></entry>
+    					<entry>Delivers messages using Http.</entry>
+  					</row>
+            <row>
+    					<entry><link xlink:href="#UdpMessagingSystem">Udp Messaging</link></entry>
+    					<entry>Delivers messages using Udp.</entry>
+  					</row>
+            <row>
+              <entry>
+                <link xlink:href="#AndroidUsbCableMessagingSystem">Android USB Cable Messaging</link>
+              </entry>
+              <entry>Delivers messages between Android and PC connected via USB cable.</entry>
+            </row>
+					</table>
+					
+					<table>
+					<title>
+					Internal Communication
+					</title>
+  					<tableHeader>
+    					<row>
+      					<entry>Messaging</entry>
+      					<entry>Description</entry>
+    					</row>
+  					</tableHeader>
+  					<row>
+    					<entry><link xlink:href="#SilverlightMessagingSystem">Silverlight Messaging</link></entry>
+    					<entry>Delivers messages between Silverlight components with using Silverlight messaging. No message size restrictions.
+    					No sending thread restrictions.</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#SynchronousMessagingSystem">Synchronous Messaging</link></entry>
+    					<entry>
+    					Very fast messaging delivering messages synchronously in the context of the sending thread.
+    					The sender is blocked until the message is delivered and processed.
+    					This messaging is typically used when the message is sent to some local communication node
+    					(e.g. channel wrapper) from where it will be routed further.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#ThreadMessagingSystem">Thread Messaging</link></entry>
+    					<entry>
+    					Non-blocking messaging delivering messages to the receiver's queue.
+    					The input channel has one working thread removing messages from the queue and processing
+    					them one by one.
+    					</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#ThreadPoolMessagingSystem">Thread Pool Messaging</link></entry>
+    					<entry>
+    					Non-blocking messaging delivering messages to the receiver via .NET thread pool.
+    					The input channel receives messages in the context of a thread from the thread pool.
+    					Therefore the input channel processes all incoming messages in parallel.
+    					</entry>
+  					</row>
+					</table>
+				</listItem>
+				
+				<listItem><legacyBold>Composites</legacyBold> - Components extending the functionality of messaging systems.
+					<table>
+  					<tableHeader>
+    					<row>
+      					<entry>Extension</entry>
+      					<entry>Description</entry>
+    					</row>
+  					</tableHeader>
+  					<row>
+    					<entry><link xlink:href="#MonitoredMessaging">Monitored Messaging</link></entry>
+    					<entry>Actively monitors if the communicating parts are still connected.</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#BufferedMessaging">Buffered Messaging</link></entry>
+    					<entry>If the communicating parts are disconnected, it tries to reconnect
+    					and meanwhile stores sent messages in the buffer. When the communication is reconnected,
+    					messages stored in the buffer are sent.</entry>
+  					</row>
+  					<row>
+    					<entry><link xlink:href="#BufferedMonitoredMessaging">Buffered and Monitored Messaging</link></entry>
+    					<entry>
+    					Combines Monitored and Buffered messaging. Therefore, it actively monitors if communicating
+    					parts are still connected and in case of the disconnection it stores sent messages in
+    					the buffer and tries to reconnect.
+    					</entry>
+  					</row>
+					</table>
+				</listItem>
+					
+			</list>
+      	</content>
+  	</section>
+  	
+  	<section address="EndPoints">
+  		<title>End Points</title>
+  		<content>
+  			<para>
+  			End Points are components located at the beginning or at the end of
+  			the communication path. They can be either message senders or message receivers.
+  			They can send one-way messages or request-response messages.
+  			(In case of request-response communication, the receiver can send response messages back to the sender).
+     		</para>
+      		<sections>
+          		<section address="StringMessages">
+              		<title>String Messages</title>
+              		<content>
+              			<para>
+              			The following picture shows the one-way communication with using string messages.
+              			The user code uses the string message sender to send a message.
+              			The string message sender sends the message via the attached channel to the
+              			string message receiver that notifies the user code to process the message.
+              			</para>
+              			<markup>
+      						<img src="../media/StringOneWayCommunication.gif" width="100%"/>
+      					</markup>
+              		
+              			<para>
+              			</para>
+              			
+              			<para>
+              			The following picture shows the request-response communication with using string messages.
+              			The user code uses the duplex string message sender to send a message.
+              			The duplex string message sender sends the message via the attached duplex channel
+              			to the duplex string message receiver that notifies the user code to process the message.
+              			The user code then uses duplex string message receiver to send back the response message.
+              			</para>
+              			<markup>
+      						<img src="../media/StringRequestResponseCommunication.gif" width="100%"/>
+      					</markup>
+              		
+                  		<para>
+                  		To send and receive text messages the framework provides the following functionality:
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IStringMessageSender</codeEntityReference></entry>
+    							<entry>Sends string messages into the attached output channel.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IStringMessageReceiver</codeEntityReference></entry>
+    							<entry>Receives string messages from the attached input channel.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.StringMessagesFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IStringMessageSender</codeEntityReference>, 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IStringMessageReceiver</codeEntityReference>
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IDuplexStringMessageSender</codeEntityReference></entry>
+    							<entry>Sends string messages into the attached duplex output channel and receives responses.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IDuplexStringMessageReceiver</codeEntityReference></entry>
+    							<entry>Receives string messages from the attached duplex input channel and sends back responses.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.DuplexStringMessagesFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IDuplexStringMessageSender</codeEntityReference>, 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.StringMessages.IDuplexStringMessageReceiver</codeEntityReference>
+    							</entry>
+  							</row>
+						</table>
+
+                  		
+              		</content>
+          		</section>
+          		<section address="TypedMessages">
+              		<title>Typed Messages</title>
+              		<content>
+              			<para>
+  						The following picture shows the one-way communication with using typed messages.
+  						The user code uses the typed message sender to send the message of specified type.
+  						The sender creates the message and uses the attached channel to send it via a desired messaging system.
+  						The messaging system delivers the message to the typed message receiver and notifies the user code
+  						to handle the message.
+  						</para>
+			  			<markup>
+			      			<img src="../media/TypedOneWayCommunication.gif" width="100%"/>
+			      		</markup>
+			      		
+			      		<para>
+			      		</para>
+			      		
+			      		<para>
+			      		The following picture shows the request-response communication with using typed messages.
+			      		The user code uses the duplex typed message sender to send the message.
+			      		The sender creates the message and uses the attached duplex channel to send it via
+			      		a desired messaging system.
+			      		The messaging system delivers the message to the duplex typed message receiver and
+			      		notifies the user code to handle the message.
+			      		The user code handles the message and sends back the response.
+			      		</para>
+			      		<markup>
+			      			<img src="../media/TypedRequestResponseCommunication.gif" width="100%"/>
+			      		</markup>
+              		
+                  		<para>
+                  		To send and receive strongly typed messages the framework provides the following functionality:
+                  		</para>
+                  		
+                  		<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ITypedMessageSender`1</codeEntityReference></entry>
+    							<entry>Sends messages of the specified type into the attached output channel.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ITypedMessageReceiver`1</codeEntityReference></entry>
+    							<entry>Receives messages of the specified type from the attached input channel.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.TypedMessagesFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ITypedMessageSender`1</codeEntityReference>, 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ITypedMessageReceiver`1</codeEntityReference>
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IDuplexTypedMessageSender`2</codeEntityReference></entry>
+    							<entry>Sends messages of the specified type into the attached duplex output channel and asynchronously receives
+    							responses of the specified type.</entry>
+  							</row>
+                <row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ISyncDuplexTypedMessageSender`2</codeEntityReference></entry>
+    							<entry>Sends messages of the specified type into the attached duplex output channel and synchronously receives
+    							response of the specified type.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IDuplexTypedMessageReceiver`2</codeEntityReference></entry>
+    							<entry>Receives messages of the specified type from the attached duplex input channel
+    							and sends back responses of the specified type.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.DuplexTypedMessagesFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IDuplexTypedMessageSender`2</codeEntityReference>,
+                      <codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ISyncDuplexTypedMessageSender`2</codeEntityReference>,
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IDuplexTypedMessageReceiver`2</codeEntityReference>
+    							</entry>
+  							</row>
+  							
+                <row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IReliableTypedMessageSender`2</codeEntityReference></entry>
+    							<entry>Sends messages of the specified type into the attached duplex output channel and asynchronously receives
+    							responses of the specified type. In addition it receives a notification whether the sent message was delivered or not.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IReliableTypedMessageReceiver`2</codeEntityReference></entry>
+    							<entry>Receives messages of the specified type from the attached duplex input channel
+    							and sends back responses of the specified type. In addition it receives a notification whether sent
+                  response message was delivered or not.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ReliableTypedMessagesFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IReliableTypedMessageSender`2</codeEntityReference>, 
+    									<codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.IReliableTypedMessageReceiver`2</codeEntityReference>
+    							</entry>
+  							</row>
+  							
+						</table>
+                  		
+              		</content>
+          		</section>
+      		</sections>
+  			
+  		</content>
+  	</section>
+  	
+  	<section address="CommunicationNodes">
+  		<title>Communication Nodes</title>
+  		<content>
+  			<para>
+  			The communication nodes are components manipulating the routing of messages.
+  			</para>
+  			
+  			<sections>
+  			
+          		<section address="Broker">
+              		<title>Broker</title>
+              		<content>
+                  		<para>
+                  		The broker is the component providing functionality for publish-subscribe scenarios.
+                  		Application(s) wanting to notify some state uses the broker to forward notification
+                  		messages to subscribed clients.
+                  		</para>
+                  		
+                  		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the communication with the broker.
+			  			The user code uses the broker client to subscribe for desired messages and to
+			  			send messages to the broker. Broker receives messages and forwards them
+			  			to subscribed clients. (The message is not sent to clients that are not subscribed.)
+			  			</para>
+			  			<markup>
+			      			<img src="../media/BrokerCommunication.gif" width="100%"/>
+			      		</markup>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Broker.IDuplexBrokerClient</codeEntityReference></entry>
+    							<entry>
+    							The broker client provides the functionality to publish a message via the broker and to subscribe for
+    							desired messages. Except specifying the message type, the client can also subscribe
+    							with using a regular expression.
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Broker.IDuplexBroker</codeEntityReference></entry>
+    							<entry>
+    							Receives requests from clients to be subscribed. It also receives messages from client that forwards
+    							to all subscribed clients.
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Broker.DuplexBrokerFactory</codeEntityReference></entry>
+    							<entry>Creates instancies of types: 
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.Broker.IDuplexBrokerClient</codeEntityReference>, 
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.Broker.IDuplexBroker</codeEntityReference>
+    							</entry>
+  							</row>
+						</table>
+
+              		</content>
+          		</section>
+          		
+          		<section address="Router">
+              		<title>Router</title>
+              		<content>
+                  		<para>
+                  		The router is the component that receives messages on specified addresses and forwards them
+                  		to another addresses.
+                  		</para>
+                  		
+                  		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the router in one-way communication.
+			  			The router receives the message from the 'User Code 1' e.g. on tcp://127.0.0.1:8091/ and
+                  		then forwards it to tcp://137.1.2.3:8091/. The 'User Code A' receives the message,
+                  		processes and it.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/RouterOneWayCommunication.gif" width="100%"/>
+			      		</markup>
+			      		
+			      		<para>
+                  		</para>
+                  		
+                  		<para>
+                  		The following picture shows the duplex router in request-response communication.
+                  		The router receives the message from the 'User Code 1' e.g. on tcp://127.0.0.1:8091/ and
+                  		then forwards it to tcp://137.1.2.3:8091/. The 'User Code A' receives the message,
+                  		processes it and sends back the response. The response message is received by the router
+                  		and send correctly to the 'User Code 1'.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/RouterRequestResponseCommunication.gif" width="100%"/>
+			      		</markup>
+                  		
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Router.IRouter</codeEntityReference></entry>
+    							<entry>Routes messages received from attached input channels to configured output channels.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Router.RouterFactory</codeEntityReference></entry>
+    							<entry>Instantiates:  
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.Router.IRouter</codeEntityReference>. 
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Router.IDuplexRouter</codeEntityReference></entry>
+    							<entry>
+    							Routes messages received from attached duplex input channels to configured duplex output channels.
+    							It also supports sending of response messages from all receivers and receiving them by the sender.
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Router.DuplexRouterFactory</codeEntityReference></entry>
+    							<entry>Instantiates:  
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.Router.IDuplexRouter</codeEntityReference>. 
+    							</entry>
+  							</row>
+  							
+						</table>
+
+                  		
+              		</content>
+          		</section>
+
+          <section address="BackupRouter">
+            <title>Backup Router</title>
+            <content>
+              <para>
+                The backup router is the component that is able to reroute the communication int a backup service in case
+                the service is not available.
+              </para>
+
+              <table>
+                <tableHeader>
+                  <row>
+                    <entry>Interface or Factory</entry>
+                    <entry>Description</entry>
+                  </row>
+                </tableHeader>
+                <row>
+                  <entry>
+                    <codeEntityReference>T:Eneter.Messaging.Nodes.BackupRouter.IBackupConnectionRouter</codeEntityReference>
+                  </entry>
+                  <entry>Reconnects with a backup service in case of a disconnection</entry>
+                </row>
+                <row>
+                  <entry>
+                    <codeEntityReference>T:Eneter.Messaging.Nodes.BackupRouter.BackupConnectionRouterFactory</codeEntityReference>
+                  </entry>
+                  <entry>
+                    Instantiates:
+                    <codeEntityReference>T:Eneter.Messaging.Nodes.BackupRouter.IBackupConnectionRouter</codeEntityReference>.
+                  </entry>
+                </row>
+
+              </table>
+            </content>
+          </section>
+          
+          		<section address="Dispatcher">
+              		<title>Dispatcher</title>
+              		<content>
+                  		<para>
+                  		The dispatcher is the component that receives messages and forwards them to all attached
+                  		receivers. Therefore, the same message is processed by more receivers in parallel.
+                  		</para>
+                  		
+                  		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the dispatcher in one-way communication.
+			  			The dispatcher receives a message from the 'User Code 1' and forwards it to two attached
+			  			receivers: 'User Code A' and 'User Code B'.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/DispatcherOneWayCommunication.gif" width="100%"/>
+			      		</markup>
+			      		
+			      		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the dispatcher in request-response communication.
+			  			The dispatcher receives a message from the User Code 1 and forwards it to two attached
+			  			receivers: User Code A and User Code B.
+			  			Both receivers process the message and sends back their responses. The dispatcher
+			  			sends both responses to the 'User Code 1'. The 'User Code 1' evaluates both
+			  			results and continues accordingly.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/DispatcherRequestResponseCommunication.gif" width="100%"/>
+			      		</markup>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Dispatcher.IDispatcher</codeEntityReference></entry>
+    							<entry>Receives messages from attached input channels and forwards them to all attached output channels.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Dispatcher.DispatcherFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.Dispatcher.IDispatcher</codeEntityReference>. 
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Dispatcher.IDuplexDispatcher</codeEntityReference></entry>
+    							<entry>
+    							Receives messages from attached duplex input channels and forwards them to all duplex output channels.
+    							It also supports sending of response messages from all receivers and receiving them by the sender.
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.Dispatcher.DuplexDispatcherFactory</codeEntityReference></entry>
+    							<entry>Instantiates:
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.Dispatcher.IDuplexDispatcher</codeEntityReference>. 
+    							</entry>
+  							</row>
+  							
+						</table>
+
+                  		
+              		</content>
+          		</section>
+          		
+          		<section address="LoadBalancer">
+              		<title>Load Balancer</title>
+              		<content>
+                  		<para>
+                  		The load balancer is the component providing functionality to distribute the workload across
+                  		computers, processes or threads.
+                  		</para>
+                  		
+                  		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the load balancer.
+			  			The load balancer receives the request and chooses the attached service for the processing.
+			  			When another request comes, the load balancer chooses other service.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/LoadBalancer.gif" width="100%"/>
+			      		</markup>
+			      		
+			      		<para>
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.LoadBalancer.ILoadBalancer</codeEntityReference></entry>
+    							<entry>
+    							Distributes the workload across computers, processes or threads.
+    							It allows to attach/detach services to the pool dynamically during the runtime.
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.LoadBalancer.ILoadBalancerFactory</codeEntityReference></entry>
+    							<entry>Instantiates: 
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.LoadBalancer.ILoadBalancer</codeEntityReference>. 
+    							</entry>
+  							</row>
+						</table>
+
+                  		
+              		</content>
+          		</section>
+          		
+          		<section address="ChannelWrapperAndUnwrapper">
+              		<title>Channel Wrapper and Unwrapper</title>
+              		<content>
+                  		<para>
+                  		The channel wrapper and unwrapper are components that allows to send/receive more messages via
+                  		one channel. The user code then does not need to implement some <legacyItalic>if ... then</legacyItalic> code
+                  		recognizing particular messages.
+                  		It also can help to save channel resources. E.g. application can open only limited number of Http requests.
+                  		The channel wrapper has attached more input channels and one output channel. The symmetric component
+                  		the channel unwrapper has attached one input channel and more output channels.
+                  		</para>
+                  		
+                  		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the channel wrapper-unwrapper in one-way communication.
+			  			When the wrapper receives a message (e.g. from User Code A) it wraps the message
+                  		and forwards it to the output channel. The unwrapper on the other side receives the message,
+                  		unwraps it and base on the preserved channel id, forwards it to the correct output channel.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/WrapperOneWayCommunication.gif" width="100%"/>
+			      		</markup>
+			      		
+			      		<para>
+                  		</para>
+                  		
+                  		<para>
+			  			The following picture shows the channel wrapper-unwrapper in request-response communication.
+			  			When the wrapper receives a message (e.g. from User Code A) it wraps the message
+                  		and forwards it to the output channel. The unwrapper on the other side receives the message,
+                  		unwraps it and base on the preserved channel id, forwards it to the correct output channel.
+                  		The receiver processes the request and sends back the response message.
+			  			</para>
+			  			<markup>
+			      			<img src="../media/WrapperRequestResponseCommunication.gif" width="100%"/>
+			      		</markup>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface or Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IChannelWrapper</codeEntityReference></entry>
+    							<entry>It has attached more input channels and one output channel. When it receives a message from one of input
+    							channels it wraps the message (preserving the original channel id) and forwards it to the output channel.</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IChannelUnwrapper</codeEntityReference></entry>
+    							<entry>It has attached one input channel and more output channels. When it receives a message from the input
+    							channel it unwraps it and based on the original channel id it sends the message to the correct output channel.
+    							This is the symmetric component to the channel wrapper. I.e. what the channel wrapper wraps the channel unwrapper unwraps.
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IDuplexChannelWrapper</codeEntityReference></entry>
+    							<entry>It has attached more duplex input channels and one duplex output channel. When it receives a message
+    							from one of duplex input channels it wraps the message
+    							(preserving the original channel id) and forwards it to the duplex output channel.
+    							<para>
+    							The using of duplex channels allows request-response communication between senders and receivers.
+    							</para>
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IDuplexChannelUnwrapper</codeEntityReference></entry>
+    							<entry>It has attached one duplex input channel and more duplex output channels.
+    							When it receives a message from the duplex input channel it unwraps it and based on the original
+    							channel id it sends the message to the correct duplex output channel.
+    							This is the symmetric component to the duplex channel wrapper. I.e. what the duplex channel wrapper wraps
+    							the duplex channel unwrapper unwraps.
+    							<para>
+    							The using of duplex channels allows request-response communication between senders and receivers.
+    							</para>
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.ChannelWrapperFactory</codeEntityReference></entry>
+    							<entry>Creates instance of  
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IChannelWrapper</codeEntityReference>,
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IChannelUnwrapper</codeEntityReference>,
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IDuplexChannelWrapper</codeEntityReference>,
+    									<codeEntityReference>T:Eneter.Messaging.Nodes.ChannelWrapper.IDuplexChannelUnwrapper</codeEntityReference>.
+    							</entry>
+  							</row>
+						</table>
+                 		
+              		</content>
+          		</section>
+          		
+  			</sections>
+  		</content>
+  	</section>
+    
+    <section address="MessagingSystems">
+  		<title>Messaging Systems</title>
+  		<content>
+  			<para>
+  			Messaging systems are responsible for delivering messages across various
+  			boundaries. In general, the framework has interprocess messaging and
+  			messaging delivering messages inside the process.
+  			</para>
+  			
+  			<sections>
+  				<section address="SharedMemoryMessagingSystem">
+              		<title>Shared Memory Messaging System</title>
+              		<content>
+                  		<para>
+                  		Very fast messaging system transferring messages between processes on one computer with using the shared memory.
+                  		The shared memory is faster than named pipes.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem.SharedMemoryMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output and input channels.
+    							The channel id is a string that will be used to create the memory-mapped file.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+
+  				<section address="NamedPipeMessagingSystem">
+              		<title>Named Pipe Messaging System</title>
+              		<content>
+                  		<para>
+                  		The messaging system transferring messages between processes and computers with using named pipes.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem.NamedPipeMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output and input channels.
+    							The channel id must be a valid Uri address (e.g. net.pipe://127.0.0.1/SomeName/).
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="TcpMessagingSystem">
+              		<title>Tcp Messaging System</title>
+              		<content>
+                  		<para>
+                  		The messaging system transferring messages between processes and computers with using Tcp.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.TcpMessagingSystem.TcpMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output and input channels.
+    							The channel id must be a valid Uri address representing an Ip address (e.g. tcp://127.0.0.1:8091/).
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+
+          <section address="WebSocketMessagingSystem">
+            <title>Websocket Messaging System</title>
+            <content>
+              <para>
+                The messaging system transferring messages between processes and computers with using Websockets.
+              </para>
+
+              <table>
+                <tableHeader>
+                  <row>
+                    <entry>Messaging System Factory</entry>
+                    <entry>Description</entry>
+                  </row>
+                </tableHeader>
+                <row>
+                  <entry>
+                    <codeEntityReference>T:Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem.WebSocketMessagingSystemFactory</codeEntityReference>
+                  </entry>
+                  <entry>
+                    Implements the factory creating output and input channels.
+                    The channel id must be a valid Uri address (e.g. ws://127.0.0.1:8091/MyService/).
+                  </entry>
+                </row>
+              </table>
+
+            </content>
+          </section>
+  				
+  				<section address="HttpMessagingSystem">
+              		<title>Http Messaging System</title>
+              		<content>
+                  		<para>
+                  		The messaging system transferring messages between processes and computers with using Http.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output and input channels.
+    							The channel id must be a valid Uri address (e.g. http://127.0.0.1:8091/MyService/).
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+
+          <section address="AndroidUsbCableMessagingSystem">
+            <title>Android USB Cable Messaging System</title>
+            <content>
+              <para>
+                The messaging system transferring messages between Android and computer via USB cable.
+              </para>
+
+              <table>
+                <tableHeader>
+                  <row>
+                    <entry>Messaging System Factory</entry>
+                    <entry>Description</entry>
+                  </row>
+                </tableHeader>
+                <row>
+                  <entry>
+                    <codeEntityReference>T:Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem.AndroidUsbCableMessagingFactory</codeEntityReference>
+                  </entry>
+                  <entry>
+                    Implements the factory creating output and input channels that use Android USB cable for the communication.
+                    The channel id must be a port number where application on Android device listens to messages.
+                    (e.g. 8093).
+                  </entry>
+                </row>
+              </table>
+
+            </content>
+          </section>
+  				
+  				<section address="SilverlightMessagingSystem">
+              		<title>Silverlight Messaging System</title>
+              		<content>
+                  		<para>
+                  		The messaging system transferring messages between silverlight components.
+                  		No size restrictions, no thread restrictions.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.SilverlightMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory for the messaging system in Silverlight environment.
+    							It creates input and output channels.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="SynchronousMessagingSystem">
+              		<title>Synchronous Messaging System</title>
+              		<content>
+                  		<para>
+                  		Fast internal messaging system delivering messages synchronously in the caller thread.
+                  		The sender is blocked until the message is delivered and processed.
+                  		The messaging system is suitable to transfer messages between local components
+                  		if the synchronous approach is desired or the synchronous approach is not a problem.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem.SynchronousMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the messaging system delivering messages synchronously in the caller thread.
+    							It creates output and input channels using the caller thread to deliver messages.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="ThreadMessagingSystem">
+              		<title>Thread Messaging System</title>
+              		<content>
+                  		<para>
+                  		Non-blocking internal messaging transferring messsages to the queue of the working thread.
+                  		Each input channel is represented by its own working thread removing messages
+                  		from its queue one by one.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.ThreadMessagingSystem.ThreadMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output and input channels.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="ThreadPoolMessagingSystem">
+              		<title>Thread Pool Messaging System</title>
+              		<content>
+                  		<para>
+                  		Non-blocking internal messaging delivering messages with using .NET thread pool.
+                  		The message is delivered in the context of a thread from the thread pool.
+                  		The input channel processes incoming messages in parallel.
+                  		Therefore, the order of messages is not guaranteed in the user code.
+                  		</para>
+                  		<para>
+                  		Therefore, do not forget to be careful and avoid race conditioning. 
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Messaging System Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.ThreadPoolMessagingSystem.ThreadPoolMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output and input channels.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="MessagingSystemAPI">
+              		<title>Messaging System API</title>
+              		<content>
+                  		<para>
+                  		The typical messaging scenario is that a sender asks the messaging system to deliver
+                  		a message to a desired receiver. Then the messaging system takes the message, identifies the receiver
+                  		and delivers it. And this is exactly the functionality that the framework expects from
+                  		messaging systems.
+                  		</para>
+                  		<para>
+                  		The idea is the messaging system maintains receivers with their unique id and uses message channels
+                  		to transfer messages. The message channel has the channel id corresponding with the receiver unique id maintained
+                  		by the messaging system. (Therefore, the message channel can also be understood as a logical address.)
+                  		The channel has two ends. The end used by the receiver is called the input channel.
+                  		The end used by the sender is called the output channel.
+                  		</para>
+                  		<para>
+                  		Every messaging system should implement the following interfaces:
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Interface</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IOutputChannel</codeEntityReference></entry>
+    							<entry>
+    							The implementation is responsible for sending messages to the messaging system (one-way communication).
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IInputChannel</codeEntityReference></entry>
+    							<entry>
+    							The implementation is responsible for listening / receiving messages.
+    							There can be only one instance of the input channel with the specified id.
+    							(So that the address is assigned only to the one listener.)
+    							</entry>
+  							</row>
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IDuplexOutputChannel</codeEntityReference></entry>
+    							<entry>
+    							The implementation is responsible for sending messages to the messaging system and
+    							receiving response messages (request-response communication).
+    							</entry>
+  							</row>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IDuplexInputChannel</codeEntityReference></entry>
+    							<entry>
+    							The implementation is responsible for listening / receiving messages and for sending response messages.
+    							There can be only one instance of the duplex input channel with the specified id.
+    							(So that the address is assigned only to the one listener.)
+    							</entry>
+  							</row>
+  							
+  							
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IMessagingSystemFactory</codeEntityReference></entry>
+    							<entry>
+    							The implementation is responsible for instantiating of 
+    								<codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IOutputChannel</codeEntityReference>,
+    								<codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IInputChannel</codeEntityReference>,
+    								<codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IDuplexOutputChannel</codeEntityReference>,
+    								<codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IDuplexInputChannel</codeEntityReference>.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  			</sections>
+  		</content>
+  	</section>
+  	
+  	<section address="Composites">
+  		<title>Composites</title>
+  		<content>
+  			<para>
+  			Composites extends the default behavior of messaging systems by additional functionality.
+  			Technically, they implement the interface <codeEntityReference>T:Eneter.Messaging.MessagingSystems.MessagingSystemBase.IMessagingSystemFactory</codeEntityReference>.
+  			So, they act as a messaging system. Internally they implement some additional feature
+  			(e.g. monitoring if communicating parts are still connected) and then they use the real messaging system
+  			(e.g. TCP messaging) to send messages.
+  			</para>
+  			
+  			<sections>
+
+  				<section address="MonitoredMessaging">
+              		<title>Monitored Messaging</title>
+              		<content>
+                  		<para>
+                  		It actively monitors if the communicating parts are still connected.
+                  		The sender (duplex output channel) regularly sends the 'ping' message and expects,
+                  		the response within the specified time. If the response is received,
+                  		the communication is considered to be connected.
+                  		On the other side, the receiver (duplex input channel) measures if the 'ping' request
+                  		is received within the specified time. If yes, it sends back the response
+                  		and considers the communication as connected.
+                  		</para>
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Composite Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit.MonitoredMessagingFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating duplex output channel and duplex input channel
+    							that actively monitors if the communicating parts are connected.
+    							The monitoring functionality is not applicable for the output channel
+    							and the input channel.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="BufferedMessaging">
+              		<title>Buffered Messaging</title>
+              		<content>
+                  		<para>
+                  		If the communicating parts are disconnected, it tries to reconnect and meanwhile stores sent
+                  		messages in the buffer. When the communication is reconnected, messages stored in the buffer are sent.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Composite Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit.BufferedMessagingFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating output channel, duplex output channel and duplex input channel
+    							with buffering of sent messages in case of disconnection and automatic reconnect.
+    							The buffered messaging is not applicable for the one-way input channel.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  				
+  				<section address="BufferedMonitoredMessaging">
+              		<title>Buffered and Monitored Messaging</title>
+              		<content>
+                  		<para>
+                  		It combines Buffered Messaging and Monitored Messaging together.
+                  		Therefore, it actively monitors if the communicating parts are connected. Then,
+                  		in case of disconnection, it stores sent messages in the buffer
+                  		and at the same time it tries to reconnect.
+                  		</para>
+                  		
+						<table>
+  							<tableHeader>
+    							<row>
+      								<entry>Composite Factory</entry>
+      								<entry>Description</entry>
+    							</row>
+  							</tableHeader>
+  							<row>
+    							<entry><codeEntityReference>T:Eneter.Messaging.MessagingSystems.Composites.BufferedMonitoredMessagingFactory</codeEntityReference></entry>
+    							<entry>
+    							Implements the factory creating channels actively monitoring the connection
+    							and buffering and reconnecting in case of disconnection.
+    							</entry>
+  							</row>
+						</table>
+                  		
+                  	</content>
+  				</section>
+  			</sections>
+  		</content>
+  	</section>
+  	
+    
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID"/>
+      <link xlink:href="Other Topic's ID">Link inner text</link>
+
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8270" />
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

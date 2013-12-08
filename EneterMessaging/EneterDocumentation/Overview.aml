@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="94743750-5cea-45a8-bf17-f2a98655e913" revisionNumber="1">
+  <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <summary>
+      <para>
+       Welcome to the Eneter.Messaging.Framework, the cross-platform message oriented middleware.
+      </para>
+    </summary>
+    <introduction>
+      <para>
+      <literal>Eneter Messaging Framework</literal> is a lightweight framework for the interprocess communication.<br/>
+      It is easy to use and it works across various platforms. The framework provides communication components
+      that can be used to create communication scenarios fitting your needs.
+      </para>
+      <autoOutline />
+    </introduction>
+
+    <section address="SupportedPlatforms">
+      <title>Supported Platforms</title>
+      <content>
+        <para>
+        The framework is provided for multiple platforms.
+        Therefore, you can use it for communication between two .NET applications but also
+        for the communication between Java, Android and .NET applications.
+        </para>
+        <para>
+          The following platforms are supported:
+        </para>
+		    <list class="bullet">
+		      <listItem><para>.NET 3.5, 4.0, 4.5</para></listItem>
+		      <listItem><para>Windows Phone 7.0, 7.1</para></listItem>
+		      <listItem><para>Silverlight 3, 4, 5</para></listItem>
+		      <listItem><para>Compact Framework 2.0, 3.5</para></listItem>
+		      <listItem><para>Mono 2.6.4</para></listItem>
+		      <listItem><para>Java 6</para></listItem>
+		      <listItem><para>Android 2.1 (or later)</para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="Protocols">
+      <title>Protocols</title>
+      <content>
+        <para>
+          The framework for .NET supports following protocols and transportation mechanisms:
+        </para>
+		    <list class="bullet">
+		      <listItem><para><legacyItalic>TCP</legacyItalic> - for communication between processes running on different machines. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.TcpMessagingSystem</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>WebSocket</legacyItalic> - for communication between processes running on different machines. It provides bi-directional, full-duplex communication in environments which block non-standard Internet connections using a firewall.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>HTTP</legacyItalic> - for communication between processes running on different machines. It works in environments blocking non-standard Internet connections using a firewall.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.HttpMessagingSystem</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>UDP</legacyItalic> - for communication between processes running on different machines. For short and fast messaging. Delivery of packets is not guaranteed.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.UdpMessagingSystem</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Shared Memory</legacyItalic> - for very fast communication between processes running on the same machine. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Named Pipes</legacyItalic> - for communication between processes running on the same machine. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Silverlight Messaging</legacyItalic> - for communication between Silverlight applications. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Android USB Cable</legacyItalic> - for communication between computer and Android device connected via the USB cable.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>Thread Messaging</legacyItalic> - for communication between threads running in the same process. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.ThreadMessagingSystem</codeEntityReference></para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="MessageSerialization">
+      <title>Message Serialization</title>
+      <content>
+        <para>
+          Communicated messages are encoded by a serializer. To serialize/deserialize messages the framework supports:
+        </para>
+		    <list class="bullet">
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.XmlStringSerializer</codeEntityReference> - serialization to XML <literal>(works for the communication between .NET and Java).</literal></para></listItem>
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.DataContractXmlStringSerializer</codeEntityReference> - serialization to XML using DataContract and DataMember attributes.</para></listItem>
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.DataContractJsonStringSerializer</codeEntityReference> - serialization to JSON using DataContract and DataMember attributes.</para></listItem>
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.BinarySerializer</codeEntityReference> - for fast serialization using the binary format (does not work for the communication between .NET and Java).</para></listItem>
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.AesSerializer</codeEntityReference> - for encrypting using Advanced Encryption Standard <literal>(works for the communication between .NET and Java).</literal></para></listItem>
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.RijndaelSerializer</codeEntityReference> - for encrypting using Rijndael algorithm.</para></listItem>
+		      <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.GZipSerializer</codeEntityReference> - for compressing big messages before sending across the network <literal>(works for the communication between .NET and Java).</literal></para></listItem>
+          <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.RsaSerializer</codeEntityReference> - for encrypting messages by RSA algorithm using public and private keys <literal>(works for the communication between .NET and Java).</literal></para></listItem>
+          <listItem><para><codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.RsaDigitalSignatureSerializer</codeEntityReference> - for using digital signature to verify who sent the message and that the message was not changed <literal>(works for the communication between .NET and Java).</literal></para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="SendingReceivingMessages">
+      <title>Sending-Receiving Messages</title>
+      <content>
+        <para>
+          To implement the communication between applications, the framework provides functionality to send and receive messages.
+          Communication can be one-way or request-response and messages can be:
+        </para>
+		    <list class="bullet">
+		      <listItem><para><legacyItalic>String Messages</legacyItalic> - for sending and receiving text messages. <codeEntityReference>N:Eneter.Messaging.EndPoints.StringMessages</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Typed Messages</legacyItalic> - for sending and receiving data structures of specified types (strongly typed messages). <codeEntityReference>N:Eneter.Messaging.EndPoints.TypedMessages</codeEntityReference></para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="RoutingMessages">
+      <title>Routing Messages</title>
+      <content>
+        <para>
+          It provides components that can be placed on the communication path to control the routing behavior.
+        </para>
+		    <list class="bullet">
+		      <listItem><para><legacyItalic>Broker</legacyItalic> - for publish-subscribe scenarios (publisher sends messages to the broker and the broker notifies all subscribers). <codeEntityReference>N:Eneter.Messaging.Nodes.Broker</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Dispatcher</legacyItalic> - for routing messages to all connected receivers (e.g. for a service listening to TCP and HTTP at the same time). <codeEntityReference>N:Eneter.Messaging.Nodes.Dispatcher</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Router</legacyItalic> - for routing messages to preconfigured addresses. <codeEntityReference>N:Eneter.Messaging.Nodes.Router</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>Backup Router</legacyItalic> - for routing messages to a backup service if the service is not available. <codeEntityReference>N:Eneter.Messaging.Nodes.BackupRouter</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Channel Wrapper/Unwrapper</legacyItalic> - for receiving multiple type of messages on one address (no need for if ... else ... statement in the user code). <codeEntityReference>N:Eneter.Messaging.Nodes.ChannelWrapper</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Load Balancer</legacyItalic> - for distributing workload across more computers (or processes). <codeEntityReference>N:Eneter.Messaging.Nodes.LoadBalancer</codeEntityReference></para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="Reliability">
+      <title>Reliability</title>
+      <content>
+        <para>
+        The communication across the network is typically less reliable as a local call in inside a process. The network connection can be interrupted or a receiving application can be temporarily unavailable. If your communication scenario requires overcome these issues, the framework provides:
+        </para>
+		    <list class="bullet">
+		      <listItem><para><legacyItalic>Monitoring of connection availability</legacyItalic> - for early detection of a disconnection. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Buffered messaging and automatic reconnect</legacyItalic> - for overcoming short disconnections (e.g. in case of unstable network). <codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Acknowledged messaging</legacyItalic> - for getting notification whether a message was delivered or not. <codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ReliableTypedMessagesFactory</codeEntityReference></para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="Security">
+      <title>Security</title>
+      <content>
+        <para>
+          The communication across the network is easy to observe and confidential data can be acquired by unauthorized persons. Therefore, you may want to protect your data:
+        </para>
+		    <list class="bullet">
+		      <listItem><para>SSL or serializer using a cryptographic algorithm AES, RSA or RSA based digital signature.</para></listItem>
+		    </list>
+      </content>
+    </section>
+    
+    <section address="EneterMessagingFrameworkForNETBasedPlatforms">
+      <title>Eneter Messaging Framework for .NET based platforms</title>
+      <content>
+        <para>
+          <markup>
+      		  <img src="../media/EneterComponents.gif" width="100%" title="Download" alt="Download" />
+      	  </markup>
+        </para>
+      </content>
+    </section>
+
+
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID"/>
+      <link xlink:href="Other Topic's ID">Link inner text</link>
+
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8270" />
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

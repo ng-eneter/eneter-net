@@ -1,0 +1,23 @@
+Projects:
+
+    EneterMessagingFrameworkCF20_.csproj
+    EneterMessagingFrameworkCF35_.csproj
+
+were created using SharpDevelop 3.2.1. It is not guaranted these project files will work in VS2008.
+
+To recreate the project file in VS2008 create the class library project targeting 'Compact Framework 2.0' or 'Compact Framework 3.5' and set following properties in the project:
+
+Assembly Name:		Eneter.Messaging.Framework.CF
+Root Namespace:		Eneter.Messaging
+Conditional Compilation Symbols:  COMPACT_FRAMEWORK;COMPACT_FRAMEWORK20
+
+Then you can just import the following directories to the project:
+    DataProcessing
+    Diagnostic
+    EndPoints
+    Infrastructure
+    MessagingSystems
+    Nodes
+    System
+
+Then use AssemblyInfo.cs  from the Eneter directory 'Properties'.

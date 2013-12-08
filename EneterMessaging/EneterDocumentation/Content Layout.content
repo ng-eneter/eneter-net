@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Topics>
+  <Topic id="94743750-5cea-45a8-bf17-f2a98655e913" visible="True" isDefault="true" title="Introduction" />
+  <Topic id="539fb726-b358-41a2-bcbf-df92ada3b8da" visible="True" title="Technical Overview" />
+  <Topic id="61003225-e72d-4ed1-a2b5-196f2380c14f" visible="True" isSelected="true" title="Release Notes" />
+  <Topic id="c561ace9-bf6e-44d3-aac3-1e25a78387d6" visible="True" title="Software License" />
+  <Topic id="d2b83907-3f8e-4272-9eb3-ceed62142432" visible="True" noFile="true" isExpanded="true" title="Examples">
+    <Topic id="4df36e2e-281e-444f-a18b-837bf30bec14" visible="True" title="How to: Send and Receive Text Messages" />
+    <Topic id="10a9ac12-1cc8-4980-8649-aff89288a48f" visible="True" title="How to: Send and Receive data type messages" />
+    <Topic id="9a961e93-8bb7-4d1e-940d-2fde845a5f55" visible="True" title="How to: Communicate across Unstable Network" />
+    <Topic id="890c173d-ef10-4c52-8de9-1fb7aeaac4aa" visible="True" title="How to: Communicate from Windows Phone 7" />
+    <Topic id="18b7915d-25ec-48e5-b8d0-1a07bb972381" visible="True" title="How to: Encrypt Messages with AES" />
+    <Topic id="f6b44c4e-d4fb-4db2-a81f-a706e6fc9831" visible="True" title="How to: Implement Service Sending Notification Messages to Subscribed Clients" />
+    <Topic id="18a24899-06a4-4756-97ce-18d853815b5b" visible="True" title="How to: Service Listening to TCP, WebSocket and Shared Memory at the same time" />
+    <Topic id="68c57023-0805-431e-8097-a715ddefb8f2" visible="True" title="How to: Communicate between Silverlight and Desktop Application" />
+    <Topic id="bbdca769-ee23-4c80-aafe-34ae96090bf7" visible="True" title="How to: Communicate between Android and .NET application" />
+    <Topic id="8ab86716-a970-46a9-a78f-179173517c06" visible="True" title="More Examples" />
+  </Topic>
+</Topics>

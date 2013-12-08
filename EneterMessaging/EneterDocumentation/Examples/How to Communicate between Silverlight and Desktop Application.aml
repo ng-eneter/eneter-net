@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="68c57023-0805-431e-8097-a715ddefb8f2" revisionNumber="1">
+  <developerSampleDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <introduction>
+      <para>Example showing communication between Silverlight application and a desktop application.</para>
+      <markup>
+        <img src="../media/SilverlightDuplexTcpConnection.gif" width="100%" />
+      </markup>
+    </introduction>
+
+    <codeExample>
+      Desktop application as a service capable to communicate with a Silverlight application.
+      <code language="c#">
+using System;
+using System.Windows.Forms;
+using Eneter.Messaging.EndPoints.StringMessages;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+
+namespace DesktopApplication
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+
+            // Start the policy server to be able to communicate with silverlight.
+            // Note: Before Silverlight open the communication it asks the policy
+            //       server for the policy xml.
+            //       If the policy server is not present or the content of the
+            //       policy xml does not allow the communication the communication
+            //       is not open.
+            myPolicyServer = new TcpPolicyServer();
+            myPolicyServer.StartPolicyServer();
+
+            // Create duplex message receiver.
+            // It can receive messages and also send back response messages.
+            IDuplexStringMessagesFactory aStringMessagesFactory = new DuplexStringMessagesFactory();
+            myMessageReceiver = aStringMessagesFactory.CreateDuplexStringMessageReceiver();
+            myMessageReceiver.ResponseReceiverConnected += ClientConnected;
+            myMessageReceiver.ResponseReceiverDisconnected += ClientDisconnected;
+            myMessageReceiver.RequestReceived += MessageReceived;
+
+            // Create TCP based messaging.
+            // Note: TCP in Silverlight can use only ports 4502 - 4532.
+            IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
+            IDuplexInputChannel aDuplexInputChannel = aMessaging.CreateDuplexInputChannel("tcp://127.0.0.1:4502/");
+
+            // Attach the duplex input channel to the message receiver and start listening.
+            // Note: Duplex input channel can receive messages but also send messages back.
+            myMessageReceiver.AttachDuplexInputChannel(aDuplexInputChannel);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            // Close listenig.
+            // Note: If the listening is not closed, then listening threads are not ended
+            //       and the application would not be closed properly.
+            myMessageReceiver.DetachDuplexInputChannel();
+
+            myPolicyServer.StopPolicyServer();
+        }
+
+        // The method is called when a message from the client is received.
+        private void MessageReceived(object sender, StringRequestReceivedEventArgs e)
+        {
+            // Display received message.
+            InvokeInUIThread(() =>
+                {
+                    ReceivedMessageTextBox.Text = e.RequestMessage;
+                });
+        }
+
+
+        // The method is called when a client is connected.
+        // The Silverlight client is connected when the client attaches the output duplex channel.
+        private void ClientConnected(object sender, ResponseReceiverEventArgs e)
+        {
+            // Add the connected client to the listbox.
+            InvokeInUIThread(() =>
+                {
+                    ConnectedClientsListBox.Items.Add(e.ResponseReceiverId);
+                });
+        }
+
+        // The method is called when a client is disconnected.
+        // The Silverlight client is disconnected if the web page is closed.
+        private void ClientDisconnected(object sender, ResponseReceiverEventArgs e)
+        {
+            // Remove the disconnected client from the listbox.
+            InvokeInUIThread(() =>
+                {
+                    ConnectedClientsListBox.Items.Remove(e.ResponseReceiverId);
+                });
+        }
+
+        private void SendButton_Click(object sender, EventArgs e)
+        {
+            // Send the message to all connected clients.
+            foreach (string aClientId in ConnectedClientsListBox.Items)
+            {
+                myMessageReceiver.SendResponseMessage(aClientId, MessageTextBox.Text);
+            }
+        }
+
+        // Helper method to invoke some functionality in UI thread.
+        private void InvokeInUIThread(Action uiMethod)
+        {
+            // If we are not in the UI thread then we must synchronize 
+            // via the invoke mechanism.
+            if (InvokeRequired)
+            {
+                Invoke(uiMethod);
+            }
+            else
+            {
+                uiMethod();
+            }
+        }
+
+        private TcpPolicyServer myPolicyServer;
+        private IDuplexStringMessageReceiver myMessageReceiver;
+    }
+}
+      </code>
+    </codeExample>
+
+    <codeExample>
+      Silverlight client sending messages to the desktop application.
+      <code language="c#">
+using System;
+using System.Windows;
+using System.Windows.Controls;
+using Eneter.Messaging.EndPoints.StringMessages;
+using Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+
+namespace SilverlightApplication
+{
+    public partial class MainPage : UserControl
+    {
+        public MainPage()
+        {
+            InitializeComponent();
+
+            // Create duplex message sender.
+            // It can send messages and also receive messages.
+            IDuplexStringMessagesFactory aStringMessagesFactory = new DuplexStringMessagesFactory();
+            myMessageSender = aStringMessagesFactory.CreateDuplexStringMessageSender();
+            myMessageSender.ResponseReceived += MessageReceived;
+
+            // Create TCP based messaging.
+            IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
+            IDuplexOutputChannel aDuplexOutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:4502/");
+
+            // Attach the duplex output channel to the message sender
+            // and be able to send messages and receive messages.
+            myMessageSender.AttachDuplexOutputChannel(aDuplexOutputChannel);
+        }
+
+        // The method is called when a message from the desktop application is received.
+        private void MessageReceived(object sender, StringResponseReceivedEventArgs e)
+        {
+            textBox2.Text = e.ResponseMessage;
+        }
+
+        // The method is called when the button to send message is clicked.
+        private void SendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            myMessageSender.SendMessage(textBox1.Text);
+        }
+
+
+        private IDuplexStringMessageSender myMessageSender;
+    }
+}
+      </code>
+    </codeExample>
+
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID">Link text</link>
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerSampleDocument>
+</topic>

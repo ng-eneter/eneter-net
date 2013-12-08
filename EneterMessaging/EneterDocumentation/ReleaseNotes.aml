@@ -1,0 +1,1504 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="61003225-e72d-4ed1-a2b5-196f2380c14f" revisionNumber="1">
+  <developerConceptualDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <summary>
+      <para>
+        This is the summary of all Eneter releases.
+      </para>
+    </summary>
+
+    <introduction>
+      <autoOutline />
+    </introduction>
+
+    <section address="Eneter51">
+      <title>Eneter 5.1</title>
+      <content>
+        <para>Release Date: 2013-07-01</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.1 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, .Net 4.0, .Net 4.5</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, Silverlight 4, Silverlight 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7, Windows Phone 7.1</para>
+          </listItem>
+          <listItem>
+            <para>Compact Framework 2.0, Compact Framework 3.5</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Communication via UDP suported.</para>
+          </listItem>
+          <listItem>
+            <para>Support for IPv6 added.</para>
+          </listItem>
+          <listItem>
+            <para>Backup Router - routing to a backup service if the service is not available.</para>
+          </listItem>
+          <listItem>
+            <para>Automatic pinging to keep connection alive in websocket messaging for Android devices.</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              Performance significantly improved in many areas of the framework.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Buffered monitored messaging improved detection of broken connection.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Bridge component removed from the framework.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Broker and Channel Wrapper-Unwrapper are not compatible with previous versions of the framework.
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Cross-platform Notes:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Binary serializer cannot be used for the communication between Java and .NET based applications.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>0000020 - SyncDuplexTypedMessageSender may not work correctly.</para>
+          </listItem>
+        </list>
+        <para>
+          Java 6, Android 2.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Router is not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Silverlight 3, Silverlight 4, Silverlight 5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP and HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+
+        <para>
+          Windows Phone 7.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+
+        <para>
+          Compact Framework 2.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Only XmlSerializer is supported</para>
+          </listItem>
+          <listItem>
+            <para>Tracing does not automatically detect namespaces and method names</para>
+          </listItem>
+        </list>
+        <para>
+          Compact Framework 3.5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Only XmlSerializer is supported</para>
+          </listItem>
+          <listItem>
+            <para>Tracing does not automatically detect namespaces and method names</para>
+          </listItem>
+        </list>
+        <para>
+          Mono 2.6.4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>DataContractXmlStringSerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Mono platform is less stable as .Net platform</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+    
+    <section address="Eneter50">
+      <title>Eneter 5.0</title>
+      <content>
+        <para>Release Date: 2013-02-10</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.1 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, .Net 4.0, .Net 4.5</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, Silverlight 4, Silverlight 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7, Windows Phone 7.1</para>
+          </listItem>
+          <listItem>
+            <para>Compact Framework 2.0, Compact Framework 3.5</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>.Net 4.5 supported</para>
+          </listItem>
+          <listItem>
+            <para>Communication between applications via Android USB cable</para>
+          </listItem>
+          <listItem>
+            <para>Digitally signed messages</para>
+          </listItem>
+          <listItem>
+            <para>RSA encrypted messages (public and private key encryption)</para>
+          </listItem>
+          <listItem>
+            <para>Synchronous request-response communication</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to send notification messages directly via IDuplexBroker interface</para>
+          </listItem>
+          <listItem>
+            <para>Reliable messaging for Java and Android</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer for Java and Android</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              Reliable messaging was reworked and simplified.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Commands were removed from the framework and will not be supported anymore.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Typed Sequenced Messages were removed from the framework and will not be supported anymore.
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Cross-platform Notes:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Binary serializer cannot be used for the communication between Java and .NET based applications.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>No serious bugs detected.</para>
+          </listItem>
+        </list>
+        <para>
+          Java 6, Android 2.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Router is not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Silverlight 3, Silverlight 4, Silverlight 5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP and HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+
+        <para>
+          Windows Phone 7.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+
+        <para>
+          Compact Framework 2.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Only XmlSerializer is supported</para>
+          </listItem>
+          <listItem>
+            <para>Tracing does not automatically detect namespaces and method names</para>
+          </listItem>
+        </list>
+        <para>
+          Compact Framework 3.5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Only XmlSerializer is supported</para>
+          </listItem>
+          <listItem>
+            <para>Tracing does not automatically detect namespaces and method names</para>
+          </listItem>
+        </list>
+        <para>
+          Mono 2.6.4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>DataContractXmlStringSerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Mono platform is less stable as .Net platform</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+    <section address="Eneter42">
+      <title>Eneter 4.2</title>
+      <content>
+        <para>Release Date: 2012-10-01</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.1 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, .Net 4.0</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, Silverlight 4, Silverlight 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7, Windows Phone 7.1</para>
+          </listItem>
+          <listItem>
+            <para>Compact Framework 2.0, Compact Framework 3.5</para>
+          </listItem>
+          <listItem>
+            <para>Mono 2.6.4</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Compact Framework 2.0 and 3.5 supported.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility for the service to obtain the IP address of the client that sent the message via TCP or WebSocket.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to setup the concurrency mode for receiving messages via TCP and WebSockets.</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              No changes. Eneter 4.2 is compatible with Eneter 4.1 and Eneter 4.0
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Cross-platform Notes:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Binary serializer cannot be used for the communication between Java and .NET based applications.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>No serious bugs detected.</para>
+          </listItem>
+        </list>
+        <para>
+          Java 6, Android 2.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Reliable acknowledged messages are not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Router is not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Load balancer not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Commands are not implemeneted yet</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Silverlight 3, Silverlight 4, Silverlight 5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP and HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        
+        <para>
+          Windows Phone 7.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+
+        <para>
+          Compact Framework 2.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Only XmlSerializer is supported</para>
+          </listItem>
+          <listItem>
+            <para>Tracing does not automatically detect namespaces and method names</para>
+          </listItem>
+          <listItem>
+            <para>Commands are not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Compact Framework 3.5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Only XmlSerializer is supported</para>
+          </listItem>
+          <listItem>
+            <para>Tracing does not automatically detect namespaces and method names</para>
+          </listItem>
+          <listItem>
+            <para>Commands are not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Mono 2.6.4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>DataContractXmlStringSerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Mono platform is less stable as .Net platform</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+        
+      </content>
+    </section>
+
+    <section address="Eneter41">
+      <title>Eneter 4.1</title>
+      <content>
+        <para>Release Date: 2012-07-01</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.1 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, .Net 4.0</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, Silverlight 4, Silverlight 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7, Windows Phone 7.1</para>
+          </listItem>
+          <listItem>
+            <para>Mono 2.6.4</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Websocket communication for Java 6, Android, .Net 3.5, .Net 4.0, Silverlight 3, Silverlight 4, Silverlight 5, Windows Phone 7.1 and Mono 2.6.4</para>
+          </listItem>
+          <listItem>
+            <para>JSON serialization for .Net 3.5, .Net 4.0</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              No changes. Eneter 4.1 is compatible with Eneter 4.0.
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Cross-platform Notes:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Binary serializer cannot be used for the communication between Java and .NET based applications.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>No serious bugs detected.</para>
+          </listItem>
+        </list>
+        <para>
+          Java 6, Android 2.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Reliable acknowledged messages are not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Router is not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Load balancer not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Commands are not implemeneted yet</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Silverlight 3, Silverlight 4, Silverlight 5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP and HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Mono 2.6.4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>DataContractXmlStringSerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Mono platform is less stable as .Net platform</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Json serializer is not supported</para>
+          </listItem>
+        </list>
+
+      </content>
+    </section>
+
+    <section address="Eneter40">
+      <title>Eneter 4.0</title>
+      <content>
+        <para>Release Date: 2012-03-03</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.1 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, .Net 4.0</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, Silverlight 4, Silverlight 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7</para>
+          </listItem>
+          <listItem>
+            <para>Mono 2.6.4</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Cross-platform communication between .NET, Java and Android applications.</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 5 and Windows Phone 7.1 supported.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to supply a custom encoder/formatter for the low-level communication between channels.</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              Formatting of messages was changed. Therefore, applications based on Eneter 4.0 cannot communicate with applications based on previous Eneter versions.
+              The formatting was changed because the encoding information (i.e. Big or Little Endian, and UTF-8 or UTF-16) needs to be included in the message for the Cross-platform communication.
+              However, the API is still the same. Therefore, to migrate to Eneter 4.0 just update references in your project and rebuild.
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Cross-platform Notes:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Binary serializer cannot be used for the communication between Java and .NET based applications.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>0000013 - EneterTrace causes a security exception in Silverlight.</para>
+          </listItem>
+        </list>
+        <para>
+          Java 6, Android 2.1
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Reliable acknowledged messages are not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Router is not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Load balancer not implemented yet</para>
+          </listItem>
+          <listItem>
+            <para>Commands are not implemeneted yet</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Silverlight 3, Silverlight 4, Silverlight 5
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP and HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Mono 2.6.4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>DataContractXmlStringSerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Mono platform is less stable as .Net platform</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+        </list>
+
+      </content>
+    </section>
+
+    <section address="Eneter30">
+      <title>Eneter 3.0</title>
+      <content>
+        <para>Release Date: 2011-10-16</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>.Net 3.5, .Net 4.0</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, Silverlight 4</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7</para>
+          </listItem>
+          <listItem>
+            <para>Mono 2.6.4</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Interprocess communication via shared memory (faster than Named Pipes)</para>
+          </listItem>
+          <listItem>
+            <para>Named Pipes messaging supports security settings</para>
+          </listItem>
+          <listItem>
+            <para>GZip Serializer to compress long messages</para>
+          </listItem>
+          <listItem>
+            <para>Clients can use regular expressions to subscribe for events from the broker</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer for distributing the workload</para>
+          </listItem>
+          <listItem>
+            <para>Significantly improved tracing</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>The Broker is not compatible with brokers from previous vesrions. The API is still the same, but the messages subscribing clients were modified in order to support regular expressions.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>0000012 - DataContractXmlStringSerializer in Silverlight is not compatible with DataContractXmlStringSerializer in desktop application.</para>
+          </listItem>
+          <listItem>
+            <para>0000011 - DuplexBrokerClient incorectly detects if the duplex output channel is attached.</para>
+          </listItem>
+          <listItem>
+            <para>0000009 - Uri address cannot end with '/' in case of named pipes.</para>
+          </listItem>
+          <listItem>
+            <para>0000008 - Opening of HTTP connection sometimes hangs on Windows Phone 7.</para>
+          </listItem>
+        </list>
+        <para>
+          Silverlight 3, Silverlight 4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP and HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Windows Phone 7.0
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>TCP is not supported</para>
+          </listItem>
+          <listItem>
+            <para>HTTP listener is not supported (only receiving of response messages is supported)</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Rijndael serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Load Balancer is not supported</para>
+          </listItem>
+        </list>
+        <para>
+          Mono 2.6.4
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Named pipes are not supported</para>
+          </listItem>
+          <listItem>
+            <para>Shared memory is not supported</para>
+          </listItem>
+          <listItem>
+            <para>SSL is not supported for the TCP communication</para>
+          </listItem>
+          <listItem>
+            <para>DataContractXmlStringSerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>BinarySerializer is not supported</para>
+          </listItem>
+          <listItem>
+            <para>Mono platform is less stable as .Net platform</para>
+          </listItem>
+          <listItem>
+            <para>GZip serializer is not supported</para>
+          </listItem>
+        </list>
+
+      </content>
+    </section>
+
+    <section address="Eneter20">
+      <title>Eneter 2.0</title>
+      <content>
+        <para>Release Date: 2011-03-20</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>.Net 3.5, .Net 4.0</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3 and Silverlight 4</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7</para>
+          </listItem>
+          <listItem>
+            <para>Mono 2.6.4</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Connection monitoring</para>
+          </listItem>
+          <listItem>
+            <para>Buffering of sent messages in case of a disconnection</para>
+          </listItem>
+          <listItem>
+            <para>Automatic reconnect in case of a disconnection</para>
+          </listItem>
+          <listItem>
+            <para>Reliable messaging (when the message is delivered the receiver sends the acknowledge message)</para>
+          </listItem>
+          <listItem>
+            <para>TCP based messaging supports SSL</para>
+          </listItem>
+          <listItem>
+            <para>HTTP policy server added for the communication between the Silverlight application and the HTTP server</para>
+          </listItem>
+          <listItem>
+            <para>Encrypted serialization (AES and Rijndael encryption)</para>
+          </listItem>
+          <listItem>
+            <para>Service can disconnect a certain client</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>If the serializer is not specified, then XmlStringSerializer is always used by default.</para>
+          </listItem>
+          <listItem>
+            <para>If the duplex output channel is attached, it does not mean, the channel is listening to response messages.</para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>0000007 - Memory leak in Silverlight client when the Tcp connection is closed</para>
+          </listItem>
+          <listItem>
+            <para>0000006 - The application sending messages via Tcp is not closed properly if the</para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+    <section address="Eneter10">
+      <title>Eneter 1.0</title>
+      <content>
+        <para>Release Date: 2010-07-04</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>.Net 3.5, .Net 4.0</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3 and Silverlight 4</para>
+          </listItem>
+        </list>
+        <para>
+          Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Interprocess communication with strongly typed messages</para>
+          </listItem>
+          <listItem>
+            <para>Communication via TCP, HTTP and Named Pipes</para>
+          </listItem>
+          <listItem>
+            <para>Communication components Broker, Dispatcher and Router</para>
+          </listItem>
+          <listItem>
+            <para>TCP based messaging</para>
+          </listItem>
+          <listItem>
+            <para>TCP policy server for the communication between Silverlight and desktop applications</para>
+          </listItem>
+          <listItem>
+            <para>XML and Binary serializing</para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID"/>
+      <link xlink:href="Other Topic's ID">Link inner text</link>
+
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8270" />
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

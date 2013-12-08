@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Eneter.MessagingUnitTests</RootNamespace>
+    <AssemblyName>Eneter.MessagingUnitTests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\Program Files\NUnit-2.6.2\bin\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataProcessing\Serializing\Test_RsaSerializer_Bin.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_RsaSerializer_Xml.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_AesSerializer_Bin.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_AesSerializer_Xml.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_DataContractJsonStringSerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_RsaDigitalSignatureSerializer_Xml.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_GZipSerializer_Bin.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_GZipSerializer_Xml.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_RijndaelSerializer_Bin.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_RijndaelSerializer_Xml.cs" />
+    <Compile Include="DataProcessing\MessageQueueing\Test_WorkingThread.cs" />
+    <Compile Include="DataProcessing\Serializing\SerializerTesterBase.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_BinarySerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_DataContractXmlStringSerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\Test_XmlStringSerializer.cs" />
+    <Compile Include="DataProcessing\Streaming\Test_DynamicStream.cs" />
+    <Compile Include="Diagnostic\Test_EneterTrace.cs" />
+    <Compile Include="EndPoints\Rpc\RpcBaseTester.cs" />
+    <Compile Include="EndPoints\Rpc\Test_Rpc_SharedMemory_Bin.cs" />
+    <Compile Include="EndPoints\Rpc\Test_Rpc_Sync_Xml.cs" />
+    <Compile Include="EndPoints\Rpc\Test_Rpc_Tcp_Bin.cs" />
+    <Compile Include="EndPoints\StringRequestResponse\StringRequestResponseBaseTester.cs" />
+    <Compile Include="EndPoints\StringRequestResponse\Test_StringRequestResponse_NamedPipeMessaging.cs" />
+    <Compile Include="EndPoints\StringRequestResponse\Test_StringRequestResponse_SynchronousMessaging.cs" />
+    <Compile Include="EndPoints\SyncTypedMessages\SyncTypedMessagesBaseTester.cs" />
+    <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Sync_Xml.cs" />
+    <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Tcp_Xml.cs" />
+    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Sync_Xml.cs" />
+    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Tcp_Xml.cs" />
+    <Compile Include="EndPoints\TypedReliableMessages\TypedReliableMessagesBaseTester.cs" />
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_NamedPipe_Bin.cs" />
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_BinarySerializer.cs" />
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_XmlStringSerializer.cs" />
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_Tcp_Bin.cs" />
+    <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\MonitorConnectionTesterBase.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\ReconnecterBaseTester.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Pipe_Xml.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Tcp_Bin.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitotConnection_Sync_Bin.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Pipe.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Sync.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Tcp.cs" />
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_ThreadPool.cs" />
+    <Compile Include="MessagingSystems\Composits\MessageBus\MessageBusBaseTester.cs" />
+    <Compile Include="MessagingSystems\Composits\MessageBus\Test_MessageBus_Synchronous.cs" />
+    <Compile Include="MessagingSystems\Composits\MessageBus\Test_MessageBus_Tcp_Bin.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Sync_Xml.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs" />
+    <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterConnectionProtocol.cs" />
+    <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterStringConnectionProtocol.cs" />
+    <Compile Include="MessagingSystems\BaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpMessagingSystem_Synchronous.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpPolicyServer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemBaseTester.cs" />
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\Test_NamedPipeMessagingLocalMachine.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\Test_SharedMemoryMessagingSystem.cs" />
+    <Compile Include="MessagingSystems\SynchronousMessagingSystem\Test_SynchronousMessagingSystem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemBase.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_NegotiatonSecurity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_Prallel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_SslSecurity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_Synchronous.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\ThreadMessagingSystem\Test_ThreadMessagingSystem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\Test_ThreadPoolMessaging.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\Test_UdpMessagingSystem.cs" />
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\Test_WebSocketListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\Test_WebSocketMessaging.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Nodes\BackupRuter\Test_BackupRouter.cs" />
+    <Compile Include="Nodes\Broker\Test_Broker.cs" />
+    <Compile Include="Nodes\ChannelWrapper\Mock_DuplexInputChannelAttachable.cs" />
+    <Compile Include="Nodes\ChannelWrapper\Mock_DuplexOutputChannelAttachable.cs" />
+    <Compile Include="Nodes\ChannelWrapper\Tester_DuplexChannelWrapper.cs" />
+    <Compile Include="Nodes\Dispatcher\Test_DuplexDispatcher.cs" />
+    <Compile Include="Nodes\LoadBalancer\Test_LoadBalancer.cs" />
+    <Compile Include="Nodes\Router\Test_DuplexRouter.cs" />
+    <Compile Include="PerformanceTimer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RandomDataGenerator.cs" />
+    <Compile Include="RandomPortGenerator.cs" />
+    <Compile Include="SyncEvent.cs" />
+    <Compile Include="TestExtension.cs" />
+    <Compile Include="Threading\Dispatching\Test_WindowsDispatching.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EneterSigner.pfx" />
+    <None Include="Resources\MyClientCertificate.cer" />
+    <None Include="Resources\MyLocalCertificate.cer" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EneterMessagingFramework\EneterMessagingFrameworkNet40.csproj">
+      <Project>{8884B886-FCFA-44EA-BE93-F884CCFB7AF2}</Project>
+      <Name>EneterMessagingFrameworkNet40</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

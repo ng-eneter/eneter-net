@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="f6b44c4e-d4fb-4db2-a81f-a706e6fc9831" revisionNumber="1">
+  <developerHowToDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--
+    <summary>
+      <para>Optional summary abstract</para>
+    </summary>
+    -->
+    <introduction>
+      <para>
+        The following example shows how to implement a service publishing events that can be observed by clients.
+        The example uses the Broker component that can be used for sending notification messages to subscribed clients.
+      </para>
+      <markup>
+		    <img src="../media/Publish-SubscribeCommunication.gif" width="100%"/>
+	    </markup>
+      
+    </introduction>
+    
+    <codeExample>
+    Service sending notification messages to subscribed clients:
+    <code language="C#">
+using System;
+using System.Windows.Forms;
+using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+using Eneter.Messaging.Nodes.Broker;
+
+namespace Publisher
+{
+    public partial class Form1 : Form
+    {
+        // Notification message 1
+        public class NotifyMsg1
+        {
+            public DateTime CurrentTime { get; set; }
+        }
+
+        // Notification message 2
+        public class NotifyMsg2
+        {
+            public int Number { get; set; }
+        }
+
+        // Notification message 3
+        public class NotifyMsg3
+        {
+            public string TextMessage { get; set; }
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+
+            // Create broker providing observer/observable functionality for notification messages.
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory();
+            myBroker = aBrokerFactory.CreateBroker();
+            
+            // Create Tcp based messaging to communicate with clients.
+            IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
+            IDuplexInputChannel aTcpInputChannel = aMessaging.CreateDuplexInputChannel("tcp://127.0.0.1:8091/");
+
+            // Attach output channel and start listening.
+            myBroker.AttachDuplexInputChannel(aTcpInputChannel);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            // Detach output channel and release thread responsible for listening.
+            myBroker.DetachDuplexInputChannel();
+        }
+
+        // Send NotifyMsg1
+        private void Notify1Btn_Click(object sender, EventArgs e)
+        {
+            NotifyMsg1 aMsg = new NotifyMsg1();
+            aMsg.CurrentTime = DateTime.Now;
+
+            object aSerializedMsg = mySerializer.Serialize&lt;NotifyMsg1&gt;(aMsg);
+
+            myBroker.SendMessage("MyNotifyMsg1", aSerializedMsg);
+        }
+
+        // Send NotifyMsg2
+        private void Notify2Btn_Click(object sender, EventArgs e)
+        {
+            NotifyMsg2 aMsg = new NotifyMsg2();
+            aMsg.Number = 12345;
+
+            object aSerializedMsg = mySerializer.Serialize&lt;NotifyMsg2&gt;(aMsg);
+
+            myBroker.SendMessage("MyNotifyMsg2", aSerializedMsg);
+        }
+
+        // Send NotifyMsg3
+        private void Notify3Btn_Click(object sender, EventArgs e)
+        {
+            NotifyMsg3 aMsg = new NotifyMsg3();
+            aMsg.TextMessage = "My notifying text message.";
+
+            object aSerializedMsg = mySerializer.Serialize&lt;NotifyMsg3&gt;(aMsg);
+
+            myBroker.SendMessage("MyNotifyMsg3", aSerializedMsg);
+        }
+
+
+        // Broker used to forward messages to subscribers.
+        private IDuplexBroker myBroker;
+
+        // Serializer used to serialize notification messages.
+        private ISerializer mySerializer = new XmlStringSerializer();
+    }
+}
+    </code>
+      </codeExample>
+
+    <codeExample>
+    Client subscribing to receive notification messages.
+    <code language="C#">
+using System;
+using System.Windows.Forms;
+using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+using Eneter.Messaging.Nodes.Broker;
+
+namespace Subscriber
+{
+    public partial class Form1 : Form
+    {
+        // Notification message 1
+        public class NotifyMsg1
+        {
+            public DateTime CurrentTime { get; set; }
+        }
+
+        // Notification message 2
+        public class NotifyMsg2
+        {
+            public int Number { get; set; }
+        }
+
+        // Notification message 3
+        public class NotifyMsg3
+        {
+            public string TextMessage { get; set; }
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+
+            // Create the broker client that will receive notification messages.
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(new XmlStringSerializer());
+            myBrokerClient = aBrokerFactory.CreateBrokerClient();
+            myBrokerClient.BrokerMessageReceived += OnNotificationMessageReceived;
+
+            // Create the Tcp messaging for the communication with the publisher.
+            // Note: For the interprocess communication you can use: Tcp, NamedPipes and Http.
+            IMessagingSystemFactory aMessagingFactory = new TcpMessagingSystemFactory();
+
+            // Create duplex output channel for the communication with the publisher.
+            // Note: The duplex output channel can send requests and receive responses.
+            //       In our case, the broker client will send requests to subscribe/unsubscribe
+            //       and receive notifications as response messages.
+            IDuplexOutputChannel anOutputChannel = aMessagingFactory.CreateDuplexOutputChannel("tcp://127.0.0.1:8091/");
+
+            // Attach the output channel to the broker client
+            myBrokerClient.AttachDuplexOutputChannel(anOutputChannel);
+        }
+
+        // Correctly close the communication.
+        // Note: If the communication is not correctly closed, the thread listening to
+        //       response messages will not be closed.
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            myBrokerClient.DetachDuplexOutputChannel();
+        }
+
+        // Method processing notification messages from the publisher.
+        private void OnNotificationMessageReceived(object sender, BrokerMessageReceivedEventArgs e)
+        {
+            // The notification event does not come in UI thread.
+            // Therefore, if we want to work with UI controls we must execute it in the UI thread.
+            InvokeInUIThread(() =&gt;
+                {
+                    if (e.ReceivingError == null)
+                    {
+                        if (e.MessageTypeId == "MyNotifyMsg1")
+                        {
+                            NotifyMsg1 aDeserializedMsg = mySerializer.Deserialize&lt;NotifyMsg1&gt;(e.Message);
+                            Received1TextBox.Text = aDeserializedMsg.CurrentTime.ToString();
+                        }
+                        else if (e.MessageTypeId == "MyNotifyMsg2")
+                        {
+                            NotifyMsg2 aDeserializedMsg = mySerializer.Deserialize&lt;NotifyMsg2&gt;(e.Message);
+                            Received2TextBox.Text = aDeserializedMsg.Number.ToString();
+                        }
+                        else if (e.MessageTypeId == "MyNotifyMsg3")
+                        {
+                            NotifyMsg3 aDeserializedMsg = mySerializer.Deserialize&lt;NotifyMsg3&gt;(e.Message);
+                            Received3TextBox.Text = aDeserializedMsg.TextMessage;
+                        }
+                    }
+                });
+        }
+
+        // Subscribe to notification message 1
+        private void Subscribe1Btn_Click(object sender, EventArgs e)
+        {
+            myBrokerClient.Subscribe("MyNotifyMsg1");
+        }
+
+        // Unsubscribe from notification message 1
+        private void Unsubscribe1Btn_Click(object sender, EventArgs e)
+        {
+            Received1TextBox.Text = "";
+            myBrokerClient.Unsubscribe("MyNotifyMsg1");
+        }
+
+        // Subscribe to notification message 2
+        private void Subscribe2Btn_Click(object sender, EventArgs e)
+        {
+            myBrokerClient.Subscribe("MyNotifyMsg2");
+        }
+
+        // Unsubscribe from notification message 2
+        private void Unsubscribe2Btn_Click(object sender, EventArgs e)
+        {
+            Received2TextBox.Text = "";
+            myBrokerClient.Unsubscribe("MyNotifyMsg2");
+        }
+
+        // Subscribe to notification message 3
+        private void Subscribe3Btn_Click(object sender, EventArgs e)
+        {
+            myBrokerClient.Subscribe("MyNotifyMsg3");
+        }
+
+        // Unsubscribe from notification message 3
+        private void Unsubscribe3Btn_Click(object sender, EventArgs e)
+        {
+            Received3TextBox.Text = "";
+            myBrokerClient.Unsubscribe("MyNotifyMsg3");
+        }
+
+        // Helper method to invoke some functionality in UI thread.
+        private void InvokeInUIThread(Action uiMethod)
+        {
+            // If we are not in the UI thread then we must synchronize via the invoke mechanism.
+            if (InvokeRequired)
+            {
+                Invoke(uiMethod);
+            }
+            else
+            {
+                uiMethod();
+            }
+        }
+
+
+        // BrokerClient provides the communication with the broker.
+        private IDuplexBrokerClient myBrokerClient;
+
+        // Serializer used to sdeerialize notification messages.
+        private XmlStringSerializer mySerializer = new XmlStringSerializer();
+    }
+}
+    </code>
+    
+    </codeExample>
+    
+    <!-- <buildInstructions>Optional instructions for building a
+         code example.</buildInstructions> -->
+    <!-- <robustProgramming>Optional discussion of error handling and other
+         issues related to writing solid code.</robustProgramming> -->
+    <!-- <security>Optional discussion of security issues.</security> -->
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID">Link text</link>
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerHowToDocument>
+</topic>
