@@ -21,7 +21,7 @@ namespace Eneter.Messaging.Threading.Dispatching
                 lock (myQueue)
                 {
                     // If the queue is empty, then start also the thread that will process messages.
-                    // If the queue is not empty, the processing thread already exists.
+                    // If the queue is not empty, the  processing thread already exists.
                     if (myQueue.Count == 0)
                     {
                         ThreadPool.QueueUserWorkItem(DoWork);
