@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
 
 using System;
 using System.Collections.Generic;

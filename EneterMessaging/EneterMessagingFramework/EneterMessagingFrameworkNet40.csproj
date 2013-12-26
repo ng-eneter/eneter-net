@@ -123,9 +123,9 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\LocalProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputConnector.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListener.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListenerFactory.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListener_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListenerFactory_CompactFramework.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider.cs">
       <SubType>Code</SubType>
     </Compile>

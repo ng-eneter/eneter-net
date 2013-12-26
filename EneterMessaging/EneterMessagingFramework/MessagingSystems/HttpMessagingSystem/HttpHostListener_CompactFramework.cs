@@ -90,6 +90,8 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     string aRequestUriStr = aHandlerUri.Scheme + "://" + aHandlerUri.Host + ":" + Address.Port + anAbsolutePath + anHttpRequestRegex.Groups["query"].Value;
                     Uri aRequestUri = new Uri(aRequestUriStr);
 
+                    string anHttpMethod = anHttpRequestRegex.Groups["method"].Value;
+                    
                     // Read the content of the request message.
                     byte[] aRequestMessage = null;
 
@@ -115,7 +117,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                             aRequestMessage = aBuffer.ToArray();
                         }
                     }
-                    else if (anHttpRequestRegex.Groups["method"].Value == "POST")
+                    else if (anHttpMethod == "POST")
                     {
                         // Get size of the message.
                         string aSizeStr;
@@ -146,8 +148,9 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         aRequestMessage = StreamUtil.ReadBytes(aDataStream, aSize);
                     }
 
-                    // The message is not in chunks.
-                    HttpRequestContext aClientContext = new HttpRequestContext(aRequestUri, aRequestMessage, aDataStream);
+                    // Http message from the client.
+                    IPEndPoint aRemoteEndpoint = tcpClient.Client.RemoteEndPoint as IPEndPoint;
+                    HttpRequestContext aClientContext = new HttpRequestContext(aRequestUri, anHttpMethod, aRemoteEndpoint, aRequestMessage, aDataStream);
 
                     try
                     {

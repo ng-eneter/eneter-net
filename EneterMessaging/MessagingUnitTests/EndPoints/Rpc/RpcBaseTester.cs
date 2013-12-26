@@ -10,7 +10,7 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using System.Diagnostics;
 using Eneter.Messaging.Diagnostic;
 using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 {
@@ -82,7 +82,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
-
+#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcCall()
         {
@@ -114,6 +114,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+#endif
 
         [Test]
         public void DynamicRpcCall()
@@ -146,6 +147,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
+#if !COMPACT_FRAMEWORK
         [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RpcCallError()
@@ -176,7 +178,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+#endif
 
+#if !COMPACT_FRAMEWORK
         [Test]
         [ExpectedException(typeof(TimeoutException))]
         public virtual void RpcTimeout()
@@ -209,7 +213,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+#endif
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcNonGenericEvent()
         {
@@ -260,7 +266,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-
+#endif
 
         [Test]
         public void DynamicRpcNonGenericEvent()
@@ -276,7 +282,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 anRpcClient.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
 
                 AutoResetEvent anEventReceived = new AutoResetEvent(false);
-                Action<object, EventArgs> anEventHandler = (x, y) =>
+                EventHandler<EventArgs> anEventHandler = (x, y) =>
                 {
                     anEventReceived.Set();
                 };
@@ -311,6 +317,8 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
+        
+#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcGenericEvent()
         {
@@ -366,7 +374,8 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-
+#endif
+        
         [Test]
         public void DynamicRpcGenericEvent()
         {
@@ -382,7 +391,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 anRpcClient.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
 
                 AutoResetEvent anEventReceived = new AutoResetEvent(false);
-                Action<object, OpenArgs> anEventHandler = (x, y) =>
+                EventHandler<OpenArgs> anEventHandler = (x, y) =>
                     {
                         anEventReceived.Set();
                     };
@@ -421,6 +430,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void SubscribeBeforeAttachOutputChannel()
         {
@@ -481,8 +491,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+#endif
 
-
+#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcNonGenericEvent_10000()
         {
@@ -542,7 +553,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-
+#endif
 
         [Test]
         public void DynamicRpcNonGenericEvent_10000()
@@ -559,7 +570,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
                 int aCounter = 0;
                 AutoResetEvent anEventReceived = new AutoResetEvent(false);
-                Action<object, EventArgs> anEventHandler = (x, y) =>
+                EventHandler<EventArgs> anEventHandler = (x, y) =>
                     {
                         ++aCounter;
                         if (aCounter == 10000)
@@ -602,7 +613,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
-
+#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcCall_10000()
         {
@@ -658,7 +669,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+#endif
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void MultipleClients_RemoteCall_10()
         {
@@ -731,7 +744,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-
+#endif
+        
+#if !COMPACT_FRAMEWORK
         [Test]
         public void MultipleClients_RemoteEvent_10()
         {
@@ -827,7 +842,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+#endif
 
+#if !COMPACT_FRAMEWORK
         [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void NoInterfaceTypeProvided()
@@ -835,6 +852,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             RpcFactory anRpcFactory = new RpcFactory();
             anRpcFactory.CreateClient<OpenArgs>();
         }
+#endif
 
         protected IMessagingSystemFactory myMessaging;
         protected string myChannelId;

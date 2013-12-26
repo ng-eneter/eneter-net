@@ -226,6 +226,11 @@ namespace System.Linq
             return new List<TSource>(source);
         }
         
+        public static TSource[] ToArray<TSource>(
+            this IEnumerable<TSource> source)
+        {
+            return source.ToList().ToArray();
+        }
         
         
         public static IEnumerable<TSource> Where<TSource>(
@@ -241,7 +246,6 @@ namespace System.Linq
         /// Filters a sequence of values based on a predicate. 
         /// Each element's index is used in the logic of the predicate function.
         /// </summary>
-
         public static IEnumerable<TSource> Where<TSource>(
             this IEnumerable<TSource> source,
             Func<TSource, int, bool> predicate)
@@ -263,7 +267,41 @@ namespace System.Linq
         }
         
         
-        
+        /// <summary>
+        /// Projects each element of a sequence into a new form.
+        /// </summary>
+        public static IEnumerable<TResult> Select<TSource, TResult>(
+            this IEnumerable<TSource> source,
+            Func<TSource, TResult> selector)
+        {
+            if (selector == null) throw new ArgumentNullException("selector");
+
+            return source.Select((item, i) => selector(item));
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence into a new form by 
+        /// incorporating the element's index.
+        /// </summary>
+        public static IEnumerable<TResult> Select<TSource, TResult>(
+            this IEnumerable<TSource> source,
+            Func<TSource, int, TResult> selector)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (selector == null) throw new ArgumentNullException("selector");
+
+            return SelectYield(source, selector);
+        }
+
+        private static IEnumerable<TResult> SelectYield<TSource, TResult>(
+            IEnumerable<TSource> source,
+            Func<TSource, int, TResult> selector)
+        {
+            var i = 0;
+            foreach (var item in source)
+                yield return selector(item, i++);
+        }
+
     }
 }
 
@@ -277,7 +315,10 @@ namespace System
     //delegate TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3);
     //delegate TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
     
-    delegate void Action();
+    /// <summary>
+    /// Delegate.
+    /// </summary>
+    public delegate void Action();
     delegate void Action<T1, T2>(T1 arg1, T2 arg2);
     delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
     //delegate void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);

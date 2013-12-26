@@ -36,7 +36,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Returns the instance of the service interface implementing the proxy.
         /// </summary>
@@ -56,7 +56,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// Prefer to use the Proxy property where you can subscribe to events exposed via the interface.
         /// Use this method in cases when the proxy is not available (e.g. in Silverloight).
         /// </remarks>
-        void SubscribeRemoteEvent<TEventArgs>(string eventName, Action<object, TEventArgs> eventHandler) where TEventArgs : EventArgs;
+        void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler) where TEventArgs : EventArgs;
 
         /// <summary>
         /// Unsubscribe from the event on the service.

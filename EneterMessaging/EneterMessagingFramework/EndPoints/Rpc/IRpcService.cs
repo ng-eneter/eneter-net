@@ -5,6 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
+
 using System;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;

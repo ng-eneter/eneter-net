@@ -19,9 +19,11 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             myMessaging = new SynchronousMessagingSystemFactory();
         }
 
+#if !COMPACT_FRAMEWORK
         public override void RpcTimeout()
         {
             // N.A.
         }
+#endif
     }
 }

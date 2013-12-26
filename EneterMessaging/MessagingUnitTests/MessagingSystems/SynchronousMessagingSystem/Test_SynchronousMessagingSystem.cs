@@ -8,6 +8,7 @@ using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using System.Text.RegularExpressions;
+using System.IO;
 
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.SynchronousMessagingSystem
@@ -19,7 +20,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.SynchronousMessagingSystem
         public void Setup()
         {
             //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
-            //EneterTrace.StartProfiler();
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             MessagingSystemFactory = new SynchronousMessagingSystemFactory();
         }

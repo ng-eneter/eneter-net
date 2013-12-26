@@ -67,7 +67,11 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 myStopReceivingRequestedFlag = true;
                 myStopPollingWaitingEvent.Set();
 
+#if COMPACT_FRAMEWORK
+                if (myResponseReceiverThread != null)
+#else
                 if (myResponseReceiverThread != null && myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
+#endif
                 {
                     if (!myResponseReceiverThread.Join(3000))
                     {

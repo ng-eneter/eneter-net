@@ -5,6 +5,8 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
+#if !COMPACT_FRAMEWORK20
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -407,3 +409,5 @@ namespace Eneter.Messaging.EndPoints.Rpc
         protected override string TracedObject { get { return GetType().Name + " "; } }
     }
 }
+
+#endif

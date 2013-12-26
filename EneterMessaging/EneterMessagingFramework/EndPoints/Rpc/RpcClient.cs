@@ -64,7 +64,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 mySerializer = serializer;
                 myRpcTimeout = rpcTimeout;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
                 // Dynamically implement and instantiate the given interface as the proxy.
                 Proxy = ProxyProvider.CreateInstance<TServiceInterface>(CallMethod, SubscribeEvent, UnsubscribeEvent);
 #endif
@@ -149,7 +149,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
-        public void SubscribeRemoteEvent<TEventArgs>(string eventName, Action<object, TEventArgs> eventHandler)
+        public void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler)
             where TEventArgs : EventArgs
         {
             using (EneterTrace.Entering())
@@ -467,7 +467,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     AttachedDuplexOutputChannel.SendMessage(aSerializedMessage);
 
                     // Wait for the response.
-                    if (!anRpcSyncContext.RpcCompleted.WaitOne(myRpcTimeout))
+                    if (!anRpcSyncContext.RpcCompleted.WaitOne((int)myRpcTimeout.TotalMilliseconds))
                     {
                         throw new TimeoutException("Remote call to '" + rpcRequest.OperationName + "' has not returned within the specified timeout " + myRpcTimeout + ".");
                     }

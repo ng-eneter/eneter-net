@@ -9,23 +9,31 @@
 
 using System;
 using System.IO;
+using System.Net;
+
 using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
     internal class HttpRequestContext
     {
-        public HttpRequestContext(Uri uri, byte[] requestMessage, Stream responseStream)
+        public HttpRequestContext(Uri uri, string httpMethod, IPEndPoint remoteEndPoint, byte[] requestMessage, Stream responseStream)
         {
             using (EneterTrace.Entering())
             {
                 Uri = uri;
+                HttpMethod = httpMethod;
+                RemoteEndPoint = remoteEndPoint;
                 myResponseStream = responseStream;
                 myRequestMessage = requestMessage;
             }
         }
 
         public Uri Uri { get; private set; }
+        
+        public string HttpMethod { get; private set; }
+        
+        public IPEndPoint RemoteEndPoint { get; private set; }
 
         /// <summary>
         /// Returns the body content of the HTTP request.

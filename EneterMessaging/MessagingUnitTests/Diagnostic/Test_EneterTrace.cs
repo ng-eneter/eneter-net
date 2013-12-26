@@ -60,6 +60,9 @@ namespace Eneter.MessagingUnitTests.Diagnostic
             {
                 EneterTrace.TraceLog = null;
             }
+
+            // Give some time allowing the trace buffer to flush.
+            Thread.Sleep(300);
         }
 
         [Test]
@@ -110,7 +113,7 @@ namespace Eneter.MessagingUnitTests.Diagnostic
                 // Eneter trace.
                 EneterTrace.NameSpaceFilter = new Regex("^Eneter");
                 EneterTrace.Debug("This message shall be traced.");
-                Thread.Sleep(10);
+                Thread.Sleep(100);
                 string aMessage = EneterTrace.TraceLog.ToString();
                 Assert.IsTrue(aMessage.Contains("This message shall be traced."));
 
@@ -121,7 +124,7 @@ namespace Eneter.MessagingUnitTests.Diagnostic
                 // Eneter trace shall be filtered out.
                 EneterTrace.NameSpaceFilter = new Regex(@"^(?!\bEneter\b)");
                 EneterTrace.Debug("This message shall not be traced.");
-                Thread.Sleep(10);
+                Thread.Sleep(100);
                 Assert.AreEqual("", EneterTrace.TraceLog.ToString());
             }
             finally

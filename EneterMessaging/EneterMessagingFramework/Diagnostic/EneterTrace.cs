@@ -512,7 +512,9 @@ namespace Eneter.Messaging.Diagnostic
 #endif
 
                         string aMessage = string.Join(" ", aJoinBuf);
-                        WriteToTrace(aMessage);
+
+                        // Write the trace message to the buffer.
+                        WriteToTraceBuffer(aMessage);
                     };
 
                 EnqueueJob(aTraceJob);
@@ -523,24 +525,6 @@ namespace Eneter.Messaging.Diagnostic
                 //       Therefore, the exception is ignored.
                 string anExceptionDetails = GetDetailsFromException(err);
                 Console.WriteLine("EneterTrace failed to trace the message. " + anExceptionDetails);
-            }
-        }
-
-        private static void WriteToTrace(string message)
-        {
-            lock (myTraceLogLock)
-            {
-                // If a trace log is set, then write to it.
-                if (TraceLog != null)
-                {
-                    TraceLog.WriteLine(message);
-                    TraceLog.Flush();
-                }
-                else
-                {
-                    // Otherwise write to the debug port.
-                    System.Diagnostics.Debug.WriteLine(message);
-                }
             }
         }
 
@@ -652,6 +636,78 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
+
+        private static void WriteToTraceBuffer(string message)
+        {
+            lock (myBufferedTraces)
+            {
+                // If the buffer was empty also start the thread processing the buffer.
+                if (myBufferedTraces.Length == 0)
+                {
+                    // Add the message to the buffer.
+                    // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
+                    myBufferedTraces.Append(message);
+                    myBufferedTraces.Append("\r\n");
+
+                    // Flush the buffer in the specified time.
+                    myTraceBufferFlushTimer.Change(50, -1);
+                }
+                else
+                {
+                    // Meanwhile while the flush time is not elapsed continue writing to the buffer.
+                    // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
+                    myBufferedTraces.Append(message);
+                    myBufferedTraces.Append("\r\n");
+                }
+            }
+        }
+
+        private static void OnFlushTraceBuffer(object x)
+        {
+            string aBufferedTraceMessages;
+
+            lock (myBufferedTraces)
+            {
+                aBufferedTraceMessages = myBufferedTraces.ToString();
+                
+                // Note: compact framework does not support Clear().
+                myBufferedTraces.Length = 0;
+            }
+
+            // Flush buffered messages to the trace.
+            WriteToTrace(aBufferedTraceMessages);
+        }
+
+        private static void WriteToTrace(string message)
+        {
+            try
+            {
+                lock (myTraceLogLock)
+                {
+                    // If a trace log is set, then write to it.
+                    if (TraceLog != null)
+                    {
+                        TraceLog.Write(message);
+                        TraceLog.Flush();
+                    }
+                    else
+                    {
+#if !SILVERLIGHT
+                        // Otherwise write to the debug port.
+                        System.Diagnostics.Debug.Write(message);
+#else
+                        System.Diagnostics.Debug.WriteLine(message);
+#endif
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                string anExceptionDetails = GetDetailsFromException(err);
+                Console.WriteLine("EneterTrace failed to write to the trace." + anExceptionDetails);
+            }
+        }
+
         /// <summary>
         /// Private helper constructor.
         /// </summary>
@@ -680,6 +736,9 @@ namespace Eneter.Messaging.Diagnostic
 
         private static ManualResetEvent myQueueThreadEndedEvent = new ManualResetEvent(true);
         private static Queue<Action> myTraceQueue = new Queue<Action>();
+
+        private static StringBuilder myBufferedTraces = new StringBuilder();
+        private static Timer myTraceBufferFlushTimer = new Timer(OnFlushTraceBuffer, null, -1, -1);
 
 #if !COMPACT_FRAMEWORK
         private class ProfilerData
