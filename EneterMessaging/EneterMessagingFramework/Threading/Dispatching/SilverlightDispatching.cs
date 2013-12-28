@@ -17,9 +17,9 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// <summary>
     /// Provides dispatcher that invokes incoming methods in the Silverlight thread.
     /// </summary>
-    public class SilverlightDispatching : IDispatcherProvider
+    public class SilverlightDispatching : IThreadDispatcherProvider
     {
-        private class SilverlightDispatcher : IDispatcher
+        private class SilverlightDispatcher : IThreadDispatcher
         {
             public void Invoke(Action workItem)
             {
@@ -34,7 +34,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// Returns dispatcher which invokes methods in the Silverlight thread.
         /// </summary>
         /// <returns></returns>
-        public IDispatcher GetDispatcher()
+        public IThreadDispatcher GetDispatcher()
         {
             using (EneterTrace.Entering())
             {

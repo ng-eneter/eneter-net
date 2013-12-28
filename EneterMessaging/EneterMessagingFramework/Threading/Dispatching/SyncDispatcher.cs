@@ -12,7 +12,7 @@ using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.Threading.Dispatching
 {
-    internal class SyncDispatcher : IDispatcher
+    internal class SyncDispatcher : IThreadDispatcher
     {
         public void Invoke(Action workItem)
         {

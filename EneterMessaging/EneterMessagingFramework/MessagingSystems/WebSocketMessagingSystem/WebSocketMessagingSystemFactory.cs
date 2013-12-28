@@ -162,7 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
 
 #if !SILVERLIGHT
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(ClientSecurityStreamFactory,
@@ -195,7 +195,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
 
 #if !SILVERLIGHT
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(ClientSecurityStreamFactory,
@@ -225,7 +225,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             using (EneterTrace.Entering())
             {
 #if !SILVERLIGHT
-                IDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory anInputConnectorFactory = new WebSocketInputConnectorFactory(ServerSecurityStreamFactory,
                     (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
@@ -302,7 +302,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
-        public IDispatcherProvider InputChannelThreading { get; set; }
+        public IThreadDispatcherProvider InputChannelThreading { get; set; }
 
         /// <summary>
         /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
@@ -311,7 +311,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
-        public IDispatcherProvider OutputChannelThreading { get; set; }
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
 #if !SILVERLIGHT
         private ISecurityFactory myServerSecurityStreamFactory = new NonSecurityFactory();

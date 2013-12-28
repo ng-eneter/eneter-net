@@ -19,9 +19,9 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// Provides dispatcher that internally uses System.Windows.Threading.Dispatcher.
     /// E.g. in case of WPF it allows to synchronize incoming methods into the UI thread.
     /// </summary>
-    public class WindowsDispatching : IDispatcherProvider
+    public class WindowsDispatching : IThreadDispatcherProvider
     {
-        private class WindowsDispatcher : IDispatcher
+        private class WindowsDispatcher : IThreadDispatcher
         {
             public WindowsDispatcher(Dispatcher workingThreadDispatcher)
             {
@@ -61,7 +61,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// Returns dispatcher which invokes incoming methods using the windows dispatcher.
         /// </summary>
         /// <returns></returns>
-        public IDispatcher GetDispatcher()
+        public IThreadDispatcher GetDispatcher()
         {
             return (myDispatcher != null) ? myDispatcher : new WindowsDispatcher(StartNewWindowsDispatcher());
         }
@@ -115,7 +115,7 @@ namespace Eneter.Messaging.Threading.Dispatching
             }
         }
 
-        private IDispatcher myDispatcher;
+        private IThreadDispatcher myDispatcher;
     }
 }
 

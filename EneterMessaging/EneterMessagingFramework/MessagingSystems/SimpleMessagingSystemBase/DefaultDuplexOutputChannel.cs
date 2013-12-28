@@ -22,7 +22,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-        public DefaultDuplexOutputChannel(string channelId, string responseReceiverId, IDispatcher dispatcher,
+        public DefaultDuplexOutputChannel(string channelId, string responseReceiverId, IThreadDispatcher dispatcher,
             IOutputConnectorFactory outputConnectorFactory, IProtocolFormatter protocolFormatter, bool startReceiverAfterSendOpenRequest)
         {
             using (EneterTrace.Entering())
@@ -158,7 +158,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        public IDispatcher Dispatcher { get; private set; }
+        public IThreadDispatcher Dispatcher { get; private set; }
 
         private bool HandleResponse(MessageContext messageContext)
         {

@@ -240,7 +240,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
 #if !SILVERLIGHT
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
@@ -280,7 +280,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
 #if !SILVERLIGHT
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
@@ -317,7 +317,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             using (EneterTrace.Entering())
             {
 #if !SILVERLIGHT
-                IDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory aFactory = new TcpInputConnectorFactory(
                     ServerSecurityStreamFactory,
@@ -439,7 +439,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
-        public IDispatcherProvider InputChannelThreading { get; set; }
+        public IThreadDispatcherProvider InputChannelThreading { get; set; }
 #endif
 
         /// <summary>
@@ -449,7 +449,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
-        public IDispatcherProvider OutputChannelThreading { get; set; }
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
         
 
         private IProtocolFormatter<byte[]> myProtocolFormatter;

@@ -317,8 +317,8 @@
     <Compile Include="System\ReadOnlyDictionary.cs" />
     <Compile Include="System\SystemAttributes.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
-    <Compile Include="Threading\Dispatching\IDispatcher.cs" />
-    <Compile Include="Threading\Dispatching\IDispatcherProvider.cs" />
+    <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
+    <Compile Include="Threading\Dispatching\IThreadDispatcherProvider.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
     <Compile Include="Threading\Dispatching\SilverlightDispatching.cs" />
     <Compile Include="Threading\Dispatching\SyncDispatcher.cs" />

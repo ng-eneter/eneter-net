@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !COMPACT_FRAMEWORK
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,8 +19,8 @@ namespace Eneter.MessagingUnitTests.Threading.Dispatching
         {
             Dispatcher aDispatcher = WindowsDispatching.StartNewWindowsDispatcher();
 
-            IDispatcherProvider aDispatching = new WindowsDispatching(aDispatcher);
-            IDispatcher anEneterDispatcher = aDispatching.GetDispatcher();
+            IThreadDispatcherProvider aDispatching = new WindowsDispatching(aDispatcher);
+            IThreadDispatcher anEneterDispatcher = aDispatching.GetDispatcher();
 
             ManualResetEvent anInvokeCompleted1 = new ManualResetEvent(false);
             int aThreadId1 = 0;
@@ -48,3 +50,5 @@ namespace Eneter.MessagingUnitTests.Threading.Dispatching
         
     }
 }
+
+#endif

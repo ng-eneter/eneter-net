@@ -166,7 +166,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        public IDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
 
         private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
         {

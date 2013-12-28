@@ -13,9 +13,6 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
     /// <summary>
     /// Declares the duplex input channel that can receive messages from the duplex output channel and send back response messages.
     /// </summary>
-    /// <remarks>
-    /// Notice, the duplex input channel works only with duplex output channel and not with output channel.
-    /// </remarks>
     public interface IDuplexInputChannel
     {
         /// <summary>
@@ -78,7 +75,7 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         void DisconnectResponseReceiver(string responseReceiverId);
 
         /// <summary>
-        /// Dispatcher defining the threading model for raising events.
+        /// Returns dispatcher that defines the threading model for raising events.
         /// </summary>
         /// <remarks>
         /// Dispatcher is responsible for raising ResponseReceiverConnected, ResponseReceiverDisconnected and MessageReceived events
@@ -87,6 +84,6 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         /// The only exception is the event ResponseReceiverConnecting which is not dispatched to any specific thread because
         /// it may set a value which needs to be checked when it returns.
         /// </remarks>
-        IDispatcher Dispatcher { get; }
+        IThreadDispatcher Dispatcher { get; }
     }
 }

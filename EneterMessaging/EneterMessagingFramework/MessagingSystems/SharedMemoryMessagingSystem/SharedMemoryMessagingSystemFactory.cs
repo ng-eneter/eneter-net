@@ -310,7 +310,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myConnectorFactory, myProtocolFormatter, true);
             }
         }
@@ -339,7 +339,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myConnectorFactory, myProtocolFormatter, true);
             }
         }
@@ -362,7 +362,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aThreadDispatcher = InputChannelThreading.GetDispatcher();
+                IThreadDispatcher aThreadDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aThreadDispatcher, anInputConnector, myProtocolFormatter);
@@ -377,7 +377,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
-        public IDispatcherProvider InputChannelThreading { get; set; }
+        public IThreadDispatcherProvider InputChannelThreading { get; set; }
 
         /// <summary>
         /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
@@ -386,7 +386,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
-        public IDispatcherProvider OutputChannelThreading { get; set; }
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
         private SharedMemoryConnectorFactory myConnectorFactory;
         private IProtocolFormatter<byte[]> myProtocolFormatter;

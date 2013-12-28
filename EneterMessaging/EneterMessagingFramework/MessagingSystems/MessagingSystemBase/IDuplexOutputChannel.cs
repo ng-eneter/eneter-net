@@ -107,13 +107,13 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         bool IsConnected { get; }
 
         /// <summary>
-        /// Dispatcher defining the threading model for raising events.
+        /// Returns dispatcher that defines the threading model for raising events.
         /// </summary>
         /// <remarks>
         /// Dispatcher is responsible for raising ConnectionOpened, ConnectionClosed and ResponseMessageReceived events
         /// in desired thread. It allows to specify which threading mechanism/model is used to raise asynchronous events.
         /// E.g. events are queued and raised by one thread. Or e.g. in Silverlight events can be raised in the Silverlight thread.
         /// </remarks>
-        IDispatcher Dispatcher { get; }
+        IThreadDispatcher Dispatcher { get; }
     }
 }

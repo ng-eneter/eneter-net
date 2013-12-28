@@ -12,7 +12,7 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// <summary>
     /// Declares dispatcher that is responsible for invoking methods according to desired threading model.
     /// </summary>
-    public interface IDispatcher
+    public interface IThreadDispatcher
     {
         /// <summary>
         /// Invokes the given delegate in the desired thread.

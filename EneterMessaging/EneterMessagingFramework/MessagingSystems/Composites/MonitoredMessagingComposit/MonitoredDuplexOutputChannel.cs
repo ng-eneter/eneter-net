@@ -167,7 +167,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        public IDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
 
         private void OnResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e)
         {

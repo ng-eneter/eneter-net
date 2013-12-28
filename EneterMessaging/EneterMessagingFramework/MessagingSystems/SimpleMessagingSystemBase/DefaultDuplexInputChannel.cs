@@ -39,9 +39,9 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
         public DefaultDuplexInputChannel(string channelId,  // address to listen
-            IDispatcher dispatcher,                         // how messages are encoded between channels
-            IInputConnector inputConnector,                 // threading model used to notify messages and events
-            IProtocolFormatter protocolFormatter)           // listener used for listening to messages
+            IThreadDispatcher dispatcher,                         // threading model used to notify messages and events
+            IInputConnector inputConnector,                 // listener used for listening to messages
+            IProtocolFormatter protocolFormatter)           // how messages are encoded between channels
         {
             using (EneterTrace.Entering())
             {
@@ -54,7 +54,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 ChannelId = channelId;
                 Dispatcher = dispatcher;
                 myProtocolFormatter = protocolFormatter;
-                myServiceConnector = inputConnector;
+                myInputConnector = inputConnector;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     try
                     {
                         // Start listen to messages.
-                        myServiceConnector.StartListening(HandleMessage);
+                        myInputConnector.StartListening(HandleMessage);
                     }
                     catch (Exception err)
                     {
@@ -111,7 +111,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                     try
                     {
-                        myServiceConnector.StopListening();
+                        myInputConnector.StopListening();
                     }
                     catch (Exception err)
                     {
@@ -129,7 +129,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     lock (myListeningManipulatorLock)
                     {
-                        return myServiceConnector.IsListening;
+                        return myInputConnector.IsListening;
                     }
                 }
             }
@@ -184,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        public IDispatcher Dispatcher { get; private set; }
+        public IThreadDispatcher Dispatcher { get; private set; }
 
         private void DisconnectClients()
         {
@@ -277,26 +277,29 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         private void CleanDisconnectedResponseReceiver(ISender responseSender, string senderAddress)
         {
-            // Some client got disconnected without sending the 'close' messages.
-            // So try to identify closed response receiver and clean it.
-            KeyValuePair<string, TConnectionContext> aPair;
-            lock (myConnectedClients)
+            using (EneterTrace.Entering())
             {
-                // Note: KeyValuePair is a struct so the default value is not null.
-                aPair = myConnectedClients.FirstOrDefault(x => x.Value.ResponseSender == responseSender);
-            }
+                // Some client got disconnected without sending the 'close' messages.
+                // So try to identify closed response receiver and clean it.
+                KeyValuePair<string, TConnectionContext> aPair;
+                lock (myConnectedClients)
+                {
+                    // Note: KeyValuePair is a struct so the default value is not null.
+                    aPair = myConnectedClients.FirstOrDefault(x => x.Value.ResponseSender == responseSender);
+                }
 
-            if (!String.IsNullOrEmpty(aPair.Key))
-            {
-                CloseResponseMessageSender(aPair.Key, false);
-            }
-            else
-            {
-                // Decoding the message returned null.
-                // This can happen if a client closed the connection and the stream was closed.
-                // e.g. in case of Named Pipes.
+                if (!String.IsNullOrEmpty(aPair.Key))
+                {
+                    CloseResponseMessageSender(aPair.Key, false);
+                }
+                else
+                {
+                    // Decoding the message returned null.
+                    // This can happen if a client closed the connection and the stream was closed.
+                    // e.g. in case of Named Pipes.
 
-                // nothing to do here.
+                    // nothing to do here.
+                }
             }
         }
 
@@ -331,7 +334,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             ISender aResponseSender = messageContext.ResponseSender;
                             if (aResponseSender == null)
                             {
-                                aResponseSender = myServiceConnector.CreateResponseSender(responseReceiverId);
+                                aResponseSender = myInputConnector.CreateResponseSender(responseReceiverId);
                             }
 
                             aConnectionContext = new TConnectionContext(aResponseSender, messageContext.SenderAddress);
@@ -484,7 +487,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         private Dictionary<string, TConnectionContext> myConnectedClients = new Dictionary<string, TConnectionContext>();
 
 
-        private IInputConnector myServiceConnector;
+        private IInputConnector myInputConnector;
         private IProtocolFormatter myProtocolFormatter;
 
         private object myListeningManipulatorLock = new object();

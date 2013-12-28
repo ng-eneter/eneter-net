@@ -14,9 +14,9 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// <summary>
     /// Provides dispatcher that just invokes the method directly from the calling thread.
     /// </summary>
-    public class NoDispatching : IDispatcherProvider
+    public class NoDispatching : IThreadDispatcherProvider
     {
-        private class DefaultDispatcher : IDispatcher
+        private class DefaultDispatcher : IThreadDispatcher
         {
             public void Invoke(Action workItem)
             {
@@ -29,7 +29,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// Returns dispatcher invoking the method directly from the calling thread.
         /// </summary>
         /// <returns></returns>
-        public IDispatcher GetDispatcher()
+        public IThreadDispatcher GetDispatcher()
         {
             using (EneterTrace.Entering())
             {

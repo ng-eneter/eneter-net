@@ -231,7 +231,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             }
         }
 
-        private IDispatcher myDispatcher;
+        private IThreadDispatcher myDispatcher;
         private ConnectorFactory myConnectorFactory;
         private IProtocolFormatter<string> myProtocolFormatter;
     }

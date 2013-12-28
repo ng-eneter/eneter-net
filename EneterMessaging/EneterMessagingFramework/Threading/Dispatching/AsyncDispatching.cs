@@ -13,9 +13,9 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// <summary>
     /// Provides dispatcher that invokes methods asynchronously using ThreadPool.
     /// </summary>
-    public class AsyncDispatching : IDispatcherProvider
+    public class AsyncDispatching : IThreadDispatcherProvider
     {
-        private class AsyncDispatcher : IDispatcher
+        private class AsyncDispatcher : IThreadDispatcher
         {
             public void Invoke(Action workItem)
             {
@@ -27,11 +27,11 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// Returns dispatcher that invokes methods using TrheadPool.
         /// </summary>
         /// <returns></returns>
-        public IDispatcher GetDispatcher()
+        public IThreadDispatcher GetDispatcher()
         {
             return myDispatcher;
         }
 
-        private IDispatcher myDispatcher = new AsyncDispatcher();
+        private IThreadDispatcher myDispatcher = new AsyncDispatcher();
     }
 }

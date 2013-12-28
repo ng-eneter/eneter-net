@@ -559,7 +559,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private ISerializer mySerializer;
         private int myCounter;
         private Dictionary<int, RemoteCallContext> myPendingRemoteCalls = new Dictionary<int, RemoteCallContext>();
-        private IDispatcher myRaiseEventInvoker;
+        private IThreadDispatcher myRaiseEventInvoker;
         private object myConnectionManipulatorLock = new object();
         private TimeSpan myRpcTimeout;
 

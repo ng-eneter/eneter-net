@@ -279,7 +279,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private Thread myListeningThread;
         private ManualResetEvent myListeningToResponsesStartedEvent = new ManualResetEvent(false);
         private Func<MessageContext, bool> myMessageHandler;
-        private IDispatcher myWorkingThreadDispatcher;
+        private IThreadDispatcher myWorkingThreadDispatcher;
 
         private string TracedObject
         {

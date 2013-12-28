@@ -138,7 +138,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        public IDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
 
         private void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
         {

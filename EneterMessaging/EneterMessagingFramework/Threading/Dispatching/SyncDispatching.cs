@@ -12,7 +12,7 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// <summary>
     /// Provides dispatcher that queues incoming methods and calls them synchronously one by one.
     /// </summary>
-    public class SyncDispatching : IDispatcherProvider
+    public class SyncDispatching : IThreadDispatcherProvider
     {
         /// <summary>
         /// Constructs dispatching where each GetDispatcher() returns a new instance of the dispatcher.
@@ -44,7 +44,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// Returns dispatcher that sync all incoming methods into one thread.
         /// </summary>
         /// <returns></returns>
-        public IDispatcher GetDispatcher()
+        public IThreadDispatcher GetDispatcher()
         {
             using (EneterTrace.Entering())
             {
@@ -52,6 +52,6 @@ namespace Eneter.Messaging.Threading.Dispatching
             }
         }
 
-        private IDispatcher mySharedDispatcher;
+        private IThreadDispatcher mySharedDispatcher;
     }
 }

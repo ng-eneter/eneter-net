@@ -37,7 +37,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
             get { return myUnderlyingInputChannel.ChannelId; }
         }
 
-        public IDispatcher Dispatcher
+        public IThreadDispatcher Dispatcher
         {
             get { return myUnderlyingInputChannel.Dispatcher; }
         }

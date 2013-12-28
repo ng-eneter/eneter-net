@@ -86,7 +86,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
             }
         }
 
-        public IDispatcher Dispatcher { get { return myOutputchannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get { return myOutputchannel.Dispatcher; } }
 
         private void ConfigureAdbToForwardCommunication(string portNumber)
         {

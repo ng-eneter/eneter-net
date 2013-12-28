@@ -131,7 +131,7 @@ namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
-        public IDispatcherProvider InputChannelThreading
+        public IThreadDispatcherProvider InputChannelThreading
         {
             get
             {
@@ -151,7 +151,7 @@ namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
-        public IDispatcherProvider OutputChannelThreading
+        public IThreadDispatcherProvider OutputChannelThreading
         {
             get
             {

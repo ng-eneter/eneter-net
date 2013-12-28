@@ -230,7 +230,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myPollingFrequency);
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aClientConnectorFactory, myProtocolFormatter, false);
             }
@@ -257,7 +257,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myPollingFrequency);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aClientConnectorFactory, myProtocolFormatter, false);
             }
@@ -282,7 +282,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
 #if !SILVERLIGHT
-                IDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myInputConnectorFactory.CreateInputConnector(channelId);
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
 #else
@@ -299,7 +299,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
-        public IDispatcherProvider InputChannelThreading { get; set; }
+        public IThreadDispatcherProvider InputChannelThreading { get; set; }
 #endif
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
-        public IDispatcherProvider OutputChannelThreading { get; set; }
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
         /// <summary>
         /// Defines how often the client poll the server for response messages.

@@ -59,13 +59,13 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector_Silverlight.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
-    <Compile Include="Threading\Dispatching\IDispatcher.cs" />
+    <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
     <Compile Include="DataProcessing\MessageQueueing\MessageQueue.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DataProcessing\MessageQueueing\MonitorExt.cs" />
     <Compile Include="DataProcessing\MessageQueueing\WorkingThread.cs" />
-    <Compile Include="Threading\Dispatching\IDispatcherProvider.cs" />
+    <Compile Include="Threading\Dispatching\IThreadDispatcherProvider.cs" />
     <Compile Include="Threading\Dispatching\SilverlightDispatching.cs" />
     <Compile Include="DataProcessing\MessageQueueing\_NamespaceDoc.cs">
       <SubType>Code</SubType>

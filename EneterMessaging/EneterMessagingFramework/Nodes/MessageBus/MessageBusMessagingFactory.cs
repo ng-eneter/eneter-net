@@ -105,7 +105,7 @@ namespace Eneter.Messaging.Nodes.MessageBus
         }
 
 
-        private IDispatcher myDispatcher;
+        private IThreadDispatcher myDispatcher;
         private MessageBusConnectorFactory myConnectorFactory;
         private IProtocolFormatter myProtocolFormatter;
     }
