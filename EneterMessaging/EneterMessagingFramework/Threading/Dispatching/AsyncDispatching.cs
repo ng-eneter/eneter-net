@@ -32,6 +32,6 @@ namespace Eneter.Messaging.Threading.Dispatching
             return myDispatcher;
         }
 
-        private IThreadDispatcher myDispatcher = new AsyncDispatcher();
+        private static IThreadDispatcher myDispatcher = new AsyncDispatcher();
     }
 }

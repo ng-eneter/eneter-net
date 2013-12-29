@@ -37,49 +37,46 @@ namespace Eneter.Messaging.Threading.Dispatching
         {
             using (EneterTrace.Entering())
             {
-                using (EneterTrace.Entering())
+                try
                 {
-                    try
+                    Action aJob;
+
+                    while (true)
                     {
-                        Action aJob;
-
-                        while (true)
+                        // Take the job from the queue.
+                        lock (myQueue)
                         {
-                            // Take the job from the queue.
-                            lock (myQueue)
+                            if (myQueue.Count == 0)
                             {
-                                if (myQueue.Count == 0)
-                                {
-                                    return;
-                                }
-
-                                aJob = myQueue.Dequeue();
+                                return;
                             }
 
-                            try
-                            {
-                                // Execute the job.
-                                aJob();
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
-                            }
+                            aJob = myQueue.Dequeue();
+                        }
 
-                            // If it was the last job then the working thread can end.
-                            lock (myQueue)
+                        try
+                        {
+                            // Execute the job.
+                            aJob();
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+                        }
+
+                        // If it was the last job then the working thread can end.
+                        lock (myQueue)
+                        {
+                            if (myQueue.Count == 0)
                             {
-                                if (myQueue.Count == 0)
-                                {
-                                    return;
-                                }
+                                return;
                             }
                         }
                     }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Error(TracedObject + "failed in processing the working queue.", err);
-                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Error(TracedObject + "failed in processing the working queue.", err);
                 }
             }
         }

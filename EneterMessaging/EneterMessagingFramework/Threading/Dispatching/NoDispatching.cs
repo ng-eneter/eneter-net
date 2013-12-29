@@ -37,6 +37,6 @@ namespace Eneter.Messaging.Threading.Dispatching
             }
         }
 
-        private DefaultDispatcher myDispatcher = new DefaultDispatcher();
+        private static DefaultDispatcher myDispatcher = new DefaultDispatcher();
     }
 }
