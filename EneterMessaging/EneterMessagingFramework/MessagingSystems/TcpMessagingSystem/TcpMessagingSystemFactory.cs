@@ -433,8 +433,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 #if !SILVERLIGHT
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex input channel according to
-        /// desired threading strategy.
+        /// Provides thread dispatcher responsible for routing events from duplex input channel according to
+        /// desired threading model.
         /// </summary>
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.

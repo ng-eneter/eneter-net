@@ -46,20 +46,21 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    byte[] aMessage = (byte[])message;
-                    myClientStream.Write(aMessage, 0, aMessage.Length);
+                    lock (mySenderLock)
+                    {
+                        byte[] aMessage = (byte[])message;
+                        myClientStream.Write(aMessage, 0, aMessage.Length);
+                    }
                 }
             }
 
             public void SendMessage(Action<Stream> toStreamWritter)
             {
-                using (EneterTrace.Entering())
-                {
-                    toStreamWritter(myClientStream);
-                }
+                throw new NotSupportedException("Sending via the stream is not supported.");
             }
 
             private Stream myClientStream;
+            private object mySenderLock = new object();
         }
 
         public TcpInputConnector(string ipAddressAndPort, ISecurityFactory securityFactory,

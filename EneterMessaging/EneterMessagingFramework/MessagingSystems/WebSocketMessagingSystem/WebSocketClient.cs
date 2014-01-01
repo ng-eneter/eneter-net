@@ -196,9 +196,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 HeaderFields["Connection"] = "Upgrade";
                 HeaderFields["Sec-WebSocket-Version"] = "13";
 
-#if SILVERLIGHT
                 ConnectTimeout = 30000;
-#endif
                 SendTimeout = 30000;
             }
         }

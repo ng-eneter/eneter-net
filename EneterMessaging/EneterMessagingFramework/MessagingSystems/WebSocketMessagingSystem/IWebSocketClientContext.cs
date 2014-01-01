@@ -66,7 +66,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
         /// <summary>
         /// Sets or gets the receive timeout in miliseconds. Default value is 0 what is infinite time.
-        /// Default value is -1 infinite.
         /// </summary>
         int ReceiveTimeout { get; set; }
 

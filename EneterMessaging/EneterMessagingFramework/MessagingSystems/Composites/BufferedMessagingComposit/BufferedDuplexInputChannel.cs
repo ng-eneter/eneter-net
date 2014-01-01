@@ -37,6 +37,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
         public string ChannelId { get { return myUnderlyingInputChannel.ChannelId; } }
 
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
+
         public void StartListening()
         {
             using (EneterTrace.Entering())
@@ -178,8 +180,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
-
         private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
         {
             using (EneterTrace.Entering())
@@ -217,6 +217,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 // If the response receiver does not exist, then create it.
                 UpdateResponseReceiverContext(e.ResponseReceiverId, e.SenderAddress, true, true);
 
+                // Note: this method is called from the underlying channel. Therefore it is called in the correct thread.
                 Notify<DuplexChannelMessageEventArgs>(MessageReceived, () => e, true);
             }
         }

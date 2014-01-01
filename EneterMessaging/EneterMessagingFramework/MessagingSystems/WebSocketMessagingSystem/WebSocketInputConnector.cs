@@ -171,7 +171,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private WebSocketListener myListener;
         private Func<MessageContext, bool> myMessageHandler;
         private object myListenerManipulatorLock = new object();
-        private List<IWebSocketClientContext> myConnectedSenders = new List<IWebSocketClientContext>();
         private int mySendTimeout;
         private int myReceiveTimeout;
     }

@@ -34,6 +34,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
         public string ResponseReceiverId { get { return myUnderlyingOutputChannel.ResponseReceiverId; } }
 
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
+
 
         public bool IsConnected
         {
@@ -88,10 +90,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 lock (myConnectionManipulatorLock)
                 {
                     myIsSendingThreadRequestedToStop = true;
-                    mySendingThreadIsStoppedEvent.WaitOne(5000);
+                    if (!mySendingThreadIsStoppedEvent.WaitOne(5000))
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to stop the message sending thread within 5 seconds.");
+                    }
 
                     myIsConnectionOpeningRequestedToStop = true;
-                    myConnectionOpeningThreadIsStoppedEvent.WaitOne(5000);
+                    if (!myConnectionOpeningThreadIsStoppedEvent.WaitOne(5000))
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to stop the connection openning thread within 5 seconds.");
+                    }
 
                     myUnderlyingOutputChannel.CloseConnection();
                     myUnderlyingOutputChannel.ConnectionOpened -= OnConnectionOpened;
@@ -137,8 +145,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 }
             }
         }
-
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
 
         private void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
         {
