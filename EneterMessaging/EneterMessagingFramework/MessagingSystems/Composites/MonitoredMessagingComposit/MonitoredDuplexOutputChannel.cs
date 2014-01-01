@@ -37,6 +37,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
         public string ResponseReceiverId { get { return myUnderlyingOutputChannel.ResponseReceiverId; } }
 
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
+
         public void OpenConnection()
         {
             using (EneterTrace.Entering())
@@ -166,8 +168,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 }
             }
         }
-
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
 
         private void OnResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e)
         {

@@ -61,6 +61,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
+
         public void StartListening()
         {
             using (EneterTrace.Entering())
@@ -165,8 +167,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 }
             }
         }
-
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
 
         private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
         {
@@ -302,7 +302,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                     // Notify that the response receiver was disconected.
                     ResponseReceiverEventArgs e = new ResponseReceiverEventArgs(aResponseReceiver.ResponseReceiverId, aResponseReceiver.ClientAddress);
-                    NotifyResponseReceiverDisconnected(e);
+                    Dispatcher.Invoke(() => NotifyResponseReceiverDisconnected(e));
                 }
 
                 // If the timer chall continue.
