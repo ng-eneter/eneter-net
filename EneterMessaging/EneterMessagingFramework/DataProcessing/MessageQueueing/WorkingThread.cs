@@ -76,7 +76,10 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                         throw new InvalidOperationException(aMessage);
                     }
 
-                    myWorker.Invoke(() => myMessageHandler(message));
+                    // Note: If the message handler is unregistered before the message handler is processed from the queue
+                    //       then myMessageHandler will be null and the exception will occur. Therefore we need to store it locally.
+                    Action<_MessageType> aMessageHandler = myMessageHandler;
+                    myWorker.Invoke(() => aMessageHandler(message));
                 }
             }
         }
