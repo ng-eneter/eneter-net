@@ -261,7 +261,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         {
                             // If the last polling activity time exceeded the maximum allowed time then
                             // it is considered the connection is closed.
-                            if (aTime - x.LastPollingActivityTime > TimeSpan.FromMilliseconds(myResponseReceiverInactivityTimeout))
+                            if (aTime - x.LastPollingActivityTime >= TimeSpan.FromMilliseconds(myResponseReceiverInactivityTimeout))
                             {
                                 // If the connection was broken unexpectidly then the message handler must be notified.
                                 if (!x.IsDisposed)

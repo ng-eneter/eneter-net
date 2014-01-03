@@ -130,11 +130,13 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                     while (!myStopReceivingRequestedFlag)
                     {
-                        // Send poll request to get messages from the service.
-                        WebResponse anHttpResponse = HttpRequestInvoker.InvokeGetRequest(aPollingUri);
+                        myStopPollingWaitingEvent.WaitOne(myPollingFrequencyMiliseconds);
 
                         if (!myStopReceivingRequestedFlag)
                         {
+                            // Send poll request to get messages from the service.
+                            WebResponse anHttpResponse = HttpRequestInvoker.InvokeGetRequest(aPollingUri);
+
                             // Convert the response to the fast memory stream
                             using (MemoryStream aBufferedResponse = new MemoryStream())
                             {
@@ -155,11 +157,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                                         break;
                                     }
                                 }
-                            }
-
-                            if (!myStopReceivingRequestedFlag)
-                            {
-                                myStopPollingWaitingEvent.WaitOne(myPollingFrequencyMiliseconds);
                             }
                         }
                     }
