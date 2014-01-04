@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using NUnit.Framework;
+using System.Diagnostics;
 
 namespace Eneter.MessagingUnitTests.Diagnostic
 {
@@ -135,7 +136,47 @@ namespace Eneter.MessagingUnitTests.Diagnostic
             }
         }
 #endif
-        
+
+#if !COMPACT_FRAMEWORK
+
+        [Test]
+	    public void performanceTest()
+	    {
+	        EneterTrace.EDetailLevel aStoredDetailedLevel = EneterTrace.DetailLevel;
+	        TextWriter aStoredTraceLog = EneterTrace.TraceLog;
+	    
+	        try
+	        {
+    	        // Without tracing.
+    	        EneterTrace.DetailLevel = EneterTrace.EDetailLevel.None;
+    	        Stopwatch aStopWatch1 = new Stopwatch();
+                aStopWatch1.Start();
+                calculatePi();
+                aStopWatch1.Stop();
+    	        TimeSpan aDeltaTime1 = aStopWatch1.Elapsed;
+    	    
+    	    
+    	        // With traceing.
+    	        EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+                EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+    	    
+                Stopwatch aStopWatch2 = new Stopwatch();
+                aStopWatch2.Start();
+                calculatePi();
+                aStopWatch2.Stop();
+    	        TimeSpan aDeltaTime2 = aStopWatch2.Elapsed;
+            
+                Console.WriteLine("No trace: " + aDeltaTime1);
+                Console.WriteLine("With trace: " + aDeltaTime2);
+	        }
+	        finally
+	        {
+                EneterTrace.DetailLevel = aStoredDetailedLevel;
+                EneterTrace.TraceLog = aStoredTraceLog;
+	        }
+	    }
+#endif
+
         
         private void TestMethod1()
         {
@@ -150,6 +191,37 @@ namespace Eneter.MessagingUnitTests.Diagnostic
         private void TestMethod3()
         {
             throw new InvalidOperationException("1st Inner Exception.");
+        }
+
+        private void calculatePi()
+	{
+	    using (EneterTrace.Entering())
+        {
+            double aCalculatedPi = 0.0;
+            for (double i = -1.0; i <= 1.0; i += 0.005)
+            {
+                aCalculatedPi += calculateRange(i, i + 0.005);
+            }
+     
+            Console.WriteLine("PI = " + aCalculatedPi.ToString());
+        }
+	}
+
+        private double calculateRange(double from, double to)
+        {
+            using (EneterTrace.Entering())
+            {
+                // Calculate pi
+                double aResult = 0.0;
+                double aDx = 0.00001;
+                for (double x = from; x < to; x += aDx)
+                {
+                    EneterTrace.Debug("blblblblblblblblblblblblbbllblbblblblblbl");
+                    aResult += 2 * Math.Sqrt(1 - x * x) * aDx;
+                }
+
+                return aResult;
+            }
         }
     }
 }
