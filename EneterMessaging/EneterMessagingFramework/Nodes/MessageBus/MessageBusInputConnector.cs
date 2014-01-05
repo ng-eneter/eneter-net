@@ -127,7 +127,14 @@ namespace Eneter.Messaging.Nodes.MessageBus
                 MessageContext aMessageContext = new MessageContext(e.Message, "", null);
                 if (myMessageHandler != null)
                 {
-                    myMessageHandler(aMessageContext);
+                    try
+                    {
+                        myMessageHandler(aMessageContext);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
                 }
             }
         }
