@@ -27,6 +27,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             event EventHandler<OpenArgs> Open;
             event EventHandler Close;
             int Sum(int a, int b);
+            string CreateString(string src);
             void Fail();
             void Timeout();
         }
@@ -39,6 +40,11 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             public int Sum(int a, int b)
             {
                 return a + b;
+            }
+
+            public string CreateString(string src)
+            {
+                return src;
             }
 
             public void Fail()
@@ -100,6 +106,40 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 int k = aServiceProxy.Sum(1, 2);
 
                 Assert.AreEqual(3, k);
+            }
+            finally
+            {
+                if (anRpcClient.IsDuplexOutputChannelAttached)
+                {
+                    anRpcClient.DetachDuplexOutputChannel();
+                }
+
+                if (anRpcService.IsDuplexInputChannelAttached)
+                {
+                    anRpcService.DetachDuplexInputChannel();
+                }
+            }
+        }
+#endif
+
+#if !COMPACT_FRAMEWORK
+        [Test]
+        public void RpcCall_NullArgument()
+        {
+            RpcFactory anRpcFactory = new RpcFactory(mySerializer);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
+
+            try
+            {
+                anRpcService.AttachDuplexInputChannel(myMessaging.CreateDuplexInputChannel(myChannelId));
+                anRpcClient.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
+
+
+                IHello aServiceProxy = anRpcClient.Proxy;
+                string k = aServiceProxy.CreateString(null);
+
+                Assert.AreEqual(null, k);
             }
             finally
             {
