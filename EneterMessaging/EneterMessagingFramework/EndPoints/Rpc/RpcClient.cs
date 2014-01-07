@@ -37,6 +37,18 @@ namespace Eneter.Messaging.EndPoints.Rpc
             public object SerializedReturnValue { get; set; }
         }
 
+        private class RemoteMethod
+        {
+            public RemoteMethod(Type returnType, Type[] argTypes)
+            {
+                ReturnType = returnType;
+                ArgTypes = argTypes;
+            }
+
+            public Type[] ArgTypes { get; private set; }
+            public Type ReturnType { get; private set; }
+        }
+
         // Provides info about a remote event and maintains subscribers for that event.
         private class RemoteEvent
         {
@@ -73,7 +85,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 foreach (MethodInfo aMethodInfo in typeof(TServiceInterface).GetMethods())
                 {
                     Type aReturnType = aMethodInfo.ReturnType;
-                    myRemoteMethodReturnTypes[aMethodInfo.Name] = aReturnType;
+                    Type[] anArgTypes = aMethodInfo.GetParameters().Select(x => x.ParameterType).ToArray();
+                    RemoteMethod aRemoteMethod = new RemoteMethod(aReturnType, anArgTypes);
+                    myRemoteMethods[aMethodInfo.Name] = aRemoteMethod;
                 }
 
                 // Store remote events.
@@ -285,13 +299,24 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
+                RemoteMethod aRemoteMethod;
+                myRemoteMethods.TryGetValue(methodName, out aRemoteMethod);
+                if (aRemoteMethod == null)
+                {
+                    string anErrorMessage = TracedObject + "failed to call remote method '" + methodName + "' because the method is not declared in the service interface on the client side.";
+                    EneterTrace.Error(anErrorMessage);
+                    throw new InvalidOperationException(anErrorMessage);
+                }
+
                 // Serialize method parameters.
                 object[] aSerialzedMethodParameters = new object[parameters.Length];
                 try
                 {
                     for (int i = 0; i < parameters.Length; ++i)
                     {
-                        aSerialzedMethodParameters[i] = mySerializer.Serialize(parameters[i].GetType(), parameters[i]);
+                        // The parameter can be null, therefore we need to get the parameter type from the method declaration
+                        // and not from the parameter instance.
+                        aSerialzedMethodParameters[i] = mySerializer.Serialize(aRemoteMethod.ArgTypes[i], parameters[i]);
                     }
                 }
                 catch (Exception err)
@@ -310,22 +335,12 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                 object aSerializedReturnValue = CallService(aRequestMessage);
 
-                // Get the type of the return value.
-                Type aReturnType;
-                myRemoteMethodReturnTypes.TryGetValue(aRequestMessage.OperationName, out aReturnType);
-                if (aReturnType == null)
-                {
-                    string anErrorMessage = TracedObject + "failed to deserialize the received return value. The method '" + aRequestMessage.OperationName + "' was not found.";
-                    EneterTrace.Error(anErrorMessage);
-                    throw new InvalidOperationException(anErrorMessage);
-                }
-
                 // Deserialize the return value.
                 object aDeserializedReturnValue = null;
                 try
                 {
-                    aDeserializedReturnValue = (aReturnType != typeof(void)) ?
-                        mySerializer.Deserialize(aReturnType, aSerializedReturnValue) :
+                    aDeserializedReturnValue = (aRemoteMethod.ReturnType != typeof(void)) ?
+                        mySerializer.Deserialize(aRemoteMethod.ReturnType, aSerializedReturnValue) :
                         null;
                 }
                 catch (Exception err)
@@ -563,7 +578,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private object myConnectionManipulatorLock = new object();
         private TimeSpan myRpcTimeout;
 
-        private Dictionary<string, Type> myRemoteMethodReturnTypes = new Dictionary<string, Type>();
+        private Dictionary<string, RemoteMethod> myRemoteMethods = new Dictionary<string, RemoteMethod>();
         private Dictionary<string, RemoteEvent> myRemoteEvents = new Dictionary<string, RemoteEvent>();
         
         protected override string TracedObject { get { return GetType().Name + " "; } }
