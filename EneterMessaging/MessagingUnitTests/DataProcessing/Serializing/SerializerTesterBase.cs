@@ -72,6 +72,28 @@ namespace Eneter.MessagingUnitTests.DataProcessing.Serializing
         }
 
         [Test]
+        public void SerializeDeserialize_NULL()
+        {
+            T1 t1 = null;
+
+            object aSerializedT1 = TestedSerializer.Serialize<T1>(t1);
+            T1 aDeserializedT1 = TestedSerializer.Deserialize<T1>(aSerializedT1);
+
+            Assert.AreEqual(null, aDeserializedT1);
+        }
+
+        [Test]
+        public void SerializeDeserialize_EmptyByteArray()
+        {
+            byte[] aBytes = { };
+
+            object aSerialized = TestedSerializer.Serialize<byte[]>(aBytes);
+            byte[] aDeserialized = TestedSerializer.Deserialize<byte[]>(aSerialized);
+
+            Assert.AreEqual(0, aDeserialized.Length);
+        }
+
+        [Test]
         public void SerializeDeserialize_10MB()
         {
             // 10MB

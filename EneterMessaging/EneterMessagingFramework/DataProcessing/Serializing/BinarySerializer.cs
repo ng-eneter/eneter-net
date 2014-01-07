@@ -114,6 +114,12 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 {
                     using (MemoryStream aMemoryStream = new MemoryStream())
                     {
+                        // Note: BinaryFormatter is not able to serialize null.
+                        if (dataToSerialize == null)
+                        {
+                            return myNull;
+                        }
+
                         BinaryFormatter aBinaryFormatter = new BinaryFormatter();
                         aBinaryFormatter.Serialize(aMemoryStream, dataToSerialize);
                         byte[] aSerializedData = aMemoryStream.ToArray();
@@ -144,6 +150,12 @@ namespace Eneter.Messaging.DataProcessing.Serializing
             {
                 byte[] aData = (byte[])serializedData;
 
+                if (aData.Length == 0)
+                {
+                    // It will return null.
+                    return default(_T);
+                }
+
                 try
                 {
                     using (MemoryStream aMemoryStream = new MemoryStream(aData))
@@ -168,6 +180,8 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
 
         private bool myEnforceTypeBinding;
+
+        private static byte[] myNull = { };
     }
 }
 
