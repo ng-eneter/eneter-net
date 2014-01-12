@@ -221,6 +221,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 #endif
 
 #if !COMPACT_FRAMEWORK
+
+        // Note: This test is not applicable for the synchronous messaging
+        //       because synchronous messaging is a sequence within one thread and so the remote call
+        //       does not wait.
         [Test]
         [ExpectedException(typeof(TimeoutException))]
         public virtual void RpcTimeout()
@@ -431,8 +435,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 anRpcClient.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
 
                 AutoResetEvent anEventReceived = new AutoResetEvent(false);
+                string aReceivedEvent = "";
                 EventHandler<OpenArgs> anEventHandler = (x, y) =>
                     {
+                        aReceivedEvent = y.Name;
                         anEventReceived.Set();
                     };
 
@@ -447,6 +453,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 aService.RaiseOpen(anOpenArgs);
 
                 Assert.IsTrue(anEventReceived.WaitOne());
+                Assert.AreEqual("Hello", aReceivedEvent);
 
                 // Unsubscribe.
                 anRpcClient.UnsubscribeRemoteEvent("Open", anEventHandler);
@@ -572,10 +579,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                     aService.RaiseClose();
                 }
 
+                Assert.IsTrue(anEventReceived.WaitOne());
+
                 aStopWatch.Stop();
                 Console.WriteLine("Remote event. Elapsed time = " + aStopWatch.Elapsed);
-
-                Assert.IsTrue(anEventReceived.WaitOne());
 
                 // Unsubscribe.
                 aServiceProxy.Close -= anEventHandler.Invoke;
@@ -666,10 +673,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 anRpcService.AttachDuplexInputChannel(myMessaging.CreateDuplexInputChannel(myChannelId));
                 anRpcClient.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
 
+                IHello aServiceProxy = anRpcClient.Proxy;
+
                 Stopwatch aStopWatch = new Stopwatch();
                 aStopWatch.Start();
-
-                IHello aServiceProxy = anRpcClient.Proxy;
 
                 //EneterTrace.StartProfiler();
 
@@ -683,10 +690,11 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 aStopWatch.Stop();
                 Console.WriteLine("Rpc call. Elapsed time = " + aStopWatch.Elapsed);
 
-                Stopwatch aStopWatch2 = new Stopwatch();
-                aStopWatch2.Start();
 
                 HelloService aService = new HelloService();
+
+                Stopwatch aStopWatch2 = new Stopwatch();
+                aStopWatch2.Start();
 
                 for (int i = 0; i < 10000; ++i)
                 {
