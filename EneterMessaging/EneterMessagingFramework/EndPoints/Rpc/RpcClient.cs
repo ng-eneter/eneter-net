@@ -24,15 +24,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
         // Represents the context of an active remote call.
         private class RemoteCallContext
         {
-            public RemoteCallContext(string name)
+            public RemoteCallContext()
             {
                 RpcCompleted = new ManualResetEvent(false);
-                MethodName = name;
             }
 
             public ManualResetEvent RpcCompleted { get; private set; }
 
-            public string MethodName { get; private set; }
             public Exception Error { get; set; }
             public object SerializedReturnValue { get; set; }
         }
@@ -282,7 +280,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     }
                     else
                     {
-                        // Note: this happens if the event is of type EventErgs.
+                         // Note: this happens if the event is of type EventErgs.
                         // The event is raised in its own thread so that the receiving thread is not blocked.
                         myRaiseEventInvoker.Invoke(() => RaiseEvent(aMessage.OperationName, null));
                     }
@@ -471,7 +469,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                 try
                 {
-                    RemoteCallContext anRpcSyncContext = new RemoteCallContext(rpcRequest.OperationName);
+                    RemoteCallContext anRpcSyncContext = new RemoteCallContext();
                     lock (myPendingRemoteCalls)
                     {
                         myPendingRemoteCalls.Add(rpcRequest.Id, anRpcSyncContext);

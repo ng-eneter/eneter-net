@@ -32,6 +32,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 SubscribedClients = new HashSet<string>();
             }
 
+            // Subscribes anonymous event handler in the service.
+            // When an event occurs the anonymous event handler forwards the event to subscribed remote clients.
             public void Subscribe()
             {
                 EventInfo.AddEventHandler(myService, myHandler);
@@ -320,7 +322,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                         string anErrorMessage = TracedObject + "failed to serialize the result.";
                                         EneterTrace.Error(anErrorMessage, err);
 
-                                        aResponseMessage.Error = anErrorMessage + "\n" + err.ToString();
+                                        aResponseMessage.Error = anErrorMessage + "\r\n" + err.ToString();
                                     }
                                 }
                             }
