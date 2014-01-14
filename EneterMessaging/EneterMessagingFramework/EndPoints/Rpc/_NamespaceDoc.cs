@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.EndPoints.Rpc
 {
     /// <summary>
-    /// Functionality to communicate using remote procedure calls.
+    /// Communication using remote procedure calls.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

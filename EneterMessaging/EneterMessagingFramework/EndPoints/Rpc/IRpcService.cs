@@ -12,6 +12,14 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.Messaging.EndPoints.Rpc
 {
+    /// <summary>
+    /// Declares service receiving requests via remote procedure calls.
+    /// </summary>
+    /// <typeparam name="TServiceInterface">
+    /// Service interface.
+    /// The provided type must be a non-generic interface which can declare methods and events.
+    /// Methods arguments and return value cannot be generic.
+    /// </typeparam>
     public interface IRpcService<TServiceInterface> : IAttachableDuplexInputChannel
         where TServiceInterface : class
     {

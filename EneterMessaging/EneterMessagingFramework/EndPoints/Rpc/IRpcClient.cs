@@ -12,70 +12,67 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.Rpc
 {
     /// <summary>
-    /// Declares client providing communication using remote procedure calls.
+    /// Declares client using remote procedure calls.
     /// </summary>
-    /// <typeparam name="TServiceInterface">Service interface containing methods and events.</typeparam>
+    /// <typeparam name="TServiceInterface">Service interface.</typeparam>
     public interface IRpcClient<TServiceInterface> : IAttachableDuplexOutputChannel
         where TServiceInterface : class
     {
         /// <summary>
-        /// The event is raised when the connection with the service was open.
+        /// Event raised when the connection with the service was open.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is invoked in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
-        /// The event is raised when the connection with the service was closed.
+        /// Event raised when the connection with the service was closed.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is invoked in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
 #if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
-        /// Returns the instance of the service interface implementing the proxy.
+        /// Returns the proxy for the service.
         /// </summary>
         /// <remarks>
-        /// The returned instance inmplements the proxy ensuring the communication with the service.
+        /// The returned instance provides the proxy for the service interface.
+        /// Calling of a method from the proxy will result to the communication with the service.
         /// </remarks>
         TServiceInterface Proxy { get; }
 #endif
 
         /// <summary>
-        /// Subscribes for the event on the service.
+        /// Subscribes to an event from the service.
         /// </summary>
         /// <typeparam name="TEventArgs">Type of the event args. It must be derived from EventArgs.</typeparam>
         /// <param name="eventName">name of the event</param>
         /// <param name="eventHandler">event handler processing the event</param>
         /// <remarks>
-        /// Prefer to use the Proxy property where you can subscribe to events exposed via the interface.
-        /// Use this method in cases when the proxy is not available (e.g. in Silverloight).
+        /// Use this method if subscribing via the proxy is not suitable. (E.g. the proxy is not supported in Silverlight)
+        /// If the method does not exist in the service interface the exception is thrown.
         /// </remarks>
         void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler) where TEventArgs : EventArgs;
 
         /// <summary>
-        /// Unsubscribe from the event on the service.
+        /// Unsubscribes from the event in the service.
         /// </summary>
         /// <param name="eventName">name of the event</param>
         /// <param name="eventHandler">event handler that shall be unsubscribed</param>
         /// <remarks>
-        /// Prefer to use the Proxy property where you can unsubscribe from events exposed via the interface.
-        /// Use this method in cases when the proxy is not available (e.g. in Silverloight).
+        /// Use this method if subscribing via the proxy is not suitable. (E.g. the proxy is not supported in Silverlight)
+        /// If the method does not exist in the service interface the exception is thrown.
         /// </remarks>
         void UnsubscribeRemoteEvent(string eventName, Delegate eventHandler);
 
 
         /// <summary>
-        /// Calls the remote method on the service.
+        /// Calls the method in the service.
         /// </summary>
         /// <param name="methodName">name of the method</param>
         /// <param name="args">list of arguments</param>
         /// <returns>returned value. null if it returns 'void'</returns>
+        /// <remarks>
+        /// Use this method if subscribing via the proxy is not suitable. (E.g. the proxy is not supported in Silverlight)
+        /// If the method does not exist in the service interface the exception is thrown.
+        /// </remarks>
         object CallRemoteMethod(string methodName, params object[] args);
     }
 }
