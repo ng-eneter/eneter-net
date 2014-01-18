@@ -184,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, () => e, false);
+                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, e, false);
             }
         }
 
@@ -196,7 +196,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 // If the response receiver does not exist, then create it.
                 UpdateResponseReceiverContext(e.ResponseReceiverId, e.SenderAddress, true, true);
 
-                Notify<ResponseReceiverEventArgs>(ResponseReceiverConnected, () => e, false);
+                Notify<ResponseReceiverEventArgs>(ResponseReceiverConnected, e, false);
             }
         }
 
@@ -218,7 +218,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 UpdateResponseReceiverContext(e.ResponseReceiverId, e.SenderAddress, true, true);
 
                 // Note: this method is called from the underlying channel. Therefore it is called in the correct thread.
-                Notify<DuplexChannelMessageEventArgs>(MessageReceived, () => e, true);
+                Notify<DuplexChannelMessageEventArgs>(MessageReceived, e, true);
             }
         }
 
@@ -325,7 +325,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     }
 
                     // Invoke the event in the correct thread.
-                    Dispatcher.Invoke(() => Notify<ResponseReceiverEventArgs>(ResponseReceiverDisconnected, () => new ResponseReceiverEventArgs(aResponseReceiverContext.ResponseReceiverId, aResponseReceiverContext.ClientAddress), false));
+                    Dispatcher.Invoke(() => Notify<ResponseReceiverEventArgs>(ResponseReceiverDisconnected, new ResponseReceiverEventArgs(aResponseReceiverContext.ResponseReceiverId, aResponseReceiverContext.ClientAddress), false));
                 }
 
                 // If the timer checking the timeout for response receivers shall continue
@@ -336,7 +336,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        private void Notify<T>(EventHandler<T> handler, Func<T> eventFactory, bool isNobodySubscribedWarning)
+        private void Notify<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
             where T : EventArgs
         {
             using (EneterTrace.Entering())
@@ -345,8 +345,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 {
                     try
                     {
-                        T anEventArgs = eventFactory();
-                        handler(this, anEventArgs);
+                        handler(this, eventArgs);
                     }
                     catch (Exception err)
                     {

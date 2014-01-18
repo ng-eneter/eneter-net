@@ -150,7 +150,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                Notify<DuplexChannelEventArgs>(ConnectionOpened, () => e, false);
+                Notify<DuplexChannelEventArgs>(ConnectionOpened, e, false);
             }
         }
 
@@ -161,7 +161,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 // If the opening of the connection is not desired, then just return.
                 if (myIsConnectionOpeningRequestedToStop)
                 {
-                    Notify<DuplexChannelEventArgs>(ConnectionClosed, () => e, false);
+                    Notify<DuplexChannelEventArgs>(ConnectionClosed, e, false);
                     return;
                 }
 
@@ -180,7 +180,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, () => e, true);
+                Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, e, true);
             }
         }
 
@@ -296,7 +296,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        private void Notify<T>(EventHandler<T> handler, Func<T> eventFactory, bool isNobodySubscribedWarning)
+        private void Notify<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
             where T : EventArgs
         {
             using (EneterTrace.Entering())
@@ -305,8 +305,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 {
                     try
                     {
-                        T anEventArgs = eventFactory();
-                        handler(this, anEventArgs);
+                        handler(this, eventArgs);
                     }
                     catch (Exception err)
                     {

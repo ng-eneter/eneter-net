@@ -367,7 +367,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 // Note: This event must be notified from the thread listening to messages.
                 //       So that based on the return the thread can decide if the connection stays open or will be closed.
-                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, () => aConnectionToken, false);
+                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, aConnectionToken, false);
 
                 return aConnectionToken.IsConnectionAllowed;
             }
@@ -446,7 +446,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                Notify<ResponseReceiverEventArgs>(handler, () => new ResponseReceiverEventArgs(responseReceiverId, senderAddress), false);
+                ResponseReceiverEventArgs anEventArgs = new ResponseReceiverEventArgs(responseReceiverId, senderAddress);
+                Notify<ResponseReceiverEventArgs>(handler, anEventArgs, false);
             }
         }
 
@@ -455,11 +456,12 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                Notify<DuplexChannelMessageEventArgs>(MessageReceived, () => new DuplexChannelMessageEventArgs(ChannelId, protocolMessage.Message, protocolMessage.ResponseReceiverId, messageContext.SenderAddress), true);
+                DuplexChannelMessageEventArgs anEventArgs = new DuplexChannelMessageEventArgs(ChannelId, protocolMessage.Message, protocolMessage.ResponseReceiverId, messageContext.SenderAddress);
+                Notify<DuplexChannelMessageEventArgs>(MessageReceived, anEventArgs, true);
             }
         }
 
-        private void Notify<T>(EventHandler<T> handler, Func<T> eventFactory, bool isNobodySubscribedWarning)
+        private void Notify<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
             where T : EventArgs
         {
             using (EneterTrace.Entering())
@@ -468,8 +470,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     try
                     {
-                        T anEventArgs = eventFactory();
-                        handler(this, anEventArgs);
+                        handler(this, eventArgs);
                     }
                     catch (Exception err)
                     {

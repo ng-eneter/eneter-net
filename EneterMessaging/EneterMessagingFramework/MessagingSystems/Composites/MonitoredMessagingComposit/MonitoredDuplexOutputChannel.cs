@@ -186,7 +186,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                     else
                     {
-                        Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, () => new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress), true);
+                        Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress), true);
                     }
                 }
                 catch (Exception err)
@@ -200,7 +200,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                Notify<DuplexChannelEventArgs>(ConnectionOpened, () => e, false);
+                Notify<DuplexChannelEventArgs>(ConnectionOpened, e, false);
             }
         }
 
@@ -257,13 +257,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 // Notify, the connection is closed.
                 ThreadPool.QueueUserWorkItem(x =>
-                    Dispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionClosed, () => new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, ""), false))
+                    Dispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionClosed, new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, ""), false))
                     );
             }
         }
 
 
-        private void Notify<T>(EventHandler<T> handler, Func<T> eventFactory, bool isNobodySubscribedWarning)
+        private void Notify<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
             where T : EventArgs
         {
             using (EneterTrace.Entering())
@@ -272,8 +272,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 {
                     try
                     {
-                        T anEventArgs = eventFactory();
-                        handler(this, anEventArgs);
+                        handler(this, eventArgs);
                     }
                     catch (Exception err)
                     {
