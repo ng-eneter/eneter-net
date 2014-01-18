@@ -97,6 +97,8 @@
     <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_XmlStringSerializer.cs" />
     <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_Tcp_Bin.cs" />
     <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs" />
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs" />
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticatedConnection_Tcp.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs" />

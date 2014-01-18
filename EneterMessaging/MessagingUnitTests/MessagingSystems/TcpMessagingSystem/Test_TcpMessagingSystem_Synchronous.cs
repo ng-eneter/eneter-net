@@ -21,13 +21,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
         [SetUp]
         public void Setup()
         {
-            EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
-            EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
             //EneterTrace.StartProfiler();
 
             // Generate random number for the port.
-            Random aRnd = new Random();
-            int aPort = aRnd.Next(8000, 9000); 
+            string aPort = RandomPortGenerator.Generate();
 
             MessagingSystemFactory = new TcpMessagingSystemFactory();
             //ChannelId = "tcp://127.0.0.1:" + aPort + "/";
