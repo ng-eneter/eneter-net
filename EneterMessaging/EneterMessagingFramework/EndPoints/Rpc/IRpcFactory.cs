@@ -9,8 +9,7 @@
 namespace Eneter.Messaging.EndPoints.Rpc
 {
     /// <summary>
-    /// Declares the factory which creates client and sercice components for the interprocess communication using RPC
-    /// (Remote Procedure Call).
+    /// Declares factory which can create RPC clients and services. 
     /// </summary>
     public interface IRpcFactory
     {

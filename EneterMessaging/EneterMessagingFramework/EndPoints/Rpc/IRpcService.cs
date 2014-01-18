@@ -18,18 +18,17 @@ namespace Eneter.Messaging.EndPoints.Rpc
     /// <typeparam name="TServiceInterface">
     /// Service interface.
     /// The provided type must be a non-generic interface which can declare methods and events.
-    /// Methods arguments and return value cannot be generic.
     /// </typeparam>
     public interface IRpcService<TServiceInterface> : IAttachableDuplexInputChannel
         where TServiceInterface : class
     {
         /// <summary>
-        /// The event is invoked when a duplex typed message sender opened the connection via its duplex output channel.
+        /// The event is invoked when the connection is opened.
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
 
         /// <summary>
-        /// The event is invoked when a duplex typed message sender closed the connection via its duplex output channel.
+        /// The event is invoked when the connection is closed.
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
     }
