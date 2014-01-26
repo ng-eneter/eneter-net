@@ -341,9 +341,6 @@
     <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\MessagingSystemBase\ConnectionTokenEventArgs.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\MessagingSystemBase\DuplexChannelEventArgs.cs">
       <SubType>Code</SubType>
     </Compile>

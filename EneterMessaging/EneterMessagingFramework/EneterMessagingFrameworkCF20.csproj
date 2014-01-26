@@ -168,7 +168,6 @@
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker_Silverlight.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\ServerUri_Silverlight.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\MessagingSystemBase\ConnectionTokenEventArgs.cs" />
     <Compile Include="MessagingSystems\MessagingSystemBase\DuplexChannelEventArgs.cs" />
     <Compile Include="MessagingSystems\MessagingSystemBase\DuplexChannelMessageEventArgs.cs" />
     <Compile Include="MessagingSystems\MessagingSystemBase\IDuplexInputChannel.cs" />
