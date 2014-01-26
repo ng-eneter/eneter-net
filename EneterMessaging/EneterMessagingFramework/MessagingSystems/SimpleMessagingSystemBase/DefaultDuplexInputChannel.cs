@@ -198,7 +198,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             ((IDisposable)aConnection.Value.ResponseSender).Dispose();
                         }
 
-                        Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, aConnection.Key, aConnection.Value.SenderAddress));
+                        // Note: we must assign receiver id to a separate variable because aConnection is same instance for all iterations.
+                        //       And so the client could get incorrect id in the notified event.
+                        string aResponseReceiverId = aConnection.Key;
+                        Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, aResponseReceiverId, aConnection.Value.SenderAddress));
                     }
                     myConnectedClients.Clear();
                 }
