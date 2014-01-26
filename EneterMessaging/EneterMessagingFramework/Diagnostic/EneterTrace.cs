@@ -329,7 +329,7 @@ namespace Eneter.Messaging.Diagnostic
                 {
                     TimeSpan aTimeSpan = TimeSpan.FromTicks(anItem.Value.Ticks);
 #if !SILVERLIGHT3 && !WINDOWS_PHONE_70 && !NET35 && !MONO
-                    string aMessage = string.Join("", aTimeSpan.ToString(), " ", anItem.Value.Calls, "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name);
+                    string aMessage = string.Join("", aTimeSpan.ToString(), " ", anItem.Value.Calls, "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name, "\r\n");
 #else
                     string[] aJoinBuf = { aTimeSpan.ToString(), " ", anItem.Value.Calls.ToString(), "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name };
                     string aMessage = string.Join("", aJoinBuf);
