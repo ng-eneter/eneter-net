@@ -33,7 +33,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             public ISender ResponseSender { get; private set; }
         }
 
-        public event EventHandler<ConnectionTokenEventArgs> ResponseReceiverConnecting;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
@@ -245,22 +244,14 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
                     // If the connection is not open then it will open it.
-                    if (!CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId))
-                    {
-                        // If the connection is not approved stop listening for this client.
-                        return false;
-                    }
+                    CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
 
                     Dispatcher.Invoke(() => NotifyMessageReceived(messageContext, aProtocolMessage));
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                 {
                     // If the connection is not approved.
-                    if (!CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId))
-                    {
-                        // If the connection is not approved stop listening for this client.
-                        return false;
-                    }
+                    CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
@@ -311,11 +302,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         /// <param name="messageContext"></param>
         /// <param name="responseReceiverId"></param>
         /// <returns></returns>
-        private bool CreateResponseMessageSender(MessageContext messageContext, string responseReceiverId)
+        private void CreateResponseMessageSender(MessageContext messageContext, string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
-                bool aConnectionApprovedFlag = true;
                 bool aNewConnectionFlag = false;
 
                 // If the connection is not open yet.
@@ -326,26 +316,20 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                     if (aConnectionContext == null)
                     {
-                        if (IsMessageSenderApproved(messageContext.SenderAddress, responseReceiverId))
+                        // Get the response sender.
+                        // Some messagings send the response sender in the message context and some
+                        // provides the factory to create it.
+                        ISender aResponseSender = messageContext.ResponseSender;
+                        if (aResponseSender == null)
                         {
-                            // Get the response sender.
-                            // Some messagings send the response sender in the message context and some
-                            // provides the factory to create it.
-                            ISender aResponseSender = messageContext.ResponseSender;
-                            if (aResponseSender == null)
-                            {
-                                aResponseSender = myInputConnector.CreateResponseSender(responseReceiverId);
-                            }
-
-                            aConnectionContext = new TConnectionContext(aResponseSender, messageContext.SenderAddress);
-                            myConnectedClients[responseReceiverId] = aConnectionContext;
-
-                            aNewConnectionFlag = true;
+                            aResponseSender = myInputConnector.CreateResponseSender(responseReceiverId);
                         }
-                        else
-                        {
-                            aConnectionApprovedFlag = false;
-                        }
+
+                        aConnectionContext = new TConnectionContext(aResponseSender, messageContext.SenderAddress);
+                        myConnectedClients[responseReceiverId] = aConnectionContext;
+
+                        // Connection was created.
+                        aNewConnectionFlag = true;
                     }
                 }
 
@@ -354,22 +338,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     // Open connection comes from the client. So notify it from dispatcher threading.
                     ThreadPool.QueueUserWorkItem(x => Dispatcher.Invoke(() => Notify(ResponseReceiverConnected, responseReceiverId, aConnectionContext.SenderAddress)));
                 }
-
-                return aConnectionApprovedFlag;
-            }
-        }
-
-        private bool IsMessageSenderApproved(string senderAddress, string responseReceiverId)
-        {
-            using (EneterTrace.Entering())
-            {
-                ConnectionTokenEventArgs aConnectionToken = new ConnectionTokenEventArgs(responseReceiverId, senderAddress);
-
-                // Note: This event must be notified from the thread listening to messages.
-                //       So that based on the return the thread can decide if the connection stays open or will be closed.
-                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, aConnectionToken, false);
-
-                return aConnectionToken.IsConnectionAllowed;
             }
         }
 

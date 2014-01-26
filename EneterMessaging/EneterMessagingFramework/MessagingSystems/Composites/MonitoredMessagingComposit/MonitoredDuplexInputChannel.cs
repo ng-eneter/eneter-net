@@ -34,7 +34,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
 
 
-        public event EventHandler<ConnectionTokenEventArgs> ResponseReceiverConnecting;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
@@ -76,7 +75,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         throw new InvalidOperationException(aMessage);
                     }
 
-                    myUnderlyingInputChannel.ResponseReceiverConnecting += OnResponseReceiverConnecting;
                     myUnderlyingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
                     myUnderlyingInputChannel.MessageReceived += OnMessageReceived;
 
@@ -86,7 +84,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                     catch (Exception err)
                     {
-                        myUnderlyingInputChannel.ResponseReceiverConnecting -= OnResponseReceiverConnecting;
                         myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
                         myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
 
@@ -111,7 +108,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
                     }
 
-                    myUnderlyingInputChannel.ResponseReceiverConnecting -= OnResponseReceiverConnecting;
                     myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
                     myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
                 }
@@ -164,24 +160,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + ErrorHandler.DisconnectResponseReceiverFailure + responseReceiverId, err);
-                }
-            }
-        }
-
-        private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                if (ResponseReceiverConnecting != null)
-                {
-                    try
-                    {
-                        ResponseReceiverConnecting(this, e);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
                 }
             }
         }

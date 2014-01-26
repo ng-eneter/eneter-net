@@ -783,60 +783,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             }
         }
 
-        [Test]
-        public virtual void Duplex_14_DoNotAllowConnecting()
-        {
-            IDuplexInputChannel aDuplexInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
-            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
-
-            AutoResetEvent aConnectionNotAllowedEvent = new AutoResetEvent(false);
-            ConnectionTokenEventArgs aConnectionToken = null;
-            aDuplexInputChannel.ResponseReceiverConnecting += (x, y) =>
-                {
-                    aConnectionToken = y;
-
-                    // Indicate the connection is not allowed.
-                    y.IsConnectionAllowed = false;
-                    aConnectionNotAllowedEvent.Set();
-                };
-
-            ResponseReceiverEventArgs aConnectedResponseReceiver = null;
-            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
-                {
-                    aConnectedResponseReceiver = y;
-                };
-
-            AutoResetEvent aConnectionClosedEvent = new AutoResetEvent(false);
-            aDuplexOutputChannel.ConnectionClosed += (x, y) =>
-                {
-                    aConnectionClosedEvent.Set();
-                };
-
-            try
-            {
-                aDuplexInputChannel.StartListening();
-
-                // Open connection - the event will try to close the connection.
-                aDuplexOutputChannel.OpenConnection();
-
-                aConnectionNotAllowedEvent.WaitOne();
-
-                // Note: Not all messagings are really physically connted so the duplex output channel
-                //       does not have to receive it was disconneced.
-                //       e.g. TCP gets this notification.
-                //aConnectionClosedEvent.WaitOne();
-
-                Assert.IsNull(aConnectedResponseReceiver);
-
-                Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, aConnectionToken.ResponseReceiverId);
-                //Assert.IsFalse(aDuplexOutputChannel.IsConnected);
-            }
-            finally
-            {
-                aDuplexInputChannel.StopListening();
-                aDuplexOutputChannel.CloseConnection();
-            }
-        }
 
 
         private void SendMessageReceiveResponse(string channelId, string message, string responseMessage,

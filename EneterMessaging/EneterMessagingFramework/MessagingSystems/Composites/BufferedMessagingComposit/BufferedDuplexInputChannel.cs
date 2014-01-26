@@ -17,7 +17,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
     internal class BufferedDuplexInputChannel : IDuplexInputChannel
     {
-        public event EventHandler<ConnectionTokenEventArgs> ResponseReceiverConnecting;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
@@ -45,7 +44,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 lock (myListeningManipulatorLock)
                 {
-                    myUnderlyingInputChannel.ResponseReceiverConnecting += OnResponseReceiverConnecting;
                     myUnderlyingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
                     myUnderlyingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
                     myUnderlyingInputChannel.MessageReceived += OnMessageReceived;
@@ -56,7 +54,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     }
                     catch (Exception err)
                     {
-                        myUnderlyingInputChannel.ResponseReceiverConnecting -= OnResponseReceiverConnecting;
                         myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
                         myUnderlyingInputChannel.ResponseReceiverDisconnected -= OnResponseReceiverDisconnected;
                         myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
@@ -100,7 +97,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
                     }
 
-                    myUnderlyingInputChannel.ResponseReceiverConnecting -= OnResponseReceiverConnecting;
                     myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
                     myUnderlyingInputChannel.ResponseReceiverDisconnected -= OnResponseReceiverDisconnected;
                     myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
@@ -177,14 +173,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 }
 
                 myUnderlyingInputChannel.DisconnectResponseReceiver(responseReceiverId);
-            }
-        }
-
-        private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, e, false);
             }
         }
 

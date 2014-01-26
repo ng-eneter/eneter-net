@@ -21,7 +21,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             public string HandshakeMessage { get; private set; }
         }
 
-        public event EventHandler<ConnectionTokenEventArgs> ResponseReceiverConnecting;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
@@ -34,7 +33,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 myUnderlayingInputChannel = underlyingInputChannel;
                 myVerify = authenticationCallback;
 
-                myUnderlayingInputChannel.ResponseReceiverConnecting += OnResponseReceiverConnecting;
                 myUnderlayingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
                 myUnderlayingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
                 myUnderlayingInputChannel.MessageReceived += OnMessageReceived;
@@ -89,15 +87,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             using (EneterTrace.Entering())
             {
                 myUnderlayingInputChannel.DisconnectResponseReceiver(responseReceiverId);
-            }
-        }
-
-
-        private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                Notify<ConnectionTokenEventArgs>(ResponseReceiverConnecting, e, false);
             }
         }
 

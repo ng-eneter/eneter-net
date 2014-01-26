@@ -16,16 +16,6 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
     public interface IDuplexInputChannel
     {
         /// <summary>
-        /// The event is invoked before a duplex output channel opens the connection.
-        /// </summary>
-        /// <remarks>
-        /// The event allows to grant or deny the connection.
-        /// E.g. if the IsConnectionAllowed is set to false the connection will not be open.<br/>
-        /// This event does not use the dispatcher. Therefore the event can be raised in whatever thread.
-        /// </remarks>
-        event EventHandler<ConnectionTokenEventArgs> ResponseReceiverConnecting;
-
-        /// <summary>
         /// The event is invoked when a duplex output channel opened the connection.
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;

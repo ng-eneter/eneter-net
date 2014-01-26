@@ -12,7 +12,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
 {
     internal class Mock_MonitorDuplexInputChannel : IDuplexInputChannel
     {
-        public event EventHandler<ConnectionTokenEventArgs> ResponseReceiverConnecting;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
@@ -21,7 +20,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
         public Mock_MonitorDuplexInputChannel(IDuplexInputChannel underlyingInputChannel, ISerializer serializer)
         {
             myUnderlyingInputChannel = underlyingInputChannel;
-            myUnderlyingInputChannel.ResponseReceiverConnecting += OnResponseReceiverConnecting;
             myUnderlyingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
             myUnderlyingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
             myUnderlyingInputChannel.MessageReceived += OnMessageReceived;
@@ -74,21 +72,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
 
         public bool ResponsePingFlag { get; set; }
 
-
-        private void OnResponseReceiverConnecting(object sender, ConnectionTokenEventArgs e)
-        {
-            if (ResponseReceiverConnecting != null)
-            {
-                try
-                {
-                    ResponseReceiverConnecting(this, e);
-                }
-                catch (Exception err)
-                {
-                    EneterTrace.Warning(TracedObject + "detected an exception from the 'ResponseReceiverConnecting' event handler.", err);
-                }
-            }
-        }
 
         private void OnResponseReceiverConnected(object sender, ResponseReceiverEventArgs e)
         {

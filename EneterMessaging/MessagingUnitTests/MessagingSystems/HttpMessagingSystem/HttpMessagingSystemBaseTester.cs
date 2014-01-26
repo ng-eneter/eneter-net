@@ -28,59 +28,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.HttpMessagingSystem
         }
 
         [Test]
-        public override void Duplex_14_DoNotAllowConnecting()
-        {
-            IDuplexInputChannel aDuplexInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
-            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
-
-            AutoResetEvent aConnectionNotAllowedEvent = new AutoResetEvent(false);
-            ConnectionTokenEventArgs aConnectionToken = null;
-            aDuplexInputChannel.ResponseReceiverConnecting += (x, y) =>
-            {
-                aConnectionToken = y;
-
-                // Indicate the connection is not allowed.
-                y.IsConnectionAllowed = false;
-                aConnectionNotAllowedEvent.Set();
-            };
-
-            ResponseReceiverEventArgs aConnectedResponseReceiver = null;
-            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
-            {
-                aConnectedResponseReceiver = y;
-            };
-
-            try
-            {
-                aDuplexInputChannel.StartListening();
-
-                WebException anException = null;
-                try
-                {
-                    aDuplexOutputChannel.OpenConnection();
-                }
-                catch (WebException err)
-                {
-                    anException = err;
-                }
-
-                aConnectionNotAllowedEvent.WaitOne();
-
-                Assert.IsNotNull(anException);
-
-                Assert.IsNull(aConnectedResponseReceiver);
-
-                Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, aConnectionToken.ResponseReceiverId);
-                Assert.IsFalse(aDuplexOutputChannel.IsConnected);
-            }
-            finally
-            {
-                aDuplexInputChannel.StopListening();
-                aDuplexOutputChannel.CloseConnection();
-            }
-        }
-
-        [Test]
         public void B01_InactivityTimeout()
         {
             // Set the polling frequency slower

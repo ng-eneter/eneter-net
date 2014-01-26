@@ -152,7 +152,6 @@
     <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\MessagingSystemBase\ConnectionTokenEventArgs.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\ListeningInstance.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeOutputConnector.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemFactory.cs" />
