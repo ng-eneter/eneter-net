@@ -219,7 +219,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aResponseReceiverConnectedEvent.WaitOne();
                 Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectedReceiver);
 
-
                 anOutputChannel.CloseConnection();
                 Assert.IsFalse(anOutputChannel.IsConnected);
 
@@ -722,12 +721,16 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
             try
             {
+                //EneterTrace.StartProfiler();
+
                 aDuplexInputChannel.StartListening();
 
                 // Open connection - the event will try to close the connection.
                 aDuplexOutputChannel.OpenConnection();
 
                 aConnectionClosedEvent.WaitOne();
+
+                //EneterTrace.StopProfiler();
 
                 Assert.IsTrue(isOpenedFlag);
                 Assert.IsTrue(isClosedFlag);
@@ -738,6 +741,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aDuplexOutputChannel.CloseConnection();
             }
 
+            // To allow traces to finish.
+            Thread.Sleep(100);
         }
 
         [Test]

@@ -99,6 +99,7 @@
     <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs" />
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs" />
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticatedConnection_Tcp.cs" />
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticationConnection_Sync.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs" />

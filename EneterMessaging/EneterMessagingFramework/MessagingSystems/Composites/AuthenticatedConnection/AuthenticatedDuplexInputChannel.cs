@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2014
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Eneter.Messaging.Diagnostic;
@@ -9,16 +16,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
     internal class AuthenticatedDuplexInputChannel : IDuplexInputChannel
     {
-        private class NotYetAuthenticatedConnection
+        private class TNotYetAuthenticatedConnection
         {
-            public NotYetAuthenticatedConnection(string responseReceiverId)
-            {
-                ResponseReceiverId = responseReceiverId;
-                HandshakeMessage = Guid.NewGuid().ToString();
-            }
-
-            public string ResponseReceiverId { get; private set; }
-            public string HandshakeMessage { get; private set; }
+            public object LoginMessage { get; set; }
+            public object HandshakeMessage { get; set; }
         }
 
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
@@ -26,14 +27,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
 
-        public AuthenticatedDuplexInputChannel(IDuplexInputChannel underlyingInputChannel, AuthenticateCallback authenticationCallback)
+        public AuthenticatedDuplexInputChannel(IDuplexInputChannel underlyingInputChannel,
+            GetHanshakeMessage getHandshakeMessageCallback,
+            VerifyHandshakeResponseMessage verifyHandshakeResponseMessageCallback)
         {
             using (EneterTrace.Entering())
             {
                 myUnderlayingInputChannel = underlyingInputChannel;
-                myVerify = authenticationCallback;
+                myGetHandshakeMessageCallback = getHandshakeMessageCallback;
+                myVerifyResponseMessageCallback = verifyHandshakeResponseMessageCallback;
 
-                myUnderlayingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
                 myUnderlayingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
                 myUnderlayingInputChannel.MessageReceived += OnMessageReceived;
             }
@@ -90,37 +93,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             }
         }
 
-
-        private void OnResponseReceiverConnected(object sender, ResponseReceiverEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myNotYetAuthenticatedConnections)
-                {
-                    // Create not authenticated client.
-                    if (!myNotYetAuthenticatedConnections.Any(x => x.ResponseReceiverId == e.ResponseReceiverId))
-                    {
-                        NotYetAuthenticatedConnection aNewConnection = new NotYetAuthenticatedConnection(e.ResponseReceiverId);
-                        myNotYetAuthenticatedConnections.Add(aNewConnection);
-
-                        // Try to send the handshake message.
-                        // The response for the handshake will be received in 'OnMessageReceived' method.
-                        try
-                        {
-                            myUnderlayingInputChannel.SendResponseMessage(e.ResponseReceiverId, aNewConnection.HandshakeMessage);
-                        }
-                        catch (Exception err)
-                        {
-                            myNotYetAuthenticatedConnections.Remove(aNewConnection);
-
-                            string anErrorMessage = TracedObject + "failed to send the handshake message.";
-                            EneterTrace.Error(anErrorMessage, err);
-                        }
-                    }
-                }
-            }
-        }
-
         private void OnResponseReceiverDisconnected(object sender, ResponseReceiverEventArgs e)
         {
             using (EneterTrace.Entering())
@@ -133,7 +105,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                 lock (myNotYetAuthenticatedConnections)
                 {
-                    myNotYetAuthenticatedConnections.RemoveWhere(x => x.ResponseReceiverId == e.ResponseReceiverId);
+                    myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
                 }
 
                 if (anIsAuthenticatedConnection)
@@ -147,81 +119,122 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                
+                // If the connection has already been authenticated then this is a regular request message that will be notified.
                 bool anIsAuthenticated;
                 lock (myAuthenticatedConnections)
                 {
                     anIsAuthenticated = myAuthenticatedConnections.Contains(e.ResponseReceiverId);
                 }
-
-                // If the connection has already been authenticated then just forward the message.
                 if (anIsAuthenticated)
                 {
                     Notify<DuplexChannelMessageEventArgs>(MessageReceived, e, true);
+
+                    return;
                 }
-                else
+
+
+                bool aDisconnectFlag = true;
+                bool aNewResponseReceiverAuthenticated = false;
+
+                lock (myNotYetAuthenticatedConnections)
                 {
-                    // If the handshake verifycation is not good then disconnect the client.
-                    bool aDisconnectFlag = true;
-
-                    // If the connection is not authenticated this message must be a response for the handshake message.
-                    lock (myNotYetAuthenticatedConnections)
+                    TNotYetAuthenticatedConnection aConnection;
+                    myNotYetAuthenticatedConnections.TryGetValue(e.ResponseReceiverId, out aConnection);
+                    if (aConnection == null)
                     {
-                        NotYetAuthenticatedConnection aNotAuthenticatedConnection = myNotYetAuthenticatedConnections.FirstOrDefault(x => x.ResponseReceiverId == e.ResponseReceiverId);
-                        if (aNotAuthenticatedConnection != null)
+                        aConnection = new TNotYetAuthenticatedConnection();
+                        myNotYetAuthenticatedConnections[e.ResponseReceiverId] = aConnection;
+                    }
+
+                    // If the connection is in the state that the handshake message was sent then this is the handshake response message.
+                    // The response for the handshake will be verified.
+                    if (aConnection.HandshakeMessage != null)
+                    {
+                        try
                         {
-                            try
+                            if (myVerifyResponseMessageCallback(e.ChannelId, e.ResponseReceiverId, aConnection.LoginMessage, aConnection.HandshakeMessage, e.Message))
                             {
-                                // Verify the client and its handshake response message.
-                                if (myVerify(aNotAuthenticatedConnection.ResponseReceiverId, aNotAuthenticatedConnection.HandshakeMessage, e.Message))
+                                // Send acknowledge message that the connection is authenticated.
+                                try
                                 {
-                                    try
-                                    {
-                                        // Send back the acknowledge message.
-                                        myUnderlayingInputChannel.SendResponseMessage(e.ResponseReceiverId, "OK");
+                                    myUnderlayingInputChannel.SendResponseMessage(e.ResponseReceiverId, "OK");
 
-                                        // The response receiver does not have to be disconnected.
-                                        aDisconnectFlag = false;
-                                    }
-                                    catch (Exception err)
+                                    aDisconnectFlag = false;
+                                    aNewResponseReceiverAuthenticated = true;
+
+                                    // Move the connection among authenticated connections.
+                                    myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
+                                    lock (myAuthenticatedConnections)
                                     {
-                                        string anErrorMessage = TracedObject + "detected an exception when sending the connection acknowledge message. The client will be disconnected.";
-                                        EneterTrace.Error(anErrorMessage, err);
+                                        myAuthenticatedConnections.Add(e.ResponseReceiverId);
                                     }
                                 }
-                            }
-                            catch (Exception err)
-                            {
-                                string anErrorMessage = TracedObject + "detected an exception when verifying the response for the handshake message. The client will be diconnected.";
-                                EneterTrace.Error(anErrorMessage, err);
-                            }
-
-                            // If the authentication was not successful then disconnect the client.
-                            if (aDisconnectFlag)
-                            {
-                                myUnderlayingInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
-                            }
-                            else
-                            {
-                                // Note: this lock is inside 'myNotYetAuthenticatedConnections' lock.
-                                lock (myAuthenticatedConnections)
+                                catch (Exception err)
                                 {
-                                    myAuthenticatedConnections.Add(e.ResponseReceiverId);
+                                    string anErrorMessage = TracedObject + "failed to send the acknowledge message that the connection was authenticated. The client will be disconnected.";
+                                    EneterTrace.Error(anErrorMessage, err);
                                 }
                             }
+                        }
+                        catch (Exception err)
+                        {
+                            string anErrorMessage = TracedObject + "failed to verify the response for the handshake message. The client will be disconnected.";
+                            EneterTrace.Error(anErrorMessage, err);
+                        }
+                    }
+                    else
+                    {
+                        // If the connection is in the state that it is not logged in then this must be the login message.
+                        // The handshake message will be sent.
+                        try
+                        {
+                            aConnection.HandshakeMessage = myGetHandshakeMessageCallback(e.ChannelId, e.ResponseReceiverId, e.Message);
 
-                            // Remove response receiver from the group of not authenticated connections.
-                            myNotYetAuthenticatedConnections.Remove(aNotAuthenticatedConnection);
+                            // If the login was accepted.
+                            if (aConnection.HandshakeMessage != null)
+                            {
+                                try
+                                {
+                                    // Send the handshake message to the client.
+                                    myUnderlayingInputChannel.SendResponseMessage(e.ResponseReceiverId, aConnection.HandshakeMessage);
+                                    aDisconnectFlag = false;
+                                }
+                                catch (Exception err)
+                                {
+                                    string anErrorMessage = TracedObject + "failed to send the handshake message. The client will be disconnected.";
+                                    EneterTrace.Error(anErrorMessage, err);
+                                }
+                            }
+                        }
+                        catch (Exception err)
+                        {
+                            string anErrorMessage = TracedObject + "failed to get the handshake message. The client will be disconnected.";
+                            EneterTrace.Error(anErrorMessage, err);
                         }
                     }
 
-                    // Note: the notification is out of the lock in order not to block it.
-                    if (!aDisconnectFlag)
+                    if (aDisconnectFlag)
                     {
-                        ResponseReceiverEventArgs anEventArgs = new ResponseReceiverEventArgs(e.ResponseReceiverId, e.SenderAddress);
-                        Notify<ResponseReceiverEventArgs>(ResponseReceiverConnected, anEventArgs, false);
+                        myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
                     }
                 }
+
+
+                // If the connection with the client shall be closed.
+                // Note: the disconnection runs outside the lock in order to reduce blocking.
+                if (aDisconnectFlag)
+                {
+                    myUnderlayingInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
+                }
+
+                // Notify ResponseReceiverConnected if a new connection is authenticated.
+                // Note: the notification runs outside the lock in order to reduce blocking.
+                if (aNewResponseReceiverAuthenticated)
+                {
+                    ResponseReceiverEventArgs anEventArgs = new ResponseReceiverEventArgs(e.ResponseReceiverId, e.SenderAddress);
+                    Notify<ResponseReceiverEventArgs>(ResponseReceiverConnected, anEventArgs, false);
+                }
+
             }
         }
 
@@ -249,10 +262,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         }
 
         private IDuplexInputChannel myUnderlayingInputChannel;
-        private HashSet<NotYetAuthenticatedConnection> myNotYetAuthenticatedConnections = new HashSet<NotYetAuthenticatedConnection>();
+
+        private Dictionary<string, TNotYetAuthenticatedConnection> myNotYetAuthenticatedConnections = new Dictionary<string, TNotYetAuthenticatedConnection>();
         private HashSet<string> myAuthenticatedConnections = new HashSet<string>();
 
-        private AuthenticateCallback myVerify;
+        private GetHanshakeMessage myGetHandshakeMessageCallback;
+        private VerifyHandshakeResponseMessage myVerifyResponseMessageCallback;
 
         private string TracedObject
         {

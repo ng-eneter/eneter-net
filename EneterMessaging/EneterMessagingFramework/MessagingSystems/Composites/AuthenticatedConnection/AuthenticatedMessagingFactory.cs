@@ -1,35 +1,51 @@
-﻿using System;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2014
+*/
+
+using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
-    public delegate bool AuthenticateCallback(string responseReceiverId, string handshakeMessage, object handshakeResponse);
-    public delegate object GetHandshakeResponseCallback(string handshakeMessage);
+    public delegate object GetLoginMessage(string channelId, string responseReceiverId);
+    public delegate object GetHanshakeMessage(string channelId, string responseReceiverId, object loginMessage);
+    public delegate object GetHandshakeResponseMessage(string channelId, string responseReceiverId, object handshakeMessage);
+    public delegate bool VerifyHandshakeResponseMessage(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponse);
 
     public class AuthenticatedMessagingFactory : IMessagingSystemFactory
     {
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
-            AuthenticateCallback authenticateCallback)
-            : this(underlyingMessagingSystem, null, authenticateCallback)
+            GetLoginMessage getLoginMessageCallback,
+            GetHandshakeResponseMessage getHandshakeResponseMessageCallback)
+            : this(underlyingMessagingSystem, getLoginMessageCallback, getHandshakeResponseMessageCallback, null, null)
         {
         }
 
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
-            GetHandshakeResponseCallback handshakeResponseCallback)
-            : this(underlyingMessagingSystem, handshakeResponseCallback, null)
+            GetHanshakeMessage getHandshakeMessageCallback,
+            VerifyHandshakeResponseMessage verifyHandshakeResponseMessageCallback)
+            : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, verifyHandshakeResponseMessageCallback)
         {
         }
 
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
-            GetHandshakeResponseCallback handshakeResponseCallback,
-            AuthenticateCallback authenticateCallback)
+            GetLoginMessage getLoginMessageCallback,
+            GetHandshakeResponseMessage getHandshakeResponseMessageCallback,
+            GetHanshakeMessage getHandshakeMessageCallback,
+            VerifyHandshakeResponseMessage verifyHandshakeResponseMessageCallback)
         {
             using (EneterTrace.Entering())
             {
                 myUnderlyingMessaging = underlyingMessagingSystem;
-                myHandshakeResponseCallback = handshakeResponseCallback;
-                myAuthenticateCallback = authenticateCallback;
+
+                myGetLoginMessageCallback = getLoginMessageCallback;
+                myGetHandShakeMessageCallback = getHandshakeMessageCallback;
+                myGetHandshakeResponseMessageCallback = getHandshakeResponseMessageCallback;
+                myVerifyHandshakeResponseMessageCallback = verifyHandshakeResponseMessageCallback;
             }
         }
 
@@ -37,15 +53,23 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                if (myHandshakeResponseCallback == null)
+                if (myGetLoginMessageCallback == null)
                 {
-                    string anErrorMessage = TracedObject + "failed to create duplex output channel because the callback for handshake response is null.";
+                    string anErrorMessage = TracedObject + "failed to create duplex output channel because the callback to get the login message is null.";
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
+                if (myGetHandshakeResponseMessageCallback == null)
+                {
+                    string anErrorMessage = TracedObject + "failed to create duplex output channel because the callback to get the response message for handshake is null.";
+                    EneterTrace.Error(anErrorMessage);
+                    throw new InvalidOperationException(anErrorMessage);
+                }
+
+
                 IDuplexOutputChannel anUnderlyingOutputChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId);
-                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myHandshakeResponseCallback);
+                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback);
             }
         }
 
@@ -53,15 +77,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                if (myHandshakeResponseCallback == null)
+                if (myGetLoginMessageCallback == null)
                 {
-                    string anErrorMessage = TracedObject + "failed to create duplex output channel because the callback for handshake response is null.";
+                    string anErrorMessage = TracedObject + "failed to create duplex output channel because the callback to get the login message is null.";
+                    EneterTrace.Error(anErrorMessage);
+                    throw new InvalidOperationException(anErrorMessage);
+                }
+
+                if (myGetHandshakeResponseMessageCallback == null)
+                {
+                    string anErrorMessage = TracedObject + "failed to create duplex output channel because the callback to get the response message for handshake is null.";
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
                 IDuplexOutputChannel anUnderlyingOutputChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId, responseReceiverId);
-                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myHandshakeResponseCallback);
+                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback);
             }
         }
 
@@ -69,22 +100,32 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                if (myAuthenticateCallback == null)
+                if (myGetHandShakeMessageCallback == null)
                 {
-                    string anErrorMessage = TracedObject + "failed to create duplex input channel because the callback for authentication is null.";
+                    string anErrorMessage = TracedObject + "failed to create duplex input channel because the callback to get the handshake message is null.";
+                    EneterTrace.Error(anErrorMessage);
+                    throw new InvalidOperationException(anErrorMessage);
+                }
+
+                if (myVerifyHandshakeResponseMessageCallback == null)
+                {
+                    string anErrorMessage = TracedObject + "failed to create duplex input channel because the callback to verify the handshake response message is null.";
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
                 IDuplexInputChannel anUnderlyingInputChannel = myUnderlyingMessaging.CreateDuplexInputChannel(channelId);
-                return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myAuthenticateCallback);
+                return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myGetHandShakeMessageCallback, myVerifyHandshakeResponseMessageCallback);
             }
         }
 
 
         private IMessagingSystemFactory myUnderlyingMessaging;
-        private GetHandshakeResponseCallback myHandshakeResponseCallback;
-        private AuthenticateCallback myAuthenticateCallback;
+
+        private GetLoginMessage myGetLoginMessageCallback;
+        private GetHanshakeMessage myGetHandShakeMessageCallback;
+        private GetHandshakeResponseMessage myGetHandshakeResponseMessageCallback;
+        private VerifyHandshakeResponseMessage myVerifyHandshakeResponseMessageCallback;
 
         private string TracedObject
         {
