@@ -34,39 +34,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
             MessagingSystemFactory = new AuthenticatedMessagingFactory(anUnderlyingMessaging,
                 GetLoginMessage,
                 GetHandshakeResponseMessage,
-                GetHandshakeMessage, VerifyHandshakeResponseMessage);
+                GetHandshakeMessage, VerifyHandshakeResponseMessage)
+                {
+                    AuthenticationTimeout = TimeSpan.FromMilliseconds(2000)
+                };
 
             myHandshakeSerializer = new AesSerializer("Password123");
         }
-
-        private object GetLoginMessage(string channelId, string responseReceiverId)
-        {
-            return "MyLoginName";
-        }
-
-        private object GetHandshakeMessage(string channelId, string responseReceiverId, object loginMessage)
-        {
-            if ((string)loginMessage == "MyLoginName")
-            {
-                return "MyHandshake";
-            }
-
-            return null;
-        }
-
-        private object GetHandshakeResponseMessage(string channelId, string responseReceiverId, object handshakeMessage)
-        {
-            object aHandshakeResponse = myHandshakeSerializer.Serialize<string>((string)handshakeMessage);
-            return aHandshakeResponse;
-        }
-
-        private bool VerifyHandshakeResponseMessage(string channelId, string responseReceiverId, object loginMassage, object handshakeMessage, object handshakeResponse)
-        {
-            string aHandshakeResponse = myHandshakeSerializer.Deserialize<string>(handshakeResponse);
-            return (string)handshakeMessage == aHandshakeResponse;
-        }
-
-
-        private ISerializer myHandshakeSerializer;
     }
 }
