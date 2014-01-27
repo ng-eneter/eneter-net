@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.Threading.Dispatching;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2014
+*/
+
+using System;
 using System.Threading;
+using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
@@ -20,14 +24,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
         public AuthenticatedDuplexOutputChannel(IDuplexOutputChannel underlyingOutputChannel,
             GetLoginMessage getLoginMessageCallback,
-            GetHandshakeResponseMessage getHandshakeResponseMessageCallback)
+            GetHandshakeResponseMessage getHandshakeResponseMessageCallback,
+            TimeSpan authenticationTimeout)
         {
             using (EneterTrace.Entering())
             {
                 myUnderlyingOutputChannel = underlyingOutputChannel;
-
                 myGetLoginMessageCallback = getLoginMessageCallback;
                 myGetHandshakeResponseMessageCallback = getHandshakeResponseMessageCallback;
+                myAuthenticationTimeout = authenticationTimeout;
 
                 myUnderlyingOutputChannel.ConnectionClosed += OnConnectionClosed;
                 myUnderlyingOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
@@ -52,42 +57,51 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         throw new InvalidOperationException(aMessage);
                     }
 
-                    // Reset internal states.
-                    myIsHandshakeResponseSent = false;
-                    myIsConnectionAcknowledged = false;
-                    myConnectionAcknowledged.Reset();
-
-                    myUnderlyingOutputChannel.OpenConnection();
-
-                    // Send the login message.
-                    object aLoginMessage;
                     try
                     {
-                        aLoginMessage = myGetLoginMessageCallback(ChannelId, ResponseReceiverId);
-                    }
-                    catch (Exception err)
-                    {
-                        string anErrorMessage = TracedObject + "failed to get the login message.";
-                        EneterTrace.Error(anErrorMessage, err);
-                        throw;
-                    }
+                        // Reset internal states.
+                        myIsHandshakeResponseSent = false;
+                        myIsConnectionAcknowledged = false;
+                        myConnectionAcknowledged.Reset();
 
-                    try
-                    {
-                        myUnderlyingOutputChannel.SendMessage(aLoginMessage);
-                    }
-                    catch (Exception err)
-                    {
-                        string anErrorMessage = TracedObject + "failed to send the login message.";
-                        EneterTrace.Error(anErrorMessage, err);
-                        throw;
-                    }
+                        myUnderlyingOutputChannel.OpenConnection();
 
-                    // Wait until the hanshake is completed.
-                    if (!myConnectionAcknowledged.WaitOne(5000))
+                        // Send the login message.
+                        object aLoginMessage;
+                        try
+                        {
+                            aLoginMessage = myGetLoginMessageCallback(ChannelId, ResponseReceiverId);
+                        }
+                        catch (Exception err)
+                        {
+                            string anErrorMessage = TracedObject + "failed to get the login message.";
+                            EneterTrace.Error(anErrorMessage, err);
+                            throw;
+                        }
+
+                        try
+                        {
+                            myUnderlyingOutputChannel.SendMessage(aLoginMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            string anErrorMessage = TracedObject + "failed to send the login message.";
+                            EneterTrace.Error(anErrorMessage, err);
+                            throw;
+                        }
+
+                        // Wait until the hanshake is completed.
+                        if (!myConnectionAcknowledged.WaitOne(myAuthenticationTimeout))
+                        {
+                            string anErrorMessage = TracedObject + "failed to process authentication within defined timeout " + myAuthenticationTimeout.TotalMilliseconds + " ms.";
+                            EneterTrace.Error(anErrorMessage);
+                            throw new TimeoutException(anErrorMessage);
+                        }
+                    }
+                    catch
                     {
-                        string aWarningMessage = TracedObject + "detected the handshake message was not processed within 5 seconds.";
-                        EneterTrace.Warning(aWarningMessage);
+                        CloseConnection();
+                        throw;
                     }
                 }
             }
@@ -262,6 +276,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private IDuplexOutputChannel myUnderlyingOutputChannel;
         private GetLoginMessage myGetLoginMessageCallback;
         private GetHandshakeResponseMessage myGetHandshakeResponseMessageCallback;
+        private TimeSpan myAuthenticationTimeout;
         private bool myIsHandshakeResponseSent;
         private bool myIsConnectionAcknowledged;
         private ManualResetEvent myConnectionAcknowledged = new ManualResetEvent(false);

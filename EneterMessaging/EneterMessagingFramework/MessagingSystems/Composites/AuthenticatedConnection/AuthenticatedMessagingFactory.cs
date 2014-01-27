@@ -41,6 +41,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             using (EneterTrace.Entering())
             {
                 myUnderlyingMessaging = underlyingMessagingSystem;
+                AuthenticationTimeout = TimeSpan.FromMilliseconds(10000);
 
                 myGetLoginMessageCallback = getLoginMessageCallback;
                 myGetHandShakeMessageCallback = getHandshakeMessageCallback;
@@ -69,7 +70,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
 
                 IDuplexOutputChannel anUnderlyingOutputChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId);
-                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback);
+                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback, AuthenticationTimeout);
             }
         }
 
@@ -92,7 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
 
                 IDuplexOutputChannel anUnderlyingOutputChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId, responseReceiverId);
-                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback);
+                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback, AuthenticationTimeout);
             }
         }
 
@@ -118,6 +119,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myGetHandShakeMessageCallback, myVerifyHandshakeResponseMessageCallback);
             }
         }
+
+
+        /// <summary>
+        /// Sets or gets the timeout for the authentication.
+        /// </summary>
+        /// <remarks>
+        /// The authentication timeout is used by dulex output channel when opening connection.
+        /// If the connection is open but the authentication exceeds defined time the timeout exception is thrown and the connection is not open.
+        /// Default value is 10 seconds.
+        /// </remarks>
+        public TimeSpan AuthenticationTimeout { get; set; }
 
 
         private IMessagingSystemFactory myUnderlyingMessaging;
