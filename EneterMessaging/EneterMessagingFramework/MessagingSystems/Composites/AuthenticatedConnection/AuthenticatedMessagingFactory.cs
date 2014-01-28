@@ -86,7 +86,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 myGetLoginMessageCallback = getLoginMessageCallback;
                 myGetHandShakeMessageCallback = getHandshakeMessageCallback;
                 myGetHandshakeResponseMessageCallback = getHandshakeResponseMessageCallback;
-                myVerifyHandshakeResponseMessageCallback = verifyHandshakeResponseMessageCallback;
+                myAuthenticateCallback = verifyHandshakeResponseMessageCallback;
             }
         }
 
@@ -148,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
-                if (myVerifyHandshakeResponseMessageCallback == null)
+                if (myAuthenticateCallback == null)
                 {
                     string anErrorMessage = TracedObject + "failed to create duplex input channel because the callback to verify the handshake response message is null.";
                     EneterTrace.Error(anErrorMessage);
@@ -156,7 +156,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
 
                 IDuplexInputChannel anUnderlyingInputChannel = myUnderlyingMessaging.CreateDuplexInputChannel(channelId);
-                return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myGetHandShakeMessageCallback, myVerifyHandshakeResponseMessageCallback);
+                return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myGetHandShakeMessageCallback, myAuthenticateCallback);
             }
         }
 
@@ -177,7 +177,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private GetLoginMessage myGetLoginMessageCallback;
         private GetHanshakeMessage myGetHandShakeMessageCallback;
         private GetHandshakeResponseMessage myGetHandshakeResponseMessageCallback;
-        private Authenticate myVerifyHandshakeResponseMessageCallback;
+        private Authenticate myAuthenticateCallback;
 
         private string TracedObject
         {

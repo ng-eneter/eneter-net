@@ -34,7 +34,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             {
                 myUnderlayingInputChannel = underlyingInputChannel;
                 myGetHandshakeMessageCallback = getHandshakeMessageCallback;
-                myVerifyResponseMessageCallback = verifyHandshakeResponseMessageCallback;
+                myAuthenticateCallback = verifyHandshakeResponseMessageCallback;
 
                 myUnderlayingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
                 myUnderlayingInputChannel.MessageReceived += OnMessageReceived;
@@ -151,7 +151,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     {
                         try
                         {
-                            if (myVerifyResponseMessageCallback(e.ChannelId, e.ResponseReceiverId, aConnection.LoginMessage, aConnection.HandshakeMessage, e.Message))
+                            if (myAuthenticateCallback(e.ChannelId, e.ResponseReceiverId, aConnection.LoginMessage, aConnection.HandshakeMessage, e.Message))
                             {
                                 // Send acknowledge message that the connection is authenticated.
                                 try
@@ -223,7 +223,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 // Note: the disconnection runs outside the lock in order to reduce blocking.
                 if (aDisconnectFlag)
                 {
-                    myUnderlayingInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
+                    try
+                    {
+                        myUnderlayingInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + "failed to disconnect response receiver.";
+                        EneterTrace.Warning(anErrorMessage, err);
+                    }
                 }
 
                 // Notify ResponseReceiverConnected if a new connection is authenticated.
@@ -266,7 +274,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private HashSet<string> myAuthenticatedConnections = new HashSet<string>();
 
         private GetHanshakeMessage myGetHandshakeMessageCallback;
-        private Authenticate myVerifyResponseMessageCallback;
+        private Authenticate myAuthenticateCallback;
 
         private string TracedObject
         {

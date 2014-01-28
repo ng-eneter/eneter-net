@@ -129,6 +129,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             }
         }
 
+        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
+
         public void SendMessage(object message)
         {
             using (EneterTrace.Entering())
@@ -146,9 +148,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
             }
         }
-
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
-        
 
 
         private void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
@@ -182,7 +181,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             {
                 if (myIsConnectionAcknowledged)
                 {
-                    // If the connection is properly established via hadshaking.
+                    // If the connection is properly established via handshaking.
                     Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, e, true);
 
                     return;
