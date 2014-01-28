@@ -50,7 +50,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     /// <param name="handshakeMessage">handshake message sent from the service</param>
     /// <param name="handshakeResponse">handshake response received from the client</param>
     /// <returns>true if the client is authenticated</returns>
-    public delegate bool Authenticate(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponse);
+    public delegate bool Authenticate(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponseMessage);
 
 
     /// <summary>
