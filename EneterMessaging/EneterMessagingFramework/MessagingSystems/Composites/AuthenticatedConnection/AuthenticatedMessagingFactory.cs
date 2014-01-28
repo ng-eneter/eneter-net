@@ -50,7 +50,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     /// <param name="handshakeMessage">handshake message sent from the service</param>
     /// <param name="handshakeResponse">handshake response received from the client</param>
     /// <returns>true if the client is authenticated</returns>
-    public delegate bool AuthenticateClient(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponse);
+    public delegate bool Authenticate(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponse);
 
 
     /// <summary>
@@ -67,7 +67,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
             GetHanshakeMessage getHandshakeMessageCallback,
-            AuthenticateClient verifyHandshakeResponseMessageCallback)
+            Authenticate verifyHandshakeResponseMessageCallback)
             : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, verifyHandshakeResponseMessageCallback)
         {
         }
@@ -76,7 +76,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             GetLoginMessage getLoginMessageCallback,
             GetHandshakeResponseMessage getHandshakeResponseMessageCallback,
             GetHanshakeMessage getHandshakeMessageCallback,
-            AuthenticateClient verifyHandshakeResponseMessageCallback)
+            Authenticate verifyHandshakeResponseMessageCallback)
         {
             using (EneterTrace.Entering())
             {
@@ -177,7 +177,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private GetLoginMessage myGetLoginMessageCallback;
         private GetHanshakeMessage myGetHandShakeMessageCallback;
         private GetHandshakeResponseMessage myGetHandshakeResponseMessageCallback;
-        private AuthenticateClient myVerifyHandshakeResponseMessageCallback;
+        private Authenticate myVerifyHandshakeResponseMessageCallback;
 
         private string TracedObject
         {
