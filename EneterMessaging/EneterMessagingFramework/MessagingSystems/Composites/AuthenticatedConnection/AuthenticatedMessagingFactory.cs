@@ -67,8 +67,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
             GetHanshakeMessage getHandshakeMessageCallback,
-            Authenticate verifyHandshakeResponseMessageCallback)
-            : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, verifyHandshakeResponseMessageCallback)
+            Authenticate authenticateCallback)
+            : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, authenticateCallback)
         {
         }
 
@@ -76,7 +76,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             GetLoginMessage getLoginMessageCallback,
             GetHandshakeResponseMessage getHandshakeResponseMessageCallback,
             GetHanshakeMessage getHandshakeMessageCallback,
-            Authenticate verifyHandshakeResponseMessageCallback)
+            Authenticate authenticateCallback)
         {
             using (EneterTrace.Entering())
             {
@@ -86,7 +86,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 myGetLoginMessageCallback = getLoginMessageCallback;
                 myGetHandShakeMessageCallback = getHandshakeMessageCallback;
                 myGetHandshakeResponseMessageCallback = getHandshakeResponseMessageCallback;
-                myAuthenticateCallback = verifyHandshakeResponseMessageCallback;
+                myAuthenticateCallback = authenticateCallback;
             }
         }
 
