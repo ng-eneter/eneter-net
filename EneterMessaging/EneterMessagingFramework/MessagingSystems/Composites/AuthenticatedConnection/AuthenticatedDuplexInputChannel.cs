@@ -204,6 +204,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                                     EneterTrace.Error(anErrorMessage, err);
                                 }
                             }
+                            else
+                            {
+                                // the client will be disconnected.
+                            }
                         }
                         catch (Exception err)
                         {
