@@ -56,6 +56,7 @@
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />

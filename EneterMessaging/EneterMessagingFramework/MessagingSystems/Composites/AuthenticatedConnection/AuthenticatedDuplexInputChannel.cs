@@ -28,7 +28,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
         public AuthenticatedDuplexInputChannel(IDuplexInputChannel underlyingInputChannel,
             GetHanshakeMessage getHandshakeMessageCallback,
-            VerifyHandshakeResponseMessage verifyHandshakeResponseMessageCallback)
+            AuthenticateClient verifyHandshakeResponseMessageCallback)
         {
             using (EneterTrace.Entering())
             {
@@ -266,7 +266,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private HashSet<string> myAuthenticatedConnections = new HashSet<string>();
 
         private GetHanshakeMessage myGetHandshakeMessageCallback;
-        private VerifyHandshakeResponseMessage myVerifyResponseMessageCallback;
+        private AuthenticateClient myVerifyResponseMessageCallback;
 
         private string TracedObject
         {
