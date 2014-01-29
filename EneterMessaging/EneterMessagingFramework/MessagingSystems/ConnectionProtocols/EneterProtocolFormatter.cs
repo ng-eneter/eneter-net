@@ -188,10 +188,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     {
                         aProtocolMessage = DecodeRequest(EProtocolMessageType.CloseConnectionRequest, aReader, anEndianEncodingId, aStringEncodingId);
                     }
-                    else if (aMessageType == POLL_REQUEST)
-                    {
-                        aProtocolMessage = DecodeRequest(EProtocolMessageType.PollRequest, aReader, anEndianEncodingId, aStringEncodingId);
-                    }
                     else if (aMessageType == REQUEST_MESSAGE)
                     {
                         aProtocolMessage = DecodeMessage(aReader, anEndianEncodingId, aStringEncodingId);

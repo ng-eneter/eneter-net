@@ -29,11 +29,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         CloseConnectionRequest,
 
         /// <summary>
-        /// Poll request message.
-        /// </summary>
-        PollRequest,
-
-        /// <summary>
         /// Message or reaponse message.
         /// </summary>
         MessageReceived
