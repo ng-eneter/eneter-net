@@ -187,6 +187,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         // The handshake message will be sent.
                         try
                         {
+                            aConnection.LoginMessage = e.Message;
                             aConnection.HandshakeMessage = myGetHandshakeMessageCallback(e.ChannelId, e.ResponseReceiverId, e.Message);
 
                             // If the login was accepted.
