@@ -1,18 +1,21 @@
-﻿using System;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2014
+*/
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.EndPoints.StringMessages;
-using Eneter.Messaging.Infrastructure.Attachable;
-using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.DataProcessing.Serializing;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using System.IO;
+using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 {
-    internal class MessageBus
+    internal class MessageBus : IMessageBus
     {
         private class TServiceContext
         {
@@ -22,7 +25,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
 
             public string LogicalServiceId { get; set; }
-            public string PhysicalResponseReceiverId { get; set; }
+            public string PhysicalServiceResponseReceiverId { get; set; }
 
             // Key is logical client id inside the message bus.
             // Value is physical client response receiver id.
@@ -33,17 +36,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             public string LogicalClientId { get; set; }
             public string LogicalServiceId { get; set; }
+            public string PhysicalServiceResponseReceiverId { get; set; }
         }
 
-
-        public MessageBus()
-        {
-            using (EneterTrace.Entering())
-            {
-            }
-        }
-
-        
 
         public void AttachDuplexInputChannel(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel)
         {
@@ -51,7 +46,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    
+                    myServiceChannel.StartListening();
+                    myClientChannel.StartListening();
                 }
             }
         }
@@ -62,18 +58,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             {
                 lock (myConnectionManipulatorLock)
                 {
-                   
+                    myClientChannel.StopListening();
+                    myServiceChannel.StopListening();
                 }
             }
         }
 
 
-
+        // Service disconnected from the message bus.
         private void OnServiceDisconnected(object sender, ResponseReceiverEventArgs e)
         {
             using (EneterTrace.Entering())
             {
-                DisconnectAllClients(e.ResponseReceiverId);
+                DisconnectService(e.ResponseReceiverId);
             }
         }
         
@@ -86,145 +83,33 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
                     if (aProtocolMessage != null)
                     {
-                        // A service connects to the message bus.
+                        // A service wants to connect to the message bus.
                         if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                         {
-                            string aPhysicalServiceResponseReceiverId = e.ResponseReceiverId;
-                            string aLogicalServiceId = aProtocolMessage.ResponseReceiverId;
-
-                            bool anIsDuplicate = false;
-
-                            lock (myConnectedServicesLock)
-                            {
-                                // If the service is not connected yet.
-                                if (!myConnectedServicesLogical.ContainsKey(aLogicalServiceId))
-                                {
-                                    AddService(aPhysicalServiceResponseReceiverId, aLogicalServiceId);
-                                }
-                                else
-                                {
-                                    anIsDuplicate = true;
-                                }
-                            }
-
-                            if (anIsDuplicate)
-                            {
-                                string anErrorMessage = TracedObject + "failed to connect the service because the service '" + aProtocolMessage.ResponseReceiverId + "' is already connected. The connection will be closed.";
-                                EneterTrace.Warning(anErrorMessage);
-
-                                // Close connection that tries to connect the duplicated service.
-                                // Note: notice there are no connected clients in this case!
-                                CloseConnection(myServiceChannel, aPhysicalServiceResponseReceiverId);
-                            }
+                            ConnectService(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId);
                         }
-                        // A service wants to disconnect a client.
+                        // A service wants to disconnect a particular client.
                         else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                         {
-                            string aPhysicalServiceResponseReceiverId = e.ResponseReceiverId;
-                            string aLogicalClientId = aProtocolMessage.ResponseReceiverId;
-                            string aPhysicalClientResponseReceiverId = null;
-
-                            // Get the service context.
-                            TServiceContext aServiceContext;
-                            lock (myConnectedServicesLock)
-                            {
-                                myConnectedServicesPhysical.TryGetValue(aPhysicalServiceResponseReceiverId, out aServiceContext);
-                                if (aServiceContext != null)
-                                {
-                                    // Get response receiver id of the client which shall be disconnected.
-                                    aServiceContext.ConnectedClients.TryGetValue(aLogicalClientId, out aPhysicalClientResponseReceiverId);
-
-                                    // Remove the client from the list of clients connected to this service.
-                                    aServiceContext.ConnectedClients.Remove(aLogicalClientId);
-
-                                    // Remove the client from the list of clients.
-                                    if (aPhysicalClientResponseReceiverId != null)
-                                    {
-                                        myConnectedClientsPhysical.Remove(aPhysicalClientResponseReceiverId);
-                                    }
-                                }
-                            }
-
-                            if (aServiceContext == null)
-                            {
-                                // Service context was not found. Something is wrong.
-                                // This service connection will be closed.
-                                string anErrorMessage = TracedObject + "failed to disconnect the client because the service was not found. The service will be disconnected..";
-                                EneterTrace.Warning(anErrorMessage);
-
-                                CloseConnection(myServiceChannel, aPhysicalServiceResponseReceiverId);
-                            }
-
-                            // Disconnect desired client.
-                            if (!string.IsNullOrEmpty(aPhysicalClientResponseReceiverId))
-                            {
-                                SendCloseConnectionMessage(myClientChannel, aPhysicalClientResponseReceiverId, e.Message);
-                                CloseConnection(myClientChannel, aPhysicalClientResponseReceiverId);
-                            }
+                            ServiceDisconnectsClient(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId, aProtocolMessage.Message);
                         }
                         // A service sends a response message to a client.
                         else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                         {
-                            string aPhysicalServiceResponseReceiverId = e.ResponseReceiverId;
-                            string aLogicalClientId = aProtocolMessage.ResponseReceiverId;
-                            string aPhysicalClientResponseReceiverId = null;
-
-                            // Get the physical response receiver id for the client.
-                            TServiceContext aServiceContext;
-                            lock (myConnectedServicesLock)
-                            {
-                                myConnectedServicesPhysical.TryGetValue(aPhysicalServiceResponseReceiverId, out aServiceContext);
-                                if (aServiceContext != null)
-                                {
-                                    aServiceContext.ConnectedClients.TryGetValue(aLogicalClientId, out aPhysicalClientResponseReceiverId);
-                                }
-                            }
-
-                            if (aServiceContext == null)
-                            {
-                                // Service context was not found. Something is wrong.
-                                // This service connection will be closed.
-                                string anErrorMessage = TracedObject + "failed to send the message because the service was not found. The service will be disconnected.";
-                                EneterTrace.Warning(anErrorMessage);
-
-                                CloseConnection(myServiceChannel, aPhysicalServiceResponseReceiverId);
-                            }
-
-                            if (!string.IsNullOrEmpty(aPhysicalClientResponseReceiverId))
-                            {
-                                try
-                                {
-                                    // Forward the message to the client.
-                                    myClientChannel.SendResponseMessage(aPhysicalClientResponseReceiverId, e.Message);
-                                }
-                                catch (Exception err)
-                                {
-                                    string anErrorMessage = TracedObject + "failed to send the message to the client. The client will be disconnected.";
-                                    EneterTrace.Error(anErrorMessage, err);
-
-                                    lock (myConnectedServicesLock)
-                                    {
-                                        RemoveClient(aPhysicalClientResponseReceiverId, aLogicalClientId, aServiceContext);
-                                    }
-
-                                    CloseConnection(myClientChannel, aPhysicalClientResponseReceiverId);
-                                }
-                            }
+                            SendResponseMessageToClient(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId, aProtocolMessage.Message);
                         }
                         else if (aProtocolMessage.MessageType == EProtocolMessageType.Unknown)
                         {
                             string anErrorMessage = TracedObject + "detected incorrect message format. The service will be disconnected.";
                             EneterTrace.Warning(anErrorMessage);
 
-                            CloseConnection(myServiceChannel, e.ResponseReceiverId);
-                            DisconnectAllClients(e.ResponseReceiverId);
+                            DisconnectService(e.ResponseReceiverId);
                         }
                     }
                     else
                     {
                         // The ProtocolMessage was null. It means the connection was closed.
-                        CloseConnection(myServiceChannel, e.ResponseReceiverId);
-                        DisconnectAllClients(e.ResponseReceiverId);
+                        DisconnectService(e.ResponseReceiverId);
                     }
 
                 }
@@ -232,55 +117,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 {
                     EneterTrace.Error(TracedObject + "failed to receive a message from the service. The service will be disconnected.", err);
 
-                    CloseConnection(myServiceChannel, e.ResponseReceiverId);
-                    DisconnectAllClients(e.ResponseReceiverId);
+                    DisconnectService(e.ResponseReceiverId);
                 }
             }
         }
 
 
 
-
+        // Client has sent the disconnection message.
         private void OnClientDisconnected(object sender, ResponseReceiverEventArgs e)
         {
             using (EneterTrace.Entering())
             {
-                string aPhysicalServiceResponseReceiverId = null;
-                string aLogicalClientId = null;
-
-                lock (myConnectedServicesLock)
-                {
-                    // Get the client context.
-                    TClientContext aClientContext;
-                    myConnectedClientsPhysical.TryGetValue(e.ResponseReceiverId, out aClientContext);
-
-                    // Get the service context.
-                    if (aClientContext != null)
-                    {
-                        // Get the logical client id.
-                        aLogicalClientId = aClientContext.LogicalClientId;
-
-                        // Remove disconnected client from the list of clients.
-                        myConnectedClientsPhysical.Remove(e.ResponseReceiverId);
-
-                        TServiceContext aServiceContext;
-                        myConnectedServicesLogical.TryGetValue(aClientContext.LogicalServiceId, out aServiceContext);
-                        if (aServiceContext != null)
-                        {
-                            // Get response receiver id of the service.
-                            aPhysicalServiceResponseReceiverId = aServiceContext.PhysicalResponseReceiverId;
-
-                            // Remove the client from the list of clients connected to this service.
-                            aServiceContext.ConnectedClients.Remove(aLogicalClientId);
-                        }
-                    }
-                }
-
-                if (aLogicalClientId != null && aPhysicalServiceResponseReceiverId != null)
-                {
-                    // Notify the service the client is disconnected.
-                    SendCloseConnectionMessage(myServiceChannel, aPhysicalServiceResponseReceiverId, aLogicalClientId);
-                }
+                ClientDisconnectsItself(e.ResponseReceiverId);
             }
         }
 
@@ -291,56 +140,424 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
                 if (aProtocolMessage != null)
                 {
-                    // Client wants to connect to the service.
+                    // Client wants to open the connection.
+                    // Note: At this state the logical service id is not specified.
                     if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                     {
-                        string aPhysicalClientResponseReceiverId = e.ResponseReceiverId;
-                        string aLogicalClientId = aProtocolMessage.ResponseReceiverId;
-                        string aLogicalServiceId = aProtocolMessage.
-                        
-
-                        bool anIsClientAdded;
-                        lock (myConnectedServicesLock)
-                        {
-                            anIsClientAdded = AddClient(
-                        }
+                        BeginConnectingClient(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId);
                     }
-                    // Client wants to close connection with the service.
+                    // Client wants to close the connection with the service.
                     else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                     {
+                        ClientDisconnectsItself(e.ResponseReceiverId);
                     }
-                    // Client sends a message to the service.
+                    // Client announces the name of the service that wants to connect.
+                    // Or the client sends a message to the service.
                     else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                     {
+                        ProcessMessageFromClient(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId, aProtocolMessage.Message);
                     }
                     else if (aProtocolMessage.MessageType == EProtocolMessageType.Unknown)
                     {
+                        string anErrorMessage = TracedObject + "detected incorrect message format. The client will be disconnected.";
+                        EneterTrace.Warning(anErrorMessage);
+
+                        ClientDisconnectsItself(e.ResponseReceiverId);
                     }
                 }
             }
         }
 
 
-        private void DisconnectAllClients(string physicalServiceResponseReceiverId)
+
+
+        private void BeginConnectingClient(string physicalClientResponseReceiverId, string logicalClientId)
+        {
+            using (EneterTrace.Entering())
+            {
+                bool anIsClientAdded;
+                lock (myConnectionsLock)
+                {
+                    anIsClientAdded = AddClient(physicalClientResponseReceiverId, logicalClientId);
+                }
+
+                // If the client was not added then something is wrong and the connection will be closed.
+                if (!anIsClientAdded)
+                {
+                    CloseConnection(myClientChannel, physicalClientResponseReceiverId);
+                }
+            }
+        }
+
+        private void ProcessMessageFromClient(string physicalClientResponseReceiverId, string logicalClientId, object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aPhysicalServiceResponseReceiverId = null;
+                bool anErrorFlag = true;
+                bool anIsConnectingClient = false;
+
+                lock (myConnectionsLock)
+                {
+                    // Get the client context.
+                    TClientContext aClientContext;
+                    myConnectedClientsPhysical.TryGetValue(physicalClientResponseReceiverId, out aClientContext);
+                    if (aClientContext != null)
+                    {
+                        // If the client context does not contain the service then this is the 2nd phase of openning the connection
+                        // and the received message must contain service logical id.
+                        if (string.IsNullOrEmpty(aClientContext.PhysicalServiceResponseReceiverId))
+                        {
+                            byte[] aMessageBuffer = message as byte[];
+                            if (aMessageBuffer != null)
+                            {
+                                try
+                                {
+                                    using (MemoryStream aDataStream = new MemoryStream(aMessageBuffer))
+                                    {
+                                        // Store service logical id.
+                                        aClientContext.LogicalServiceId = myEncoderDecoder.Decode(aDataStream) as string;
+                                    }
+                                }
+                                catch (Exception err)
+                                {
+                                    string anErrorMessage = TracedObject + "failed to decode the service logical id from the message.";
+                                    EneterTrace.Error(anErrorMessage, err);
+                                }
+
+                                if (!string.IsNullOrEmpty(aClientContext.LogicalServiceId))
+                                {
+                                    TServiceContext aServiceContext;
+                                    myConnectedServicesLogical.TryGetValue(aClientContext.LogicalServiceId, out aServiceContext);
+                                    if (aServiceContext != null)
+                                    {
+                                        // Store physical service response receiver id.
+                                        aClientContext.PhysicalServiceResponseReceiverId = aServiceContext.PhysicalServiceResponseReceiverId;
+                                        aPhysicalServiceResponseReceiverId = aServiceContext.PhysicalServiceResponseReceiverId;
+
+                                        // Add the client to service's open connections.
+                                        if (!aServiceContext.ConnectedClients.ContainsKey(aClientContext.LogicalClientId))
+                                        {
+                                            aServiceContext.ConnectedClients[aClientContext.LogicalClientId] = physicalClientResponseReceiverId;
+
+                                            // The client successfully opened the connection.
+                                            anErrorFlag = false;
+
+                                            // The method performed finalizing of opening the connection.
+                                            anIsConnectingClient = true;
+                                        }
+                                        else
+                                        {
+                                            // The client with such id is already there and it is not good.
+                                            string anErrorMessage = TracedObject + "failed to add the client among service open connections because the client with the same id already exists.";
+                                            EneterTrace.Error(anErrorMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        string anErrorMessage = TracedObject + "did not find the response receiver id for the service '" + aClientContext.LogicalServiceId + "'.";
+                                        EneterTrace.Error(anErrorMessage);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string anErrorMessage = TracedObject + "failed to connect the client because the service logical id was not byte[].";
+                                EneterTrace.Error(anErrorMessage);
+                            }
+
+                            // If something was wrong then clean storages.
+                            if (anErrorFlag)
+                            {
+                                myConnectedClientsPhysical.Remove(physicalClientResponseReceiverId);
+
+                                // Note: it is not needed to clean TServiceContext because the client was not put to the service context yet.
+                            }
+                        }
+                        else
+                        {
+                            // The service is already included in the client context.
+                            // Therefore the incomming message is a request message for the service.
+                            aPhysicalServiceResponseReceiverId = aClientContext.PhysicalServiceResponseReceiverId;
+
+                            anErrorFlag = false;
+                        }
+                    }
+                    else
+                    {
+                        // Client context does not exist. It means there is something wrong with connecting the client to the message bus.
+                        string anErrorMessage = TracedObject + "failed to connect the client because the client did not oen the connection first.";
+                        EneterTrace.Error(anErrorMessage);
+
+                        anErrorFlag = true;
+                    }
+                }
+
+                if (anErrorFlag)
+                {
+                    ClientDisconnectsItself(physicalClientResponseReceiverId);
+                }
+                else
+                {
+                    if (anIsConnectingClient)
+                    {
+                        // Send the open connection message to the service.
+                        ClientSendsOpenConnectionToService(logicalClientId, aPhysicalServiceResponseReceiverId);
+                    }
+                    else
+                    {
+                        // Forward the message to the service.
+                        SendMessageToService(aPhysicalServiceResponseReceiverId, message);
+                    }
+                }
+            }
+        }
+
+        // A client disconnect itself. 
+        private void ClientDisconnectsItself(string physicalClientResponseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aPhysicalServiceResponseReceiverId = null;
+                string aLogicalClientId = null;
+
+                lock (myConnectionsLock)
+                {
+                    RemoveClientByPhysical(physicalClientResponseReceiverId, out aLogicalClientId, out aPhysicalServiceResponseReceiverId);
+                }
+
+                if (aLogicalClientId != null && aPhysicalServiceResponseReceiverId != null)
+                {
+                    // Notify service the client is disconnected.
+                    ClientSendsCloseConnectionToService(aLogicalClientId, aPhysicalServiceResponseReceiverId);
+                }
+
+                // Close physical connection with the client.
+                CloseConnection(myClientChannel, physicalClientResponseReceiverId);
+            }
+        }
+
+        // Service disconnects its client.
+        private void ServiceDisconnectsClient(string physicalServiceResponseReceiverId, string logicalClientId, object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aPhysicalClientResponseReceiverId;
+                lock (myConnectionsLock)
+                {
+                    RemoveClientByLogical(physicalServiceResponseReceiverId, logicalClientId, out aPhysicalClientResponseReceiverId);
+                }
+
+                SendCloseConnectionMessage(myClientChannel, aPhysicalClientResponseReceiverId, message);
+                CloseConnection(myClientChannel, aPhysicalClientResponseReceiverId);
+            }
+        }
+
+        private void ServiceDisconnectsClient(string physicalClientResponseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aLogicalClientId;
+                string aPhysicalClientResponseReceiverId;
+                lock (myConnectionsLock)
+                {
+                    RemoveClientByPhysical(physicalClientResponseReceiverId, out aLogicalClientId, out aPhysicalClientResponseReceiverId);
+                }
+
+                if (aLogicalClientId != null && aPhysicalClientResponseReceiverId != null)
+                {
+                    SendCloseConnectionMessage(myClientChannel, aPhysicalClientResponseReceiverId, aLogicalClientId);
+                }
+                CloseConnection(myClientChannel, aPhysicalClientResponseReceiverId);
+            }
+        }
+
+        private void ClientSendsOpenConnectionToService(string logicalClientId, string physicalServiceResponseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    object anOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage(logicalClientId);
+                    SendMessageToService(physicalServiceResponseReceiverId, anOpenConnectionMessage);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Error(TracedObject + "failed to encode open connection message. The client will be disconnected.", err);
+
+                    ClientDisconnectsItself(physicalServiceResponseReceiverId);
+                }
+            }
+        }
+
+        private void ClientSendsCloseConnectionToService(string logicalClientId, string physicalServiceResponseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    object aCloseConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage(logicalClientId);
+                    SendMessageToService(physicalServiceResponseReceiverId, aCloseConnectionMessage);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + "failed to encode close connection message.", err);
+                }
+            }
+        }
+
+        private void SendMessageToService(string physicalServiceResponseReceiverId, object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    myServiceChannel.SendResponseMessage(physicalServiceResponseReceiverId, message);
+                }
+                catch (Exception err)
+                {
+                    string anErrorMessage = TracedObject + "failed to send message to the service.";
+                    EneterTrace.Error(anErrorMessage, err);
+
+                    // The sending of a message to the service failed.
+                    // Therefore consider the service as disconnected.
+                    DisconnectService(physicalServiceResponseReceiverId);
+                }
+            }
+        }
+
+
+
+
+
+        private void ConnectService(string physicalServiceResponseReceiverId, string logicalServiceId)
+        {
+            using (EneterTrace.Entering())
+            {
+                bool anIsDuplicate = false;
+
+                lock (myConnectionsLock)
+                {
+                    // Connect service only if such service is not connected yet.
+                    if (!myConnectedServicesLogical.ContainsKey(logicalServiceId))
+                    {
+                        // Add service among connected services.
+                        AddService(physicalServiceResponseReceiverId, logicalServiceId);
+                    }
+                    else
+                    {
+                        anIsDuplicate = true;
+                    }
+                }
+
+                if (anIsDuplicate)
+                {
+                    string anErrorMessage = TracedObject + "failed to connect the service because the service '" + logicalServiceId + "' is already connected. The connection will be closed.";
+                    EneterTrace.Warning(anErrorMessage);
+
+                    // Close connection that tries to connect the duplicated service.
+                    // Note: notice there are no connected clients in this case!
+                    CloseConnection(myServiceChannel, physicalServiceResponseReceiverId);
+                }
+            }
+        }
+
+        private void DisconnectService(string physicalServiceResponseReceiverId)
         {
             using (EneterTrace.Entering())
             {
                 TServiceContext aServiceContext;
-                lock (myConnectedServicesLock)
+                lock (myConnectionsLock)
                 {
                     aServiceContext = RemoveService(physicalServiceResponseReceiverId);
                 }
 
-                // Disconnect all connected clients.
-                foreach (KeyValuePair<string, string> aClientContext in aServiceContext.ConnectedClients)
+                if (aServiceContext != null)
                 {
-                    SendCloseConnectionMessage(myClientChannel, aClientContext.Value, aClientContext.Key);
-                    CloseConnection(myClientChannel, aClientContext.Value);
+                    // Disconnect all connected clients.
+                    foreach (KeyValuePair<string, string> aClientContext in aServiceContext.ConnectedClients)
+                    {
+                        SendCloseConnectionMessage(myClientChannel, aClientContext.Value, aClientContext.Key);
+                        CloseConnection(myClientChannel, aClientContext.Value);
+                    }
+
+                    aServiceContext.ConnectedClients.Clear();
                 }
 
-                aServiceContext.ConnectedClients.Clear();
+                CloseConnection(myServiceChannel, physicalServiceResponseReceiverId);
             }
         }
+
+        private void SendResponseMessageToClient(string physicalServiceResponseReceiverId, string logicalClientId, object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                bool aDisconnectServiceFlag = false;
+
+                // Get the physical response receiver id for the client.
+                string aPhysicalClientResponseReceiverId = null;
+                lock (myConnectionsLock)
+                {
+                    TServiceContext aServiceContext;
+                    myConnectedServicesPhysical.TryGetValue(physicalServiceResponseReceiverId, out aServiceContext);
+                    if (aServiceContext != null)
+                    {
+                        aServiceContext.ConnectedClients.TryGetValue(logicalClientId, out aPhysicalClientResponseReceiverId);
+                    }
+                    else
+                    {
+                        // A service context was not found. The service cannot operate without the context.
+                        string anErrorMessage = TracedObject + "failed to send the message to the client because the service context was not found. The service will be disconnected.";
+                        EneterTrace.Warning(anErrorMessage);
+
+                        aDisconnectServiceFlag = true;
+                    }
+                }
+
+                if (aDisconnectServiceFlag)
+                {
+                    DisconnectService(physicalServiceResponseReceiverId);
+                }
+
+                if (!string.IsNullOrEmpty(aPhysicalClientResponseReceiverId))
+                {
+                    SendMessageToClient(aPhysicalClientResponseReceiverId, message);
+                }
+                else
+                {
+                    string anErrorMessage = TracedObject + "failed to send the message to the client because the client was not found among connected clients.";
+                    EneterTrace.Warning(anErrorMessage);
+                }
+            }
+        }
+
+
+        private void SendMessageToClient(string physicalClientResponseReceiverId, object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    myClientChannel.SendResponseMessage(physicalClientResponseReceiverId, message);
+                }
+                catch (Exception err)
+                {
+                    string anErrorMessage = TracedObject + "failed to send message to the client.";
+                    EneterTrace.Error(anErrorMessage, err);
+
+                    ServiceDisconnectsClient(physicalClientResponseReceiverId);
+                }
+
+            }
+        }
+
+
+        
+
+
+
+        
+
 
         private void SendCloseConnectionMessage(IDuplexInputChannel channel, string physicalResponseReceiverId, string logicalId)
         {
@@ -396,25 +613,34 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             {
                 TServiceContext aServiceContext = new TServiceContext();
                 aServiceContext.LogicalServiceId = logicalServiceId;
-                aServiceContext.PhysicalResponseReceiverId = physicalServiceResponseReceiverId;
+                aServiceContext.PhysicalServiceResponseReceiverId = physicalServiceResponseReceiverId;
 
-                myConnectedServicesLogical[logicalServiceId] = aServiceContext;
                 myConnectedServicesPhysical[physicalServiceResponseReceiverId] = aServiceContext;
+                myConnectedServicesLogical[logicalServiceId] = aServiceContext;
             }
         }
 
-        private bool AddClient(string physicalClientResponseReceiverId, string logicalClientId, string logicalServiceId)
+        private bool AddClient(string physicalClientResponseReceiverId, string logicalClientId)
         {
             using (EneterTrace.Entering())
             {
-                TServiceContext aServiceContext;
-                myConnectedServicesLogical.TryGetValue(logicalServiceId, out aServiceContext);
-                if (aServiceContext != null)
+                if (!string.IsNullOrEmpty(logicalClientId))
                 {
-                    if (!aServiceContext.ConnectedClients.ContainsKey(logicalClientId))
+                    // If such client does not exist.
+                    TClientContext aClientContext;
+                    myConnectedClientsPhysical.TryGetValue(physicalClientResponseReceiverId, out aClientContext);
+                    if (aClientContext == null)
                     {
-                        aServiceContext.ConnectedClients[logicalClientId] = physicalClientResponseReceiverId;
+                        aClientContext = new TClientContext();
+                        aClientContext.LogicalClientId = logicalClientId;
+
+                        myConnectedClientsPhysical.Add(physicalClientResponseReceiverId, aClientContext);
                         return true;
+                    }
+                    else
+                    {
+                        string anErrorMessage = TracedObject + "failed to open the connection for the client because the client with the same response receiver id already exist.";
+                        EneterTrace.Warning(anErrorMessage);
                     }
                 }
 
@@ -443,34 +669,79 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-        private void RemoveClient(string physicalClientResponseReceiverId, string logicalClientId, TServiceContext serviceContext)
+        private void RemoveClientByPhysical(string physicalClientResponseReceiverId, out string logicalClientId, out string physicalServiceResponseReceiverId)
         {
             using (EneterTrace.Entering())
             {
-                myConnectedClientsPhysical.Remove(physicalClientResponseReceiverId);
-                serviceContext.ConnectedClients.Remove(logicalClientId);
+                logicalClientId = null;
+                physicalServiceResponseReceiverId = null;
+
+                TClientContext aClientContext;
+                myConnectedClientsPhysical.TryGetValue(physicalClientResponseReceiverId, out aClientContext);
+                if (aClientContext != null)
+                {
+                    logicalClientId = aClientContext.LogicalClientId;
+                    physicalServiceResponseReceiverId = aClientContext.PhysicalServiceResponseReceiverId;
+
+                    // Remove lient from the list of clients.
+                    myConnectedClientsPhysical.Remove(physicalClientResponseReceiverId);
+
+                    TServiceContext aServiceContext;
+                    myConnectedServicesPhysical.TryGetValue(aClientContext.PhysicalServiceResponseReceiverId, out aServiceContext);
+                    if (aServiceContext != null)
+                    {
+                        // Remove the client from the list of clients connected to this service.
+                        aServiceContext.ConnectedClients.Remove(logicalClientId);
+                    }
+                }
             }
         }
+
+        private void RemoveClientByLogical(string physicalServiceResponseReceiverId, string logicalClientId, out string physicalClientResponseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                physicalClientResponseReceiverId = null;
+
+                TServiceContext aServiceContext;
+                myConnectedServicesPhysical.TryGetValue(physicalServiceResponseReceiverId, out aServiceContext);
+                if (aServiceContext != null)
+                {
+                    aServiceContext.ConnectedClients.TryGetValue(logicalClientId, out physicalClientResponseReceiverId);
+                    if (!string.IsNullOrEmpty(physicalClientResponseReceiverId))
+                    {
+                        // Remove the client.
+                        myConnectedClientsPhysical.Remove(physicalClientResponseReceiverId);
+                    }
+
+                    // Remove the client from the service.
+                    aServiceContext.ConnectedClients.Remove(logicalClientId);
+                }
+            }
+        }
+
+        
 
 
 
         private object myConnectionManipulatorLock = new object();
 
-        // Key is logical service id inside the message bus.
-        private Dictionary<string, TServiceContext> myConnectedServicesLogical = new Dictionary<string, TServiceContext>();
-        
         // Key is the physical response receiver id of the service.
         private Dictionary<string, TServiceContext> myConnectedServicesPhysical = new Dictionary<string, TServiceContext>();
+
+        // Key is the logic service id
+        private Dictionary<string, TServiceContext> myConnectedServicesLogical = new Dictionary<string, TServiceContext>();
 
         // Key is the physical response receiver id of the client.
         private Dictionary<string, TClientContext> myConnectedClientsPhysical = new Dictionary<string, TClientContext>();
         
-        private object myConnectedServicesLock = new object();
+        private object myConnectionsLock = new object();
 
 
         private IDuplexInputChannel myServiceChannel;
         private IDuplexInputChannel myClientChannel;
         private IProtocolFormatter myProtocolFormatter;
+        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
 
         protected string TracedObject { get { return GetType().Name + " "; } }
     }

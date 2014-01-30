@@ -57,6 +57,15 @@
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\IMessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\IMessageBusFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusInputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusOutputConnector.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />
@@ -614,9 +623,7 @@
   <ItemGroup>
     <None Include="Eneter.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MessagingSystems\Composites\BusMessaging\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
   </Target>
