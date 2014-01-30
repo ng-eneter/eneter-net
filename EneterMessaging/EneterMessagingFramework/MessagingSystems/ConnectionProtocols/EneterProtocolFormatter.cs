@@ -422,7 +422,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         private const byte UTF16 = 20;
 
         // Type of serialization.
-        // E.g. If the message is serialized into XML, the it will indicate the type is string.
+        // E.g. If the message is serialized into XML, then it will indicate the type is string.
         //      If the message is serialized in a binary format, then it will indicate the type is byte[].
         private const byte BYTES = 10;
         private const byte STRING = 20;
@@ -430,7 +430,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         // Type of low level message - used for the low level communication between channels.
         private const byte OPEN_CONNECTION_REQUEST = 10;
         private const byte CLOSE_CONNECTION_REQUEST = 20;
-        private const byte POLL_REQUEST = 30;
         private const byte REQUEST_MESSAGE = 40;
 
         private static readonly ProtocolMessage myNonProtocolMessage = new ProtocolMessage(EProtocolMessageType.Unknown, "", null);

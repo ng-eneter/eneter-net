@@ -24,7 +24,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         {
             using (EneterTrace.Entering())
             {
-                myEncoderDecoder = new EncoderDecoder(underlyingSerializer);
+                myUnderlyingSerializer = underlyingSerializer;
 
                 mySecretKey = key;
                 myInitializeVector = iv;
@@ -57,7 +57,9 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                     // Create stream encrypting data.
                     using (CryptoStream anEncryptor = new CryptoStream(anEncryptedData, aTransformer, CryptoStreamMode.Write))
                     {
-                        myEncoderDecoder.Serialize<_T>(anEncryptor, dataToSerialize);
+                        // Use underlying serializer to serialize data.
+                        object aSerializedData = myUnderlyingSerializer.Serialize<_T>(dataToSerialize);
+                        myEncoderDecoder.Encode(anEncryptor, aSerializedData);
                     }
 
                     byte[] aCompressedDataArray = anEncryptedData.ToArray();
@@ -92,7 +94,8 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
                     using (CryptoStream aCryptoStream = new CryptoStream(anEncryptedDataStream, aTransfromer, CryptoStreamMode.Read))
                     {
-                        _T aDeserializedData = myEncoderDecoder.Deserialize<_T>(aCryptoStream);
+                        object aDecodedData = myEncoderDecoder.Decode(aCryptoStream);
+                        _T aDeserializedData = myUnderlyingSerializer.Deserialize<_T>(aDecodedData);
                         return aDeserializedData;
                     }
                 }
@@ -102,7 +105,8 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private byte[] mySecretKey;
         private byte[] myInitializeVector;
 
-        private EncoderDecoder myEncoderDecoder;
+        private ISerializer myUnderlyingSerializer;
+        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

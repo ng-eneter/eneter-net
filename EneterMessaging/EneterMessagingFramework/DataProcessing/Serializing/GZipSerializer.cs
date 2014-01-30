@@ -60,7 +60,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         {
             using (EneterTrace.Entering())
             {
-                myEncoderDecoder = new EncoderDecoder(underlyingSerializer);
+                myUnderlyingSerializer = underlyingSerializer;
             }
         }
 
@@ -80,7 +80,9 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                     // Create GZipStream to compress data.
                     using (GZipStream aGzipStream = new GZipStream(aCompressedData, CompressionMode.Compress))
                     {
-                        myEncoderDecoder.Serialize<_T>(aGzipStream, dataToSerialize);
+                        // Use underlying serializer to serialize data.
+                        object aSerializedData = myUnderlyingSerializer.Serialize<_T>(dataToSerialize);
+                        myEncoderDecoder.Encode(aGzipStream, aSerializedData);
                     }
 
                     byte[] aCompressedDataArray = aCompressedData.ToArray();
@@ -108,14 +110,16 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                     // Create the GZipStream to decompress data.
                     using (GZipStream aGzipStream = new GZipStream(aCompressedStream, CompressionMode.Decompress))
                     {
-                        _T aDeserializedData = myEncoderDecoder.Deserialize<_T>(aGzipStream);
+                        object aDecodedData = myEncoderDecoder.Decode(aGzipStream);
+                        _T aDeserializedData = myUnderlyingSerializer.Deserialize<_T>(aDecodedData);
                         return aDeserializedData;
                     }
                 }
             }
         }
 
-        private EncoderDecoder myEncoderDecoder;
+        private ISerializer myUnderlyingSerializer;
+        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
 
 
         private string TracedObject { get { return GetType().Name + ' '; } }

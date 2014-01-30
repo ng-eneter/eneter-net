@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !COMPACT_FRAMEWORK20
+//#if !COMPACT_FRAMEWORK20
 
 using System;
 using System.IO;
@@ -16,26 +16,15 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 {
     internal class EncoderDecoder
     {
-        public EncoderDecoder(ISerializer underlyingSerializer)
+        public void Encode(Stream writer, object dataToEncode)
         {
             using (EneterTrace.Entering())
             {
-                myUnderlyingSerializer = underlyingSerializer;
-            }
-        }
-
-        public void Serialize<T>(Stream writer, T dataToSerialize)
-        {
-            using (EneterTrace.Entering())
-            {
-                // Use underlying serializer to serialize data.
-                Object aSerializedData = myUnderlyingSerializer.Serialize<T>(dataToSerialize);
-
                 // Encrypt serialized data.
-                if (aSerializedData is string)
+                if (dataToEncode is string)
                 {
                     // Note: UTF-8 is used by .NET
-                    byte[] aDataToEncode = Encoding.UTF8.GetBytes((string)aSerializedData);
+                    byte[] aDataToEncode = Encoding.UTF8.GetBytes((string)dataToEncode);
 
                     // Write info that encoded data is UTF8.
                     writer.WriteByte(STRING_UTF8_ID);
@@ -43,13 +32,13 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                     // Encode data.
                     writer.Write(aDataToEncode, 0, aDataToEncode.Length);
                 }
-                else if (aSerializedData is byte[])
+                else if (dataToEncode is byte[])
                 {
                     // Write info, that encoded data is array of bytes.
                     writer.WriteByte(BYTES_ID);
 
                     // Encode data.
-                    writer.Write((byte[])aSerializedData, 0, ((byte[])aSerializedData).Length);
+                    writer.Write((byte[])dataToEncode, 0, ((byte[])dataToEncode).Length);
                 }
                 else
                 {
@@ -60,7 +49,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
             }
         }
 
-        public T Deserialize<T>(Stream reader)
+        public object Decode(Stream reader)
         {
             using (EneterTrace.Entering())
             {
@@ -123,13 +112,10 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
-                // Use underlying serializer to deserialize data.
-                return myUnderlyingSerializer.Deserialize<T>(aDecodedData);
+                return aDecodedData;
             }
         }
 
-        private ISerializer myUnderlyingSerializer;
-    
         private readonly byte STRING_UTF8_ID = 10;
         private readonly byte STRING_UTF16_LE_ID = 20;
         private readonly byte STRING_UTF16_BE_ID = 30;
@@ -137,4 +123,4 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     }
 }
 
-#endif
+//#endif

@@ -97,7 +97,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
                 myVerifySignerCertificate = (verifySignerCertificate == null) ? VerifySignerCertificate : verifySignerCertificate;
                 myUnderlyingSerializer = underlyingSerializer;
-                myEncoderDecoder = new EncoderDecoder(underlyingSerializer);
             }
         }
 
@@ -118,12 +117,13 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
                 byte[][] aSignedData = new byte[3][];
 
-                using (MemoryStream aSerializedData = new MemoryStream())
+                using (MemoryStream aSerializedDataStream = new MemoryStream())
                 {
                     // Serialize incoming data using underlying serializer.
-                    myEncoderDecoder.Serialize<_T>(aSerializedData, dataToSerialize);
+                    object aSerializedData = myUnderlyingSerializer.Serialize<_T>(dataToSerialize);
+                    myEncoderDecoder.Encode(aSerializedDataStream, aSerializedData);
 
-                    aSignedData[0] = aSerializedData.ToArray();
+                    aSignedData[0] = aSerializedDataStream.ToArray();
                 }
 
                 // Calculate hash from serialized data.
@@ -175,12 +175,11 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                     throw new InvalidOperationException(TracedObject + "failed to deserialize data because the signature verification failed.");
                 }
 
-                using (MemoryStream aDeserializedData = new MemoryStream(aSignedData[0], 0, aSignedData[0].Length))
+                using (MemoryStream aDeserializedDataStream = new MemoryStream(aSignedData[0], 0, aSignedData[0].Length))
                 {
-                    // Deserialize data.
-                    _T aDeserialized = myEncoderDecoder.Deserialize<_T>(aDeserializedData);
-
-                    return aDeserialized;
+                    object aDecodedData = myEncoderDecoder.Decode(aDeserializedDataStream);
+                    _T aDeserializedData = myUnderlyingSerializer.Deserialize<_T>(aDecodedData);
+                    return aDeserializedData;
                 }
             }
         }
@@ -191,7 +190,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         }
 
         private ISerializer myUnderlyingSerializer;
-        private EncoderDecoder myEncoderDecoder;
+        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
         private byte[] myPublicCertificate;
         private X509Certificate2 mySignerCertificate;
         private Func<X509Certificate2, bool> myVerifySignerCertificate;
