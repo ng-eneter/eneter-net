@@ -20,6 +20,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
     {
         private class TConnector : AttachableDuplexInputChannelBase
         {
+            public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
             public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
             public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
@@ -33,6 +34,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
             protected override void OnResponseReceiverConnected(object sender, ResponseReceiverEventArgs e)
             {
+                if (ResponseReceiverConnected != null)
+                {
+                    ResponseReceiverConnected(sender, e);
+                }
             }
 
             protected override void OnResponseReceiverDisconnected(object sender, ResponseReceiverEventArgs e)
@@ -79,6 +84,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 myServiceConnector = new TConnector();
                 myClientConnector = new TConnector();
 
+                myServiceConnector.ResponseReceiverConnected += OnServiceConnected;
                 myServiceConnector.ResponseReceiverDisconnected += OnServiceDisconnected;
                 myServiceConnector.MessageReceived += OnMessageFromServiceReceived;
 
@@ -142,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         // A service sends a response message to a client.
                         if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                         {
-                            ForwardResponseMessageToClient(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId, aProtocolMessage.Message);
+                            ForwardResponseMessageToClient(e.ResponseReceiverId, aProtocolMessage, e.Message);
                         }
                         else if (aProtocolMessage.MessageType == EProtocolMessageType.Unknown)
                         {
@@ -190,7 +196,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     // Or the client sends a message to the service.
                     if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                     {
-                        ProcessMessageFromClient(e.ResponseReceiverId, aProtocolMessage.ResponseReceiverId, aProtocolMessage.Message);
+                        ProcessMessageFromClient(e.ResponseReceiverId, aProtocolMessage, e.Message);
                     }
                     else if (aProtocolMessage.MessageType == EProtocolMessageType.Unknown)
                     {
@@ -204,7 +210,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         }
 
 
-        private void ProcessMessageFromClient(string physicalClientResponseReceiverId, string logicalClientId, object message)
+        private void ProcessMessageFromClient(string physicalClientResponseReceiverId, ProtocolMessage protocolMessage, object encodedProtocolMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -221,30 +227,20 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     // If the client context does not exist then this is the open connection message.
                     if (aClientContext == null)
                     {
-                        byte[] aMessageBuffer = message as byte[];
-                        try
-                        {
-                            if (aMessageBuffer != null)
-                            {
-                                using (MemoryStream aDataStream = new MemoryStream(aMessageBuffer))
-                                {
-                                    aServiceId = (string) myEncoderDecoder.Decode(aDataStream);
-                                }
-                            }
-                        }
-                        catch (Exception err)
-                        {
-                            string anErrorMessage = TracedObject + "failed to decode the service logical id from the message.";
-                            EneterTrace.Error(anErrorMessage, err);
-                        }
+                        aServiceId = protocolMessage.Message as string;
 
                         // If service id was sucessfully decoded.
                         if (!string.IsNullOrEmpty(aServiceId))
                         {
-                            if (AddClient(aServiceId, physicalClientResponseReceiverId, logicalClientId))
+                            if (AddClient(aServiceId, physicalClientResponseReceiverId, protocolMessage.ResponseReceiverId))
                             {
                                 aSuccessFlag = true;
                             }
+                        }
+                        else
+                        {
+                            string anErrorMessage = TracedObject + "failed to open connection for the client because service id was null or empty string.";
+                            EneterTrace.Error(anErrorMessage);
                         }
                     }
                     else
@@ -263,12 +259,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     if (anIsConnectingClient)
                     {
                         // Send the open connection message to the service.
-                        ClientSendsOpenConnectionToService(aServiceId, logicalClientId);
+                        ClientSendsOpenConnectionToService(aServiceId, protocolMessage.ResponseReceiverId);
                     }
                     else
                     {
                         // Forward the message to the service.
-                        SendMessageToService(aServiceId, message);
+                        SendMessageToService(aServiceId, encodedProtocolMessage);
                     }
                 }
                 else
@@ -325,22 +321,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-        // Service disconnects its client.
-        private void ServiceDisconnectsClient(string serviceId, string logicalClientId, object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                string aPhysicalClientResponseReceiverId;
-                lock (myConnectionsLock)
-                {
-                    RemoveClientByLogical(serviceId, logicalClientId, out aPhysicalClientResponseReceiverId);
-                }
-
-                SendCloseConnectionMessage(myClientConnector, aPhysicalClientResponseReceiverId, message);
-                CloseConnection(myClientConnector, aPhysicalClientResponseReceiverId);
-            }
-        }
-
         private void ServiceDisconnectsClient(string physicalClientResponseReceiverId)
         {
             using (EneterTrace.Entering())
@@ -354,8 +334,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
                 if (aLogicalClientId != null && aPhysicalClientResponseReceiverId != null)
                 {
-                    SendCloseConnectionMessage(myClientConnector, aPhysicalClientResponseReceiverId, aLogicalClientId);
+                    CloseConnection(myClientConnector, aPhysicalClientResponseReceiverId);
                 }
+
                 CloseConnection(myClientConnector, aPhysicalClientResponseReceiverId);
             }
         }
@@ -397,13 +378,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-        private void SendMessageToService(string serviceId, object message)
+        private void SendMessageToService(string serviceId, object encodedProtocolMessage)
         {
             using (EneterTrace.Entering())
             {
                 try
                 {
-                    myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(serviceId, message);
+                    myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(serviceId, encodedProtocolMessage);
                 }
                 catch (Exception err)
                 {
@@ -479,7 +460,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-        private void ForwardResponseMessageToClient(string serviceId, string logicalClientId, object message)
+        private void ForwardResponseMessageToClient(string serviceId, ProtocolMessage protocolMessage, object encodedProtocolMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -494,7 +475,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     if (aServiceContext != null)
                     {
                         // Get response receiver id from clients connected to this service.
-                        aServiceContext.ConnectedClients.TryGetValue(logicalClientId, out aPhysicalClientResponseReceiverId);
+                        aServiceContext.ConnectedClients.TryGetValue(protocolMessage.ResponseReceiverId, out aPhysicalClientResponseReceiverId);
                     }
                     else
                     {
@@ -513,7 +494,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
                 if (!string.IsNullOrEmpty(aPhysicalClientResponseReceiverId))
                 {
-                    SendMessageToClient(aPhysicalClientResponseReceiverId, message);
+                    SendMessageToClient(aPhysicalClientResponseReceiverId, encodedProtocolMessage);
                 }
                 else
                 {
@@ -524,13 +505,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         }
 
 
-        private void SendMessageToClient(string physicalClientResponseReceiverId, object message)
+        private void SendMessageToClient(string physicalClientResponseReceiverId, object encodedProtocolMessage)
         {
             using (EneterTrace.Entering())
             {
                 try
                 {
-                    myClientConnector.AttachedDuplexInputChannel.SendResponseMessage(physicalClientResponseReceiverId, message);
+                    myClientConnector.AttachedDuplexInputChannel.SendResponseMessage(physicalClientResponseReceiverId, encodedProtocolMessage);
                 }
                 catch (Exception err)
                 {
@@ -543,22 +524,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-
-        private void SendCloseConnectionMessage(TConnector connector, string physicalResponseReceiverId, object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                try
-                {
-                    connector.AttachedDuplexInputChannel.SendResponseMessage(physicalResponseReceiverId, message);
-                }
-                catch (Exception err)
-                {
-                    string anErrorMessage = TracedObject + "failed to send close connection message.";
-                    EneterTrace.Warning(anErrorMessage, err);
-                }
-            }
-        }
 
         private void CloseConnection(TConnector connector, string physicalResponseReceiverId)
         {
