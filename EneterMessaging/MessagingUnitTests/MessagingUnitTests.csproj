@@ -112,6 +112,7 @@
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Sync.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Tcp.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_ThreadPool.cs" />
+    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Sync.cs" />
     <Compile Include="Nodes\MessageBus\MessageBusBaseTester.cs" />
     <Compile Include="Nodes\MessageBus\Test_MessageBus_Synchronous.cs" />
     <Compile Include="Nodes\MessageBus\Test_MessageBus_Tcp_Bin.cs" />

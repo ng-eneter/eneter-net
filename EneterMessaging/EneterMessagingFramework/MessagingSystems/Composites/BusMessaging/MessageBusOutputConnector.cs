@@ -41,6 +41,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
                         myMessageBusOutputChannel.OpenConnection();
 
+                        // Encode open connection message to connect the client to the service via the message bus.
                         object anOpenConnectionMessage = myProtocolFormatter.EncodeMessage(myClientIdInMessageBus, myServiceAddressInMessageBus);
                         myMessageBusOutputChannel.SendMessage(anOpenConnectionMessage);
                     }
@@ -91,8 +92,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(myClientIdInMessageBus, message);
-                myMessageBusOutputChannel.SendMessage(anEncodedMessage);
+                myMessageBusOutputChannel.SendMessage(message);
             }
         }
 

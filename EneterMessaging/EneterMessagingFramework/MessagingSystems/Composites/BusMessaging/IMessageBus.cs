@@ -11,8 +11,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 {
     public interface IMessageBus
     {
-        void AttachDuplexInputChannel(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel);
+        void AttachDuplexInputChannels(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel);
 
-        void DetachDuplexInputChannel();
+        void DetachDuplexInputChannels();
     }
 }

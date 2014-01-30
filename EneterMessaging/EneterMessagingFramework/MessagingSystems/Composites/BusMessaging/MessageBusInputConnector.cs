@@ -18,11 +18,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
     {
         private class ResponseSender : ISender
         {
-            public ResponseSender(string responseReceiverId, IDuplexOutputChannel messageBusOutputChannel, IProtocolFormatter protocolFormatter)
+            public ResponseSender(string clientId, IDuplexOutputChannel messageBusOutputChannel, IProtocolFormatter protocolFormatter)
             {
                 using (EneterTrace.Entering())
                 {
-                    myResponseReceiverId = responseReceiverId;
+                    myClientId = clientId;
                     myMessageBusOutputChannel = messageBusOutputChannel;
                     myProtocolFormatter = protocolFormatter;
                 }
@@ -37,8 +37,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             {
                 using (EneterTrace.Entering())
                 {
-                    object anEncodedRequestMessage = myProtocolFormatter.EncodeMessage(myResponseReceiverId, message);
-                    myMessageBusOutputChannel.SendMessage(anEncodedRequestMessage);
+                    myMessageBusOutputChannel.SendMessage(message);
                 }
             }
 
@@ -47,16 +46,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 throw new NotSupportedException();
             }
 
-            private string myResponseReceiverId;
+            private string myClientId;
             private IDuplexOutputChannel myMessageBusOutputChannel;
             private IProtocolFormatter myProtocolFormatter;
         }
 
-        public MessageBusInputConnector(string inputConnectorAddress, IDuplexOutputChannel messageBusOutputChannel, IProtocolFormatter protocolFormatter)
+        public MessageBusInputConnector(IDuplexOutputChannel messageBusOutputChannel, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
-                myServiceAddressInMessageBus = inputConnectorAddress;
                 myMessageBusOutputChannel = messageBusOutputChannel;
                 myProtocolFormatter = protocolFormatter;
             }
@@ -70,6 +68,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 {
                     myMessageHandler = messageHandler;
                     myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
+
+                    // Open the connection with the service.
+                    // Note: the response receiver id of this output channel represents the service id inside the message bus.
                     myMessageBusOutputChannel.OpenConnection();
                 }
                 catch
@@ -99,11 +100,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             get { return myMessageBusOutputChannel.IsConnected; }
         }
 
-        public ISender CreateResponseSender(string responseReceiverAddress)
+        public ISender CreateResponseSender(string clientId)
         {
             using (EneterTrace.Entering())
             {
-                ResponseSender aResponseSender = new ResponseSender(responseReceiverAddress, myMessageBusOutputChannel, myProtocolFormatter);
+                ResponseSender aResponseSender = new ResponseSender(clientId, myMessageBusOutputChannel, myProtocolFormatter);
                 return aResponseSender;
             }
         }
@@ -128,7 +129,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         }
 
 
-        private string myServiceAddressInMessageBus;
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private IProtocolFormatter myProtocolFormatter;
         private Func<MessageContext, bool> myMessageHandler;

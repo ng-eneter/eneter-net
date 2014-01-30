@@ -6,17 +6,33 @@
 */
 
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 {
     public class MessageBusFactory : IMessageBusFactory
     {
-        IMessageBus IMessageBusFactory.CreateMessageBus()
+        public MessageBusFactory()
+            : this(new EneterProtocolFormatter())
+        {
+        }
+
+        public MessageBusFactory(IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
-                return new MessageBus();
+                myProtocolFormatter = protocolFormatter;
             }
         }
+
+        public IMessageBus CreateMessageBus()
+        {
+            using (EneterTrace.Entering())
+            {
+                return new MessageBus(myProtocolFormatter);
+            }
+        }
+
+        private IProtocolFormatter myProtocolFormatter;
     }
 }
