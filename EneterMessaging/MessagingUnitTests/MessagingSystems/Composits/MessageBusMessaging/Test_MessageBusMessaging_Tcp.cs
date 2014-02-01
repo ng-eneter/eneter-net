@@ -30,7 +30,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
             myMessageBus = new MessageBusFactory().CreateMessageBus();
             myMessageBus.AttachDuplexInputChannels(aMessageBusServiceInputChannel, aMessageBusClientInputChannel);
 
-            MessagingSystemFactory = new MessageBusMessagingFactory("tcp://[::1]:" + aPort1 + "/", "tcp://[::1]:" + aPort1 + "/", anUnderlyingMessaging);
+            MessagingSystemFactory = new MessageBusMessagingFactory("tcp://[::1]:" + aPort1 + "/", "tcp://[::1]:" + aPort2 + "/", anUnderlyingMessaging);
 
             // Address of the service in the message bus.
             ChannelId = "Service1_Address";
