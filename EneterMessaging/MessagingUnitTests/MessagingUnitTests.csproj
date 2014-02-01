@@ -116,9 +116,6 @@
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp.cs" />
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Ws.cs" />
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_TestMessaeBusMessaging_SharedMemory.cs" />
-    <Compile Include="Nodes\MessageBus\MessageBusBaseTester.cs" />
-    <Compile Include="Nodes\MessageBus\Test_MessageBus_Synchronous.cs" />
-    <Compile Include="Nodes\MessageBus\Test_MessageBus_Tcp_Bin.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs" />
