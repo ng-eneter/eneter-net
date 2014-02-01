@@ -323,5 +323,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 #endif
 
 
+
+        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
     }
 }

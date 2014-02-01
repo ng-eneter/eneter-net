@@ -8,6 +8,7 @@
 using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
@@ -127,6 +128,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
+        public IProtocolFormatter ProtocolFormatter { get { return myUnderlyingMessaging.ProtocolFormatter; } }
 
         private IMessagingSystemFactory myUnderlyingMessaging;
         private TimeSpan myMaxOfflineTime;

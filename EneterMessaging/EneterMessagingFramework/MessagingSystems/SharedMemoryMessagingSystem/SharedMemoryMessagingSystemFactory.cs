@@ -388,6 +388,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
+        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
+
         private SharedMemoryConnectorFactory myConnectorFactory;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }

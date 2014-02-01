@@ -450,7 +450,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
-        
+
+
+        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
 
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }

@@ -70,7 +70,7 @@ namespace Eneter.Messaging.Nodes.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                myProtocolFormatter = protocolFormatter;
+                ProtocolFormatter = protocolFormatter;
                 IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(serializer);
                 myConnectorFactory = new MessageBusConnectorFactory(brokerAddress, aBrokerFactory, brokerMessaging);
 
@@ -83,7 +83,7 @@ namespace Eneter.Messaging.Nodes.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, ProtocolFormatter, false);
             }
         }
 
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.Nodes.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, ProtocolFormatter, false);
             }
         }
 
@@ -100,13 +100,13 @@ namespace Eneter.Messaging.Nodes.MessageBus
             using (EneterTrace.Entering())
             {
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, ProtocolFormatter);
             }
         }
 
+        public IProtocolFormatter ProtocolFormatter { get; private set; }
 
         private IThreadDispatcher myDispatcher;
         private MessageBusConnectorFactory myConnectorFactory;
-        private IProtocolFormatter myProtocolFormatter;
     }
 }

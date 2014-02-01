@@ -8,6 +8,7 @@
 using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
@@ -171,6 +172,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// </remarks>
         public TimeSpan AuthenticationTimeout { get; set; }
 
+        public IProtocolFormatter ProtocolFormatter { get { return myUnderlyingMessaging.ProtocolFormatter; } }
 
         private IMessagingSystemFactory myUnderlyingMessaging;
 

@@ -65,7 +65,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                myProtocolFormatter = protocolFormatter;
+                ProtocolFormatter = protocolFormatter;
                 myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, messageBusMessaging, protocolFormatter);
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
@@ -77,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, ProtocolFormatter, false);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, ProtocolFormatter, false);
             }
         }
 
@@ -94,15 +94,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             using (EneterTrace.Entering())
             {
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, myProtocolFormatter);
+                DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, ProtocolFormatter);
                 anInputChannel.IncludeResponseReceiverIdToResponses = true;
                 return anInputChannel;
             }
         }
 
 
+        public IProtocolFormatter ProtocolFormatter { get; private set; }
+
         private IThreadDispatcher myDispatcher;
         private MessageBusConnectorFactory myConnectorFactory;
-        private IProtocolFormatter myProtocolFormatter;
     }
 }

@@ -163,6 +163,8 @@ namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
             }
         }
 
+        public IProtocolFormatter ProtocolFormatter { get { return myDefaultMessagingFactory.ProtocolFormatter; } }
+
         private DefaultMessagingSystemFactory myDefaultMessagingFactory;
     }
 }

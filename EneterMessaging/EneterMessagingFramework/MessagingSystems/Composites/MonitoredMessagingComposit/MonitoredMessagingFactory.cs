@@ -9,6 +9,7 @@ using System;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
@@ -138,6 +139,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
+        public IProtocolFormatter ProtocolFormatter { get { return myUnderlyingMessaging.ProtocolFormatter; } }
 
         private IMessagingSystemFactory myUnderlyingMessaging;
         private TimeSpan myPingFrequency;

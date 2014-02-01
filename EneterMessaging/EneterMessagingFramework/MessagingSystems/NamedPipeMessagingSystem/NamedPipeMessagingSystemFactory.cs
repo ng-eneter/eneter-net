@@ -284,6 +284,8 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
+        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
+
         private NamedPipeConnectorFactory myConnectorFactory;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }

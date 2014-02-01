@@ -12,6 +12,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit;
 using Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites
 {
@@ -167,6 +168,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites
                 return myBufferedMessaging.CreateDuplexInputChannel(channelId);
             }
         }
+
+        public IProtocolFormatter ProtocolFormatter { get { return myBufferedMessaging.ProtocolFormatter; } }
 
         private IMessagingSystemFactory myBufferedMessaging;
     }
