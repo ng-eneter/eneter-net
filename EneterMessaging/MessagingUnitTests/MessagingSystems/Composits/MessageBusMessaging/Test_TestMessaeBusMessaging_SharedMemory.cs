@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Eneter.Messaging.MessagingSystems.Composites.BusMessaging;
-using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem;
+using Eneter.Messaging.MessagingSystems.Composites.BusMessaging;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessaging
 {
     [TestFixture]
-    public class Test_MessageBusMessaging_Tcp : BaseTester
+    public class Test_TestMessaeBusMessaging_SharedMemory : BaseTester
     {
         [SetUp]
         public void Setup()
@@ -23,14 +23,14 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
             int aPort1 = RandomPortGenerator.GenerateInt();
             int aPort2 = aPort1 + 10;
 
-            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
+            IMessagingSystemFactory anUnderlyingMessaging = new SharedMemoryMessagingSystemFactory();
 
-            IDuplexInputChannel aMessageBusServiceInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("tcp://[::1]:" + aPort1 + "/");
-            IDuplexInputChannel aMessageBusClientInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("tcp://[::1]:" + aPort2 + "/");
+            IDuplexInputChannel aMessageBusServiceInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("MyServicesAddress");
+            IDuplexInputChannel aMessageBusClientInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("MyClientsAddress");
             myMessageBus = new MessageBusFactory().CreateMessageBus();
             myMessageBus.AttachDuplexInputChannels(aMessageBusServiceInputChannel, aMessageBusClientInputChannel);
 
-            MessagingSystemFactory = new MessageBusMessagingFactory("tcp://[::1]:" + aPort1 + "/", "tcp://[::1]:" + aPort1 + "/", anUnderlyingMessaging);
+            MessagingSystemFactory = new MessageBusMessagingFactory("MyServicesAddress", "MyClientsAddress", anUnderlyingMessaging);
 
             // Address of the service in the message bus.
             ChannelId = "Service1_Address";

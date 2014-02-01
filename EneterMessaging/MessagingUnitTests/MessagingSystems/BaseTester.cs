@@ -814,6 +814,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     TDuplexClient aC = aClient;
                     WaitCallback aW = x =>
                         {
+                            //EneterTrace.Info("CONNECT CLIENT");
                             aC.OpenConnection();
                         };
                     ThreadPool.QueueUserWorkItem(aW);

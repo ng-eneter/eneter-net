@@ -39,6 +39,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     {
                         myResponseMessageHandler = responseMessageHandler;
                         myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
+                        myMessageBusOutputChannel.ConnectionClosed += OnConnectionWithMessageBusClosed;
                         myMessageBusOutputChannel.OpenConnection();
 
                         // This is a special request message that will be processed by the message as open connection for the client.
@@ -70,6 +71,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     {
                         myMessageBusOutputChannel.CloseConnection();
                         myMessageBusOutputChannel.ResponseMessageReceived -= OnMessageFromMessageBusReceived;
+                        myMessageBusOutputChannel.ConnectionClosed -= OnConnectionWithMessageBusClosed;
                     }
 
                     myResponseMessageHandler = null;
@@ -117,6 +119,24 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     {
                         MessageContext aMessageContext = new MessageContext(e.Message, e.SenderAddress, null);
                         myResponseMessageHandler(aMessageContext);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
+                }
+            }
+        }
+
+        private void OnConnectionWithMessageBusClosed(object sender, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                if (myResponseMessageHandler != null)
+                {
+                    try
+                    {
+                        myResponseMessageHandler(null);
                     }
                     catch (Exception err)
                     {
