@@ -18,13 +18,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
     {
         private class ResponseSender : ISender
         {
-            public ResponseSender(string clientId, IDuplexOutputChannel messageBusOutputChannel, IProtocolFormatter protocolFormatter)
+            public ResponseSender(string clientId, IDuplexOutputChannel messageBusOutputChannel)
             {
                 using (EneterTrace.Entering())
                 {
                     myClientId = clientId;
                     myMessageBusOutputChannel = messageBusOutputChannel;
-                    myProtocolFormatter = protocolFormatter;
                 }
             }
 
@@ -48,15 +47,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
             private string myClientId;
             private IDuplexOutputChannel myMessageBusOutputChannel;
-            private IProtocolFormatter myProtocolFormatter;
         }
 
-        public MessageBusInputConnector(IDuplexOutputChannel messageBusOutputChannel, IProtocolFormatter protocolFormatter)
+        public MessageBusInputConnector(IDuplexOutputChannel messageBusOutputChannel)
         {
             using (EneterTrace.Entering())
             {
                 myMessageBusOutputChannel = messageBusOutputChannel;
-                myProtocolFormatter = protocolFormatter;
             }
         }
 
@@ -106,7 +103,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                ResponseSender aResponseSender = new ResponseSender(clientId, myMessageBusOutputChannel, myProtocolFormatter);
+                ResponseSender aResponseSender = new ResponseSender(clientId, myMessageBusOutputChannel);
                 return aResponseSender;
             }
         }
@@ -150,7 +147,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
 
         private IDuplexOutputChannel myMessageBusOutputChannel;
-        private IProtocolFormatter myProtocolFormatter;
         private Func<MessageContext, bool> myMessageHandler;
 
         private string TracedObject { get { return GetType().Name + ' '; } }

@@ -17,14 +17,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
     {
         private class MessageBusConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
-            public MessageBusConnectorFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory messageBusMessaging, IProtocolFormatter protocolFormatter)
+            public MessageBusConnectorFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory messageBusMessaging)
             {
                 using (EneterTrace.Entering())
                 {
                     myClientConnectingAddress = clientConnectingAddress;
                     myServiceConnectingAddress = serviceConnctingAddress;
                     myMessageBusMessaging = messageBusMessaging;
-                    myProtocolFormatter = protocolFormatter;
                 }
             }
 
@@ -33,7 +32,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 using (EneterTrace.Entering())
                 {
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, clientConnectorAddress);
-                    return new MessageBusOutputConnector(serviceConnectorAddress, clientConnectorAddress, aMessageBusOutputChannel, myProtocolFormatter);
+                    return new MessageBusOutputConnector(serviceConnectorAddress, clientConnectorAddress, aMessageBusOutputChannel, myMessageBusMessaging.ProtocolFormatter);
                 }
             }
 
@@ -44,32 +43,26 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                     // Note: message bus service address is encoded in OpenConnectionMessage when the service connects the message bus.
                     //       Therefore receiverAddress (which is message bus service address) is used when creating output channel.
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myServiceConnectingAddress, receiverAddress);
-                    return new MessageBusInputConnector(aMessageBusOutputChannel, myProtocolFormatter);
+                    return new MessageBusInputConnector(aMessageBusOutputChannel);
                 }
             }
 
             private string myClientConnectingAddress;
             private string myServiceConnectingAddress;
             private IMessagingSystemFactory myMessageBusMessaging;
-            private IProtocolFormatter myProtocolFormatter;
         }
 
 
-        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory messageBusMessaging)
-            : this(serviceConnctingAddress, clientConnectingAddress, messageBusMessaging, new EneterProtocolFormatter())
-        {
-        }
-
-
-        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory messageBusMessaging, IProtocolFormatter protocolFormatter)
+        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
         {
             using (EneterTrace.Entering())
             {
-                ProtocolFormatter = protocolFormatter;
-                myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, messageBusMessaging, protocolFormatter);
+                myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging);
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
                 myDispatcher = new NoDispatching().GetDispatcher();
+
+                ProtocolFormatter = underlyingMessaging.ProtocolFormatter;
             }
         }
 
