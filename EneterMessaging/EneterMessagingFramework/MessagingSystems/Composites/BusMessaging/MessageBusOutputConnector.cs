@@ -50,6 +50,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         CloseConnection();
                         throw;
                     }
+
+                    if (!myMessageBusOutputChannel.IsConnected)
+                    {
+                        throw new InvalidOperationException(TracedObject + ErrorHandler.OpenConnectionFailure);
+                    }
                 }
             }
         }

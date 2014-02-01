@@ -54,8 +54,12 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 Dispatcher = dispatcher;
                 myProtocolFormatter = protocolFormatter;
                 myInputConnector = inputConnector;
+
+                IncludeResponseReceiverIdToResponses = false;
             }
         }
+
+        public bool IncludeResponseReceiverIdToResponses { private get; set; }
 
         public string ChannelId { get; private set; }
 
@@ -161,7 +165,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     try
                     {
                         // Send the response message.
-                        SenderUtil.SendMessage(aConnectionContext.ResponseSender, "", message, myProtocolFormatter);
+                        string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? responseReceiverId : "";
+                        SenderUtil.SendMessage(aConnectionContext.ResponseSender, aResponseReceiverId, message, myProtocolFormatter);
                     }
                     catch (Exception err)
                     {
@@ -365,7 +370,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             try
                             {
                                 // Try to send close connection message.
-                                SenderUtil.SendCloseConnection(aConnectionContext.ResponseSender, "", myProtocolFormatter);
+                                string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? responseReceiverId : "";
+                                SenderUtil.SendCloseConnection(aConnectionContext.ResponseSender, aResponseReceiverId, myProtocolFormatter);
                             }
                             catch (Exception err)
                             {
@@ -457,7 +463,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
 
         private Dictionary<string, TConnectionContext> myConnectedClients = new Dictionary<string, TConnectionContext>();
-
 
         private IInputConnector myInputConnector;
         private IProtocolFormatter myProtocolFormatter;
