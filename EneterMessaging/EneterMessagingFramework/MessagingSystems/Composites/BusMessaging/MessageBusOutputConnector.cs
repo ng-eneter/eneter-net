@@ -12,6 +12,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Nodes.Broker;
+using System.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 {
@@ -42,9 +43,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         myMessageBusOutputChannel.ConnectionClosed += OnConnectionWithMessageBusClosed;
                         myMessageBusOutputChannel.OpenConnection();
 
-                        // This is a special request message that will be processed by the message as open connection for the client.
-                        object aMessage = myProtocolFormatter.EncodeMessage(myClientIdInMessageBus, myServiceAddressInMessageBus);
-                        myMessageBusOutputChannel.SendMessage(aMessage);
+                        // Inform the message bus which service this client wants to connect.
+                        myOpenConnectionConfirmed.Reset();
+                        myMessageBusOutputChannel.SendMessage(myServiceAddressInMessageBus);
+
+                        if (!myOpenConnectionConfirmed.WaitOne(5000))
+                        {
+                            throw new TimeoutException(TracedObject + "failed to open the connection within the timeout.");
+                        }
                     }
                     catch
                     {
@@ -113,7 +119,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                if (myResponseMessageHandler != null)
+                if (e.Message is string && ((string)e.Message) == "OK")
+                {
+                    // Indicate the connection is open.
+                    myOpenConnectionConfirmed.Set();
+                }
+                else if (myResponseMessageHandler != null)
                 {
                     try
                     {
@@ -153,6 +164,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         private string myClientIdInMessageBus;
         private Func<MessageContext, bool> myResponseMessageHandler;
         private object myConnectionManipulator = new object();
+        private ManualResetEvent myOpenConnectionConfirmed = new ManualResetEvent(false);
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

@@ -99,6 +99,163 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
+
+        // Client has disconnected from the message bus.
+        private void OnClientDisconnected(object sender, ResponseReceiverEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                UnregisterClient(e.ResponseReceiverId);
+            }
+        }
+
+        private void OnMessageFromClientReceived(object sender, DuplexChannelMessageEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                // Client is supposed to send this message immediatelly after OpenConnection().
+                if (e.Message is string)
+                {
+                    string aServiceId = (string)e.Message;
+                    RegisterClient(e.ResponseReceiverId, aServiceId);
+                }
+                else
+                {
+                    ForwardMessageToService(e.ResponseReceiverId, e.Message);
+                }
+            }
+        }
+
+        private void RegisterClient(string clientId, string serviceId)
+        {
+            using (EneterTrace.Entering())
+            {
+                bool anIsRegistered = false;
+                lock (myConnectionsLock)
+                {
+                    // If such client does not exist yet then this is an open connection message.
+                    if (!myConnectedClients.ContainsKey(clientId))
+                    {
+                        myConnectedClients[clientId] = serviceId;
+                        anIsRegistered = true;
+                    }
+                }
+
+                if (anIsRegistered)
+                {
+                    // Encode open connection message and send it to the service.
+                    object anOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage(clientId);
+                    try
+                    {
+                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(serviceId, anOpenConnectionMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + "failed to send message to the service '" + serviceId + "'.";
+                        EneterTrace.Error(anErrorMessage, err);
+
+                        lock (myConnectionsLock)
+                        {
+                            myConnectedClients.Remove(clientId);
+                        }
+                        CloseConnection(myClientConnector, clientId);
+
+                        UnregisterService(serviceId);
+                        CloseConnection(myServiceConnector, serviceId);
+
+                        return;
+                    }
+
+                    // Confirm the connection was open.
+                    try
+                    {
+                        myClientConnector.AttachedDuplexInputChannel.SendResponseMessage(clientId, "OK");
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + "failed to confirm the connection was open.";
+                        EneterTrace.Error(anErrorMessage, err);
+
+                        lock (myConnectionsLock)
+                        {
+                            myConnectedClients.Remove(clientId);
+                        }
+                        CloseConnection(myClientConnector, clientId);
+                    }
+                }
+                else
+                {
+                    // The client does not have opened connection with the service.
+                    string anErrorMessage = TracedObject + "failed to forward the message to the service because the client has not opened connection with the service.";
+                    EneterTrace.Warning(anErrorMessage);
+
+                    CloseConnection(myClientConnector, clientId);
+                }
+            }
+        }
+
+        private void UnregisterClient(string clientId)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aServiceId;
+                lock (myConnectionsLock)
+                {
+                    myConnectedClients.TryGetValue(clientId, out aServiceId);
+                    myConnectedClients.Remove(clientId);
+                }
+
+                if (!string.IsNullOrEmpty(aServiceId))
+                {
+                    try
+                    {
+                        // Send close connection message to the service.
+                        object aCloseConnectionMessage = myProtocolFormatter.EncodeCloseConnectionMessage(clientId);
+                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, aCloseConnectionMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + ErrorHandler.CloseConnectionFailure;
+                        EneterTrace.Warning(anErrorMessage, err);
+                    }
+                }
+            }
+        }
+
+        private void ForwardMessageToService(string clientId, object encodedProtocolMessage)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aServiceId = null;
+
+                lock (myConnectionsLock)
+                {
+                    myConnectedClients.TryGetValue(clientId, out aServiceId);
+                }
+
+                if (!string.IsNullOrEmpty(aServiceId))
+                {
+                    // Forward the incomming message to the service.
+                    try
+                    {
+                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, encodedProtocolMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + "failed to send message to the service '" + aServiceId + "'.";
+                        EneterTrace.Error(anErrorMessage, err);
+
+                        UnregisterService(aServiceId);
+                        CloseConnection(myServiceConnector, aServiceId);
+
+                        throw;
+                    }
+                }
+            }
+        }
+
+
+
         // Service connects to the message bus.
         private void OnServiceConnected(object sender, ResponseReceiverEventArgs e)
         {
@@ -116,7 +273,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 UnregisterService(e.ResponseReceiverId);
             }
         }
-        
+
         private void OnMessageFromServiceReceived(object sender, DuplexChannelMessageEventArgs e)
         {
             using (EneterTrace.Entering())
@@ -129,7 +286,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         // A service sends a response message to a client.
                         if (aProtocolMessage.MessageType != EProtocolMessageType.Unknown)
                         {
-                            SendMessageToClient(aProtocolMessage.ResponseReceiverId, e.Message);
+                            ForwardMessageToClient(aProtocolMessage.ResponseReceiverId, e.Message);
                         }
                         else
                         {
@@ -148,43 +305,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 }
             }
         }
-
-
-
-        // Client has disconnected from the message bus.
-        private void OnClientDisconnected(object sender, ResponseReceiverEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                UnregisterClient(e.ResponseReceiverId);
-            }
-        }
-
-        private void OnMessageFromClientReceived(object sender, DuplexChannelMessageEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
-                if (aProtocolMessage != null)
-                {
-                    // Client announces the name of the service that wants to connect.
-                    // Or the client sends a message to the service.
-                    if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
-                    {
-                        ProcessMessageFromClient(e.ResponseReceiverId, aProtocolMessage, e.Message);
-                    }
-                    else if (aProtocolMessage.MessageType == EProtocolMessageType.Unknown)
-                    {
-                        string anErrorMessage = TracedObject + "detected incorrect message format. The client will be disconnected.";
-                        EneterTrace.Warning(anErrorMessage);
-
-                        UnregisterClient(e.ResponseReceiverId);
-                        CloseConnection(myClientConnector, e.ResponseReceiverId);
-                    }
-                }
-            }
-        }
-
 
         private void RegisterService(string serviceId)
         {
@@ -230,7 +350,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-        private void SendMessageToClient(string clientId, object encodedProtocolMessage)
+        private void ForwardMessageToClient(string clientId, object encodedProtocolMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -249,115 +369,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-        private void ProcessMessageFromClient(string clientId, ProtocolMessage protocolMessage, object encodedProtocolMessage)
-        {
-            using (EneterTrace.Entering())
-            {
-                string aServiceId = null;
-                bool aSuccessFlag = false;
-                bool anIsRegisterClient = false;
+        
 
-                lock (myConnectionsLock)
-                {
-                    // If such client does not exist yet then this is an open connection message.
-                    if (!myConnectedClients.ContainsKey(clientId))
-                    {
-                        // Get service id.
-                        aServiceId = protocolMessage.Message as string;
-                        if (!string.IsNullOrEmpty(aServiceId))
-                        {
-                            myConnectedClients[clientId] = aServiceId;
-
-                            aSuccessFlag = true;
-                            anIsRegisterClient = true;
-                        }
-                        else
-                        {
-                            string anErrorMessage = TracedObject + "failed to connect the client because service id was null or empty string.";
-                            EneterTrace.Error(anErrorMessage);
-                        }
-                    }
-                    else
-                    // The client context exists so this must be a request message for the service.
-                    {
-                        aServiceId = myConnectedClients[clientId];
-                        aSuccessFlag = true;
-                    }
-                }
-
-                if (aSuccessFlag)
-                {
-                    if (anIsRegisterClient)
-                    {
-                        // Encode open connection message.
-                        object anOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage(clientId);
-                        try
-                        {
-                            myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, anOpenConnectionMessage);
-                        }
-                        catch (Exception err)
-                        {
-                            string anErrorMessage = TracedObject + "failed to send message to the service '" + aServiceId + "'.";
-                            EneterTrace.Error(anErrorMessage, err);
-
-                            UnregisterService(aServiceId);
-                            CloseConnection(myServiceConnector, aServiceId);
-                            CloseConnection(myClientConnector, clientId);
-                        }
-                    }
-                    else
-                    {
-                        // Forward the incomming message to the service.
-                        try
-                        {
-                            myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, encodedProtocolMessage);
-                        }
-                        catch (Exception err)
-                        {
-                            string anErrorMessage = TracedObject + "failed to send message to the service '" + aServiceId + "'.";
-                            EneterTrace.Error(anErrorMessage, err);
-
-                            UnregisterService(aServiceId);
-                            CloseConnection(myServiceConnector, aServiceId);
-
-                            throw;
-                        }
-                    }
-                }
-                else
-                {
-                    CloseConnection(myClientConnector, clientId);
-                }
-            }
-        }
-
-        private void UnregisterClient(string clientId)
-        {
-            using (EneterTrace.Entering())
-            {
-                string aServiceId;
-                lock (myConnectionsLock)
-                {
-                    myConnectedClients.TryGetValue(clientId, out aServiceId);
-                    myConnectedClients.Remove(clientId);
-                }
-
-                if (!string.IsNullOrEmpty(aServiceId))
-                {
-                    try
-                    {
-                        // Send close connection message to the service.
-                        object aCloseConnectionMessage = myProtocolFormatter.EncodeCloseConnectionMessage(clientId);
-                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, aCloseConnectionMessage);
-                    }
-                    catch (Exception err)
-                    {
-                        string anErrorMessage = TracedObject + ErrorHandler.CloseConnectionFailure;
-                        EneterTrace.Warning(anErrorMessage, err);
-                    }
-                }
-            }
-        }
+        
 
 
 
