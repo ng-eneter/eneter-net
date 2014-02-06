@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit;
+using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
 {
@@ -17,6 +18,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
         [SetUp]
         public void Setup()
         {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+
             ChannelId = "tcp://127.0.0.1:6070/";
             UnderlyingMessaging = new TcpMessagingSystemFactory();
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);

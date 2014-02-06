@@ -38,7 +38,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 {
                     ++NumberOfReceivedResponses;
 
-                    //EneterTrace.Info("Received Responses: " + NumberOfReceivedResponses);
+                    EneterTrace.Info("Received Responses: " + NumberOfReceivedResponses);
 
                     if (myExpectedResponseMessage != (string)e.Message)
                     {
@@ -89,7 +89,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 {
                     ++NumberOfReceivedMessages;
 
-                    //EneterTrace.Info("Received Messages: " + NumberOfReceivedMessages);
+                    EneterTrace.Info("Received Messages: " + NumberOfReceivedMessages);
 
                     if (NumberOfReceivedMessages == myExpectedNumberOfMessages)
                     {
@@ -308,6 +308,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 anInputChannel.StartListening();
 
                 // Client opens the connection.
+                EneterTrace.Debug("Open1");
                 anOutputChannel.OpenConnection();
                 Assert.IsTrue(anOutputChannel.IsConnected);
 
@@ -322,6 +323,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
 
                 // Client closes the connection.
+                EneterTrace.Debug("Close1");
                 anOutputChannel.CloseConnection();
                 Assert.IsFalse(anOutputChannel.IsConnected);
 
@@ -334,6 +336,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
 
                 // Client opens the connection.
+                EneterTrace.Debug("Open2");
                 anOutputChannel.OpenConnection();
                 Assert.IsTrue(anOutputChannel.IsConnected);
 
@@ -348,6 +351,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
 
                 // Client sends a message.
+                EneterTrace.Debug("Hello message sending.");
                 anOutputChannel.SendMessage("Hello");
 
                 aRequestMessageReceivedEvent.WaitOne();

@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem;
 using Eneter.Messaging.MessagingSystems.Composites.BusMessaging;
+using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessaging
 {
@@ -15,7 +16,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
         [SetUp]
         public void Setup()
         {
-            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             // Generate random number for the port.

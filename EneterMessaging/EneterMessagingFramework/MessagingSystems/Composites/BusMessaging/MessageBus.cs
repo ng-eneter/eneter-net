@@ -19,6 +19,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 {
     internal class MessageBus : IMessageBus
     {
+        // Helper class to wrap basic input channel functionality.
         private class TConnector : AttachableDuplexInputChannelBase
         {
             public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
@@ -74,7 +75,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
-
+        // Attaches input channels for services and their channels and starts listening.
         public void AttachDuplexInputChannels(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel)
         {
             using (EneterTrace.Entering())
@@ -100,7 +101,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         }
 
 
-        // Client has disconnected from the message bus.
+        // Connection with the client was closed.
         private void OnClientDisconnected(object sender, ResponseReceiverEventArgs e)
         {
             using (EneterTrace.Entering())
@@ -109,11 +110,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
+        // A message from the client was received.
         private void OnMessageFromClientReceived(object sender, DuplexChannelMessageEventArgs e)
         {
             using (EneterTrace.Entering())
             {
-                // Client is supposed to send this message immediatelly after OpenConnection().
+                // If the message content is string then this message contains the service to which the client
+                // wants to connect. Client is supposed to send this message immediatelly after OpenConnection().
                 if (e.Message is string)
                 {
                     string aServiceId = (string)e.Message;
@@ -121,7 +124,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 }
                 else
                 {
-                    ForwardMessageToService(e.ResponseReceiverId, e.Message);
+                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
+                    if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
+                    {
+                        EneterTrace.Debug(e.Message.ToString());
+                        ForwardMessageToService(e.ResponseReceiverId, e.Message);
+                    }
                 }
             }
         }
@@ -163,7 +171,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         UnregisterService(serviceId);
                         CloseConnection(myServiceConnector, serviceId);
 
-                        return;
+                        throw;
                     }
 
                     // Confirm the connection was open.
@@ -181,6 +189,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                             myConnectedClients.Remove(clientId);
                         }
                         CloseConnection(myClientConnector, clientId);
+
+                        throw;
                     }
                 }
                 else
@@ -227,7 +237,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             using (EneterTrace.Entering())
             {
                 string aServiceId = null;
-
                 lock (myConnectionsLock)
                 {
                     myConnectedClients.TryGetValue(clientId, out aServiceId);
@@ -365,16 +374,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
                     UnregisterClient(clientId);
                     CloseConnection(myClientConnector, clientId);
+
+                    throw;
                 }
             }
         }
 
         
-
-        
-
-
-
         private void CloseConnection(TConnector connector, string responseReceiverId)
         {
             using (EneterTrace.Entering())

@@ -44,6 +44,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         myMessageBusOutputChannel.OpenConnection();
 
                         // Inform the message bus which service this client wants to connect.
+                        EneterTrace.Debug("Sends serviceId = " + myServiceAddressInMessageBus);
                         myOpenConnectionConfirmed.Reset();
                         myMessageBusOutputChannel.SendMessage(myServiceAddressInMessageBus);
 
@@ -119,9 +120,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
+                // If it is a confirmation message that the connection was really open.
                 if (e.Message is string && ((string)e.Message) == "OK")
                 {
-                    // Indicate the connection is open.
+                    // Indicate the connection is open and relase the waiting in the OpenConnection().
                     myOpenConnectionConfirmed.Set();
                 }
                 else if (myResponseMessageHandler != null)
@@ -143,6 +145,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
+                // In case the OpenConnection() is waiting until the connection is open relase it.
+                myOpenConnectionConfirmed.Set();
+
                 if (myResponseMessageHandler != null)
                 {
                     try
