@@ -42,8 +42,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 myTcpClient = tcpClient;
                 myClientStream = dataStream;
                 ClientEndPoint = tcpClient.Client.RemoteEndPoint as IPEndPoint;
-                SendTimeout = 30000;
-                ReceiveTimeout = -1;
+
+                // Infinite time for sending and receiving messages.
+                // Timeouts can be reconfigured when the connection is handled.
+                SendTimeout = 0;
+                ReceiveTimeout = 0;
             }
         }
 

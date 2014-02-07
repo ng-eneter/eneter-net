@@ -38,7 +38,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 {
                     ++NumberOfReceivedResponses;
 
-                    EneterTrace.Info("Received Responses: " + NumberOfReceivedResponses);
+                    //EneterTrace.Info("Received Responses: " + NumberOfReceivedResponses);
 
                     if (myExpectedResponseMessage != (string)e.Message)
                     {
@@ -89,7 +89,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 {
                     ++NumberOfReceivedMessages;
 
-                    EneterTrace.Info("Received Messages: " + NumberOfReceivedMessages);
+                    //EneterTrace.Info("Received Messages: " + NumberOfReceivedMessages);
 
                     if (NumberOfReceivedMessages == myExpectedNumberOfMessages)
                     {

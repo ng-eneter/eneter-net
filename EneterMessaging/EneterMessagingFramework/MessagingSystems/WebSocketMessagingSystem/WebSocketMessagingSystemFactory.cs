@@ -135,7 +135,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             using (EneterTrace.Entering())
             {
                 ProtocolFormatter = protocolFormatter;
+                
                 ConnectTimeout = TimeSpan.FromMilliseconds(30000);
+
+                // Infinite time for sending and receiving.
                 SendTimeout = TimeSpan.FromMilliseconds(0);
                 ReceiveTimeout = TimeSpan.FromMilliseconds(0);
 

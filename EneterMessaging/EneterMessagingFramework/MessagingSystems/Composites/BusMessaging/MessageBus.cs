@@ -319,9 +319,35 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
+                bool anIsNewServiceRegistered = false;
                 lock (myConnectionsLock)
                 {
-                    myConnectedServices.Add(serviceId);
+                    anIsNewServiceRegistered = myConnectedServices.Add(serviceId);
+                }
+
+                if (anIsNewServiceRegistered)
+                {
+                    // Confirm the service is registered inside the message bus.
+                    try
+                    {
+                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(serviceId, "OK");
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + "failed to send confirmation the service is registered.";
+                        EneterTrace.Error(anErrorMessage, err);
+
+                        CloseConnection(myClientConnector, serviceId);
+
+                        throw;
+                    }
+                }
+                else
+                {
+                    string anErrorMessage = TracedObject + "failed to register the service '" + serviceId + "' because the same service is already registered.";
+                    EneterTrace.Error(anErrorMessage);
+
+                    throw new InvalidOperationException(anErrorMessage);
                 }
             }
         }

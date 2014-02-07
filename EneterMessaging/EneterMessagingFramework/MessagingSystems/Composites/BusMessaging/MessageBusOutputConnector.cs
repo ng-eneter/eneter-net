@@ -44,7 +44,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         myMessageBusOutputChannel.OpenConnection();
 
                         // Inform the message bus which service this client wants to connect.
-                        EneterTrace.Debug("Sends serviceId = " + myServiceAddressInMessageBus);
                         myOpenConnectionConfirmed.Reset();
                         myMessageBusOutputChannel.SendMessage(myServiceAddressInMessageBus);
 
