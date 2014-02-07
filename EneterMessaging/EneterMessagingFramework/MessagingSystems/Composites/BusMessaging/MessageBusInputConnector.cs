@@ -69,13 +69,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
                     // Open the connection with the service.
                     // Note: the response receiver id of this output channel represents the service id inside the message bus.
-                    myStartListeningConfirmed.Reset();
                     myMessageBusOutputChannel.OpenConnection();
-
-                    if (!myStartListeningConfirmed.WaitOne(5000))
-                    {
-                        throw new TimeoutException(TracedObject + "failed to start the listening within the timeout.");
-                    }
                 }
                 catch
                 {
@@ -118,13 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                // If it is a confirmation message that the connection was really open.
-                if (e.Message is string && ((string)e.Message) == "OK")
-                {
-                    // Indicate the listening is started and relase the waiting in the OpenConnection().
-                    myStartListeningConfirmed.Set();
-                }
-                else if (myMessageHandler != null)
+                if (myMessageHandler != null)
                 {
                     try
                     {
@@ -143,9 +131,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                // In case the StartListening() is waiting until the listening is started relase it.
-                myStartListeningConfirmed.Set();
-
                 if (myMessageHandler != null)
                 {
                     try
@@ -163,7 +148,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private Func<MessageContext, bool> myMessageHandler;
-        private ManualResetEvent myStartListeningConfirmed = new ManualResetEvent(false);
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

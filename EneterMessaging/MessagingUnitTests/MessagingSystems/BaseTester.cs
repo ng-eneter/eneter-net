@@ -211,21 +211,25 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 Assert.IsTrue(anOutputChannel.IsConnected);
 
                 // handling open connection on the client side.
+                EneterTrace.Info("1");
                 aConnectionOpenedEvent.WaitOne();
                 Assert.AreEqual(anOutputChannel.ChannelId, aConnectionOpenedEventArgs.ChannelId);
                 Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionOpenedEventArgs.ResponseReceiverId);
 
                 // handling open connection on the service side.
+                EneterTrace.Info("2");
                 aResponseReceiverConnectedEvent.WaitOne();
                 Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectedReceiver);
 
                 anOutputChannel.CloseConnection();
                 Assert.IsFalse(anOutputChannel.IsConnected);
 
+                EneterTrace.Info("3");
                 aConnectionClosedEvent.WaitOne();
                 Assert.AreEqual(anOutputChannel.ChannelId, aConnectionClosedEventArgs.ChannelId);
                 Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionClosedEventArgs.ResponseReceiverId);
 
+                EneterTrace.Info("4");
                 aResponseReceiverDisconnectedEvent.WaitOne();
                 Assert.AreEqual(anOutputChannel.ResponseReceiverId, aDisconnectedReceiver);
             }
