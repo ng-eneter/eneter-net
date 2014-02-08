@@ -32,7 +32,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 using (EneterTrace.Entering())
                 {
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, clientConnectorAddress);
-                    return new MessageBusOutputConnector(serviceConnectorAddress, clientConnectorAddress, aMessageBusOutputChannel, myMessageBusMessaging.ProtocolFormatter);
+                    return new MessageBusOutputConnector(serviceConnectorAddress, clientConnectorAddress, aMessageBusOutputChannel);
                 }
             }
 
@@ -52,8 +52,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             private IMessagingSystemFactory myMessageBusMessaging;
         }
 
-
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
+            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new EneterProtocolFormatter())
+        {
+        }
+
+        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
@@ -62,7 +66,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 // Dispatch events in the same thread as notified from the underlying messaging.
                 myDispatcher = new NoDispatching().GetDispatcher();
 
-                ProtocolFormatter = underlyingMessaging.ProtocolFormatter;
+                myProtocolFormatter = protocolFormatter;
             }
         }
 
@@ -70,7 +74,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, ProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -78,7 +82,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, ProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -87,14 +91,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             using (EneterTrace.Entering())
             {
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, ProtocolFormatter);
+                DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, myProtocolFormatter);
                 anInputChannel.IncludeResponseReceiverIdToResponses = true;
                 return anInputChannel;
             }
         }
 
 
-        public IProtocolFormatter ProtocolFormatter { get; private set; }
+        private IProtocolFormatter myProtocolFormatter;
 
         private IThreadDispatcher myDispatcher;
         private MessageBusConnectorFactory myConnectorFactory;

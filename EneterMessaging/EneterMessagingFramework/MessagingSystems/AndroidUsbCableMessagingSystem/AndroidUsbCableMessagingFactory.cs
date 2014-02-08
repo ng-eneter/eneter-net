@@ -307,8 +307,6 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
             throw new NotSupportedException("Duplex input channel is not supported for Android USB cable messaging.");
         }
 
-        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
-
         private int myAdbHostPort;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }

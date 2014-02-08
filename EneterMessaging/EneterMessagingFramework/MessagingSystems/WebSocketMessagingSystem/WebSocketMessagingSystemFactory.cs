@@ -134,7 +134,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                ProtocolFormatter = protocolFormatter;
+                myProtocolFormatter = protocolFormatter;
                 
                 ConnectTimeout = TimeSpan.FromMilliseconds(30000);
 
@@ -174,7 +174,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aFactory, ProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aFactory, myProtocolFormatter, false);
             }
         }
 
@@ -207,7 +207,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aFactory, ProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aFactory, myProtocolFormatter, false);
             }
         }
 
@@ -234,7 +234,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
                 IInputConnector anInputConnector = anInputConnectorFactory.CreateInputConnector(channelId);
 
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, ProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
 #else
                 throw new NotSupportedException("The WebSocket duplex input channel is not supported in Silverlight.");
 #endif
@@ -321,7 +321,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private ISecurityFactory myClientSecurityStreamFactory = new NonSecurityFactory();
 #endif
 
-        public IProtocolFormatter ProtocolFormatter { get; private set; }
+        private IProtocolFormatter myProtocolFormatter;
     }
 }
 

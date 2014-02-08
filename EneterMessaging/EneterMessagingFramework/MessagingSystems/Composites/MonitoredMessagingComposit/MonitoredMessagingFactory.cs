@@ -139,7 +139,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        public IProtocolFormatter ProtocolFormatter { get { return myUnderlyingMessaging.ProtocolFormatter; } }
 
         private IMessagingSystemFactory myUnderlyingMessaging;
         private TimeSpan myPingFrequency;

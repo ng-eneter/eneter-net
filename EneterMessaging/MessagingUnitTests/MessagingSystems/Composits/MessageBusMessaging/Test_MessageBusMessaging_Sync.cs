@@ -23,7 +23,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
 
             IDuplexInputChannel aMessageBusServiceInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("MyServicesAddress");
             IDuplexInputChannel aMessageBusClientInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("MyClientsAddress");
-            myMessageBus = new MessageBusFactory(anUnderlyingMessaging.ProtocolFormatter).CreateMessageBus();
+            myMessageBus = new MessageBusFactory().CreateMessageBus();
             myMessageBus.AttachDuplexInputChannels(aMessageBusServiceInputChannel, aMessageBusClientInputChannel);
 
             MessagingSystemFactory = new MessageBusMessagingFactory("MyServicesAddress", "MyClientsAddress", anUnderlyingMessaging);

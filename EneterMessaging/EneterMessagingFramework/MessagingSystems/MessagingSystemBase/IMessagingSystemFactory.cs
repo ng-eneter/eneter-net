@@ -62,7 +62,5 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         /// <param name="channelId">identifies the address, the duplex input channel listens to</param>
         /// <returns>duplex input channel</returns>
         IDuplexInputChannel CreateDuplexInputChannel(string channelId);
-
-        IProtocolFormatter ProtocolFormatter { get; }
     }
 }

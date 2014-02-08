@@ -169,8 +169,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites
             }
         }
 
-        public IProtocolFormatter ProtocolFormatter { get { return myBufferedMessaging.ProtocolFormatter; } }
-
         private IMessagingSystemFactory myBufferedMessaging;
     }
 }

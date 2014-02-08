@@ -321,9 +321,5 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 #if !SILVERLIGHT
         private IInputConnectorFactory myInputConnectorFactory;
 #endif
-
-
-
-        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
     }
 }

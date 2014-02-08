@@ -172,7 +172,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// </remarks>
         public TimeSpan AuthenticationTimeout { get; set; }
 
-        public IProtocolFormatter ProtocolFormatter { get { return myUnderlyingMessaging.ProtocolFormatter; } }
 
         private IMessagingSystemFactory myUnderlyingMessaging;
 

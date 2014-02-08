@@ -128,8 +128,6 @@ namespace Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem
             }
         }
 
-        public IProtocolFormatter ProtocolFormatter { get { return myDefaultMessagingFactory.ProtocolFormatter; } }
-
         private DefaultMessagingSystemFactory myDefaultMessagingFactory;
     }
 }

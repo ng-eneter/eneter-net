@@ -128,8 +128,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        public IProtocolFormatter ProtocolFormatter { get { return myUnderlyingMessaging.ProtocolFormatter; } }
-
         private IMessagingSystemFactory myUnderlyingMessaging;
         private TimeSpan myMaxOfflineTime;
     }

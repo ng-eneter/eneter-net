@@ -452,8 +452,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
 
-        public IProtocolFormatter ProtocolFormatter { get { return myProtocolFormatter; } }
-
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }
 }

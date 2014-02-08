@@ -59,7 +59,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                ProtocolFormatter = protocolFromatter;
+                myProtocolFormatter = protocolFromatter;
                 myConnectorFactory = new UdpConnectorFactory();
 
                 InputChannelThreading = new SyncDispatching();
@@ -93,7 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myConnectorFactory, ProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myConnectorFactory, ProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, ProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
             }
         }
 
@@ -177,7 +177,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
 
-        public IProtocolFormatter ProtocolFormatter { get; private set; }
+        private IProtocolFormatter myProtocolFormatter;
 
         private UdpConnectorFactory myConnectorFactory;
     }
