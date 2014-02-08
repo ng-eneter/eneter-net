@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem;
-using Eneter.Messaging.MessagingSystems.Composites.BusMessaging;
+using Eneter.Messaging.MessagingSystems.Composites.MessageBus;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessaging
 {

@@ -11,7 +11,7 @@
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
-namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
+namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     public class MessageBusFactory : IMessageBusFactory
     {

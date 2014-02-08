@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Eneter.Messaging.MessagingSystems.Composites.BusMessaging;
+using Eneter.Messaging.MessagingSystems.Composites.MessageBus;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.Diagnostic;

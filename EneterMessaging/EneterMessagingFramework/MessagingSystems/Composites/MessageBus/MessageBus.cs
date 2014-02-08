@@ -18,7 +18,7 @@ using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
-namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
+namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBus : IMessageBus
     {

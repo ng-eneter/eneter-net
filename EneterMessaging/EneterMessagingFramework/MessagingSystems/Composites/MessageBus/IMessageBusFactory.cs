@@ -7,7 +7,7 @@
 
 #if !SILVERLIGHT
 
-namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
+namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     public interface IMessageBusFactory
     {

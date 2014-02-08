@@ -12,7 +12,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
-namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
+namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBusInputConnector : IInputConnector
     {

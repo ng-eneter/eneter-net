@@ -14,7 +14,7 @@ using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Nodes.Broker;
 using System.Threading;
 
-namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
+namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBusOutputConnector : IOutputConnector
     {

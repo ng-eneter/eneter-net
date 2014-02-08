@@ -57,16 +57,16 @@
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\IMessageBus.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\IMessageBusFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBus.cs">
+    <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBusFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBus.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusInputConnector.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusOutputConnector.cs" />
-    <Compile Include="MessagingSystems\Composites\BusMessaging\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />

@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem;
-using Eneter.Messaging.MessagingSystems.Composites.BusMessaging;
+using Eneter.Messaging.MessagingSystems.Composites.MessageBus;
 using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessaging

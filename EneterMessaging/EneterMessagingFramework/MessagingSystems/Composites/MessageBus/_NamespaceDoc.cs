@@ -7,7 +7,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
+namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
     /// Messaging via the message bus.
