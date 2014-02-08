@@ -140,7 +140,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 500);
         }
 
-        [Test]
+        //[Test]
         public virtual void Duplex_03_Send100_10MB()
         {
             SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 100);
@@ -338,6 +338,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aResponseReceiverDisconnectedEvent.WaitOne();
                 Assert.AreEqual(anOutputChannel.ResponseReceiverId, aDisconnectedReceiver);
 
+                // Messaging system e.g. MessageBus can be more complex and needs some time to really close the connection.
+                // Therefore give some time. Investigate how to improve it.
+                Thread.Sleep(500);
 
                 // Client opens the connection.
                 EneterTrace.Debug("Open2");
@@ -796,6 +799,55 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             }
         }
 
+        // Currently this does not work. Consider for future releases.
+        //[Test]
+        public virtual void Duplex_14_IdenticalResponseReceiverIds()
+        {
+            IDuplexInputChannel aDuplexInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
+            IDuplexOutputChannel aDuplexOutputChannel1 = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId, "123");
+            IDuplexOutputChannel aDuplexOutputChannel2 = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId, "123");
+
+            List<string> aConnectedResponseReceivers = new List<string>();
+            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
+            {
+                lock (aConnectedResponseReceivers)
+                {
+                    aConnectedResponseReceivers.Add(y.ResponseReceiverId);
+                }
+            };
+
+            ManualResetEvent aConnection2Closed = new ManualResetEvent(false);
+            aDuplexOutputChannel2.ConnectionClosed += (x, y) =>
+                {
+                    aConnection2Closed.Set();
+                };
+
+            try
+            {
+                aDuplexInputChannel.StartListening();
+
+                aDuplexOutputChannel1.OpenConnection();
+                try
+                {
+                    aDuplexOutputChannel2.OpenConnection();
+                }
+                catch
+                {
+                    // If the 2nd connection throws an exception it is ok.
+                }
+
+                aConnection2Closed.WaitOne();
+
+                Assert.IsTrue(aDuplexOutputChannel1.IsConnected);
+                Assert.IsFalse(aDuplexOutputChannel1.IsConnected);
+            }
+            finally
+            {
+                aDuplexInputChannel.StopListening();
+                aDuplexOutputChannel1.CloseConnection();
+                aDuplexOutputChannel2.CloseConnection();
+            }
+        }
 
 
         private void SendMessageReceiveResponse(string channelId, string message, string responseMessage,

@@ -46,7 +46,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                         myOpenConnectionConfirmed.Reset();
                         myMessageBusOutputChannel.SendMessage(myServiceAddressInMessageBus);
 
-                        if (!myOpenConnectionConfirmed.WaitOne(5000))
+                        if (!myOpenConnectionConfirmed.WaitOne(30000))
                         {
                             throw new TimeoutException(TracedObject + "failed to open the connection within the timeout.");
                         }

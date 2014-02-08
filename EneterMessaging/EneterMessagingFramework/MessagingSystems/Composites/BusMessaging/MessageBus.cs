@@ -5,10 +5,13 @@
  * Copyright © Ondrej Uzovic 2014
 */
 
+
+// Note: It is possible to compile for Silverlight but it probably does not have too much sense
+//       therefore in order to keep dll smaller it is not included in Silverlight platforms.
+#if !SILVERLIGHT
+
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.IO;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
@@ -80,7 +83,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                lock (myAttachDetachLock)
                 {
                     myServiceConnector.AttachDuplexInputChannel(serviceInputChannel);
                     myClientConnector.AttachDuplexInputChannel(clientInputChannel);
@@ -92,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                lock (myAttachDetachLock)
                 {
                     myClientConnector.DetachDuplexInputChannel();
                     myServiceConnector.DetachDuplexInputChannel();
@@ -134,6 +137,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
             }
         }
 
+        // Adds the client to the list of connected clients and sends open connection message to the service.
+        // If the service does not exist the client is disconnected.
         private void RegisterClient(string clientId, string serviceId)
         {
             using (EneterTrace.Entering())
@@ -195,11 +200,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
                 }
                 else
                 {
-                    // The client does not have opened connection with the service.
-                    string anErrorMessage = TracedObject + "failed to forward the message to the service because the client has not opened connection with the service.";
+                    string anErrorMessage = TracedObject + "did not register the client because the client with the same id already exists.";
                     EneterTrace.Warning(anErrorMessage);
-
-                    CloseConnection(myClientConnector, clientId);
                 }
             }
         }
@@ -259,6 +261,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
                         throw;
                     }
+                }
+                else
+                {
+                    // The client is not registered. Maybe it was closed meanwhile. So  clean it.
+                    string anErrorMessage = TracedObject + "failed to send message to the service because the client has not had open connection with the message bus.";
+                    EneterTrace.Warning(anErrorMessage);
+
+                    CloseConnection(myClientConnector, clientId);
                 }
             }
         }
@@ -398,7 +408,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 
 
 
-        private object myConnectionManipulatorLock = new object();
+        private object myAttachDetachLock = new object();
 
         private object myConnectionsLock = new object();
 
@@ -418,3 +428,5 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         protected string TracedObject { get { return GetType().Name + " "; } }
     }
 }
+
+#endif

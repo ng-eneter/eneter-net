@@ -43,11 +43,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
         }
 
 
-        public override void Duplex_07_OpenConnection_if_InputChannelNotStarted()
-        {
-            // N.A.
-        }
-
         private IMessageBus myMessageBus;
     }
 }
