@@ -32,7 +32,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 using (EneterTrace.Entering())
                 {
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, clientConnectorAddress);
-                    return new MessageBusOutputConnector(serviceConnectorAddress, clientConnectorAddress, aMessageBusOutputChannel);
+                    return new MessageBusOutputConnector(serviceConnectorAddress, aMessageBusOutputChannel);
                 }
             }
 

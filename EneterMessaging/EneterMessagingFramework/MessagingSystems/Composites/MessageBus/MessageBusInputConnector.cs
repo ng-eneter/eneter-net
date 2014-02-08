@@ -7,7 +7,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
@@ -18,11 +17,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     {
         private class ResponseSender : ISender
         {
-            public ResponseSender(string clientId, IDuplexOutputChannel messageBusOutputChannel)
+            public ResponseSender(IDuplexOutputChannel messageBusOutputChannel)
             {
                 using (EneterTrace.Entering())
                 {
-                    myClientId = clientId;
                     myMessageBusOutputChannel = messageBusOutputChannel;
                 }
             }
@@ -45,7 +43,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 throw new NotSupportedException();
             }
 
-            private string myClientId;
             private IDuplexOutputChannel myMessageBusOutputChannel;
         }
 
@@ -54,6 +51,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 myMessageBusOutputChannel = messageBusOutputChannel;
+                myResponseSender = new ResponseSender(myMessageBusOutputChannel);
             }
         }
 
@@ -101,11 +99,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
         public ISender CreateResponseSender(string clientId)
         {
-            using (EneterTrace.Entering())
-            {
-                ResponseSender aResponseSender = new ResponseSender(clientId, myMessageBusOutputChannel);
-                return aResponseSender;
-            }
+            throw new NotSupportedException("CreateResponseSender is not supported.");
         }
 
         private void OnMessageFromMessageBusReceived(object sender, DuplexChannelMessageEventArgs e)
@@ -116,7 +110,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     try
                     {
-                        MessageContext aMessageContext = new MessageContext(e.Message, e.SenderAddress, null);
+                        MessageContext aMessageContext = new MessageContext(e.Message, e.SenderAddress, myResponseSender);
                         myMessageHandler(aMessageContext);
                     }
                     catch (Exception err)
@@ -146,6 +140,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         }
 
 
+        private ISender myResponseSender;
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private Func<MessageContext, bool> myMessageHandler;
 

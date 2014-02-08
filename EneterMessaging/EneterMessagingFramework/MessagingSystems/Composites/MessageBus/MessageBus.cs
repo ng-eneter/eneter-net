@@ -12,7 +12,6 @@
 
 using System;
 using System.Collections.Generic;
-using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
@@ -421,7 +420,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         private TConnector myServiceConnector;
         private TConnector myClientConnector;
         private IProtocolFormatter myProtocolFormatter;
-        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
 
         private string TracedObject { get { return GetType().Name + " "; } }
     }

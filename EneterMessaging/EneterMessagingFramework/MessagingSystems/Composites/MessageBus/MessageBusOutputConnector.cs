@@ -18,13 +18,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBusOutputConnector : IOutputConnector
     {
-        public MessageBusOutputConnector(string serviceAddressInMessageBus, string clientIdInMessageBus,
-            IDuplexOutputChannel messageBusOutputChannel)
+        public MessageBusOutputConnector(string serviceAddressInMessageBus, IDuplexOutputChannel messageBusOutputChannel)
         {
             using (EneterTrace.Entering())
             {
                 myServiceAddressInMessageBus = serviceAddressInMessageBus;
-                myClientIdInMessageBus = clientIdInMessageBus;
                 myMessageBusOutputChannel = messageBusOutputChannel;
             }
         }
@@ -163,7 +161,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private string myServiceAddressInMessageBus;
-        private string myClientIdInMessageBus;
         private Func<MessageContext, bool> myResponseMessageHandler;
         private object myConnectionManipulator = new object();
         private ManualResetEvent myOpenConnectionConfirmed = new ManualResetEvent(false);
