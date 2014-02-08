@@ -5,6 +5,9 @@
  * Copyright © Ondrej Uzovic 2014
 */
 
+
+#if !SILVERLIGHT
+
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
@@ -36,3 +39,5 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         private IProtocolFormatter myProtocolFormatter;
     }
 }
+
+#endif

@@ -66,6 +66,7 @@
     <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusInputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\BusMessaging\MessageBusOutputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\BusMessaging\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />

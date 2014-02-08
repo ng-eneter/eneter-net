@@ -5,6 +5,7 @@
  * Copyright © Ondrej Uzovic 2014
 */
 
+#if !SILVERLIGHT
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
 {
@@ -13,3 +14,5 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BusMessaging
         IMessageBus CreateMessageBus();
     }
 }
+
+#endif
