@@ -148,11 +148,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             {
                                 isConnectionOpen = false;
                             }
-
-                            if (!client.IsConnected)
-                            {
-                                isConnectionOpen = false;
-                            }
                         }
                         else
                         {
