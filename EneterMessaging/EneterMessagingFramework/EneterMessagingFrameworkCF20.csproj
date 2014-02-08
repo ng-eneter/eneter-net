@@ -132,6 +132,10 @@
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbCableMessagingFactory.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs" />
@@ -139,6 +143,14 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseReceiverContext.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBusFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitorChannelMessage.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexOutputChannel.cs" />
@@ -300,10 +312,6 @@
     <Compile Include="Nodes\LoadBalancer\RoundRobinBalancer.cs" />
     <Compile Include="Nodes\LoadBalancer\RoundRobinBalancerFactory.cs" />
     <Compile Include="Nodes\LoadBalancer\_NamespaceDoc.cs" />
-    <Compile Include="Nodes\MessageBus\MessageBusInputConnector.cs" />
-    <Compile Include="Nodes\MessageBus\MessageBusMessagingFactory.cs" />
-    <Compile Include="Nodes\MessageBus\MessageBusOutputConnector.cs" />
-    <Compile Include="Nodes\MessageBus\_NamespaceDoc.cs" />
     <Compile Include="Nodes\Router\DuplexRouter.cs" />
     <Compile Include="Nodes\Router\DuplexRouterFactory.cs" />
     <Compile Include="Nodes\Router\IDuplexRouter.cs" />
@@ -341,7 +349,9 @@
     <Folder Include="MessagingSystems" />
     <Folder Include="MessagingSystems\AndroidUsbCableMessagingSystem" />
     <Folder Include="MessagingSystems\Composites" />
+    <Folder Include="MessagingSystems\Composites\AuthenticatedConnection" />
     <Folder Include="MessagingSystems\Composites\BufferedMessagingComposit" />
+    <Folder Include="MessagingSystems\Composites\MessageBus" />
     <Folder Include="MessagingSystems\Composites\MonitoredMessagingComposit" />
     <Folder Include="MessagingSystems\ConnectionProtocols" />
     <Folder Include="MessagingSystems\HttpMessagingSystem" />
@@ -363,7 +373,6 @@
     <Folder Include="Nodes\Broker" />
     <Folder Include="Nodes\ChannelWrapper" />
     <Folder Include="Nodes\LoadBalancer" />
-    <Folder Include="Nodes\MessageBus" />
     <Folder Include="Nodes\Router" />
     <Folder Include="System" />
     <Folder Include="Nodes" />

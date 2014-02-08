@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         }
 
                         // Wait until the hanshake is completed.
-                        if (!myConnectionAcknowledged.WaitOne(myAuthenticationTimeout))
+                        if (!myConnectionAcknowledged.WaitOne((int)myAuthenticationTimeout.TotalMilliseconds))
                         {
                             string anErrorMessage = TracedObject + "failed to process authentication within defined timeout " + myAuthenticationTimeout.TotalMilliseconds + " ms.";
                             EneterTrace.Error(anErrorMessage);
