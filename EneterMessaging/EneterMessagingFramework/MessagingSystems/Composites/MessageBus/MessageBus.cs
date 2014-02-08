@@ -130,7 +130,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
                     if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                     {
-                        EneterTrace.Debug(e.Message.ToString());
                         ForwardMessageToService(e.ResponseReceiverId, e.Message);
                     }
                 }
@@ -409,13 +408,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
 
         private object myAttachDetachLock = new object();
-
         private object myConnectionsLock = new object();
 
-        // <service id>
+        // [service id]
         private HashSet<string> myConnectedServices = new HashSet<string>();
 
-        // <client id, service id>
+        // [client id, service id]
         private Dictionary<string, string> myConnectedClients = new Dictionary<string, string>();
         
 
@@ -425,7 +423,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         private IProtocolFormatter myProtocolFormatter;
         private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
 
-        protected string TracedObject { get { return GetType().Name + " "; } }
+        private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
 
