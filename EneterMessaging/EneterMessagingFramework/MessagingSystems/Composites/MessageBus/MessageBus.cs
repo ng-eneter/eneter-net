@@ -59,6 +59,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         }
 
 
+		public event EventHandler<MessageBusServiceEventArgs> ServiceConnected;
+		public event EventHandler<MessageBusServiceEventArgs> ServiceDisconnected;
+
+
         public MessageBus(IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
@@ -102,6 +106,27 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
+		public IEnumerable<string> ConnectedServices
+		{
+			get
+			{
+				lock (myConnectionsLock)
+				{
+					string[] aServices = new string[myConnectedServices.Count];
+					myConnectedServices.CopyTo(aServices);
+					return aServices;
+				}
+			}
+		}
+
+		public void DisconnectService(string serviceAddress)
+		{
+			using (EneterTrace.Entering())
+			{
+				UnregisterService(serviceAddress);
+				CloseConnection(myServiceConnector, serviceAddress);
+			}
+		}
 
         // Connection with the client was closed.
         private void OnClientDisconnected(object sender, ResponseReceiverEventArgs e)
@@ -288,6 +313,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 UnregisterService(e.ResponseReceiverId);
+
+				if (ServiceDisconnected != null)
+				{
+					MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
+					ServiceDisconnected(this, anEvent);
+				}
             }
         }
 
@@ -327,10 +358,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+				bool aConnectedFlag;
                 lock (myConnectionsLock)
                 {
-                    myConnectedServices.Add(serviceId);
+                    aConnectedFlag = myConnectedServices.Add(serviceId);
                 }
+
+				if (aConnectedFlag && ServiceConnected != null)
+				{
+					MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(serviceId);
+					ServiceConnected(this, anEvent);
+				}
             }
         }
 

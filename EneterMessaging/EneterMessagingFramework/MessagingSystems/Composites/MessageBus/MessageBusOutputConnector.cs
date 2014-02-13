@@ -2,7 +2,7 @@
  * Project: Eneter.Messaging.Framework
  * Author:  Ondrej Uzovic
  * 
- * Copyright © Ondrej Uzovic 2013
+ * Copyright © Ondrej Uzovic 2014
 */
 
 using System;
