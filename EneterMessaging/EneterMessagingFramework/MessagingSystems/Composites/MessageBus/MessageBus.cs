@@ -304,6 +304,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 RegisterService(e.ResponseReceiverId);
+
+				if (ServiceConnected != null)
+				{
+					try
+					{
+						MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
+						ServiceConnected(this, anEvent);
+					}
+					catch (Exception err)
+					{
+						EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+					}
+				}
             }
         }
 
@@ -316,8 +329,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
 				if (ServiceDisconnected != null)
 				{
-					MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
-					ServiceDisconnected(this, anEvent);
+					try
+					{
+						MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
+						ServiceDisconnected(this, anEvent);
+					}
+					catch (Exception err)
+					{
+						EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+					}
 				}
             }
         }
@@ -358,17 +378,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-				bool aConnectedFlag;
                 lock (myConnectionsLock)
                 {
-                    aConnectedFlag = myConnectedServices.Add(serviceId);
+                    myConnectedServices.Add(serviceId);
                 }
-
-				if (aConnectedFlag && ServiceConnected != null)
-				{
-					MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(serviceId);
-					ServiceConnected(this, anEvent);
-				}
             }
         }
 
