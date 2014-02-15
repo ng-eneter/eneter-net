@@ -16,6 +16,8 @@ namespace Eneter.Messaging.Nodes.Broker
 {
     internal class DuplexBrokerClient : AttachableDuplexOutputChannelBase, IDuplexBrokerClient
     {
+        public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
+        public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
         public event EventHandler<BrokerMessageReceivedEventArgs> BrokerMessageReceived;
 
         public DuplexBrokerClient(ISerializer serializer)
@@ -196,6 +198,22 @@ namespace Eneter.Messaging.Nodes.Broker
             }
         }
 
+        protected override void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                Notify(ConnectionOpened, e);
+            }
+        }
+
+        protected override void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                Notify(ConnectionClosed, e);
+            }
+        }
+
         private void Send(EBrokerRequest request, string[] messageTypes)
         {
             using (EneterTrace.Entering())
@@ -230,6 +248,24 @@ namespace Eneter.Messaging.Nodes.Broker
             }
         }
 
+        private void Notify(EventHandler<DuplexChannelEventArgs> handler, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                if (handler != null)
+                {
+                    try
+                    {
+                        handler(this, e);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+                    }
+                }
+            }
+        }
+
 
         private ISerializer mySerializer;
         private string myDuplexOutputChannelId = "";
@@ -242,6 +278,5 @@ namespace Eneter.Messaging.Nodes.Broker
                 return GetType().Name + " '" + myDuplexOutputChannelId + "' ";
             }
         }
-
     }
 }

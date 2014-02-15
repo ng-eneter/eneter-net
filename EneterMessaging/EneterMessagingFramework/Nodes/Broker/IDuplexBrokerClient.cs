@@ -7,7 +7,7 @@
 
 using System;
 using Eneter.Messaging.Infrastructure.Attachable;
-using System.Collections.Generic;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.Messaging.Nodes.Broker
 {
@@ -20,6 +20,9 @@ namespace Eneter.Messaging.Nodes.Broker
     /// </remarks>
     public interface IDuplexBrokerClient : IAttachableDuplexOutputChannel
     {
+        event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
+        event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
+
         /// <summary>
         /// The event is invoked when the observed event is received from the broker.
         /// </summary>

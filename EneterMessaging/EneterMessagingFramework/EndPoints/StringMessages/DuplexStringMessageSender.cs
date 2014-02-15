@@ -18,53 +18,6 @@ namespace Eneter.Messaging.EndPoints.StringMessages
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
         public event EventHandler<StringResponseReceivedEventArgs> ResponseReceived;
 
-        public override void AttachDuplexOutputChannel(IDuplexOutputChannel duplexOutputChannel)
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    try
-                    {
-                        duplexOutputChannel.ConnectionOpened += OnConnectionOpened;
-                        duplexOutputChannel.ConnectionClosed += OnConnectionClosed;
-                        base.AttachDuplexOutputChannel(duplexOutputChannel);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            DetachDuplexOutputChannel();
-                        }
-                        catch
-                        {
-                        }
-
-                        throw;
-                    }
-                }
-            }
-        }
-
-        public override void DetachDuplexOutputChannel()
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    IDuplexOutputChannel anAttachedDuplexOutputChannel = AttachedDuplexOutputChannel;
-
-                    base.DetachDuplexOutputChannel();
-
-                    if (anAttachedDuplexOutputChannel != null)
-                    {
-                        anAttachedDuplexOutputChannel.ConnectionOpened -= OnConnectionOpened;
-                        anAttachedDuplexOutputChannel.ConnectionClosed -= OnConnectionClosed;
-                    }
-                }
-            }
-        }
-
         public void SendMessage(string message)
         {
             using (EneterTrace.Entering())
@@ -116,7 +69,7 @@ namespace Eneter.Messaging.EndPoints.StringMessages
             }
         }
 
-        private void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
+        protected override void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
@@ -124,7 +77,7 @@ namespace Eneter.Messaging.EndPoints.StringMessages
             }
         }
 
-        private void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
+        protected override void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
@@ -149,8 +102,6 @@ namespace Eneter.Messaging.EndPoints.StringMessages
                 }
             }
         }
-
-        private object myConnectionManipulatorLock = new object();
 
         protected override string TracedObject
         {

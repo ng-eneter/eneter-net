@@ -28,53 +28,6 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
-        public override void AttachDuplexOutputChannel(IDuplexOutputChannel duplexOutputChannel)
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    try
-                    {
-                        duplexOutputChannel.ConnectionOpened += OnConnectionOpened;
-                        duplexOutputChannel.ConnectionClosed += OnConnectionClosed;
-                        base.AttachDuplexOutputChannel(duplexOutputChannel);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            DetachDuplexOutputChannel();
-                        }
-                        catch
-                        {
-                        }
-
-                        throw;
-                    }
-                }
-            }
-        }
-
-        public override void DetachDuplexOutputChannel()
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    IDuplexOutputChannel anAttachedDuplexOutputChannel = AttachedDuplexOutputChannel;
-
-                    base.DetachDuplexOutputChannel();
-
-                    if (anAttachedDuplexOutputChannel != null)
-                    {
-                        anAttachedDuplexOutputChannel.ConnectionOpened -= OnConnectionOpened;
-                        anAttachedDuplexOutputChannel.ConnectionClosed -= OnConnectionClosed;
-                    }
-                }
-            }
-        }
-
         public void SendRequestMessage(_RequestType message)
         {
             using (EneterTrace.Entering())
@@ -133,7 +86,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
-        private void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
+        protected override void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
@@ -141,7 +94,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
-        private void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
+        protected override void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
@@ -169,7 +122,6 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
 
         private ISerializer mySerializer;
-        private object myConnectionManipulatorLock = new object();
 
         protected override string TracedObject
         {

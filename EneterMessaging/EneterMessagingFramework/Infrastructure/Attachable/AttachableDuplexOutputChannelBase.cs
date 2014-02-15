@@ -60,6 +60,8 @@ namespace Eneter.Messaging.Infrastructure.Attachable
                         finally
                         {
                             // Detach the event handler.
+                            AttachedDuplexOutputChannel.ConnectionOpened -= OnConnectionOpened;
+                            AttachedDuplexOutputChannel.ConnectionClosed -= OnConnectionClosed;
                             AttachedDuplexOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
                             AttachedDuplexOutputChannel = null;
                         }
@@ -110,11 +112,16 @@ namespace Eneter.Messaging.Infrastructure.Attachable
                     }
 
                     AttachedDuplexOutputChannel = duplexOutputChannel;
+                    AttachedDuplexOutputChannel.ConnectionOpened += OnConnectionOpened;
+                    AttachedDuplexOutputChannel.ConnectionClosed += OnConnectionClosed;
                     AttachedDuplexOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
                 }
             }
         }
 
+        protected abstract void OnConnectionOpened(object sender, DuplexChannelEventArgs e);
+
+        protected abstract void OnConnectionClosed(object sender, DuplexChannelEventArgs e);
 
         protected abstract void OnResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e);
 

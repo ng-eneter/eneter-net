@@ -111,56 +111,6 @@ namespace Eneter.Messaging.EndPoints.Rpc
         public TServiceInterface Proxy { get; private set; }
 #endif
 
-        public override void AttachDuplexOutputChannel(IDuplexOutputChannel duplexOutputChannel)
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    duplexOutputChannel.ConnectionOpened += OnConnectionOpened;
-                    duplexOutputChannel.ConnectionClosed += OnConnectionClosed;
-
-                    try
-                    {
-                        base.AttachDuplexOutputChannel(duplexOutputChannel);
-                    }
-                    catch
-                    {
-                        EneterTrace.Error(TracedObject + "failed to attach duplex output channel.");
-
-                        try
-                        {
-                            DetachDuplexOutputChannel();
-                        }
-                        catch
-                        {
-                        }
-
-                        throw;
-                    }
-                }
-            }
-        }
-
-        public override void DetachDuplexOutputChannel()
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    IDuplexOutputChannel anAttachedDuplexOutputChannel = AttachedDuplexOutputChannel;
-
-                    base.DetachDuplexOutputChannel();
-
-                    if (anAttachedDuplexOutputChannel != null)
-                    {
-                        anAttachedDuplexOutputChannel.ConnectionOpened -= OnConnectionOpened;
-                        anAttachedDuplexOutputChannel.ConnectionClosed -= OnConnectionClosed;
-                    }
-                }
-            }
-        }
-
         public void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler)
             where TEventArgs : EventArgs
         {
@@ -188,8 +138,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
-
-        private void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
+        protected override void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
@@ -210,7 +159,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
-        private void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
+        protected override void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
@@ -573,7 +522,6 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private int myCounter;
         private Dictionary<int, RemoteCallContext> myPendingRemoteCalls = new Dictionary<int, RemoteCallContext>();
         private IThreadDispatcher myRaiseEventInvoker;
-        private object myConnectionManipulatorLock = new object();
         private TimeSpan myRpcTimeout;
 
         private Dictionary<string, RemoteMethod> myRemoteMethods = new Dictionary<string, RemoteMethod>();

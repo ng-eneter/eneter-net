@@ -27,6 +27,9 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             public string ResponseReceiverId { get; set; }
         }
 
+        public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
+        public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
+
         public DuplexChannelWrapper(ISerializer serializer)
         {
             using (EneterTrace.Entering())
@@ -172,6 +175,22 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             }
         }
 
+        protected override void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                Notify(ConnectionOpened, e);
+            }
+        }
+
+        protected override void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                Notify(ConnectionClosed, e);
+            }
+        }
+
         /// <summary>
         /// The method is called when a reponse message is received from the duplex output channel.
         /// The received response is unwrapped and sent as a response to the matching duplex input channel.
@@ -249,6 +268,24 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                     myDuplexInputChannels[duplexInputChannel.ChannelId] = new TDuplexInputChannel(duplexInputChannel);
 
                     duplexInputChannel.MessageReceived += OnMessageReceived;
+                }
+            }
+        }
+
+        private void Notify(EventHandler<DuplexChannelEventArgs> handler, DuplexChannelEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                if (handler != null)
+                {
+                    try
+                    {
+                        handler(this, e);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+                    }
                 }
             }
         }

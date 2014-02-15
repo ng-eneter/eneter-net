@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.EndPoints.StringMessages
 {
     /// <summary>
-    /// Functionality to send and receive simple text messages.
+    /// Sending and receiving simple text messages.
     /// </summary>
     /// <example>
     /// For more details see example:

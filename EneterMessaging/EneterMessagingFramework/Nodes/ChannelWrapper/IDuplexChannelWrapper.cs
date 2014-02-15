@@ -7,6 +7,7 @@
 
 using System;
 using Eneter.Messaging.Infrastructure.Attachable;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.Messaging.Nodes.ChannelWrapper
 {
@@ -25,5 +26,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
     public interface IDuplexChannelWrapper : IAttachableMultipleDuplexInputChannels,
                                              IAttachableDuplexOutputChannel
     {
+        event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
+        event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
     }
 }
