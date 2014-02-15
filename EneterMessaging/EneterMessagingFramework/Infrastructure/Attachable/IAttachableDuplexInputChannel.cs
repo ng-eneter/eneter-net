@@ -10,11 +10,11 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Infrastructure.Attachable
 {
     /// <summary>
-    /// The interface declares methods to attach/detach one IDuplexInputChannel.
+    /// Declares methods to attach/detach one IDuplexInputChannel.
     /// </summary>
     /// <remarks>
-    /// The duplex input channel is used in the request-response communication by a listener
-    /// to receive request messages and send back response messages.
+    /// Communication components implementing this interface can attach the duplex input channel and
+    /// receive messages and sends response messages.
     /// </remarks>
     public interface IAttachableDuplexInputChannel
     {

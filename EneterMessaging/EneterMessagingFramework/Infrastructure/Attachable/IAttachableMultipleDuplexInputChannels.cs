@@ -13,24 +13,26 @@ using Eneter.Messaging.Nodes.Dispatcher;
 namespace Eneter.Messaging.Infrastructure.Attachable
 {
     /// <summary>
-    /// The interface declares methods to attach/detach multiple IDuplexInputChannel.
+    /// Declares methods to attach/detach multiple IDuplexInputChannel.
     /// </summary>
     /// <remarks>
-    /// Some comunication components need to attach several channels. E.g. <see cref="IDuplexDispatcher"/>. <br/>
-    /// Component using multiple duplex input channels is used in request-response communication and is
-    /// able to listen to requests on more channels (addresses) and send back (to the right sender) the response message.
+    /// Communication components implementing this interface can attach multiple duplex input channels and listens via them to messages.
     /// </remarks>
     public interface IAttachableMultipleDuplexInputChannels
     {
         /// <summary>
         /// Attaches the duplex input channel nad starts listening to messages.
         /// </summary>
+        /// <param name="duplexInputChannel">duplex input channel to be attached</param>
         void AttachDuplexInputChannel(IDuplexInputChannel duplexInputChannel);
 
         /// <summary>
         /// Detaches the duplex input channel.
-        /// Detaching the input channel stops listening to the messages.
         /// </summary>
+        /// <remarks>
+        /// Detaching the input channel stops listening to the messages.
+        /// It releases listening threads.
+        /// </remarks>
         void DetachDuplexInputChannel();
 
         /// <summary>

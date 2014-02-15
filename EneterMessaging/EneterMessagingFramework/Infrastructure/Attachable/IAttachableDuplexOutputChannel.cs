@@ -10,11 +10,11 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Infrastructure.Attachable
 {
     /// <summary>
-    /// The interface declares methods to attach/detach one IDuplexOutputChannel.
+    /// Declares methods to attach/detach one IDuplexOutputChannel.
     /// </summary>
     /// <remarks>
-    /// The duplex output channel is used in the request-response communication by a sender
-    /// to send request messages and receive response messages.
+    /// Communication components implementing this interface can attach the duplex output channel and
+    /// sends messages and receive response messages.
     /// </remarks>
     public interface IAttachableDuplexOutputChannel
     {
@@ -32,11 +32,6 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         /// <summary>
         /// Returns true if the reference to the duplex output channel is stored. <br/>
         /// </summary>
-        /// <remarks>
-        /// Notice, unlike version 1.0, the value 'true' does not mean the connection is open. If the duplex output
-        /// channel was successfuly attached but the connection was broken, the channel stays attached but the connection is not open.
-        /// To detect if the attached channel is listening to response messages, check the property <see cref="IDuplexOutputChannel.IsConnected"/>.
-        /// </remarks>
         bool IsDuplexOutputChannelAttached { get; }
 
         /// <summary>
