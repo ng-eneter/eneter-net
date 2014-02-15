@@ -13,7 +13,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
     /// <summary>
-    /// Thread processing messages from the queue.
+    /// Working thread which reads messages from the queue.
     /// </summary>
     /// <remarks>
     /// It provides a working thread processing messages from the queue.

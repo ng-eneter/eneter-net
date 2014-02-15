@@ -13,24 +13,28 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
     /// <summary>
-    /// Implements the queue for messages of type object.
-    /// One or more threads can put messages into the queue and other threads
-    /// can remove them.
-    /// If the queue is empty, then the thread reading messages is blocked until the message
-    /// is put to the queue or the thread is unblocked.
+    /// Queue for messages of type object.
     /// </summary>
+	/// <remarks>
+	/// One or more threads can put messages into the queue and other threads
+	/// can remove them.
+	/// If the queue is empty the thread reading messages is blocked until a message
+	/// is put to the queue or the thread is unblocked.
+	/// </remarks>
     public class MessageQueue : MessageQueue<object>
     {
     }
 
 
     /// <summary>
-    /// Implements the message queue.
-    /// One or more threads can put messages into the queue and other threads
-    /// can remove them.
-    /// If the queue is empty, then the thread reading the messages is blocked until the message
-    /// is put to the queue or the thread is unblocked.
+    /// Generic queue for messages.
     /// </summary>
+	/// <remarks>
+	/// One or more threads can put messages into the queue and other threads
+	/// can remove them.
+	/// If the queue is empty the thread reading messages is blocked until a message
+	/// is put to the queue or the thread is unblocked.
+	/// </remarks>
     /// <typeparam name="_MessageType">Type of the message.</typeparam>
     public class MessageQueue<_MessageType>
     {

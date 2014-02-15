@@ -12,8 +12,11 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.Rpc
 {
     /// <summary>
-    /// Declares client using remote procedure calls.
+    /// Declares client which can use Remote Procedure Calls (RPC) to communication with the service.
     /// </summary>
+    /// <remarks>
+    /// RpcClient acts as a proxy providing the communication functionality allowing a client to call methods exposed by the service.
+    /// </remarks>
     /// <typeparam name="TServiceInterface">Service interface.</typeparam>
     public interface IRpcClient<TServiceInterface> : IAttachableDuplexOutputChannel
         where TServiceInterface : class
@@ -30,12 +33,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
 #if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
-        /// Returns the proxy for the service.
+        /// Returns service proxy instance.
         /// </summary>
-        /// <remarks>
-        /// The returned instance provides the proxy for the service interface.
-        /// Calling of a method from the proxy will result to the communication with the service.
-        /// </remarks>
         TServiceInterface Proxy { get; }
 #endif
 
@@ -46,8 +45,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// <param name="eventName">name of the event</param>
         /// <param name="eventHandler">event handler processing the event</param>
         /// <remarks>
-        /// Use this method if subscribing via the proxy is not suitable. (E.g. the proxy is not supported in Silverlight)
-        /// If the method does not exist in the service interface the exception is thrown.
+        /// You can use this method for subscribing if you do not want to use the service proxy.
         /// </remarks>
         void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler) where TEventArgs : EventArgs;
 
@@ -57,21 +55,19 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// <param name="eventName">name of the event</param>
         /// <param name="eventHandler">event handler that shall be unsubscribed</param>
         /// <remarks>
-        /// Use this method if subscribing via the proxy is not suitable. (E.g. the proxy is not supported in Silverlight)
-        /// If the method does not exist in the service interface the exception is thrown.
+        /// You can use this method for unsubscribing if you do not want to use the service proxy.
         /// </remarks>
         void UnsubscribeRemoteEvent(string eventName, Delegate eventHandler);
 
 
         /// <summary>
-        /// Calls the method in the service.
+        /// Calls a method in the service.
         /// </summary>
-        /// <param name="methodName">name of the method</param>
+        /// <param name="methodName">name of the method that shall be called.</param>
         /// <param name="args">list of arguments</param>
         /// <returns>returned value. null if it returns 'void'</returns>
         /// <remarks>
-        /// Use this method if subscribing via the proxy is not suitable. (E.g. the proxy is not supported in Silverlight)
-        /// If the method does not exist in the service interface the exception is thrown.
+        /// You can use this method if you do not want to use the service proxy.
         /// </remarks>
         object CallRemoteMethod(string methodName, params object[] args);
     }
