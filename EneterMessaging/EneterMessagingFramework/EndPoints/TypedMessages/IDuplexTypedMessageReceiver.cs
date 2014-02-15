@@ -12,11 +12,10 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The interface declares the strongly typed duplex message receiver.
-    /// The receiver is able to receive messages of the specified type and send back response messages of specified type.
+    /// Declares receiver that receive messages of specified type and sends responses of specified type.
     /// </summary>
-    /// <typeparam name="_ResponseType">The type of sending response messages.</typeparam>
-    /// <typeparam name="_RequestType">The type of receiving messages.</typeparam>
+    /// <typeparam name="_ResponseType">sends response messages of this type.</typeparam>
+    /// <typeparam name="_RequestType">receives messages of this type.</typeparam>
     public interface IDuplexTypedMessageReceiver<_ResponseType, _RequestType> : IAttachableDuplexInputChannel
     {
         /// <summary>

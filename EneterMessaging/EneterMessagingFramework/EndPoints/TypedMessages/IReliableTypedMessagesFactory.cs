@@ -9,7 +9,7 @@
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The interface declares the factory to create reliable typed message sender and receiver.
+    /// Declares factory to create reliable sender and receiver.
     /// </summary>
     public interface IReliableTypedMessagesFactory
     {

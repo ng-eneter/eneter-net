@@ -12,9 +12,8 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The interface declares the strongly typed reliable message receiver.
-    /// The receiver is able to receive messages of the specified type and send back response messages of the specified type.
-    /// In addition it provides events notifying whether the respone message was delivered.
+    /// Declares the reliable message receiver that can send messages of specified type and sends back response messages of specified type.
+    /// Reliable means it provides events notifying whether the response message was delivered or not.
     /// The reliable typed message receiver can be used only with the reliable typed message sender.
     /// </summary>
     /// <typeparam name="_ResponseType">type of the response message</typeparam>
@@ -47,7 +46,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         event EventHandler<ReliableMessageIdEventArgs> ResponseMessageNotDelivered;
 
         /// <summary>
-        /// Sends the typed response message.
+        /// Sends the response message of specified type.
         /// </summary>
         /// <param name="responseReceiverId">identifies the response receiver</param>
         /// <param name="responseMessage">respone message</param>

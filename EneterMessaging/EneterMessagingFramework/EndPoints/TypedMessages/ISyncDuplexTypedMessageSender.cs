@@ -13,7 +13,9 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Message sender that sends a request message and then waits until the response is received.
+    /// Declares message sender that sends request messages of specified type and receive response messages of specified type.
+    /// Synchronous means it when the message is sent it waits until the response message is received.
+    /// If the waiting for the response message exceeds the specified timeout the TimeoutException is thrown.
     /// </summary>
     /// <typeparam name="TResponse">Response message type.</typeparam>
     /// <typeparam name="TRequest">Request message type.</typeparam>
@@ -22,24 +24,20 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// <summary>
         /// The event is raised when the connection with the receiver is open.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is invoked in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
         /// The event is raised when the connection with the receiver is closed.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is raised in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
         /// Sends the request message and returns the response.
         /// </summary>
+        /// <remarks>
+        /// It waits until the response message is received. If waiting for the response exceeds the specified timeout
+        /// TimeoutException is thrown.
+        /// </remarks>
         /// <param name="message">request message</param>
         /// <returns>response message</returns>
         TResponse SendRequestMessage(TRequest message);

@@ -12,7 +12,7 @@ using System;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Implements the factory to create duplex strongly typed message sender and receiver.
+    /// Implements factory to create typed message senders and receivers.
     /// </summary>
     /// <remarks>
     /// 
@@ -336,8 +336,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// Creates duplex typed message sender that can send request messages and receive response
         /// messages of specified type.
         /// </summary>
-        /// <typeparam name="_ResponseType">Type of receiving response messages.</typeparam>
-        /// <typeparam name="_RequestType">Type of sending messages.</typeparam>
+        /// <typeparam name="_ResponseType">Type of response messages.</typeparam>
+        /// <typeparam name="_RequestType">Type of request messages.</typeparam>
         /// <returns>duplex typed message sender</returns>
         public IDuplexTypedMessageSender<_ResponseType, _RequestType> CreateDuplexTypedMessageSender<_ResponseType, _RequestType>()
         {

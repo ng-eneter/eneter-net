@@ -12,29 +12,20 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The interface declares the strongly typed duplex message sender.
-    /// The duplex sender is able to send messages of the specified type and receive responses of the specified type.
+    /// Declares message sender that sends messages of specified type and receives responses of specified type. 
     /// </summary>
-    /// <typeparam name="_ResponseType">The type of receiving response messages.</typeparam>
-    /// <typeparam name="_RequestType">The type of sending messages.</typeparam>
+    /// <typeparam name="_ResponseType">receives response messages of this type.</typeparam>
+    /// <typeparam name="_RequestType">sends messages of this type.</typeparam>
     public interface IDuplexTypedMessageSender<_ResponseType, _RequestType> : IAttachableDuplexOutputChannel
     {
         /// <summary>
         /// The event is raised when the connection with the receiver is open.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is invoked in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
         /// The event is raised when the connection with the receiver is closed.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is raised in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
@@ -43,7 +34,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         event EventHandler<TypedResponseReceivedEventArgs<_ResponseType>> ResponseReceived;
 
         /// <summary>
-        /// Sends the strongly typed message.
+        /// Sends message of specified type.
         /// </summary>
         /// <param name="message"></param>
         void SendRequestMessage(_RequestType message);

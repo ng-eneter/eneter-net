@@ -12,7 +12,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Implements the factory to create reliable typed message sender and receiver.
+    /// Implements factory to create reliable sender and receiver.
     /// </summary>
     /// <remarks>
     /// The reliable messaging means that the sender of a message is notified whether the message was delivered or not.

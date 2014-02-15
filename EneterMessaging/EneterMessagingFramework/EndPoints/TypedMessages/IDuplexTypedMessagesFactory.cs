@@ -9,7 +9,7 @@
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The interface declares the factory that creates message senders and receivers.
+    /// Declares the factory to create typed message senders and receivers.
     /// </summary>
     public interface IDuplexTypedMessagesFactory
     {
