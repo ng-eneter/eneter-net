@@ -183,10 +183,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 {
                     // If the connection is properly established via handshaking.
                     Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, e, true);
-
                     return;
                 }
-                
+
+                bool aCloseConnectionFlag = false;
+
                 if (myIsHandshakeResponseSent)
                 {
                     // If the handshake was sent then this message must be acknowledgement.
@@ -198,16 +199,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         string anErrorMessage = TracedObject + "detected incorrect acknowledge message. The connection will be closed.";
                         EneterTrace.Error(anErrorMessage);
 
-                        myUnderlyingOutputChannel.CloseConnection();
-                        return;
+                        aCloseConnectionFlag = true;
                     }
+                    else
+                    {
+                        myIsConnectionAcknowledged = true;
+                        myConnectionAcknowledged.Set();
 
-                    myIsConnectionAcknowledged = true;
-                    myConnectionAcknowledged.Set();
-
-                    // Notify the connection is open.
-                    DuplexChannelEventArgs anEventArgs = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, e.SenderAddress);
-                    Notify<DuplexChannelEventArgs>(ConnectionOpened, anEventArgs, false);
+                        // Notify the connection is open.
+                        DuplexChannelEventArgs anEventArgs = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, e.SenderAddress);
+                        Notify<DuplexChannelEventArgs>(ConnectionOpened, anEventArgs, false);
+                    }
                 }
                 else
                     // This is the handshake message.
@@ -217,33 +219,40 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     try
                     {
                         aHandshakeResponseMessage = myGetHandshakeResponseMessageCallback(e.ChannelId, e.ResponseReceiverId, e.Message);
+                        aCloseConnectionFlag = (aHandshakeResponseMessage == null);
                     }
                     catch (Exception err)
                     {
                         string anErrorMessage = TracedObject + "failed to get the handshake response message. The connection will be closed.";
                         EneterTrace.Error(anErrorMessage, err);
 
-                        myUnderlyingOutputChannel.CloseConnection();
-                        return;
+                        aCloseConnectionFlag = true;
                     }
 
                     // Send back the response for the handshake.
-                    try
+                    if (!aCloseConnectionFlag)
                     {
-                        // Note: keep setting this flag before sending. Otherwise synchronous messaging will not work!
-                        myIsHandshakeResponseSent = true;
-                        myUnderlyingOutputChannel.SendMessage(aHandshakeResponseMessage);
-                    }
-                    catch (Exception err)
-                    {
-                        myIsHandshakeResponseSent = false;
+                        try
+                        {
+                            // Note: keep setting this flag before sending. Otherwise synchronous messaging will not work!
+                            myIsHandshakeResponseSent = true;
+                            myUnderlyingOutputChannel.SendMessage(aHandshakeResponseMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            myIsHandshakeResponseSent = false;
 
-                        string anErrorMessage = TracedObject + "failed to send the handshake response message. The connection will be closed.";
-                        EneterTrace.Error(anErrorMessage, err);
+                            string anErrorMessage = TracedObject + "failed to send the handshake response message. The connection will be closed.";
+                            EneterTrace.Error(anErrorMessage, err);
 
-                        myUnderlyingOutputChannel.CloseConnection();
-                        return;
+                            aCloseConnectionFlag = true;
+                        }
                     }
+                }
+
+                if (aCloseConnectionFlag)
+                {
+                    myUnderlyingOutputChannel.CloseConnection();
                 }
             }
         }
