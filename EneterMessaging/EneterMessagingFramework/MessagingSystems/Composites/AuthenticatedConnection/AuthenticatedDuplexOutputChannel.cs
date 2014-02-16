@@ -97,6 +97,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                             EneterTrace.Error(anErrorMessage);
                             throw new TimeoutException(anErrorMessage);
                         }
+
+                        if (!IsConnected)
+                        {
+                            String anErrorMessage = TracedObject + ErrorHandler.OpenConnectionFailure;
+                            EneterTrace.Error(anErrorMessage);
+                            throw new InvalidOperationException(anErrorMessage);
+                        }
                     }
                     catch
                     {
@@ -157,10 +164,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 // If the connection was authenticated then notify that it was closed.
                 bool aCloseNotifyFlag = myIsConnectionAcknowledged;
 
+                // If there is waiting for connection open release it.
+                myConnectionAcknowledged.Set();
                 lock (myConnectionManipulatorLock)
                 {
-                    // If there is waiting for connection open release it.
-                    myConnectionAcknowledged.Set();
                     myIsHandshakeResponseSent = false;
                     myIsConnectionAcknowledged = false;
                 }
