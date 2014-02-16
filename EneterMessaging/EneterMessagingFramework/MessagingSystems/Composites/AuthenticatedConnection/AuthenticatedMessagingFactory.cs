@@ -82,7 +82,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             using (EneterTrace.Entering())
             {
                 myUnderlyingMessaging = underlyingMessagingSystem;
-                AuthenticationTimeout = TimeSpan.FromMilliseconds(10000);
+                AuthenticationTimeout = TimeSpan.FromMilliseconds(30000);
 
                 myGetLoginMessageCallback = getLoginMessageCallback;
                 myGetHandShakeMessageCallback = getHandshakeMessageCallback;
