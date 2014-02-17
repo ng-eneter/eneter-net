@@ -10,21 +10,21 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
     /// <summary>
-    /// Provides the messaging system which buffers sent messages if the connection is not available.
+    /// Buffering of sent messages if the connection is not available.
     /// </summary>
     /// <remarks>
-    /// The buffered messaging is intended to temporarily store sent messages while the network connection is not available.
+    /// The buffered messaging is intended to temporarily store sent messages until the network connection is established.<br/>
     /// Typical scenarios are:
     /// <br/><br/>
     /// <b>Short disconnections</b><br/>
-    /// The network connection is unstable and can be interrupted. In case of the disconnection, the sent messages are stored
-    /// in the buffer while the connection tries to be automatically reopen. If the reopen is successful and the connection
-    /// is established, the messages are sent from the buffer.
+    /// In case of unstable the network the connection can broken. Buffered messaging will try to reconnect the broken connection
+    /// and meanwhile it will store sent messages in the buffer. Then when the connection is repaired it will send messages from
+    /// the buffer.
     /// <br/><br/>
     /// <b>Independent startup order</b><br/>
-    /// The communicating applications starts in undefined order and initiates the communication. In case the application receiving
-    /// messages is not up, the sent messages are stored in the buffer. Then when the receiving application is running, the messages
-    /// are automatically sent from the buffer.
+    /// It can be tricky to start communicating application in a defined order. Buffered messaging allows to start
+    /// applications in undefined order. If messages are sent to an application which is not started yet they will be stored
+    /// in the buffer until the application is started.
     /// 
     /// <example>
     /// Simple client buffering messages in case of a disconnection.
