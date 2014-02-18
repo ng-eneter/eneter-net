@@ -59,8 +59,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         }
 
 
-		public event EventHandler<MessageBusServiceEventArgs> ServiceConnected;
-		public event EventHandler<MessageBusServiceEventArgs> ServiceDisconnected;
+		public event EventHandler<MessageBusServiceEventArgs> ServiceRegistered;
+		public event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
 
         public MessageBus(IProtocolFormatter protocolFormatter)
@@ -102,6 +102,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     myClientConnector.DetachDuplexInputChannel();
                     myServiceConnector.DetachDuplexInputChannel();
+
+                    // Note: make sure 'lock (myAttachDetachLock)' is never used from 'lock (myConnectionsLock)'.
+                    lock (myConnectionsLock)
+                    {
+                        myConnectedClients.Clear();
+                        myConnectedServices.Clear();
+                    }
                 }
             }
         }
@@ -305,12 +312,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 RegisterService(e.ResponseReceiverId);
 
-				if (ServiceConnected != null)
+				if (ServiceRegistered != null)
 				{
 					try
 					{
 						MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
-						ServiceConnected(this, anEvent);
+						ServiceRegistered(this, anEvent);
 					}
 					catch (Exception err)
 					{
@@ -327,12 +334,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 UnregisterService(e.ResponseReceiverId);
 
-				if (ServiceDisconnected != null)
+				if (ServiceUnregistered != null)
 				{
 					try
 					{
 						MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
-						ServiceDisconnected(this, anEvent);
+						ServiceUnregistered(this, anEvent);
 					}
 					catch (Exception err)
 					{

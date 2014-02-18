@@ -13,8 +13,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     public interface IMessageBus
     {
-		event EventHandler<MessageBusServiceEventArgs> ServiceConnected;
-		event EventHandler<MessageBusServiceEventArgs> ServiceDisconnected;
+		event EventHandler<MessageBusServiceEventArgs> ServiceRegistered;
+		event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
         void AttachDuplexInputChannels(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel);
         void DetachDuplexInputChannels();
