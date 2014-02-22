@@ -14,7 +14,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
     /// <summary>
-    /// Declares the load balancer.
+    /// Load balancer.
     /// </summary>
     /// <remarks>
     /// The load balancer maintains a list of receivers processing a certain request.

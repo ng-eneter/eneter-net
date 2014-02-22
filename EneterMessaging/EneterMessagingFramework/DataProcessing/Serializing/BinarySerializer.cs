@@ -19,7 +19,7 @@ using System.Reflection;
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
     /// <summary>
-    /// Implements the serialization/deserialization to/from sequence of bytes.
+    /// Serializes data into .NET specific byte sequence.
     /// </summary>
     /// <remarks>
     /// The serializer internally uses BinaryFormatter provided by .Net.

@@ -10,7 +10,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Infrastructure.Attachable
 {
     /// <summary>
-    /// Declares methods to attach/detach one IDuplexInputChannel.
+    /// Interface for components which want to attach one IDuplexInputChannel.
     /// </summary>
     /// <remarks>
     /// Communication components implementing this interface can attach the duplex input channel and

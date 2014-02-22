@@ -10,7 +10,7 @@ using System;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Declares dispatcher that is responsible for invoking methods according to desired threading model.
+    /// Threading mode used by messaging systems to raise events and deliver messages.
     /// </summary>
     public interface IThreadDispatcher
     {

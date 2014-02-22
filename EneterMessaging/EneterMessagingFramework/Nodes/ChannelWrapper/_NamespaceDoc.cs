@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.Nodes.ChannelWrapper
 {
     /// <summary>
-    /// Functionality for sending/receiving more message types via one channel.
+    /// Reducing communication via multiple channels into one channel.
     /// </summary>
     /// <remarks>
     /// The channel wrapper and unwrapper are components allowing to send/receive different types of messages via one channel.

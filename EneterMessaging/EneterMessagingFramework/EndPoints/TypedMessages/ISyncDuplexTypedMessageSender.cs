@@ -13,10 +13,13 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
+    /// Synchronized sender of typed messages (it waits until the response is received).
+    /// </summary>
+    /// <remarks>
     /// Declares message sender that sends request messages of specified type and receive response messages of specified type.
     /// Synchronous means it when the message is sent it waits until the response message is received.
     /// If the waiting for the response message exceeds the specified timeout the TimeoutException is thrown.
-    /// </summary>
+    /// </remarks>
     /// <typeparam name="TResponse">Response message type.</typeparam>
     /// <typeparam name="TRequest">Request message type.</typeparam>
     public interface ISyncDuplexTypedMessageSender<TResponse, TRequest> : IAttachableDuplexOutputChannel

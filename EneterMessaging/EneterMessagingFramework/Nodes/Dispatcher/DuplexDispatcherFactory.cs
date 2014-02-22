@@ -11,7 +11,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.Dispatcher
 {
     /// <summary>
-    /// Implements the factory to create the bidirectional dispatcher.
+    /// Implements factory to create the dispatcher.
     /// </summary>
     public class DuplexDispatcherFactory : IDuplexDispatcherFactory
     {

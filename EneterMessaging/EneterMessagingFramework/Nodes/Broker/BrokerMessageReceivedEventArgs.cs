@@ -10,7 +10,7 @@ using System;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// The event arguments of the received message from the broker.
+    /// Event arguments of the received message from the broker.
     /// </summary>
     public sealed class BrokerMessageReceivedEventArgs : EventArgs
     {

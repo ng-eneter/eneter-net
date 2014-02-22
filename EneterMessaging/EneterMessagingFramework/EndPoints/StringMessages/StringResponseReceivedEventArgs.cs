@@ -10,7 +10,7 @@ using System;
 namespace Eneter.Messaging.EndPoints.StringMessages
 {
     /// <summary>
-    /// The event is invoked when a string response message is received.
+    /// Event type for text response message is received.
     /// </summary>
     public sealed class StringResponseReceivedEventArgs : EventArgs
     {

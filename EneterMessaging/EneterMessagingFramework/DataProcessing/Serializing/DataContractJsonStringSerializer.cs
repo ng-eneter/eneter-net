@@ -18,10 +18,12 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
     /// <summary>
-    /// Implements the serialization/deserialization to/from JSON string.
+    /// Serializes data into JSON.
+    /// </summary>
+    /// <remarks>
     /// The serializer is based on DataContractJsonSerializer provided by .Net and it supports
     /// attributes (DataContract, DataMember, ...) specifying how data is serialized/deserialized.
-    /// </summary>
+    /// </remarks>
     public class DataContractJsonStringSerializer : ISerializer
     {
         /// <summary>

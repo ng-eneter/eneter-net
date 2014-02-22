@@ -13,36 +13,22 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
     /// <summary>
-    /// Queue for messages of type object.
+    /// Memory message queue.
     /// </summary>
-	/// <remarks>
-	/// One or more threads can put messages into the queue and other threads
-	/// can remove them.
-	/// If the queue is empty the thread reading messages is blocked until a message
-	/// is put to the queue or the thread is unblocked.
-	/// </remarks>
-    public class MessageQueue : MessageQueue<object>
-    {
-    }
-
-
-    /// <summary>
-    /// Generic queue for messages.
-    /// </summary>
-	/// <remarks>
-	/// One or more threads can put messages into the queue and other threads
-	/// can remove them.
-	/// If the queue is empty the thread reading messages is blocked until a message
-	/// is put to the queue or the thread is unblocked.
-	/// </remarks>
-    /// <typeparam name="_MessageType">Type of the message.</typeparam>
-    public class MessageQueue<_MessageType>
+    /// <remarks>
+    /// One or more threads can put messages into the queue and other threads
+    /// can remove them.
+    /// If the queue is empty the thread reading messages is blocked until a message
+    /// is put to the queue or the thread is unblocked.
+    /// </remarks>
+    /// <typeparam name="TMessage">Type of the message.</typeparam>
+    public class MessageQueue<TMessage>
     {
         /// <summary>
         /// Puts message to the queue.
         /// </summary>
         /// <param name="message">message that shall be enqueued</param>
-        public void EnqueueMessage(_MessageType message)
+        public void EnqueueMessage(TMessage message)
         {
             using (EneterTrace.Entering())
             {
@@ -67,7 +53,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// To unblock waiting threads, use UnblockProcesseingThreads().
         /// </summary>
         /// <returns>message, it returns null if the waiting thread was unblocked but there is no message in the queue.</returns>
-        public _MessageType DequeueMessage()
+        public TMessage DequeueMessage()
         {
             using (EneterTrace.Entering())
             {
@@ -82,7 +68,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// <returns>
         /// message, it returns null if the waiting thread was unblocked but there is no message in the queue.
         /// </returns>
-        public _MessageType PeekMessage()
+        public TMessage PeekMessage()
         {
             using (EneterTrace.Entering())
             {
@@ -97,7 +83,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// <param name="millisecondsTimeout">Maximum waiting time for the message. If the time is exceeded the TimeoutException is thrown.</param>
         /// <returns>message</returns>
         /// <exception cref="TimeoutException">when the specified timeout is exceeded</exception>
-        public _MessageType DequeueMessage(int millisecondsTimeout)
+        public TMessage DequeueMessage(int millisecondsTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -114,7 +100,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// </param>
         /// <returns>message</returns>
         /// <exception cref="TimeoutException">when the specified timeout is exceeded</exception>
-        public _MessageType PeekMessage(int millisecondsTimeout)
+        public TMessage PeekMessage(int millisecondsTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -211,7 +197,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// </summary>
         /// <param name="func"></param>
         /// <returns></returns>
-        private _MessageType WaitForQueueCall(Func<_MessageType> func)
+        private TMessage WaitForQueueCall(Func<TMessage> func)
         {
             using (EneterTrace.Entering())
             {
@@ -230,7 +216,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
 
                     if (myMessageQueue.Count == 0)
                     {
-                        return default(_MessageType);
+                        return default(TMessage);
                     }
 
                     return func();
@@ -238,7 +224,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
             }
         }
 
-        private _MessageType WaitForQueueCall(Func<_MessageType> func, int millisecondsTimeout)
+        private TMessage WaitForQueueCall(Func<TMessage> func, int millisecondsTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -260,7 +246,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
 
                     if (myMessageQueue.Count == 0)
                     {
-                        return default(_MessageType);
+                        return default(TMessage);
                     }
 
                     return func();
@@ -271,7 +257,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// <summary>
         /// Queue for messages.
         /// </summary>
-        private Queue<_MessageType> myMessageQueue = new Queue<_MessageType>();
+        private Queue<TMessage> myMessageQueue = new Queue<TMessage>();
 
         /// <summary>
         /// Indicates weather the reading from the queue blocks until data is available.

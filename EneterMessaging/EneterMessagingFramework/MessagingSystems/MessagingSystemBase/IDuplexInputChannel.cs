@@ -11,7 +11,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Declares the duplex input channel that can receive messages from the duplex output channel and send back response messages.
+    /// Duplex input channel that can receive messages from the duplex output channel and send response messages.
     /// </summary>
     public interface IDuplexInputChannel
     {
@@ -32,8 +32,10 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 
         /// <summary>
         /// Returns id of this duplex input channel.
-        /// The id represents the 'address' the duplex input channel is listening to.
         /// </summary>
+        /// <remarks>
+        /// The id represents the 'address' the duplex input channel is listening to.
+        /// </remarks>
         string ChannelId { get; }
 
         /// <summary>
@@ -69,10 +71,8 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         /// </summary>
         /// <remarks>
         /// Dispatcher is responsible for raising ResponseReceiverConnected, ResponseReceiverDisconnected and MessageReceived events
-        /// in desired thread. It allows to specify which threading mechanism/model is used to raise asynchronous events.
-        /// E.g. events are queued and raised by one thread. Or e.g. in Silverlight events can be raised in the Silverlight thread.<br/>
-        /// The only exception is the event ResponseReceiverConnecting which is not dispatched to any specific thread because
-        /// it may set a value which needs to be checked when it returns.
+        /// according to desired thread model.
+        /// E.g. events are queued and raised by one particular thread.
         /// </remarks>
         IThreadDispatcher Dispatcher { get; }
     }

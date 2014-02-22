@@ -16,10 +16,12 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
     /// <summary>
-    /// Implements the serialization/deserialization to/from an xml string.
+    /// Serializes data to XML using the DataContractSerializer.
+    /// </summary>
+    /// <remarks>
     /// The serializer is based on DataContractSerializer provided by .Net and it supports
     /// attributes (DataContract, DataMember, ...) specifying how data is serialized/deserialized.
-    /// </summary>
+    /// </remarks>
     public class DataContractXmlStringSerializer : ISerializer
     {
         /// <summary>

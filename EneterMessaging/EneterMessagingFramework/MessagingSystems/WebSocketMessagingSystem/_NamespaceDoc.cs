@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages via WebSockets.
+    /// Communication via Websockets.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

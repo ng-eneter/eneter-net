@@ -12,13 +12,13 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Implements factory to create reliable sender and receiver.
+    /// Factory to create reliable typed message senders and receivers.
     /// </summary>
     /// <remarks>
-    /// The reliable messaging means that the sender of a message is notified whether the message was delivered or not.
+    /// The reliable messaging means that the sender is notified whether the message was delivered or not.
     /// <example>
-    /// Service using the reliable communication. When it sends the response message it is notified whether the message
-    /// was delivered or not.
+    /// Example of a simple service using the reliable messaging for the communication.
+    /// (The service calculates two numbers and sends back responses.)
     /// <code>
     /// using System;
     /// using Eneter.Messaging.EndPoints.TypedMessages;
@@ -102,8 +102,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     /// </example>
     /// 
     /// <example>
-    /// Client using the reliable communication. When it sends the request message it is notified whether
-    /// it was delivered or not.
+    /// Example showing a simple client using reliable messaging for the communication.
+    /// (The client sends a request to calculate two numbers.)
     /// <code>
     /// using System;
     /// using System.Windows.Forms;

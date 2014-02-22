@@ -10,7 +10,7 @@ using System;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The event when the typed message is received.
+    /// Event argument used when the typed message is received.
     /// </summary>
     /// <typeparam name="_RequestMessageType"></typeparam>
     public sealed class TypedRequestReceivedEventArgs<_RequestMessageType> : EventArgs

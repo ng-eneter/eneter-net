@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
     /// <summary>
-    /// Functionality to serialize or deserialize messages or data.
+    /// Message serializers.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

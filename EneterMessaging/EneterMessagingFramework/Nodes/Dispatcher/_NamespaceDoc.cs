@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.Nodes.Dispatcher
 {
     /// <summary>
-    /// Functionality for the component forwarding messages to all attached receivers.
+    /// Multiplying and forwarding of received messages. 
     /// </summary>
     /// <remarks>
     /// Receives messages and forwards them to all attached receivers.

@@ -14,7 +14,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
     /// <summary>
-    /// Provides the messaging system which monitors the connection in the underlying messaging system.
+    /// Extension providing the connection monitoring.
     /// </summary>
     /// <remarks>
     /// When the connection is monitored, the duplex output channel periodically sends 'ping' messages
@@ -89,7 +89,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// <see cref="IDuplexOutputChannel.ConnectionClosed"/> is invoked.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
-        /// <returns>composit duplex output channel <see cref="ICompositeDuplexOutputChannel"/></returns>
+        /// <returns>monitoring duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
             using (EneterTrace.Entering())
@@ -109,7 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">response receiver id of the channel</param>
-        /// <returns>composit duplex output channel <see cref="ICompositeDuplexOutputChannel"/></returns>
+        /// <returns>monitoring duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
@@ -129,7 +129,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// is invoked.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
-        /// <returns>composit duplex input channel <see cref="ICompositeDuplexInputChannel"/></returns>
+        /// <returns>monitoring duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
             using (EneterTrace.Entering())

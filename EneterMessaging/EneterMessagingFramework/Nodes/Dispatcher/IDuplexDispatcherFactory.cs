@@ -9,15 +9,15 @@
 namespace Eneter.Messaging.Nodes.Dispatcher
 {
     /// <summary>
-    /// Declares the factory to create the bidirectional dispatcher.
+    /// Creates the dispatcher.
     /// </summary>
     /// <remarks>
-    /// The bidirectional dispatcher sends messages to all duplex output channels and also can route back response messages.
+    /// The dispatcher sends messages to all duplex output channels and also can route back response messages.
     /// </remarks>
     public interface IDuplexDispatcherFactory
     {
         /// <summary>
-        /// Creates the duplex dispatcher.
+        /// Creates the dispatcher.
         /// </summary>
         /// <returns>duplex dispatcher</returns>
         IDuplexDispatcher CreateDuplexDispatcher();

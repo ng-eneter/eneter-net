@@ -210,6 +210,7 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitorChannelMessage.cs">
       <SubType>Code</SubType>

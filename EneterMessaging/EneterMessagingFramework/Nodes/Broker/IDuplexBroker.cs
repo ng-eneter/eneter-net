@@ -11,9 +11,11 @@ using Eneter.Messaging.Infrastructure.Attachable;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// The interface declares the broker.
-    /// The broker receives messages and forwards them to subscribed clients.
+    /// Broker component (for publish-subscribe scenarios).
     /// </summary>
+    /// <remarks>
+    /// The broker receives messages and forwards them to subscribed clients.
+    /// </remarks>
     public interface IDuplexBroker : IAttachableDuplexInputChannel
     {
         /// <summary>

@@ -19,16 +19,27 @@ using System.Threading;
 namespace Eneter.Messaging.Diagnostic
 {
     /// <summary>
-    /// Implements the functionality for tracing messages.
+    /// Super duper trace.
     /// </summary>
     /// <remarks>
-    /// The EneterTrace allows to trace error messages, warning message, info messages and debug messages.
-    /// It also allows to trace entering and leaving from a method and measures the time spent in the method.
-    /// In order to trace entering - leaving and debug messages, you must set the detail level to 'Debug'.<br/>
+    /// <example>
+    /// Example showing how to enable tracing of communication errors and warnings to a file:
+    /// <code>
+    /// EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Short;
+    /// EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+    /// </code>
+    /// </example>
+    /// <example>
+    /// Example showing how to enable tracing of detailed communication sequence to a file:
+    /// <code>
+    /// EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+    /// EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+    /// </code>
+    /// </example>
     /// <br/>
     /// Notice: The trace does not display namespaces and method names in Compact Framework platform.
     /// <example>
-    /// Tracing entering and leaving and a warning message.
+    /// Example showing how you can trace entering/leaving methods:
     /// <code>
     /// private class MyClass
     /// {

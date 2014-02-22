@@ -9,12 +9,12 @@
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
     /// <summary>
-    /// The interface declares the API for serialization and deserialization.
+    /// Declares the serializer.
     /// </summary>
     public interface ISerializer
     {
         /// <summary>
-        /// Serializes data to object.
+        /// Serializes data.
         /// </summary>
         /// <typeparam name="_T">Type of serialized data.</typeparam>
         /// <param name="dataToSerialize">Data to be serialized.</param>
@@ -25,7 +25,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         object Serialize<_T>(_T dataToSerialize);
 
         /// <summary>
-        /// Deserializes data into the specified type.
+        /// Deserializes data.
         /// </summary>
         /// <typeparam name="_T">Type of serialized data.</typeparam>
         /// <param name="serializedData">Data to be deserialized.</param>

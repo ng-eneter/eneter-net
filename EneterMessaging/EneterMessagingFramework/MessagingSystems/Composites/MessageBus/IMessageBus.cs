@@ -12,13 +12,16 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Declares the message bus component.
+    /// Message bus.
     /// </summary>
     /// <remarks>
-    /// The message bus is the component that exposes multiple services.
-    /// When a service wants to expose its functionality via the message bus it connects the message bus and registers there.
-    /// Then when a client wants to use the service it connects the message bus and asks for the service.
-    /// If the requested service is registered the communication between the client and the service is mediated via the message bus.
+    /// The message bus is the component that allows to dynamically expose various services.
+    /// Services that want to be exposed via the message bus connect the message bus and register their service ids.
+    /// Then, if a client wants to use the service it connects the message bus and asks for the particular service id.
+    /// If such service id exists the message bus mediates the communication between the client and the service.<br/>
+    /// <br/>
+    /// The presence of the message bus is transparent for logic of services and their clients. The whole communication
+    /// is realized via <see cref="MessageBusMessagingFactory"/> which ensures the interaction with the message bus.
     /// </remarks>
     public interface IMessageBus
     {

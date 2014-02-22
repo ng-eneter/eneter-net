@@ -9,20 +9,20 @@
 namespace Eneter.Messaging.EndPoints.StringMessages
 {
     /// <summary>
-    /// The interface declares the factory to create duplex string message sender and receiver.
+    /// Creates sender and receiver for text messages.
     /// </summary>
     public interface IDuplexStringMessagesFactory
     {
         /// <summary>
-        /// Creates the duplex string message sender.
+        /// Creates message sender.
         /// </summary>
-        /// <returns>duplex string message sender</returns>
+        /// <returns>string message sender</returns>
         IDuplexStringMessageSender CreateDuplexStringMessageSender();
 
         /// <summary>
-        /// Creates the duplex string message receiver.
+        /// Creates message receiver.
         /// </summary>
-        /// <returns>duplex string message receiver</returns>
+        /// <returns>string message receiver</returns>
         IDuplexStringMessageReceiver CreateDuplexStringMessageReceiver();
     }
 }

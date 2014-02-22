@@ -12,54 +12,34 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Declares the factory that creates communication channels.
+    /// Messaging factory to create output and input channels.
     /// </summary>
+    /// <remarks>
+    /// This factory interface is supposed to be implemented by all messaging systems.
+    /// Particular messaging systems are then supposed to provide correct implementations for output and input channels
+    /// using their transportation mechanisms. E.g. for TCP, Websockets, ... . 
+    /// </remarks>
     public interface IMessagingSystemFactory
     {
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages.
+        /// Creates the duplex output channel that sends messages to the duplex input channel and receives response messages.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
-        /// <param name="channelId">identifies the receiving duplex input channel</param>
+        /// <param name="channelId">id representing receiving input channel address.</param>
         /// <returns>duplex output channel</returns>
         IDuplexOutputChannel CreateDuplexOutputChannel(string channelId);
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages.
+        /// Creates the duplex output channel that sends messages to the duplex input channel and receives response messages.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method allows to specified a desired response receiver id. Please notice, the response receiver
-        /// id is supposed to be unique.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
-        /// <param name="channelId">identifies the receiving duplex input channel</param>
+        /// <param name="channelId">id representing receiving input channel address.</param>
         /// <param name="responseReceiverId">unique identifier of the response receiver represented by this duplex output channel.</param>
         /// <returns>duplex output channel</returns>
         IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId);
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages.
+        /// Creates the duplex input channel that receives messages from the duplex output channel and sends back response messages.
         /// </summary>
-        /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
-        /// </remarks>
-        /// <param name="channelId">identifies the address, the duplex input channel listens to</param>
+        /// <param name="channelId">id representing the input channel address.</param>
         /// <returns>duplex input channel</returns>
         IDuplexInputChannel CreateDuplexInputChannel(string channelId);
     }

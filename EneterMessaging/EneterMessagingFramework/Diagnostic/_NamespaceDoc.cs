@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.Diagnostic
 {
     /// <summary>
-    /// Functionality for tracing.
+    /// Tracing.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

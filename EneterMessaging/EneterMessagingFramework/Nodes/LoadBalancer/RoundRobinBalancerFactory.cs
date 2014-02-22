@@ -13,7 +13,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
     /// <summary>
-    /// Factory that creates the load balancer based on Round-Robin algorithm.
+    /// Implements factory to create the load balancer based on Round-Robin algorithm.
     /// </summary>
     /// <remarks>
     /// The Round-Robin balancer distributes the incoming requests equally to all maintained receivers.

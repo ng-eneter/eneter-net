@@ -11,7 +11,7 @@ using System.Threading;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Provides dispatcher that invokes methods asynchronously using ThreadPool.
+    /// Dispatcher that invokes callback methods asynchronously in a thread from the thread-pool.
     /// </summary>
     public class AsyncDispatching : IThreadDispatcherProvider
     {
@@ -24,7 +24,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         }
 
         /// <summary>
-        /// Returns dispatcher that invokes methods using TrheadPool.
+        /// Returns dispatcher that invokes the callback method asynchronously in a thread from the thread-pool.
         /// </summary>
         /// <returns></returns>
         public IThreadDispatcher GetDispatcher()

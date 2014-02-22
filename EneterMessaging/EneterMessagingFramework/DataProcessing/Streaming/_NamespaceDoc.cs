@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.DataProcessing.Streaming
 {
     /// <summary>
-    /// Functionality for writing and reading messages from a stream.
+    /// Helper to write and read messages sfrom a stream.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

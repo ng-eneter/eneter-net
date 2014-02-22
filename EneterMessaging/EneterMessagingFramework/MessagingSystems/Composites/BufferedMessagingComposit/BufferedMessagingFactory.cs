@@ -24,6 +24,41 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
     /// Buffered messaging also checks if the between duplex output channel and duplex input channel is active.
     /// If the connection is not used (messages do not flow) the buffered messaging
     /// waits the specified maxOfflineTime and then disconnects the client.
+    /// <br/>
+    /// <b>Note:</b><br/>
+    /// The buffered messaging does not require that both communicating parts create channels with buffered messaging factory.
+    /// It means, e.g. the duplex output channel created with buffered messaging with underlying TCP, can send messages
+    /// directly to the duplex input channel created with just TCP messaging factory.
+    /// 
+    /// <example>
+    /// Simple client buffering messages in case of a disconnection.
+    /// <code>
+    /// // Create TCP messaging.
+    /// IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
+    /// 
+    /// // Create buffered messaging that internally uses TCP.
+    /// IMessagingSystemFactory aMessaging = new BufferedMessagingSystemFactory(anUnderlyingMessaging);
+    /// 
+    /// // Create the duplex output channel.
+    /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:8045/");
+    /// 
+    /// // Create message sender to send simple string messages.
+    /// IDuplexStringMessagesFactory aSenderFactory = new DuplexStringMessagesFactory();
+    /// IDuplexStringMessageSender aSender = aSenderFactory.CreateDuplexStringMessageSender();
+    /// 
+    /// // Subscribe to receive responses.
+    /// aSender.ResponseReceived += OnResponseReceived;
+    /// 
+    /// // Attach output channel an be able to send messages and receive responses.
+    /// aSender.AttachDuplexOutputChannel(anOutputChannel);
+    /// 
+    /// ...
+    /// 
+    /// // Send a message. If the connection was broken the message will be stored in the buffer.
+    /// // Note: The buffered messaging will try to reconnect automatically.
+    /// aSender.SendMessage("Hello.");
+    /// </code>
+    /// </example>
     /// </remarks>
     public class BufferedMessagingFactory : IMessagingSystemFactory
     {
@@ -63,7 +98,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         /// are deleted from the buffer.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
-        /// <returns>composit duplex output channel <see cref="ICompositeDuplexOutputChannel"/> </returns>
+        /// <returns>buffered duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
             using (EneterTrace.Entering())
@@ -84,7 +119,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">response receiver id of this duplex output channel</param>
-        /// <returns>composit duplex output channel with the buffer <see cref="ICompositeDuplexOutputChannel"/></returns>
+        /// <returns>buffered duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
@@ -104,7 +139,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         /// <see cref="IDuplexInputChannel.ResponseReceiverDisconnected"/> is invoked and response messages are deleted from the buffer.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
-        /// <returns>composit duplex input channel with the buffer <see cref="ICompositeDuplexInputChannel"/></returns>
+        /// <returns>buffered duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
             using (EneterTrace.Entering())

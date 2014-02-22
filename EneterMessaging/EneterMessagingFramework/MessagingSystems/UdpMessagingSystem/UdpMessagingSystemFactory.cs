@@ -16,7 +16,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages via UDP.
+    /// Messaging system delivering messages via UDP.
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using UDP for sending and receiving messages.

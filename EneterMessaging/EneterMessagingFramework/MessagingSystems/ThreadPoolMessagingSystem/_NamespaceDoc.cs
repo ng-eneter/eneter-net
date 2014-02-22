@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.ThreadPoolMessagingSystem
 {
     /// <summary>
-    /// The messaging system transfering messages between threads by using the thread pool.
+    /// Asynchronous communication using multiple threads.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

@@ -14,9 +14,14 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
     /// <summary>
-    /// Implements the serialization/deserialization to/from XmlString.
+    /// Serializes data to XML (compatible with Java).
     /// </summary>
     /// <remarks>
+    /// This is the default serializer used by the framework. The serializer is compatible
+    /// with XmlStringSerializer from Eneter Messaging Framework for .NET.
+    /// Therefore, you can use it for the communication between Java and .NET applications.
+    /// <b>The serializer does not support generic types on Java and Android platforms!</b>
+    /// <br/>
     /// The serializer internally uses XmlSerializer provided by .Net.
     /// <example>
     /// Serialization and deserialization example.

@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
     /// <summary>
-    /// Functionality to distribute the workload across a farm of receivers.
+    /// Distributing the workload across a farm of receivers.
     /// </summary>
     /// <remarks>
     /// The load balancer maintains a list of receivers processing a certain request.

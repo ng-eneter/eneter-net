@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages via UDP.
+    /// Communication via UDP.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

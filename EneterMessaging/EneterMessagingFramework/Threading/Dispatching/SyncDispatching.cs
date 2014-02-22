@@ -10,7 +10,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Provides dispatcher that queues incoming methods and calls them synchronously one by one.
+    /// Dispatcher that queues callback methods and invokes them one by one from one thread.
     /// </summary>
     public class SyncDispatching : IThreadDispatcherProvider
     {

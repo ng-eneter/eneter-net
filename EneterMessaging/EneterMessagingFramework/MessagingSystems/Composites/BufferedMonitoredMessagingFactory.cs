@@ -107,7 +107,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// and deletes messages from the buffer.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
-        /// <returns>composit duplex output channel <see cref="ICompositeDuplexOutputChannel"/></returns>
+        /// <returns>buffered and monitored duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
             using (EneterTrace.Entering())
@@ -131,7 +131,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">the unique id of this response receiver</param>
-        /// <returns>composit duplex output channel <see cref="ICompositeDuplexOutputChannel"/></returns>
+        /// <returns>buffered and monitored duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
@@ -155,7 +155,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// <see cref="IDuplexInputChannel.ResponseReceiverDisconnected"/> is invoked and rsponse messages are deleted from the buffer.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
-        /// <returns>composit duplex input channel with the buffer <see cref="ICompositeDuplexInputChannel"/></returns>
+        /// <returns>buffered and monitored duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
             using (EneterTrace.Entering())

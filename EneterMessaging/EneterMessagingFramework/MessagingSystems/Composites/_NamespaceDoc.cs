@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.MessagingSystems.Composites
 {
     /// <summary>
-    /// Functionality extending behavior of messaging systems.
+    /// Extensions for messaging systems.
     /// </summary>
     /// <remarks>
     /// E.g. it is possible to extend the communication by connection monitoring, buffering, authentication or communication via the message bus.

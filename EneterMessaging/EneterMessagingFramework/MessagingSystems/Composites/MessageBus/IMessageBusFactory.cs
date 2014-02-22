@@ -10,7 +10,7 @@
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Declares factory creating the message bus.
+    /// Creates the message bus.
     /// </summary>
     public interface IMessageBusFactory
     {

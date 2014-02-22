@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.ChannelWrapper
 {
     /// <summary>
-    /// Declares the duplex channel wrapper.
+    /// Duplex channel wrapper.
     /// </summary>
     /// <remarks>
     /// The duplex channel wrapper is listening to more duplex input channels. When it receives some message,
@@ -26,7 +26,14 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
     public interface IDuplexChannelWrapper : IAttachableMultipleDuplexInputChannels,
                                              IAttachableDuplexOutputChannel
     {
+        /// <summary>
+        /// Event raised when the connection with the service was open.
+        /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
+
+        /// <summary>
+        /// Event raised when the connection with the service was closed.
+        /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
     }
 }

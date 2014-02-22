@@ -21,7 +21,7 @@ using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages via TCP.
+    /// Creates output and input channels which use TCP.
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using TCP for sending and receiving messages.

@@ -11,40 +11,23 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Declares the duplex output channel that can send messages to the duplex input channel and receive response messages.
+    /// Duplex output channel that can send messages to the duplex input channel and receive response messages.
     /// </summary>
-    /// <remarks>
-    /// Notice, the duplex output channel works only with duplex input channel and not with input channel.
-    /// </remarks>
     public interface IDuplexOutputChannel
     {
         /// <summary>
         /// The event is invoked when the connection with the duplex input channel was opened.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is invoked in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
         /// The event is invoked when the connection with the duplex input channel was closed.
         /// </summary>
-        /// <remarks>
-        /// Notice, the event is invoked in a thread from the thread pool. Therefore, if you need to manipulate UI,
-        /// do not forget to marshal it to the UI thread.
-        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
         /// The event is invoked when a response message was received.
         /// </summary>
-        /// <remarks>
-        /// Notice, this event is invoked in a different thread. The exception is only the Synchronous messaging that
-        /// invokes this event in the thread calling the method SendResponseMessage in <see cref="IDuplexInputChannel"/>.
-        /// Also, in Silverlight (and Windows Phone 7), http and tcp messagings have the possibility
-        /// to choose if the thread shall be the main Silverlight thread.
-        /// </remarks>
         event EventHandler<DuplexChannelMessageEventArgs> ResponseMessageReceived;
 
         /// <summary>
@@ -69,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         string ResponseReceiverId { get; }
 
         /// <summary>
-        /// Sends the message to the address represented by ChannelId.
+        /// Sends the message to the duplex input channel.
         /// </summary>
         /// <remarks>
         /// Notice, there is a limitation for the Silverlight platform using HTTP.
@@ -111,8 +94,8 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         /// </summary>
         /// <remarks>
         /// Dispatcher is responsible for raising ConnectionOpened, ConnectionClosed and ResponseMessageReceived events
-        /// in desired thread. It allows to specify which threading mechanism/model is used to raise asynchronous events.
-        /// E.g. events are queued and raised by one thread. Or e.g. in Silverlight events can be raised in the Silverlight thread.
+        /// according to desired thread model.
+        /// E.g. events are queued and raised by one particular thread.
         /// </remarks>
         IThreadDispatcher Dispatcher { get; }
     }

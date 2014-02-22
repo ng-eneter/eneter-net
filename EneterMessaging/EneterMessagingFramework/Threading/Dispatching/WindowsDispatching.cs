@@ -16,9 +16,11 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Provides dispatcher that internally uses System.Windows.Threading.Dispatcher.
-    /// E.g. in case of WPF it allows to synchronize incoming methods into the UI thread.
+    /// Dispatcher that internally uses System.Windows.Threading.Dispatcher.
     /// </summary>
+    /// <remarks>
+    /// E.g. in case of WPF it allows to synchronize incoming methods into the UI thread.
+    /// </remarks>
     public class WindowsDispatching : IThreadDispatcherProvider
     {
         private class WindowsDispatcher : IThreadDispatcher
@@ -107,6 +109,10 @@ namespace Eneter.Messaging.Threading.Dispatching
             }
         }
 
+        /// <summary>
+        /// Releases the thread waiting in the windows dispatcher queue for delegates that shall be invoked.
+        /// </summary>
+        /// <param name="dispatcher">dispatcher that shall be stopped</param>
         public static void StopWindowsDispatcher(Dispatcher dispatcher)
         {
             using (EneterTrace.Entering())

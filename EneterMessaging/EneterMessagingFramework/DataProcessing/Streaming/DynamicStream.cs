@@ -13,7 +13,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.Streaming
 {
     /// <summary>
-    /// Implements the stream that can be written and read at the same time.
+    /// Stream that can be written and read at the same time.
     /// </summary>
     /// <remarks>
     /// The dynamic stream supports writing of data by one thread and reading by another.

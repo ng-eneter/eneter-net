@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
     /// <summary>
-    /// Type of the message sent by the monitor duplex output channel or monitor dupolex input channel.
+    /// Type of the message (if it is ping or a data message).
     /// </summary>
     public enum MonitorChannelMessageType
     {
@@ -27,7 +27,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     }
 
     /// <summary>
-    /// The message used by the monitor duplex output channel or monitor duplex input channel for the communication.
+    /// The message internally used to monitor the connection and also to transfer message data.
     /// </summary>
 #if !SILVERLIGHT
     [Serializable]

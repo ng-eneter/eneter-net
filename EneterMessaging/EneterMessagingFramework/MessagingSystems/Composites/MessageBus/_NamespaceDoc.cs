@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Communication via the message bus.
+    /// Extension providing communication via the message bus. (Exposing multiple services from one place.)
     /// </summary>
     /// <remarks>
     /// The message bus is the component that can be used to expose multiple services from one place.

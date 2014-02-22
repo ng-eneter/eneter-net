@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
 {
     /// <summary>
-    /// SSL and Negotiate security protocol for the TCP communication.
+    /// SSL, Negotiate or Non-security protocol for the TCP communication.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

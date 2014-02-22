@@ -12,22 +12,22 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.Rpc
 {
     /// <summary>
-    /// Declares client which can use Remote Procedure Calls (RPC) to communication with the service.
+    /// Client which can use Remote Procedure Calls (note: it also works with Java and Android).
     /// </summary>
     /// <remarks>
     /// RpcClient acts as a proxy providing the communication functionality allowing a client to call methods exposed by the service.
     /// </remarks>
-    /// <typeparam name="TServiceInterface">Service interface.</typeparam>
+    /// <typeparam name="TServiceInterface">Interface exposed by the service.</typeparam>
     public interface IRpcClient<TServiceInterface> : IAttachableDuplexOutputChannel
         where TServiceInterface : class
     {
         /// <summary>
-        /// Event raised when the connection with the service was open.
+        /// Event raised when the connection with the service is open.
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
-        /// Event raised when the connection with the service was closed.
+        /// Event raised when the connection with the service is closed.
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 

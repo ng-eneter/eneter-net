@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.StringMessages
 {
     /// <summary>
-    /// Declares the duplex message receiver which can receive text messages and send back text response messages.
+    /// Receiver of text messages.
     /// </summary>
     public interface IDuplexStringMessageReceiver : IAttachableDuplexInputChannel
     {
@@ -34,7 +34,7 @@ namespace Eneter.Messaging.EndPoints.StringMessages
         /// <summary>
         /// Sends the response message back to the string message sender.
         /// </summary>
-        /// <param name="responseReceiverId">iidentifies the string message sender that shall receive the response</param>
+        /// <param name="responseReceiverId">identifies the string message sender that shall receive the response</param>
         /// <param name="responseMessage">response text message</param>
         void SendResponseMessage(string responseReceiverId, string responseMessage);
     }

@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
     /// <summary>
-    /// Monitoring the connection between communicating applications.
+    /// Extension providing monitoring the connection.
     /// </summary>
     /// <remarks>
     /// The monitoring is realized by sending 'ping' messages and receiving 'ping' responses.

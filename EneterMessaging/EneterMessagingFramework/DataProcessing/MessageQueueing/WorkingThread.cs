@@ -13,21 +13,20 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
     /// <summary>
-    /// Working thread which reads messages from the queue.
+    /// Thread with the message queue.
     /// </summary>
     /// <remarks>
-    /// It provides a working thread processing messages from the queue.
-    /// If a message is put to the queue the working thread will remove it from the queue and will call the registered handler
-    /// to process it.
+    /// If a message is put to the queue, the thread removes it from the queue and calls a call-back
+    /// method to process it.
     /// </remarks>
-    /// <typeparam name="_MessageType">type of the message processed by the thread</typeparam>
-    public class WorkingThread<_MessageType>
+    /// <typeparam name="TMessage">type of the message processed by the thread</typeparam>
+    public class WorkingThread<TMessage>
     {
         /// <summary>
         /// Registers the handler processing messages.
         /// </summary>
         /// <param name="messageHandler"></param>
-        public void RegisterMessageHandler(Action<_MessageType> messageHandler)
+        public void RegisterMessageHandler(Action<TMessage> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -63,7 +62,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// Enqueues the message to the queue.
         /// </summary>
         /// <param name="message"></param>
-        public void EnqueueMessage(_MessageType message)
+        public void EnqueueMessage(TMessage message)
         {
             using (EneterTrace.Entering())
             {
@@ -78,14 +77,14 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
 
                     // Note: If the message handler is unregistered before the message handler is processed from the queue
                     //       then myMessageHandler will be null and the exception will occur. Therefore we need to store it locally.
-                    Action<_MessageType> aMessageHandler = myMessageHandler;
+                    Action<TMessage> aMessageHandler = myMessageHandler;
                     myWorker.Invoke(() => aMessageHandler(message));
                 }
             }
         }
 
         private SyncDispatcher myWorker = new SyncDispatcher();
-        private Action<_MessageType> myMessageHandler;
+        private Action<TMessage> myMessageHandler;
         private object myLock = new object();
         private string TracedObject { get { return GetType().Name + " "; } }
     }

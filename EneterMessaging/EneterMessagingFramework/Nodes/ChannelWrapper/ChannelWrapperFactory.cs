@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.ChannelWrapper
 {
     /// <summary>
-    /// Implements the factory for creating channel wrapper and unwrapper.
+    /// Factory for creating channel wrapper and unwrapper.
     /// </summary>
     public class ChannelWrapperFactory : IChannelWrapperFactory
     {
@@ -27,7 +27,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         /// <summary>
         /// Constructs the channel wrapper factory with specified serializer.
         /// </summary>
-        /// <param name="serializer">serializer</param>
+        /// <param name="serializer">serializer used for wrapping channels with data messages.</param>
         public ChannelWrapperFactory(ISerializer serializer)
         {
             using (EneterTrace.Entering())

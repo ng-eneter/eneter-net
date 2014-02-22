@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages synchronously in the context of the caller thread.
+    /// Synchronous communication within one process (like a synchronous local call).
     /// </summary>
     /// <remarks>
     /// This messaging system transfers messages synchronously in the context of the calling thread.

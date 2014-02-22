@@ -10,7 +10,7 @@ using System;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// The event arguments used for the notification whether the message was delivered or not delivered.
+    /// Event arguments used for notification whether the message was delivered or not delivered.
     /// </summary>
     public sealed class ReliableMessageIdEventArgs : EventArgs
     {

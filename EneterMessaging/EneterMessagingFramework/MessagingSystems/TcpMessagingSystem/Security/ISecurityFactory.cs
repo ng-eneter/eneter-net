@@ -12,7 +12,7 @@ using System.IO;
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
 {
     /// <summary>
-    /// Declares the factory responsible for creating the security stream.
+    /// Creates the network stream.
     /// </summary>
     /// <remarks>
     /// The security stream wrapps the source stream and provides functionality for authentication (verifying communicating parts),

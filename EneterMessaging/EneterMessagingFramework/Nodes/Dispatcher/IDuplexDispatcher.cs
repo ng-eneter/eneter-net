@@ -10,13 +10,13 @@ using Eneter.Messaging.Infrastructure.Attachable;
 namespace Eneter.Messaging.Nodes.Dispatcher
 {
     /// <summary>
-    /// Declares the duplex dispatcher.
+    /// Dispatcher.
     /// </summary>
     /// <remarks>
     /// The duplex dispatcher has attached more duplex input channels and uses more duplex output channels.<br/>
     /// When it receives some message via the duplex input channel it forwards the message to all duplex output channels.<br/>
     /// The duplex dispatcher allows the bidirectional communication. It means, receivers to whom the message was forwarded can
-    /// sand back response messages. Therefore, the sender can get response messages from all receivers.
+    /// send back response messages. Therefore, the sender can get response messages from all receivers.
     /// </remarks>
     public interface IDuplexDispatcher : IAttachableMultipleDuplexInputChannels
     {

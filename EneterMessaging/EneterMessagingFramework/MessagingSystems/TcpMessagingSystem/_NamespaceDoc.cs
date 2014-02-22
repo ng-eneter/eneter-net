@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages via TCP.
+    /// Communication via TCP.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

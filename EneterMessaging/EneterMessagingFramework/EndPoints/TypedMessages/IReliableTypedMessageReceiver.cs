@@ -12,10 +12,13 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
+    /// Reliable typed message receiver (it confirms whether the message was received).
+    /// </summary>
+    /// <remarks>
     /// Declares the reliable message receiver that can send messages of specified type and sends back response messages of specified type.
     /// Reliable means it provides events notifying whether the response message was delivered or not.
     /// The reliable typed message receiver can be used only with the reliable typed message sender.
-    /// </summary>
+    /// </remarks>
     /// <typeparam name="_ResponseType">type of the response message</typeparam>
     /// <typeparam name="_RequestType">type of the message</typeparam>
     public interface IReliableTypedMessageReceiver<_ResponseType, _RequestType> : IAttachableDuplexInputChannel

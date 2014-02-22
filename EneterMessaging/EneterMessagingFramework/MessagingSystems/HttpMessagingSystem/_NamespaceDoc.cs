@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages via HTTP.
+    /// Communication via HTTP.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

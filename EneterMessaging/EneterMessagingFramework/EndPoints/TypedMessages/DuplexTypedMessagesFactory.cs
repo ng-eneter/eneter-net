@@ -12,12 +12,12 @@ using System;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Implements factory to create typed message senders and receivers.
+    /// Factory to create typed message senders and receivers.
     /// </summary>
     /// <remarks>
-    /// 
+    /// The following example shows how to send a receive messages:
     /// <example>
-    /// Simple service listening to request messages of type 'RequestMessage' and responding the response message of type 'ResponseMessage'.
+    /// Implementation of receiver:
     /// <code>
     /// using System;
     /// using Eneter.Messaging.EndPoints.TypedMessages;
@@ -83,91 +83,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     /// 
     /// </code>
     /// </example>
-    /// 
     /// <example>
-    /// Simple client sending request messages of type 'RequestMessage' and receiving responses of type 'ResponseMessage'.
-    /// The client is synchronous. It sends the request message and waits for the response.
-    /// <code>
-    /// using System;
-    /// using System.Windows.Forms;
-    /// using Eneter.Messaging.EndPoints.TypedMessages;
-    /// using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-    /// using Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem;
-    /// 
-    /// namespace CalculatorClientSync
-    /// {
-    ///     public partial class Form1 : Form
-    ///     {
-    ///         // Request message.
-    ///         public class RequestMessage
-    ///         {
-    ///             public int Number1 { get; set; }
-    ///             public int Number2 { get; set; }
-    ///         }
-    /// 
-    ///         // Response message.
-    ///         public class ResponseMessage
-    ///         {
-    ///             public int Result { get; set; }
-    ///         }
-    /// 
-    ///         private ISyncDuplexTypedMessageSender&lt;ResponseMessage, RequestMessage&gt; mySender;
-    /// 
-    ///         public Form1()
-    ///         {
-    ///             InitializeComponent();
-    /// 
-    ///             OpenConnection();
-    ///         }
-    /// 
-    ///         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-    ///         {
-    ///             CloseConnection();
-    ///         }
-    /// 
-    ///         private void OpenConnection()
-    ///         {
-    ///             // Create the message sender.
-    ///             IDuplexTypedMessagesFactory aSenderFactory = new DuplexTypedMessagesFactory();
-    ///             mySender = aSenderFactory.CreateSyncDuplexTypedMessageSender&lt;ResponseMessage, RequestMessage&gt;();
-    /// 
-    ///             // Use Websocket for the communication.
-    ///             // If you want to use TCP then use TcpMessagingSystemFactory().
-    ///             IMessagingSystemFactory aMessaging = new WebSocketMessagingSystemFactory();
-    ///             IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("ws://192.168.1.102:8099/aaa/");
-    /// 
-    ///             // Attach the output channel and be able to send messages
-    ///             // and receive response messages.
-    ///             mySender.AttachDuplexOutputChannel(anOutputChannel);
-    ///         }
-    /// 
-    ///         private void CloseConnection()
-    ///         {
-    ///             // Detach input channel and stop listening to response messages.
-    ///             mySender.DetachDuplexOutputChannel();
-    ///         }
-    /// 
-    ///         private void CalculateBtn_Click(object sender, EventArgs e)
-    ///         {
-    ///             // Create the request message.
-    ///             RequestMessage aRequest = new RequestMessage();
-    ///             aRequest.Number1 = int.Parse(Number1TextBox.Text);
-    ///             aRequest.Number2 = int.Parse(Number2TextBox.Text);
-    /// 
-    ///             // Send request to the service to calculate 2 numbers.
-    ///             ResponseMessage aResponse = mySender.SendRequestMessage(aRequest);
-    /// 
-    ///             // Display the result.
-    ///             ResultTextBox.Text = aResponse.Result.ToString();
-    ///         }
-    ///     }
-    /// }
-    /// </code>
-    /// </example>
-    /// 
-    /// <example>
-    /// Simple client sending request messages of type 'RequestMessage' and receiving responses of type 'ResponseMessage'.
-    /// The client receives the response asynchronously via the event.
+    /// Implementation of sender:
     /// <code>
     /// using System;
     /// using System.Windows.Forms;
@@ -266,6 +183,87 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     /// }
     /// </code>
     /// </example>
+    /// <example>
+    /// Implementation of synchronous sender (after sending it waits for the response):
+    /// <code>
+    /// using System;
+    /// using System.Windows.Forms;
+    /// using Eneter.Messaging.EndPoints.TypedMessages;
+    /// using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+    /// using Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem;
+    /// 
+    /// namespace CalculatorClientSync
+    /// {
+    ///     public partial class Form1 : Form
+    ///     {
+    ///         // Request message.
+    ///         public class RequestMessage
+    ///         {
+    ///             public int Number1 { get; set; }
+    ///             public int Number2 { get; set; }
+    ///         }
+    /// 
+    ///         // Response message.
+    ///         public class ResponseMessage
+    ///         {
+    ///             public int Result { get; set; }
+    ///         }
+    /// 
+    ///         private ISyncDuplexTypedMessageSender&lt;ResponseMessage, RequestMessage&gt; mySender;
+    /// 
+    ///         public Form1()
+    ///         {
+    ///             InitializeComponent();
+    /// 
+    ///             OpenConnection();
+    ///         }
+    /// 
+    ///         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+    ///         {
+    ///             CloseConnection();
+    ///         }
+    /// 
+    ///         private void OpenConnection()
+    ///         {
+    ///             // Create the message sender.
+    ///             IDuplexTypedMessagesFactory aSenderFactory = new DuplexTypedMessagesFactory();
+    ///             mySender = aSenderFactory.CreateSyncDuplexTypedMessageSender&lt;ResponseMessage, RequestMessage&gt;();
+    /// 
+    ///             // Use Websocket for the communication.
+    ///             // If you want to use TCP then use TcpMessagingSystemFactory().
+    ///             IMessagingSystemFactory aMessaging = new WebSocketMessagingSystemFactory();
+    ///             IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("ws://192.168.1.102:8099/aaa/");
+    /// 
+    ///             // Attach the output channel and be able to send messages
+    ///             // and receive response messages.
+    ///             mySender.AttachDuplexOutputChannel(anOutputChannel);
+    ///         }
+    /// 
+    ///         private void CloseConnection()
+    ///         {
+    ///             // Detach input channel and stop listening to response messages.
+    ///             mySender.DetachDuplexOutputChannel();
+    ///         }
+    /// 
+    ///         private void CalculateBtn_Click(object sender, EventArgs e)
+    ///         {
+    ///             // Create the request message.
+    ///             RequestMessage aRequest = new RequestMessage();
+    ///             aRequest.Number1 = int.Parse(Number1TextBox.Text);
+    ///             aRequest.Number2 = int.Parse(Number2TextBox.Text);
+    /// 
+    ///             // Send request to the service to calculate 2 numbers.
+    ///             ResponseMessage aResponse = mySender.SendRequestMessage(aRequest);
+    /// 
+    ///             // Display the result.
+    ///             ResultTextBox.Text = aResponse.Result.ToString();
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
+    /// 
+    /// 
     /// 
     /// </remarks>
     public class DuplexTypedMessagesFactory : IDuplexTypedMessagesFactory
@@ -307,22 +305,17 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// and the factory will create ISyncDuplexTypedMessageSender with specified timeout
         /// indicating how long it can wait for a response message from the service.
         /// </remarks>
-        /// <param name="syncResponseReceiveTimeout">Timeout specifying the maximum time
-        /// the ISyncDuplexTypedMessageSender will wait for the response message from the service.
-        /// </param>
+        /// <param name="syncResponseReceiveTimeout">maximum waiting time when synchronous message sender is used.</param>
         public DuplexTypedMessagesFactory(TimeSpan syncResponseReceiveTimeout)
             : this(syncResponseReceiveTimeout, new XmlStringSerializer())
         {
         }
 
         /// <summary>
-        /// Constructs the factory with specified timeout for synchronous message sender and
-        /// specified serializer.
+        /// Constructs the factory with specified timeout for synchronous message sender and specified serializer.
         /// </summary>
-        /// <param name="syncResponseReceiveTimeout">Timeout specifying the maximum time
-        /// the ISyncDuplexTypedMessageSender will wait for the response message from the service.
-        /// </param>
-        /// <param name="serializer">Serializer used to serialize request and response messages.</param>
+        /// <param name="syncResponseReceiveTimeout">maximum waiting time when synchronous message sender is used.</param>
+        /// <param name="serializer">serializer that will be used to serialize/deserialize messages.</param>
         public DuplexTypedMessagesFactory(TimeSpan syncResponseReceiveTimeout, ISerializer serializer)
         {
             using (EneterTrace.Entering())

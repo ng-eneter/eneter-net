@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// Publish-subscribe scenarios. Publishing and subscribing for notification messages.
+    /// Publish-subscribe scenarios (clients can subscribe for notification messages).
     /// </summary>
     /// <remarks>
     /// The broker is intended for publish-subscribe scenarios. Clients can use the broker to publish notification messages or

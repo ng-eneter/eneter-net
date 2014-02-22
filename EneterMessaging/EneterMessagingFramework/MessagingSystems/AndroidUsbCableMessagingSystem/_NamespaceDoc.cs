@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 {
     /// <summary>
-    /// Communication between a desktop application and an Android application via the USB cable.
+    /// Communication with Android via the USB cable.
     /// </summary>
     /// <example>
     /// <ul>

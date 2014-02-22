@@ -10,7 +10,7 @@
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
     /// <summary>
-    /// Declares the factory for load balancers.
+    ///  Creates the load balancer.
     /// </summary>
     /// <remarks>
     /// The load balancer distributes the workload across a farm of receivers that can run on different machines (or threads).

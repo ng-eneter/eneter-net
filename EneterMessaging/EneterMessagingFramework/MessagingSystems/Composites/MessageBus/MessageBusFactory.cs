@@ -14,7 +14,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Implements the factory for creating the message bus.
+    /// Implements factory for creating the message bus.
     /// </summary>
     public class MessageBusFactory : IMessageBusFactory
     {

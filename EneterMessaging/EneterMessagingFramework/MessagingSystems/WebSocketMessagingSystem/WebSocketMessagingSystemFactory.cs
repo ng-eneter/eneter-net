@@ -21,7 +21,7 @@ using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages via websockets.
+    /// Messaging system delivering messages via websockets.
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using WebSockets for sending and receiving messages.
@@ -127,8 +127,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <summary>
         /// Constructs the WebSocket messaging factory.
         /// </summary>
-        /// <param name="concurrencyMode">
-        /// Specifies the threading mode for receiving messages in input channel and duplex input channel.</param>
         /// <param name="protocolFormatter">formatter used for low-level messaging between output and input channels.</param>
         public WebSocketMessagingSystemFactory(IProtocolFormatter protocolFormatter)
         {

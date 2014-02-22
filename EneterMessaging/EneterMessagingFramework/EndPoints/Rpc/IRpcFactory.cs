@@ -9,24 +9,23 @@
 namespace Eneter.Messaging.EndPoints.Rpc
 {
     /// <summary>
-    /// Declares factory class which creates services and clients that can communicate using RPC (Remote Procedure Calls).
+    /// Creates services and clients that can communicate using Remote Procedure Calls.
     /// </summary>
     public interface IRpcFactory
     {
         /// <summary>
         /// Creates RPC client for the given interface.
         /// </summary>
-        /// <typeparam name="TServiceInterface">interface type declaring methods and events that shall be used for
-        /// the interprocess communication</typeparam>
-        /// <returns>RPC client component</returns>
+        /// <typeparam name="TServiceInterface">service interface type.</typeparam>
+        /// <returns>RpcClient instance</returns>
         IRpcClient<TServiceInterface> CreateClient<TServiceInterface>() where TServiceInterface : class;
 
         /// <summary>
         /// Creates RPC service for the given interface.
         /// </summary>
-        /// <typeparam name="TServiceInterface">interface type declaring methods and events which are exposed via the service</typeparam>
+        /// <typeparam name="TServiceInterface">service interface type</typeparam>
         /// <param name="service">instance implementing the given service interface</param>
-        /// <returns></returns>
+        /// <returns>RpcService instance.</returns>
         IRpcService<TServiceInterface> CreateService<TServiceInterface>(TServiceInterface service) where TServiceInterface : class;
     }
 }

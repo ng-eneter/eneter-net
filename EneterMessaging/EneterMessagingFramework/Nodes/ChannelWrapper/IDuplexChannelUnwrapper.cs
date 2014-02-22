@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.ChannelWrapper
 {
     /// <summary>
-    /// Declares the duplex channel unwrapper.
+    /// Duplex channel unwrapper.
     /// </summary>
     /// <remarks>
     /// The duplex channel wrapper is listening to more duplex input channels. When it receives some message,

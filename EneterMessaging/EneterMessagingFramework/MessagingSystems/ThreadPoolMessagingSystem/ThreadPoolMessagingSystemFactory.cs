@@ -15,13 +15,12 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.ThreadPoolMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages with using .Net thread pool.
+    /// Messaging system delivering messages asynchronously (when a message is received a separate thread is invoked to process it).
     /// </summary>
     /// <remarks>
-    /// The messages are put to the queue of .Net thread pool. The receiving input channel is then called
-    /// in the context of the assigned thread from the pool. Therefore the input channel can process more messages at once
-    /// and also can notify the subscriber from more different threads at the same time. <br/>
-    /// <b>Therefore do not forget to be careful and avoid race conditioning.</b>
+    /// The incoming messages are processed by multiple threads from the pool. When a message is received the thread
+    /// from the pool is taken and the message is notified.
+    /// Therefore messages come asynchronously in various threads.
     /// </remarks>
     public class ThreadPoolMessagingSystemFactory : IMessagingSystemFactory
     {

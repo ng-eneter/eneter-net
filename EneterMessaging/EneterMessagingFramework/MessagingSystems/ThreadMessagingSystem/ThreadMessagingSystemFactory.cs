@@ -15,7 +15,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages to the particular working thread.
+    /// Messaging system delivering messages to the particular working thread.
     /// </summary>
     /// <remarks>
     /// Each input channel is represented by its own working thread removing messages from the queue and processing them

@@ -9,35 +9,34 @@
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Declares the factory to create typed message senders and receivers.
+    /// Creates senders and receivers of typed messages.
     /// </summary>
     public interface IDuplexTypedMessagesFactory
     {
         /// <summary>
-        /// Creates duplex typed message sender that can send request messages and receive response
-        /// messages of specified type.
+        /// Creates duplex typed message sender that can send request messages and receive response messages of specified type.
         /// </summary>
-        /// <typeparam name="_ResponseType">Type of response messages.</typeparam>
-        /// <typeparam name="_RequestType">Type of request messages.</typeparam>
+        /// <typeparam name="TResponse">Type of response messages.</typeparam>
+        /// <typeparam name="TRequest">Type of request messages.</typeparam>
         /// <returns>duplex typed message sender</returns>
-        IDuplexTypedMessageSender<_ResponseType, _RequestType> CreateDuplexTypedMessageSender<_ResponseType, _RequestType>();
+        IDuplexTypedMessageSender<TResponse, TRequest> CreateDuplexTypedMessageSender<TResponse, TRequest>();
 
         /// <summary>
         /// Creates synchronous duplex typed message sender that sends a request message and then
         /// waits until the response message is received.
         /// </summary>
-        /// <typeparam name="_ResponseType">Response message type.</typeparam>
-        /// <typeparam name="_RequestType">Request message type.</typeparam>
-        /// <returns></returns>
-        ISyncDuplexTypedMessageSender<_ResponseType, _RequestType> CreateSyncDuplexTypedMessageSender<_ResponseType, _RequestType>();
+        /// <typeparam name="TResponse">Response message type.</typeparam>
+        /// <typeparam name="TRequest">Request message type.</typeparam>
+        /// <returns>synchronous duplex typed message sender</returns>
+        ISyncDuplexTypedMessageSender<TResponse, TRequest> CreateSyncDuplexTypedMessageSender<TResponse, TRequest>();
         
         /// <summary>
         /// Creates duplex typed message receiver that can receive request messages and
         /// send back response messages of specified type.
         /// </summary>
-        /// <typeparam name="_ResponseType">Type of response messages.</typeparam>
-        /// <typeparam name="_RequestType">Type of receiving messages.</typeparam>
+        /// <typeparam name="TResponse">Type of response messages.</typeparam>
+        /// <typeparam name="TRequest">Type of receiving messages.</typeparam>
         /// <returns>duplex typed message receiver</returns>
-        IDuplexTypedMessageReceiver<_ResponseType, _RequestType> CreateDuplexTypedMessageReceiver<_ResponseType, _RequestType>();
+        IDuplexTypedMessageReceiver<TResponse, TRequest> CreateDuplexTypedMessageReceiver<TResponse, TRequest>();
     }
 }

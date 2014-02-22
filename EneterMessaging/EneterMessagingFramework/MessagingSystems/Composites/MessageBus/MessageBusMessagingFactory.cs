@@ -14,9 +14,15 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Messaging system allowing the communication via the message bus.
+    /// Extension providing the communication via the message bus.
     /// </summary>
     /// <remarks>
+    /// This messaging wraps the communication with the message bus.
+    /// The duplex input channel created by this messaging will automatically connect the message bus and register the service
+    /// when the startListening() is called.<br/>
+    /// The duplex output channel created by this messaging will automatically connect the message bus and ask for the service
+    /// when the openConnection() is called.<br/>
+    /// <br/>
     /// The following example shows how to communicate via the message bus.
     /// 
     /// <example>

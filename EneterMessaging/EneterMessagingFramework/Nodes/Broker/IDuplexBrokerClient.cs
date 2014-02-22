@@ -12,15 +12,22 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// Declares the broker client.
+    /// Broker client to publish and subscribe messages in the broker.
     /// </summary>
     /// <remarks>
-    /// The broker client allows to send messages via the broker, so that broker will forward them to all subscribers.<br/>
-    /// It also allows to subscribe for messages the client is interested to.
+    /// The broker client allows to publish events via the broker, so that broker will forward them to all subscribers.<br/>
+    /// BrokerClient also allows to subscribe for events of interest.
     /// </remarks>
     public interface IDuplexBrokerClient : IAttachableDuplexOutputChannel
     {
+        /// <summary>
+        /// Event raised when the connection with the service was open.
+        /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
+
+        /// <summary>
+        /// Event raised when the connection with the service was closed.
+        /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
