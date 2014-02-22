@@ -11,6 +11,7 @@ using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 
 namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 {
@@ -208,6 +209,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
             using (EneterTrace.Entering())
             {
                 myAdbHostPort = adbHostPort;
+                myUnderlyingTcpMessaging = new TcpMessagingSystemFactory(protocolFormatter);
                 myProtocolFormatter = protocolFormatter;
             }
         }
@@ -278,7 +280,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), null, myAdbHostPort, myProtocolFormatter);
+                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), null, myAdbHostPort, myProtocolFormatter, myUnderlyingTcpMessaging);
             }
         }
 
@@ -292,7 +294,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), responseReceiverId, myAdbHostPort, myProtocolFormatter);
+                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), responseReceiverId, myAdbHostPort, myProtocolFormatter, myUnderlyingTcpMessaging);
             }
         }
 
@@ -307,7 +309,22 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
             throw new NotSupportedException("Duplex input channel is not supported for Android USB cable messaging.");
         }
 
+        /// <summary>
+        /// Returns underlying TCP messaging.
+        /// </summary>
+        /// <remarks>
+        /// It allows to set parameters like timeouts and threading mode.
+        /// </remarks>
+        public IMessagingSystemFactory UnderlyingTcpMessaging
+        {
+            get
+            {
+                return myUnderlyingTcpMessaging;
+            }
+        }
+
         private int myAdbHostPort;
+        private IMessagingSystemFactory myUnderlyingTcpMessaging;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }
 }

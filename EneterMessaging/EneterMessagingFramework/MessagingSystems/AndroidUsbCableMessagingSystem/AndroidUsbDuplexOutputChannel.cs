@@ -27,7 +27,8 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-        public AndroidUsbDuplexOutputChannel(int port, string responseReceiverId, int adbHostPort, IProtocolFormatter<byte[]> protocolFormatter)
+        public AndroidUsbDuplexOutputChannel(int port, string responseReceiverId, int adbHostPort, IProtocolFormatter<byte[]> protocolFormatter,
+            IMessagingSystemFactory underlyingTcpMessaging)
         {
             using (EneterTrace.Entering())
             {
@@ -35,9 +36,8 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
                 ResponseReceiverId = (string.IsNullOrEmpty(responseReceiverId)) ? port + "_" + Guid.NewGuid().ToString() : responseReceiverId;
                 myAdbHostPort = adbHostPort;
 
-                IMessagingSystemFactory aTcpMessaging = new TcpMessagingSystemFactory();
                 string anIpAddressAndPort = "tcp://127.0.0.1:" + ChannelId + "/";
-                myOutputchannel = aTcpMessaging.CreateDuplexOutputChannel(anIpAddressAndPort, ResponseReceiverId);
+                myOutputchannel = underlyingTcpMessaging.CreateDuplexOutputChannel(anIpAddressAndPort, ResponseReceiverId);
                 myOutputchannel.ConnectionOpened += OnConnectionOpened;
                 myOutputchannel.ConnectionClosed += OnConnectionClosed;
                 myOutputchannel.ResponseMessageReceived += OnResponseMessageReceived;
