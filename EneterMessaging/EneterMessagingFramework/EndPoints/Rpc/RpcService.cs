@@ -73,6 +73,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
+                ServiceInterfaceChecker.Check<TServiceInterface>();
+
                 myService = service;
                 mySerializer = serializer;
 

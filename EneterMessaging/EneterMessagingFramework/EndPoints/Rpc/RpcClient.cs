@@ -75,6 +75,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 myRpcTimeout = rpcTimeout;
 
 #if !SILVERLIGHT && !COMPACT_FRAMEWORK
+                ServiceInterfaceChecker.CheckForClient<TServiceInterface>();
+
                 // Dynamically implement and instantiate the given interface as the proxy.
                 Proxy = ProxyProvider.CreateInstance<TServiceInterface>(CallMethod, SubscribeEvent, UnsubscribeEvent);
 #endif
@@ -107,7 +109,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
         public TServiceInterface Proxy { get; private set; }
 #endif
 

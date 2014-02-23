@@ -86,6 +86,7 @@
     <Compile Include="EndPoints\Rpc\RpcFlags.cs" />
     <Compile Include="EndPoints\Rpc\RpcMessage.cs" />
     <Compile Include="EndPoints\Rpc\RpcService.cs" />
+    <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
     <Compile Include="EndPoints\Rpc\_NamespaceDoc.cs" />
     <Compile Include="EndPoints\StringMessages\DuplexStringMessageReceiver.cs" />
     <Compile Include="EndPoints\StringMessages\DuplexStringMessageSender.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitorChannelMessage.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexInputChannel.cs" />

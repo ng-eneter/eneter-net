@@ -53,6 +53,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
