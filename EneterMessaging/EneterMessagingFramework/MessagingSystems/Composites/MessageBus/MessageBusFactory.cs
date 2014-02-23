@@ -32,7 +32,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Construct the factory.
         /// </summary>
-        /// <param name="protocolFormatter">protocol formatter used for the communication between channels.</param>
+        /// <param name="protocolFormatter">This protocol formatter must be exactly same as is used by both channels that will be attached to the message bus.
+        /// </param>
         public MessageBusFactory(IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
