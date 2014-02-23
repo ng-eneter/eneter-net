@@ -12,6 +12,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 {
@@ -310,21 +311,102 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
 
         /// <summary>
-        /// Returns underlying TCP messaging.
+        /// Size of the buffer in bytes for sending messages. Default value is 8192 bytes.
         /// </summary>
-        /// <remarks>
-        /// It allows to set parameters like timeouts and threading mode.
-        /// </remarks>
-        public IMessagingSystemFactory UnderlyingTcpMessaging
+        public int SendBufferSize
         {
             get
             {
-                return myUnderlyingTcpMessaging;
+                return myUnderlyingTcpMessaging.SendBufferSize;
+            }
+            set
+            {
+                myUnderlyingTcpMessaging.SendBufferSize = value;
+            }
+        }
+
+        /// <summary>
+        /// Size of the buffer in bytes for receiving messages. Default value is 8192 bytes.
+        /// </summary>
+        public int ReceiveBufferSize
+        {
+            get
+            {
+                return myUnderlyingTcpMessaging.ReceiveBufferSize;
+            }
+            set
+            {
+                myUnderlyingTcpMessaging.ReceiveBufferSize = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets or gets timeout to send a message. Default is 0 what it infinite time.
+        /// </summary>
+        public TimeSpan SendTimeout
+        {
+            get
+            {
+                return myUnderlyingTcpMessaging.SendTimeout;
+            }
+            set
+            {
+                myUnderlyingTcpMessaging.SendTimeout = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets or gets timeout to receive a message. If not received within the time the connection is closed. Default is 0 what it infinite time.
+        /// </summary>
+        public TimeSpan ReceiveTimeout
+        {
+            get
+            {
+                return myUnderlyingTcpMessaging.ReceiveTimeout;
+            }
+            set
+            {
+                myUnderlyingTcpMessaging.ReceiveTimeout = value;
+            }
+        }
+
+
+        /// <summary>
+        /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.
+        /// </summary>
+        public TimeSpan ConnectTimeout
+        {
+            get
+            {
+                return myUnderlyingTcpMessaging.ConnectTimeout;
+            }
+            set
+            {
+                myUnderlyingTcpMessaging.ConnectTimeout = value;
+            }
+        }
+
+        /// <summary>
+        /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
+        /// desired threading strategy.
+        /// </summary>
+        /// <remarks>
+        /// Default setting is that received response messages are routed via one working thread.
+        /// </remarks>
+        public IThreadDispatcherProvider OutputChannelThreading
+        {
+            get
+            {
+                return myUnderlyingTcpMessaging.OutputChannelThreading;
+            }
+            set
+            {
+                myUnderlyingTcpMessaging.OutputChannelThreading = value;
             }
         }
 
         private int myAdbHostPort;
-        private IMessagingSystemFactory myUnderlyingTcpMessaging;
+        private TcpMessagingSystemFactory myUnderlyingTcpMessaging;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
     }
 }
