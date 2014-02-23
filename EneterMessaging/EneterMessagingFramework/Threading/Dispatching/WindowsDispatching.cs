@@ -65,7 +65,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// <returns></returns>
         public IThreadDispatcher GetDispatcher()
         {
-            return (myDispatcher != null) ? myDispatcher : new WindowsDispatcher(StartNewWindowsDispatcher());
+            return myDispatcher;
         }
 
         /// <summary>
