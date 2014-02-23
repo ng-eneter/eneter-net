@@ -61,6 +61,15 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                     // Get the absolute path to identify the end-point.
                     string anIncomingPath = anHttpRequestRegex.Groups["path"].Value;
+                    if (string.IsNullOrEmpty(anIncomingPath))
+                    {
+                    	EneterTrace.Warning(TracedObject + "failed to process HTTP request because the path is null or empty string.");
+                        byte[] aCloseConnectionResponse = HttpFormatter.EncodeError(400);
+                        aDataStream.Write(aCloseConnectionResponse, 0, aCloseConnectionResponse.Length);
+
+                        return;
+                    }
+                    
                     // if the incoming path is the whole uri then extract the absolute path.
                     Uri anIncomingUri;
                     Uri.TryCreate(anIncomingPath, UriKind.Absolute, out anIncomingUri);

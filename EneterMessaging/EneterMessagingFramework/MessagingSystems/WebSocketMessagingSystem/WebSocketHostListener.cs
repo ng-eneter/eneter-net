@@ -75,6 +75,15 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                     // Get the path to identify the end-point.
                     string anIncomingPath = anHttpOpenConnectionRegEx.Groups["path"].Value;
+                    if (string.IsNullOrEmpty(anIncomingPath))
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to process Websocket request because the path is null or empty string.");
+                        byte[] aCloseConnectionResponse = WebSocketFormatter.EncodeCloseFrame(null, 400);
+                        aDataStream.Write(aCloseConnectionResponse, 0, aCloseConnectionResponse.Length);
+
+                        return;
+                    }
+
                     // if the incoming path is the whole uri then extract the absolute path.
                     Uri anIncomingUri;
                     Uri.TryCreate(anIncomingPath, UriKind.Absolute, out anIncomingUri);
