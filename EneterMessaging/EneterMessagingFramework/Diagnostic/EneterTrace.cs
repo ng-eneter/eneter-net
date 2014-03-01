@@ -605,18 +605,23 @@ namespace Eneter.Messaging.Diagnostic
 
             try
             {
-                while (true)
+                bool aFinishFlag = false;
+                while (!aFinishFlag)
                 {
                     Action aJob;
                     lock (myTraceQueue)
                     {
-                        if (myTraceQueue.Count > 0)
-                        {
-                            aJob = myTraceQueue.Dequeue();
-                        }
-                        else
+                        if (myTraceQueue.Count == 0)
                         {
                             return;
+                        }
+
+                        aJob = myTraceQueue.Dequeue();
+
+                        // if it was the last item then indicate the thread shall end.
+                        if (myTraceQueue.Count == 0)
+                        {
+                            aFinishFlag = true;
                         }
                     }
 
@@ -630,14 +635,6 @@ namespace Eneter.Messaging.Diagnostic
                         // No error should removing jobs from the queue.
                         string anExceptionDetails = GetDetailsFromException(err);
                         Console.WriteLine("EneterTrace failed. " + anExceptionDetails);
-                    }
-
-                    lock (myTraceQueue)
-                    {
-                        if (myTraceQueue.Count == 0)
-                        {
-                            return;
-                        }
                     }
                 }
             }

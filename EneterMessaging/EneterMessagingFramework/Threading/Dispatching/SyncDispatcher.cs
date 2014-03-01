@@ -39,10 +39,11 @@ namespace Eneter.Messaging.Threading.Dispatching
             {
                 try
                 {
-                    Action aJob;
-
-                    while (true)
+                    bool aFinishFlag = false;
+                    while (!aFinishFlag)
                     {
+                        Action aJob;
+
                         // Take the job from the queue.
                         lock (myQueue)
                         {
@@ -52,6 +53,12 @@ namespace Eneter.Messaging.Threading.Dispatching
                             }
 
                             aJob = myQueue.Dequeue();
+
+                            // if it was the last item then indicate the thread shall end.
+                            if (myQueue.Count == 0)
+                            {
+                                aFinishFlag = true;
+                            }
                         }
 
                         try
@@ -62,15 +69,6 @@ namespace Eneter.Messaging.Threading.Dispatching
                         catch (Exception err)
                         {
                             EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
-                        }
-
-                        // If it was the last job then the working thread can end.
-                        lock (myQueue)
-                        {
-                            if (myQueue.Count == 0)
-                            {
-                                return;
-                            }
                         }
                     }
                 }
