@@ -22,7 +22,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
             // In addition the interface must be public.
             // Otherwise the runtime implementation of the proxy will fails because the implemented interface will be not accessible.
-            if (!typeof(T).IsPublic)
+            if (!typeof(T).IsPublic && !typeof(T).IsNestedPublic)
             {
                 string anErrorMessage = "The type '" + typeof(T).Name + "' is not public.";
                 EneterTrace.Error(anErrorMessage);
