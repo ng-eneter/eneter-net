@@ -437,17 +437,17 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// desired threading model.
         /// </summary>
         /// <remarks>
-        /// Default setting is that all messages from all connected clients are routed by one working thread.
+        /// Default setting is that all messages from all connected clients are routed one by one via a working thread.
         /// </remarks>
         public IThreadDispatcherProvider InputChannelThreading { get; set; }
 #endif
 
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
+        /// Provides thread dispatcher responsible for routing events from duplex output channel according to
         /// desired threading strategy.
         /// </summary>
         /// <remarks>
-        /// Default setting is that received response messages are routed via one working thread.
+        /// Default setting is that received response messages are routed one by one via a working thread.
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 

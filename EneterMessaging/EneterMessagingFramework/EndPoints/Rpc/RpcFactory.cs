@@ -8,6 +8,7 @@
 using System;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.EndPoints.Rpc
 {
@@ -120,6 +121,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                 // Default timeout is set to infinite by default.
                 RpcTimeout = TimeSpan.FromMilliseconds(-1);
+
+                RpcClientThreading = new SyncDispatching();
             }
         }
 
@@ -132,7 +135,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-                return new RpcClient<TServiceInterface>(Serializer, RpcTimeout);
+                return new RpcClient<TServiceInterface>(Serializer, RpcTimeout, RpcClientThreading.GetDispatcher());
             }
         }
 
@@ -158,6 +161,18 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// Gets/sets serializer used for serializing messages between RpcClient and RpcService.
         /// </summary>
         public ISerializer Serializer { get; set; }
+
+        /// <summary>
+        /// Gets/sets threading mechanism used for invoking events (if RPC interface has some) and ConnectionOpened and ConnectionClosed events.
+        /// </summary>
+        /// <remarks>
+        /// Default setting is that events are routed one by one via a working thread.<br/>
+        /// It is recomended not to set the same threading mode for the attached output channel because a deadlock can occur when
+        /// a remote procedure is called (e.g. if a return value from a remote method is routed to the same thread as is currently waiting for that return value the deadlock occurs).<br/>
+        /// <br/>
+        /// Note: The threading mode for the RPC service is defined by the threading mode of attached duplex input channel.
+        /// </remarks>
+        public IThreadDispatcherProvider RpcClientThreading { get; set; }
 
         /// <summary>
         /// Gets/sets timeout which specifies until when a call to a remote method must return.

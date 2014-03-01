@@ -67,7 +67,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
 
-        public RpcClient(ISerializer serializer, TimeSpan rpcTimeout)
+        public RpcClient(ISerializer serializer, TimeSpan rpcTimeout, IThreadDispatcher threadDispatcher)
         {
             using (EneterTrace.Entering())
             {
@@ -105,7 +105,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     }
                 }
 
-                myRaiseEventInvoker = new SyncDispatcher();
+                myThreadDispatcher = threadDispatcher;
             }
         }
 
@@ -157,7 +157,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
 
                 // Forward the event.
-                Notify(ConnectionOpened, e);
+                myThreadDispatcher.Invoke(() => Notify(ConnectionOpened, e));
             }
         }
 
@@ -166,7 +166,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
                 // Forward the event.
-                Notify(ConnectionClosed, e);
+                myThreadDispatcher.Invoke(() => Notify(ConnectionClosed, e));
             }
         }
 
@@ -227,13 +227,18 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     {
                         // Try to raise an event.
                         // The event is raised in its own thread so that the receiving thread is not blocked.
-                        myRaiseEventInvoker.Invoke(() => RaiseEvent(aMessage.OperationName, aMessage.SerializedData[0]));
+                        // Note: raising an event cannot block handling of response messages because it can block
+                        //       processing of an RPC response for which the RPC caller thread is waiting.
+                        //       And if this waiting caller thread is a thread where events are routed and if the routing
+                        //       of these events is 'blocking' then a deadlock can occur.
+                        //       Therefore ThreadPool is used.
+                        ThreadPool.QueueUserWorkItem(x => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, aMessage.SerializedData[0])));
                     }
                     else
                     {
                          // Note: this happens if the event is of type EventErgs.
                         // The event is raised in its own thread so that the receiving thread is not blocked.
-                        myRaiseEventInvoker.Invoke(() => RaiseEvent(aMessage.OperationName, null));
+                        ThreadPool.QueueUserWorkItem(x => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, null)));
                     }
                 }
                 else
@@ -523,7 +528,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private ISerializer mySerializer;
         private int myCounter;
         private Dictionary<int, RemoteCallContext> myPendingRemoteCalls = new Dictionary<int, RemoteCallContext>();
-        private IThreadDispatcher myRaiseEventInvoker;
+        private IThreadDispatcher myThreadDispatcher;
         private TimeSpan myRpcTimeout;
 
         private Dictionary<string, RemoteMethod> myRemoteMethods = new Dictionary<string, RemoteMethod>();
