@@ -53,6 +53,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
@@ -614,7 +615,6 @@
     <Compile Include="System\ReadOnlyDictionary.cs" />
     <Compile Include="System\SystemAttributes.cs" />
     <Compile Include="System\WaitHandleExt.cs" />
-    <Compile Include="Threading\Dispatching\SyncDispatcher.cs" />
     <Compile Include="Threading\Dispatching\SyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\WindowsDispatching.cs" />
     <Compile Include="Threading\Dispatching\_NamespaceDoc.cs" />

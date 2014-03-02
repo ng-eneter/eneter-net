@@ -8,7 +8,6 @@
 
 using System;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
@@ -78,12 +77,12 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                     // Note: If the message handler is unregistered before the message handler is processed from the queue
                     //       then myMessageHandler will be null and the exception will occur. Therefore we need to store it locally.
                     Action<TMessage> aMessageHandler = myMessageHandler;
-                    myWorker.Invoke(() => aMessageHandler(message));
+                    myWorker.Execute(() => aMessageHandler(message));
                 }
             }
         }
 
-        private SyncDispatcher myWorker = new SyncDispatcher();
+        private SingleThreadExecutor myWorker = new SingleThreadExecutor();
         private Action<TMessage> myMessageHandler;
         private object myLock = new object();
         private string TracedObject { get { return GetType().Name + " "; } }

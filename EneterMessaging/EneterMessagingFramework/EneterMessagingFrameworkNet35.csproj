@@ -85,6 +85,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DataProcessing\MessageQueueing\MonitorExt.cs" />
+    <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
     <Compile Include="DataProcessing\MessageQueueing\WorkingThread.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -580,7 +581,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Threading\Dispatching\SilverlightDispatching.cs" />
-    <Compile Include="Threading\Dispatching\SyncDispatcher.cs" />
     <Compile Include="Threading\Dispatching\SyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\WindowsDispatching.cs" />
     <Compile Include="Threading\Dispatching\_NamespaceDoc.cs" />

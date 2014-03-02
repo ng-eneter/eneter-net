@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !COMPACT_FRAMEWORK
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -72,3 +74,5 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
         protected TimeSpan myAuthenticationSleep = TimeSpan.FromMilliseconds(0);
     }
 }
+
+#endif

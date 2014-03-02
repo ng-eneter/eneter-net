@@ -14,6 +14,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.DataProcessing.MessageQueueing;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
@@ -25,7 +26,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 myServiceEndpoint = serviceEndPoint;
                 myIsService = isService;
-                myWorkingThreadDispatcher = new SyncDispatcher();
+                myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
 
@@ -209,7 +210,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             Buffer.BlockCopy(aBuf, 0, aDatagram, 0, aReceivedLength);
                         }
 
-                        myWorkingThreadDispatcher.Invoke(() =>
+                        myWorkingThreadDispatcher.Execute(() =>
                             {
                                 try
                                 {
@@ -252,7 +253,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 // If the listening got interrupted.
                 if (!myStopListeningRequested)
                 {
-                    myWorkingThreadDispatcher.Invoke(() =>
+                    myWorkingThreadDispatcher.Execute(() =>
                         {
                             try
                             {
@@ -279,7 +280,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private Thread myListeningThread;
         private ManualResetEvent myListeningToResponsesStartedEvent = new ManualResetEvent(false);
         private Func<MessageContext, bool> myMessageHandler;
-        private IThreadDispatcher myWorkingThreadDispatcher;
+        private SingleThreadExecutor myWorkingThreadDispatcher;
 
         private string TracedObject
         {

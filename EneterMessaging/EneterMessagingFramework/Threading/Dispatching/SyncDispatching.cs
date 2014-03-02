@@ -5,6 +5,8 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
+using System;
+using Eneter.Messaging.DataProcessing.MessageQueueing;
 using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.Threading.Dispatching
@@ -14,6 +16,16 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// </summary>
     public class SyncDispatching : IThreadDispatcherProvider
     {
+        private class SyncDispatcher : IThreadDispatcher
+        {
+            public void Invoke(Action workItem)
+            {
+                myWorkingThread.Execute(workItem);
+            }
+
+            private SingleThreadExecutor myWorkingThread = new SingleThreadExecutor();
+        }
+
         /// <summary>
         /// Constructs dispatching where each GetDispatcher() returns a new instance of the dispatcher.
         /// </summary>
