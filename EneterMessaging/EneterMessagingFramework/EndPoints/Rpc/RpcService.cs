@@ -265,6 +265,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 // If it is a remote call of a method/function.
                 if (aRequestMessage.Flag == RpcFlags.InvokeMethod)
                 {
+                    EneterTrace.Debug("RPC RECEIVED");
+
                     // Get the method from the service that shall be invoked.
                     ServiceMethod aServiceMethod;
                     myServiceMethods.TryGetValue(aRequestMessage.OperationName, out aServiceMethod);
@@ -352,18 +354,17 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         {
                             if (aRequestMessage.Flag == RpcFlags.SubscribeEvent)
                             {
+                                EneterTrace.Debug("SUBSCRIBE REMOTE EVENT RECEIVED");
+
                                 // Note: Events are added to the HashSet.
                                 //       Therefore it is ensured each client is subscribed only once.
                                 anEventContext.SubscribedClients.Add(e.ResponseReceiverId);
                             }
-                            else if (aRequestMessage.Flag == RpcFlags.UnsubscribeEvent)
-                            {
-                                anEventContext.SubscribedClients.Remove(e.ResponseReceiverId);
-                            }
                             else
                             {
-                                aResponseMessage.Error = TracedObject + "could not recognize if to subscribe or unsubscribe the event '" + aRequestMessage.OperationName + "'.";
-                                EneterTrace.Error(aResponseMessage.Error);
+                                EneterTrace.Debug("UNSUBSCRIBE REMOTE EVENT RECEIVED");
+
+                                anEventContext.SubscribedClients.Remove(e.ResponseReceiverId);
                             }
                         }
                     }
@@ -373,6 +374,11 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         aResponseMessage.Error = TracedObject + "Event '" + aRequestMessage.OperationName + "' does not exist in the service.";
                         EneterTrace.Error(aResponseMessage.Error);
                     }
+                }
+                else
+                {
+                    aResponseMessage.Error = TracedObject + "could not recognize the incoming request. If it is RPC, Subscribing or Unsubscribfing.";
+                    EneterTrace.Error(aResponseMessage.Error);
                 }
                 
 
