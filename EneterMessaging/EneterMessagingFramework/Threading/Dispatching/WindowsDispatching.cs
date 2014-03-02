@@ -19,7 +19,7 @@ namespace Eneter.Messaging.Threading.Dispatching
     /// Dispatcher that internally uses System.Windows.Threading.Dispatcher.
     /// </summary>
     /// <remarks>
-    /// E.g. in case of WPF it allows to synchronize incoming methods into the UI thread.
+    /// E.g. in case of WPF it allows to execute methods in the UI thread.
     /// </remarks>
     public class WindowsDispatching : IThreadDispatcherProvider
     {
@@ -97,6 +97,7 @@ namespace Eneter.Messaging.Threading.Dispatching
                         // Runn the loop processing dispatched requests.
                         Dispatcher.Run();
                     });
+                aWorkingThread.IsBackground = true;
                 aWorkingThread.Start();
 
                 // Wait until the dispatcher is created.
