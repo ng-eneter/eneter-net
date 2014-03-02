@@ -251,6 +251,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
+                    EneterTrace.Debug("REQUEST MESSAGE RECEIVED");
+
                     // If the connection is not open then it will open it.
                     CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
 
@@ -258,11 +260,14 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                 {
+                    EneterTrace.Debug("CLIENT CONNECTION RECEIVED");
+
                     // If the connection is not approved.
                     CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
+                    EneterTrace.Debug("CLIEN DISCONNECTION RECEIVED");
                     ThreadPool.QueueUserWorkItem(x => CloseResponseMessageSender(aProtocolMessage.ResponseReceiverId, false));
                 }
                 else
@@ -424,7 +429,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             using (EneterTrace.Entering())
             {
                 ResponseReceiverEventArgs anEventArgs = new ResponseReceiverEventArgs(responseReceiverId, senderAddress);
-                Notify<ResponseReceiverEventArgs>(handler, anEventArgs, false);
+                NotifyGeneric<ResponseReceiverEventArgs>(handler, anEventArgs, false);
             }
         }
 
@@ -434,11 +439,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             using (EneterTrace.Entering())
             {
                 DuplexChannelMessageEventArgs anEventArgs = new DuplexChannelMessageEventArgs(ChannelId, protocolMessage.Message, protocolMessage.ResponseReceiverId, messageContext.SenderAddress);
-                Notify<DuplexChannelMessageEventArgs>(MessageReceived, anEventArgs, true);
+                NotifyGeneric<DuplexChannelMessageEventArgs>(MessageReceived, anEventArgs, true);
             }
         }
 
-        private void Notify<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
+        private void NotifyGeneric<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
             where T : EventArgs
         {
             using (EneterTrace.Entering())

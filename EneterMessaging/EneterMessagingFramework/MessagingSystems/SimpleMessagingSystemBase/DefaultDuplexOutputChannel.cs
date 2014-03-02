@@ -185,10 +185,14 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 if (aProtocolMessage == null || aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
+                    EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
+
                     ThreadPool.QueueUserWorkItem(x => ClearConnection(false));
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
+                    EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
+
                     Dispatcher.Invoke(() => NotifyResponseMessageReceived(aProtocolMessage.Message));
                 }
                 else
