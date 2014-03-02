@@ -246,19 +246,19 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 
         private void EncodeHeader(BinaryWriter writer)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 // Header indicating the Eneter protocol with used Endian encoding.
                 // Note: .NET uses Little Endian and UTF8
                 byte[] aHeader = {(byte) 'E', (byte) 'N', (byte) 'E', (byte) 'T', (byte) 'E', (byte) 'R', LITTLE_ENDIAN, UTF8};
                 writer.Write(aHeader);
-            }
+            //}
         }
 
         private void EncodeMessage(BinaryWriter writer, object message)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 if (message is String)
                 {
                     writer.Write(STRING);
@@ -278,38 +278,38 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
-            }
+            //}
         }
 
 
         private ProtocolMessage DecodeRequest(EProtocolMessageType messageType, BinaryReader reader, int anEndianEncodingId, int aStringEncodingId)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 string aResponseReceiverId = GetResponseReceiverId(reader, anEndianEncodingId, aStringEncodingId);
 
                 ProtocolMessage aProtocolMessage = new ProtocolMessage(messageType, aResponseReceiverId, null);
                 return aProtocolMessage;
-            }
+            //}
         }
 
         private ProtocolMessage DecodeMessage(BinaryReader reader, int anEndianEncodingId, int aStringEncodingId)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 string aResponseReceiverId = GetResponseReceiverId(reader, anEndianEncodingId, aStringEncodingId);
                 object aMessage = GetMessage(reader, anEndianEncodingId, aStringEncodingId);
 
                 ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, aResponseReceiverId, aMessage);
                 return aProtocolMessage;
-            }
+            //}
         }
 
 
         private string GetResponseReceiverId(BinaryReader reader, int anEndianEncodingId, int aStringEncodingId)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 int aSize = ReadInt(reader, anEndianEncodingId);
 
                 byte[] aStringBytes = reader.ReadBytes(aSize);
@@ -317,13 +317,13 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                 string aResponseReceiverId = DecodeString(aStringBytes, anEndianEncodingId, aStringEncodingId);
 
                 return aResponseReceiverId;
-            }
+            //}
         }
 
         private object GetMessage(BinaryReader reader, int anEndianEncodingId, int aStringEncodingId)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 int aSerializationType = reader.ReadByte();
                 int aSize = ReadInt(reader, anEndianEncodingId);
 
@@ -343,7 +343,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                 string anErrorMessage = "Received message is not serialized into byte[] or string.";
                 EneterTrace.Error(anErrorMessage);
                 throw new InvalidOperationException(anErrorMessage);
-            }
+            //}
         }
 
         private int ReadInt(BinaryReader reader, int anEndianEncodingId)
