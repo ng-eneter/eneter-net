@@ -894,7 +894,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
 #if !COMPACT_FRAMEWORK
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void NoInterfaceTypeProvided()
         {
             RpcFactory anRpcFactory = new RpcFactory();

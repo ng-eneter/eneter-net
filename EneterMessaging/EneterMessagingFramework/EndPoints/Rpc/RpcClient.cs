@@ -54,12 +54,12 @@ namespace Eneter.Messaging.EndPoints.Rpc
             {
                 EventArgsType = eventArgsType;
                 Subscribers = new Dictionary<Delegate, Action<object, EventArgs>>();
-                Lock = new object();
+                SubscribeUnsubscribeLock = new object();
             }
 
             public Type EventArgsType { get; private set; }
             public Dictionary<Delegate, Action<object, EventArgs>> Subscribers { get; private set; }
-            public object Lock { get; private set; }
+            public object SubscribeUnsubscribeLock { get; private set; }
         }
 
 
@@ -144,20 +144,27 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-                // Recover remote subscriptions at service.
-                foreach (KeyValuePair<string, RemoteEvent> aRemoteEvent in myRemoteEvents)
-                {
-                    lock (aRemoteEvent.Value.Lock)
+                // Note: Following subscribing cannot block the thread processing events from duplex output channel
+                //       because a deadlock can occur. Because if the lock would stop this thread other messages could not be processed.
+                ThreadPool.QueueUserWorkItem(x =>
                     {
-                        if (aRemoteEvent.Value.Subscribers.Count > 0)
+                        // Recover remote subscriptions at service.
+                        foreach (KeyValuePair<string, RemoteEvent> aRemoteEvent in myRemoteEvents)
                         {
-                            SubscribeAtService(aRemoteEvent.Key);
+                            // Note: In Java, the following 'lock' section is located in RemoteEvent class.
+                            //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
+                            lock (aRemoteEvent.Value.SubscribeUnsubscribeLock)
+                            {
+                                if (aRemoteEvent.Value.Subscribers.Count > 0)
+                                {
+                                    SubscribeAtService(aRemoteEvent.Key);
+                                }
+                            }
                         }
-                    }
-                }
 
-                // Forward the event.
-                myThreadDispatcher.Invoke(() => Notify(ConnectionOpened, e));
+                        // Forward the event.
+                        myThreadDispatcher.Invoke(() => Notify(ConnectionOpened, e));
+                    });
             }
         }
 
@@ -191,6 +198,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 // If it is a response for a call.
                 if (aMessage.Flag == RpcFlags.MethodResponse)
                 {
+                    EneterTrace.Debug("RETURN FROM RPC RECEIVED");
+
                     // Try to find if there is a pending request waiting for the response.
                     RemoteCallContext anRpcContext;
                     lock (myPendingRemoteCalls)
@@ -223,6 +232,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
                 else if (aMessage.Flag == RpcFlags.RaiseEvent)
                 {
+                    EneterTrace.Debug("EVENT FROM SERVICE RECEIVED");
+
                     if (aMessage.SerializedData != null && aMessage.SerializedData.Length > 0)
                     {
                         // Try to raise an event.
@@ -321,7 +332,10 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
-                lock (aRemoteEvent.Lock)
+
+                // Note: In Java, the following 'lock' section is located in RemoteEvent class.
+                //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
+                lock (aRemoteEvent.SubscribeUnsubscribeLock)
                 {
                     // Store the subscriber.
                     aRemoteEvent.Subscribers[handler] = handlerWrapper;
@@ -360,7 +374,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     return;
                 }
 
-                lock (aServiceEvent.Lock)
+                // Note: In Java, the following 'lock' section is located in RemoteEvent class.
+                //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
+                lock (aServiceEvent.SubscribeUnsubscribeLock)
                 {
                     // Remove the subscriber from the list.
                     aServiceEvent.Subscribers.Remove(handler);
@@ -489,8 +505,10 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     return;
                 }
 
+                // Note: In Java, the following 'lock' section is located in RemoteEvent class.
+                //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
                 // Notify all subscribers.
-                lock (aRemoteEvent.Lock)
+                lock (aRemoteEvent.SubscribeUnsubscribeLock)
                 {
                     foreach (KeyValuePair<Delegate, Action<object, EventArgs>> aSubscriber in aRemoteEvent.Subscribers)
                     {
