@@ -197,6 +197,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                 if (myIsHandshakeResponseSent)
                 {
+                    EneterTrace.Debug("CONNECTION ACKNOWLEDGE RECEIVED");
+
                     // If the handshake was sent then this message must be acknowledgement.
                     string anAcknowledgeMessage = e.Message as string;
 
@@ -221,6 +223,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 else
                     // This is the handshake message.
                 {
+                    EneterTrace.Debug("HANDSHAKE RECEIVED");
+
                     // Get the response for the handshake message.
                     object aHandshakeResponseMessage = null;
                     try

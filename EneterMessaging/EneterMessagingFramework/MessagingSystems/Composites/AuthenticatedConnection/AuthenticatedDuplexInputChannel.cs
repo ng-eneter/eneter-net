@@ -149,6 +149,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     // The response for the handshake will be verified.
                     if (aConnection.HandshakeMessage != null)
                     {
+                        EneterTrace.Debug("HANDSHAKE RESPONSE RECEIVED");
+
                         try
                         {
                             if (myAuthenticateCallback(e.ChannelId, e.ResponseReceiverId, aConnection.LoginMessage, aConnection.HandshakeMessage, e.Message))
@@ -183,6 +185,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     }
                     else
                     {
+                        EneterTrace.Debug("LOGIN RECEIVED");
+
                         // If the connection is in the state that it is not logged in then this must be the login message.
                         // The handshake message will be sent.
                         try

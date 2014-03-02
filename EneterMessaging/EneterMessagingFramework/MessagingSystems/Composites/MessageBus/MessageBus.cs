@@ -140,6 +140,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+                EneterTrace.Debug("CLIENT DISCONNECTION RECEIVED");
                 UnregisterClient(e.ResponseReceiverId);
             }
         }
@@ -153,11 +154,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 // wants to connect. Client is supposed to send this message immediatelly after OpenConnection().
                 if (e.Message is string)
                 {
+                    EneterTrace.Debug("CLIENT CONNECTION RECEIVED");
+
                     string aServiceId = (string)e.Message;
                     RegisterClient(e.ResponseReceiverId, aServiceId);
                 }
                 else
                 {
+                    EneterTrace.Debug("MESSAGE FOR SERVICE RECEIVED");
+
                     ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
                     if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                     {
@@ -310,6 +315,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+                EneterTrace.Debug("SERVICE CONNECTION RECEIVED");
+
                 RegisterService(e.ResponseReceiverId);
 
 				if (ServiceRegistered != null)
@@ -332,6 +339,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+                EneterTrace.Debug("SERVICE DISCONNECTION RECEIVED");
+
                 UnregisterService(e.ResponseReceiverId);
 
 				if (ServiceUnregistered != null)
@@ -361,6 +370,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         // A service sends a response message to a client.
                         if (aProtocolMessage.MessageType != EProtocolMessageType.Unknown)
                         {
+                            EneterTrace.Debug("MESSAGE FOR CLIENT RECEIVED");
                             ForwardMessageToClient(aProtocolMessage.ResponseReceiverId, e.Message);
                         }
                         else
