@@ -73,8 +73,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         myResponseReceiver = null;
                     }
 
-                    myServiceEndpoint = null;
-
                     if (myClientSocket != null)
                     {
                         myClientSocket.Close();
