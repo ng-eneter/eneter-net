@@ -6,6 +6,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 
@@ -13,27 +14,50 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
     internal class SingleThreadExecutor
     {
-        public SingleThreadExecutor()
-        {
-            myWorkingThread = new Thread(DoJobs);
-            myWorkingThread.IsBackground = true;
-            myWorkingThread.Start();
-
-            // Store the tracing info.
-            TracedObject = "TO ~ " + myWorkingThread.ManagedThreadId;
-        }
-
         public void Execute(Action job)
         {
-            EneterTrace.Debug(TracedObject);
-            myJobQueue.EnqueueMessage(job);
+            lock (myJobQueue)
+            {
+                if (!myIsWorkingThreadRunning)
+                {
+                    myIsWorkingThreadRunning = true;
+                    ThreadPool.QueueUserWorkItem(DoJobs);
+
+                    // If we are tracing then wait until the message about the working thread is ready.
+                    if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
+                    {
+                        myTraceMessageReady.WaitOne();
+                    }
+                }
+
+                // Trace into which thread it forwards the job.
+                EneterTrace.Debug(myInvokeTraceMessage);
+
+                myJobQueue.Enqueue(job);
+            }
         }
 
-        private void DoJobs()
+        private void DoJobs(object x)
         {
+            if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
+            {
+                myInvokeTraceMessage = "TO ~ " + Thread.CurrentThread.ManagedThreadId;
+                myTraceMessageReady.Set();
+            }
+
             while (true)
             {
-                Action aJob = myJobQueue.DequeueMessage();
+                Action aJob;
+                lock (myJobQueue)
+                {
+                    if (myJobQueue.Count == 0)
+                    {
+                        myIsWorkingThreadRunning = false;
+                        return;
+                    }
+
+                    aJob = myJobQueue.Dequeue();
+                }
 
                 try
                 {
@@ -47,9 +71,12 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
             }
         }
 
-        private MessageQueue<Action> myJobQueue = new MessageQueue<Action>();
-        private Thread myWorkingThread;
-        
-        private string TracedObject;
+
+        private Queue<Action> myJobQueue = new Queue<Action>();
+        private bool myIsWorkingThreadRunning;
+
+        private string myInvokeTraceMessage;
+        private AutoResetEvent myTraceMessageReady = new AutoResetEvent(false);
+        private string TracedObject { get { return GetType().Name; } }
     }
 }

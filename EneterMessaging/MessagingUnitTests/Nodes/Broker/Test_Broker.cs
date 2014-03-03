@@ -19,6 +19,9 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
         [Test]
         public void NotifySubscribers()
         {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+
             // Create channels
             IMessagingSystemFactory aMessagingSystem = new SynchronousMessagingSystemFactory();
             

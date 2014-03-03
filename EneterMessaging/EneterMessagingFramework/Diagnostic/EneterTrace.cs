@@ -110,7 +110,7 @@ namespace Eneter.Messaging.Diagnostic
             }
 
 #if !COMPACT_FRAMEWORK
-            if (DetailLevel == EDetailLevel.Debug || myIsProfilerRunning)
+            if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
 #else
             if (DetailLevel == EDetailLevel.Debug)
 #endif
@@ -152,7 +152,7 @@ namespace Eneter.Messaging.Diagnostic
                         aMicroseconds));
                 }
 #if !COMPACT_FRAMEWORK
-                else if (myIsProfilerRunning)
+                else if (myProfilerIsRunning)
                 {
                     UpdateProfiler(myStopWatch.Elapsed.Ticks);
                 }
@@ -318,7 +318,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             lock (myProfilerData)
             {
-                myIsProfilerRunning = true;
+                myProfilerIsRunning = true;
             }
         }
 #endif
@@ -334,7 +334,7 @@ namespace Eneter.Messaging.Diagnostic
 
             lock (myProfilerData)
             {
-                myIsProfilerRunning = false;
+                myProfilerIsRunning = false;
 
                 foreach (KeyValuePair<MethodBase, ProfilerData> anItem in myProfilerData.OrderByDescending(x => x.Value.Ticks))
                 {
@@ -578,10 +578,10 @@ namespace Eneter.Messaging.Diagnostic
         {
             lock (myTraceQueue)
             {
-                // If the queue is empty, then start also the thread that will process messages.
-                // If the queue is not empty, the processing thread already exists.
-                if (myTraceQueue.Count == 0)
+                // If the thread processing messages is not running.
+                if (!myProcessingIsRunning)
                 {
+                    myProcessingIsRunning = true;
                     ThreadPool.QueueUserWorkItem(ProcessJobs);
                 }
 
@@ -605,24 +605,18 @@ namespace Eneter.Messaging.Diagnostic
 
             try
             {
-                bool aFinishFlag = false;
-                while (!aFinishFlag)
+                while (true)
                 {
                     Action aJob;
                     lock (myTraceQueue)
                     {
                         if (myTraceQueue.Count == 0)
                         {
+                            myProcessingIsRunning = false;
                             return;
                         }
 
                         aJob = myTraceQueue.Dequeue();
-
-                        // if it was the last item then indicate the thread shall end.
-                        if (myTraceQueue.Count == 0)
-                        {
-                            aFinishFlag = true;
-                        }
                     }
 
                     // Execute the job.
@@ -632,7 +626,6 @@ namespace Eneter.Messaging.Diagnostic
                     }
                     catch (Exception err)
                     {
-                        // No error should removing jobs from the queue.
                         string anExceptionDetails = GetDetailsFromException(err);
                         Console.WriteLine("EneterTrace failed. " + anExceptionDetails);
                     }
@@ -670,6 +663,8 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
+        // Invoke by the timer.
+        // Traces are written to the StringBuilder. StringBuilder is flushed once per 50ms.
         private static void OnFlushTraceBuffer(object x)
         {
             string aBufferedTraceMessages;
@@ -743,6 +738,7 @@ namespace Eneter.Messaging.Diagnostic
 #endif
 
         private static ManualResetEvent myQueueThreadEndedEvent = new ManualResetEvent(true);
+        private static bool myProcessingIsRunning;
         private static Queue<Action> myTraceQueue = new Queue<Action>();
 
         private static StringBuilder myBufferedTraces = new StringBuilder();
@@ -756,7 +752,7 @@ namespace Eneter.Messaging.Diagnostic
         }
 
         private static Dictionary<MethodBase, ProfilerData> myProfilerData = new Dictionary<MethodBase, ProfilerData>();
-        private static volatile bool myIsProfilerRunning;
+        private static volatile bool myProfilerIsRunning;
 #endif
 
         private const string ENTERING = "-->";
