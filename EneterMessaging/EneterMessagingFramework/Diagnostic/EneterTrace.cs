@@ -533,7 +533,7 @@ namespace Eneter.Messaging.Diagnostic
 
                             // Add the message to the buffer.
                             // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
-                            myTraceBuffer.Append(message);
+                            myTraceBuffer.Append(aMessage);
                             myTraceBuffer.Append("\r\n");
 
                             if (aStartTimerFlag)
