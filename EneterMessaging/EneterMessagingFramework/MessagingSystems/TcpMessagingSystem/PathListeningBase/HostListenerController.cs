@@ -34,6 +34,24 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
     /// </remarks>
     internal static class HostListenerController
     {
+        /// <summary>
+        /// Starts listening for the given URI path.
+        /// </summary>
+        /// <remarks>
+        /// The listening consists of two parts:
+        /// => Host listener - TCP listening on an address and port.
+        /// => Path listener - based on the above protocol (HTTP or WebSocket) listening to the path.
+        /// 
+        /// If the URI contains hostname instead of the IP address then it resolves the host name.
+        /// But the result can be multiple addresses. E.g. for localhost it can return IPV4: 127.0.0.1 and IPV6: [::1].
+        /// In sach case it will try to start listening to all addresses associated with the host name.
+        /// If start listening fails for one of those addresses then StartListening throws exception.
+        /// 
+        /// </remarks>
+        /// <param name="address"></param>
+        /// <param name="hostListenerFactory"></param>
+        /// <param name="connectionHandler"></param>
+        /// <param name="serverSecurityFactory"></param>
         public static void StartListening(Uri address,
                                           IHostListenerFactory hostListenerFactory,
                                           object connectionHandler,
@@ -45,31 +63,38 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
                 {
                     lock (myListeners)
                     {
-                        // Get listener for the address specified in the given uri.
-                        HostListenerBase aHostListener = FindHostListener(address);
-                        if (aHostListener == null)
+                        // Get all possible end points for the given hostname/address.
+                        IEnumerable<IPEndPoint> anEndPoints = GetEndPoints(address);
+                        foreach (IPEndPoint anEndPoint in anEndPoints)
                         {
-                            // Listener does not exist yet, so create one.
-                            IPEndPoint anAddress = GetEndPoint(address);
-                            aHostListener = hostListenerFactory.CreateHostListener(anAddress, serverSecurityFactory);
-
-                            myListeners.Add(aHostListener);
-                        }
-                        else
-                        {
-                            // If found listener is listening to another protocol.
-                            // e.g. if I want to start listening to http but websocket listener is listening on
-                            //      the given IP address and port.
-                            if (aHostListener.GetType() != hostListenerFactory.ListenerType)
+                            // Try to get existing host listener for the endpoint.
+                            HostListenerBase aHostListener = GetHostListener(anEndPoint);
+                            if (aHostListener == null)
                             {
-                                string anErrorMessage = TracedObject + "failed to start " + hostListenerFactory.ListenerType + " because " + aHostListener.GetType() + " is already listening on IP address and port.";
-                                EneterTrace.Error(anErrorMessage);
-                                throw new InvalidOperationException(anErrorMessage);
+                                // The host listener does not exist so create it.
+                                aHostListener = hostListenerFactory.CreateHostListener(anEndPoint, serverSecurityFactory);
+
+                                // Register the path listener.
+                                aHostListener.RegisterListener(address, connectionHandler);
+
+                                myListeners.Add(aHostListener);
+                            }
+                            else
+                            {
+                                // If found listener is listening to another protocol.
+                                // e.g. if I want to start listening to http but websocket listener is listening on
+                                //      the given IP address and port.
+                                if (aHostListener.GetType() != hostListenerFactory.ListenerType)
+                                {
+                                    string anErrorMessage = TracedObject + "failed to start " + hostListenerFactory.ListenerType + " because " + aHostListener.GetType() + " is already listening on IP address and port.";
+                                    EneterTrace.Error(anErrorMessage);
+                                    throw new InvalidOperationException(anErrorMessage);
+                                }
+
+                                // Register the path listener.
+                                aHostListener.RegisterListener(address, connectionHandler);
                             }
                         }
-
-                        // Register the path listener.
-                        aHostListener.RegisterListener(address, connectionHandler);
                     }
                 }
                 catch (Exception err)
@@ -88,21 +113,24 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
                 {
                     lock (myListeners)
                     {
-                        // Get host listener.
-                        HostListenerBase aPathListener = FindHostListener(uri);
-                        if (aPathListener == null)
+                        // Get all possible listening endpoints.
+                        IEnumerable<IPEndPoint> anEndPoints = GetEndPoints(uri);
+                        foreach (IPEndPoint anEndPoint in anEndPoints)
                         {
-                            return;
-                        }
+                            // Figure out if exist a host listener for the endpoint.
+                            HostListenerBase aHostListener = GetHostListener(anEndPoint);
+                            if (aHostListener != null)
+                            {
+                                // Unregister the path from the host listener.
+                                aHostListener.UnregisterListener(uri);
 
-                        // Unregister the path listener.
-                        aPathListener.UnregisterListener(uri);
-
-                        // If there is no a path listener then nobody is interested in incoming
-                        // HTTP requests and the TCP listening can be stopped.
-                        if (aPathListener.ExistAnyListener() == false)
-                        {
-                            myListeners.Remove(aPathListener);
+                                // If there is no a path listener then nobody is interested in incoming messages
+                                // and the TCP listening can be stopped.
+                                if (aHostListener.ExistAnyListener() == false)
+                                {
+                                    myListeners.Remove(aHostListener);
+                                }
+                            }
                         }
                     }
                 }
@@ -124,47 +152,52 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 lock (myListeners)
                 {
-                    // Get host listener.
-                    HostListenerBase aPathListener = FindHostListener(uri);
-                    if (aPathListener == null)
+                    // Get all possible listening endpoints.
+                    // Note: if URI contains hostname (instead of IP) then it returns false if none endpoints is listening.
+                    IEnumerable<IPEndPoint> anEndPoints = GetEndPoints(uri);
+                    foreach (IPEndPoint anEndPoint in anEndPoints)
                     {
-                        return false;
+                        // Figure out if exist a host listener for the endpoint.
+                        HostListenerBase aHostListener = GetHostListener(anEndPoint);
+                        if (aHostListener != null)
+                        {
+                            // Figure out if the path listener exists.
+                            if (aHostListener.ExistListener(uri))
+                            {
+                                return true;
+                            }
+                        }
                     }
 
-                    // If the path listener does not exist then listening is not active.
-                    if (aPathListener.ExistListener(uri) == false)
-                    {
-                        return false;
-                    }
-
-                    return true;
+                    return false;
                 }
             }
         }
 
-        private static HostListenerBase FindHostListener(Uri uri)
+        private static HostListenerBase GetHostListener(IPEndPoint endPoint)
         {
             using (EneterTrace.Entering())
             {
-                // Get host listener.
-                IPEndPoint anAddress = GetEndPoint(uri);
-                HostListenerBase aPathListener = myListeners.FirstOrDefault(x => x.Address.Equals(anAddress));
-
-                return aPathListener;
+                HostListenerBase aHostListener = myListeners.FirstOrDefault(x => x.Address.Equals(endPoint));
+                return aHostListener;
             }
         }
 
-        private static IPEndPoint GetEndPoint(Uri address)
+        private static IEnumerable<IPEndPoint> GetEndPoints(Uri address)
         {
 #if !COMPACT_FRAMEWORK
             IPAddress[] anIpAddresses = Dns.GetHostAddresses(address.Host);
-            IPAddress anIpAddress = anIpAddresses[0];
 #else
-            IPAddress anIpAddress = IPAddress.Parse(address.Host);
+            IPAddress[] anIpAddresses = { IPAddress.Parse(address.Host) };
 #endif
-            IPEndPoint anEndPoint = new IPEndPoint(anIpAddress, address.Port);
 
-            return anEndPoint;
+            IPEndPoint[] anEndPoints = new IPEndPoint[anIpAddresses.Length];
+            for (int i = 0; i < anEndPoints.Length; ++i)
+            {
+                anEndPoints[i] = new IPEndPoint(anIpAddresses[i], address.Port);
+            }
+
+            return anEndPoints;
         }
 
 

@@ -359,7 +359,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             {
                                 try
                                 {
+#if !COMPACT_FRAMEWORK
+                                    // This call also resolves the host name.
+                                    myTcpClient.Connect(Uri.Host, Uri.Port);
+#else
+                                    // Compact framework has problems with resolving host names.
+                                    // Therefore directly IPAddress is used.
                                     myTcpClient.Connect(IPAddress.Parse(Uri.Host), Uri.Port);
+#endif
                                 }
                                 catch (Exception err)
                                 {

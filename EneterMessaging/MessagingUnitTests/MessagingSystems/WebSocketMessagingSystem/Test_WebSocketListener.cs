@@ -263,6 +263,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
         [Test]
         public void Query()
         {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+
 #if !COMPACT_FRAMEWORK
             Uri anAddress = new Uri("ws://localhost:8087/MyService/");
 #else
