@@ -522,10 +522,26 @@ namespace Eneter.Messaging.Diagnostic
                         string[] aJoinBuf = { aMessageBuilder.ToString(), prefix, message };
 #endif
 
+                        // Joinn string arrays with ' ' delimiter.
                         string aMessage = string.Join(" ", aJoinBuf);
 
                         // Write the trace message to the buffer.
-                        WriteToTraceBuffer(aMessage);
+                        lock (myTraceBufferLock)
+                        {
+                            // If the buffer was empty also start the timer processing the buffer.
+                            bool aStartTimerFlag = myTraceBuffer.Length == 0;
+
+                            // Add the message to the buffer.
+                            // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
+                            myTraceBuffer.Append(message);
+                            myTraceBuffer.Append("\r\n");
+
+                            if (aStartTimerFlag)
+                            {
+                                // Flush the buffer in the specified time.
+                                myTraceBufferFlushTimer.Change(50, -1);
+                            }
+                        }
                     };
 
                 EnqueueJob(aTraceJob);
@@ -638,43 +654,26 @@ namespace Eneter.Messaging.Diagnostic
         }
 
 
-        private static void WriteToTraceBuffer(string message)
-        {
-            lock (myBufferedTraces)
-            {
-                // If the buffer was empty also start the thread processing the buffer.
-                if (myBufferedTraces.Length == 0)
-                {
-                    // Add the message to the buffer.
-                    // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
-                    myBufferedTraces.Append(message);
-                    myBufferedTraces.Append("\r\n");
-
-                    // Flush the buffer in the specified time.
-                    myTraceBufferFlushTimer.Change(50, -1);
-                }
-                else
-                {
-                    // Meanwhile while the flush time is not elapsed continue writing to the buffer.
-                    // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
-                    myBufferedTraces.Append(message);
-                    myBufferedTraces.Append("\r\n");
-                }
-            }
-        }
-
-        // Invoke by the timer.
+        // Invoked by the timer.
         // Traces are written to the StringBuilder. StringBuilder is flushed once per 50ms.
-        private static void OnFlushTraceBuffer(object x)
+        private static void OnFlushTraceBufferTick(object x)
         {
             string aBufferedTraceMessages;
 
-            lock (myBufferedTraces)
+            lock (myTraceBufferLock)
             {
-                aBufferedTraceMessages = myBufferedTraces.ToString();
-                
-                // Note: compact framework does not support Clear().
-                myBufferedTraces.Length = 0;
+                aBufferedTraceMessages = myTraceBuffer.ToString();
+
+                if (myTraceBuffer.Capacity <= myTraceBufferCapacity)
+                {
+                    // Note: compact framework does not support Clear().
+                    myTraceBuffer.Length = 0;
+                }
+                else
+                {
+                    // The allocated capacity is too big. So instantiate the new buffer and the old one can be garbage collected.
+                    myTraceBuffer = new StringBuilder();
+                }
             }
 
             // Flush buffered messages to the trace.
@@ -741,8 +740,10 @@ namespace Eneter.Messaging.Diagnostic
         private static bool myProcessingIsRunning;
         private static Queue<Action> myTraceQueue = new Queue<Action>();
 
-        private static StringBuilder myBufferedTraces = new StringBuilder();
-        private static Timer myTraceBufferFlushTimer = new Timer(OnFlushTraceBuffer, null, -1, -1);
+        private static object myTraceBufferLock = new object();
+        private static int myTraceBufferCapacity = 16384;
+        private static StringBuilder myTraceBuffer = new StringBuilder();
+        private static Timer myTraceBufferFlushTimer = new Timer(OnFlushTraceBufferTick, null, -1, -1);
 
 #if !COMPACT_FRAMEWORK
         private class ProfilerData
