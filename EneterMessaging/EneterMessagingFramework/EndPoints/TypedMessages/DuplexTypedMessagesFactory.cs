@@ -8,6 +8,7 @@
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using System;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
@@ -322,6 +323,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             {
                 mySyncResponseReceiveTimeout = syncResponseReceiveTimeout;
                 mySerializer = serializer;
+                SyncDuplexTypedSenderThreadMode = new SyncDispatching();
             }
         }
 
@@ -351,7 +353,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                SyncTypedMessageSender<_ResponseType, _RequestType> aSender = new SyncTypedMessageSender<_ResponseType, _RequestType>(mySyncResponseReceiveTimeout, mySerializer);
+                IThreadDispatcher aThreadDispatcher = SyncDuplexTypedSenderThreadMode.GetDispatcher();
+                SyncTypedMessageSender<_ResponseType, _RequestType> aSender = new SyncTypedMessageSender<_ResponseType, _RequestType>(mySyncResponseReceiveTimeout, mySerializer, aThreadDispatcher);
                 return aSender;
             }
         }
@@ -371,6 +374,25 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
+        /// <summary>
+        /// Gets or sets the threading mode for receiving ConnectionOpened and ConnectionClosed events for SyncDuplexTypedMessageSender.
+        /// </summary>
+        /// <remarks>
+        /// E.g. you use SyncDuplexTypedMessageSender and you want to route ConnectionOpened and ConnectionClosed events
+        /// to the main UI thread of your WPF based application. Therefore you specify WindowsDispatching when you create your
+        /// TCP duplex output channel which you then attach to the SyncDuplexTypedMessageSender.<br/>
+        /// Later when the application is running you call SyncDuplexTypedMessageSender.SendRequestMessage(..).<br/>
+        /// However if you call it from the main UI thread the deadlock occurs.
+        /// Because this component is synchronous the SendRequestMessage(..) will stop the calling main UI thread and will wait
+        /// for the response. But the problem is when the response comes the underlying TCP messaging will try to route it to
+        /// the main UI thread (as was specified during creating TCP duplex output channel).<br/>
+        /// But because the main UI thread is suspending and waiting the message will never arrive.<br/>
+        /// <br/>
+        /// Solution:<br/>
+        /// Do not specify the threading mode when you create yur duplex output channel but specify it using the
+        /// SyncDuplexTypedSenderThreadMode property when you create SyncDuplexTypedMessageSender.
+        /// </remarks>
+        public IThreadDispatcherProvider SyncDuplexTypedSenderThreadMode { get; set; }
 
         private ISerializer mySerializer;
         private TimeSpan mySyncResponseReceiveTimeout;

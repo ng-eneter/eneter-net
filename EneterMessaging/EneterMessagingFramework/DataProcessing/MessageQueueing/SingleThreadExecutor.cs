@@ -41,7 +41,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
             {
-                myInvokeTraceMessage = "TO ~ " + Thread.CurrentThread.ManagedThreadId;
+                myInvokeTraceMessage = "TO ~" + Thread.CurrentThread.ManagedThreadId;
                 myTraceMessageReady.Set();
             }
 

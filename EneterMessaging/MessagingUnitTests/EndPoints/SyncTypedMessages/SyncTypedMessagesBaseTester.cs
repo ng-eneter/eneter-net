@@ -7,6 +7,8 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.EndPoints.TypedMessages;
 using NUnit.Framework;
 using System.Threading;
+using Eneter.Messaging.Threading.Dispatching;
+using System.Windows.Threading;
 
 namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
 {
@@ -136,6 +138,62 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
             {
                 aSender.DetachDuplexOutputChannel();
                 aReceiver.DetachDuplexInputChannel();
+            }
+        }
+
+        [Test]
+        public void ThreadDispatching()
+        {
+            IDuplexTypedMessageReceiver<string, int> aReceiver = DuplexTypedMessagesFactory.CreateDuplexTypedMessageReceiver<string, int>();
+            aReceiver.MessageReceived += (x, y) =>
+            {
+                aReceiver.SendResponseMessage(y.ResponseReceiverId, (y.RequestMessage * 10).ToString());
+            };
+
+            // Set windows working thread dispatcher.
+            Dispatcher aWindowsDispatcher = WindowsDispatching.StartNewWindowsDispatcher();
+            WindowsDispatching aThreadDispatching = new WindowsDispatching(aWindowsDispatcher);
+            ((DuplexTypedMessagesFactory)DuplexTypedMessagesFactory).SyncDuplexTypedSenderThreadMode = aThreadDispatching;
+
+            ISyncDuplexTypedMessageSender<string, int> aSender = DuplexTypedMessagesFactory.CreateSyncDuplexTypedMessageSender<string, int>();
+
+            int aOpenConnectionThreadId = 0;
+            aSender.ConnectionOpened += (x, y) =>
+                {
+                    aOpenConnectionThreadId = Thread.CurrentThread.ManagedThreadId;
+                };
+
+            ManualResetEvent aConnectionClosedEvent = new ManualResetEvent(false);
+            int aCloseConnectionThreadId = 0;
+            aSender.ConnectionClosed += (x, y) =>
+                {
+                    aCloseConnectionThreadId = Thread.CurrentThread.ManagedThreadId;
+                    aConnectionClosedEvent.Set();
+                };
+
+            try
+            {
+                aReceiver.AttachDuplexInputChannel(InputChannel);
+                aSender.AttachDuplexOutputChannel(OutputChannel);
+
+                string aResult = aSender.SendRequestMessage(100);
+
+                aReceiver.AttachedDuplexInputChannel.DisconnectResponseReceiver(aSender.AttachedDuplexOutputChannel.ResponseReceiverId);
+                aConnectionClosedEvent.WaitOne();
+
+                Assert.AreEqual("1000", aResult);
+                Assert.AreEqual(aWindowsDispatcher.Thread.ManagedThreadId, aOpenConnectionThreadId);
+                Assert.AreEqual(aWindowsDispatcher.Thread.ManagedThreadId, aCloseConnectionThreadId);
+            }
+            finally
+            {
+                aSender.DetachDuplexOutputChannel();
+                aReceiver.DetachDuplexInputChannel();
+
+                if (aWindowsDispatcher != null)
+                {
+                    WindowsDispatching.StopWindowsDispatcher(aWindowsDispatcher);
+                }
             }
         }
 

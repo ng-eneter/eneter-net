@@ -28,17 +28,22 @@ namespace Eneter.Messaging.Threading.Dispatching
             public WindowsDispatcher(Dispatcher workingThreadDispatcher)
             {
                 myWorkingThreadDispatcher = workingThreadDispatcher;
+
+                myDispatcherTraceMessage = "TO ~" + workingThreadDispatcher.Thread.ManagedThreadId;
             }
 
             public void Invoke(Action workItem)
             {
                 using (EneterTrace.Entering())
                 {
+                    EneterTrace.Debug(myDispatcherTraceMessage);
                     myWorkingThreadDispatcher.BeginInvoke(workItem);
                 }
             }
 
             private Dispatcher myWorkingThreadDispatcher;
+
+            private string myDispatcherTraceMessage;
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using System.Threading;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
@@ -18,7 +19,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-        public SyncTypedMessageSender(TimeSpan responseReceiveTimeout, ISerializer serializer)
+        public SyncTypedMessageSender(TimeSpan responseReceiveTimeout, ISerializer serializer, IThreadDispatcher threadDispatcher)
         {
             using (EneterTrace.Entering())
             {
@@ -28,6 +29,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                 mySender = aSenderFactory.CreateDuplexTypedMessageSender<TResponse, TRequest>();
                 mySender.ConnectionOpened += OnConnectionOpened;
                 mySender.ConnectionClosed += OnConnectionClosed;
+
+                myThreadDispatcher = threadDispatcher;
             }
         }
 
@@ -145,7 +148,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                Notify(ConnectionOpened, e);
+                myThreadDispatcher.Invoke(() => Notify(ConnectionOpened, e));
             }
         }
 
@@ -156,7 +159,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                 // The connection was interrupted therefore we must unblock the thread waiting for the response.
                 myResponseAvailableEvent.Set();
 
-                Notify(ConnectionClosed, e);
+                myThreadDispatcher.Invoke(() => Notify(ConnectionClosed, e));
             }
         }
 
@@ -185,6 +188,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
         private TimeSpan myResponseReceiveTimeout;
         private IDuplexTypedMessageSender<TResponse, TRequest> mySender;
+
+        private IThreadDispatcher myThreadDispatcher;
 
         private string TracedObject
         {
