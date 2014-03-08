@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
             {
                 try
                 {
-                    SslStream anSslStream = new SslStream(source, true, myUserCertificateValidationCallback, myUserCertificateSelectionCallback);
+                    SslStream anSslStream = new SslStream(source, false, myUserCertificateValidationCallback, myUserCertificateSelectionCallback);
                     anSslStream.AuthenticateAsClient(myHostName, myCertificates, System.Security.Authentication.SslProtocols.Default, true);
                     return anSslStream;
                 }

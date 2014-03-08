@@ -31,7 +31,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
             {
                 try
                 {
-                    NegotiateStream aNegotiateStream = new NegotiateStream(source, true);
+                    NegotiateStream aNegotiateStream = new NegotiateStream(source, false);
                     aNegotiateStream.AuthenticateAsServer();
                     return aNegotiateStream;
                 }

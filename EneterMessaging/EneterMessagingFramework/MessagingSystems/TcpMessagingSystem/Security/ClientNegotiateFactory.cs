@@ -69,7 +69,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
         {
             using (EneterTrace.Entering())
             {
-                NegotiateStream aNegotiateStream = new NegotiateStream(source, true);
+                NegotiateStream aNegotiateStream = new NegotiateStream(source, false);
 
                 try
                 {
