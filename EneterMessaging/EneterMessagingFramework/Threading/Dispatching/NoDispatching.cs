@@ -12,7 +12,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Dispatcher that invokes the callback methods as is - without marshaling them into a particular thread. 
+    /// Invokes directly without routing.
     /// </summary>
     public class NoDispatching : IThreadDispatcherProvider
     {
@@ -26,7 +26,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         }
 
         /// <summary>
-        /// Returns dispatcher that invokes the callback method immediately without marshaling into a thread.
+        /// Returns dispatcher which invokes directly without routing into a thread.
         /// </summary>
         /// <returns></returns>
         public IThreadDispatcher GetDispatcher()

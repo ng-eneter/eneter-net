@@ -12,7 +12,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Dispatcher that queues callback methods and invokes them one by one from one thread.
+    /// Invokes one by one from from the queue.
     /// </summary>
     public class SyncDispatching : IThreadDispatcherProvider
     {
@@ -53,7 +53,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         }
 
         /// <summary>
-        /// Returns dispatcher that sync all incoming methods into one thread.
+        /// Returns dispatcher that queues callback methods and processes them one by one.
         /// </summary>
         /// <remarks>
         /// If SyncDispatching was created with isDispatcherShared true then it always returns the same instance

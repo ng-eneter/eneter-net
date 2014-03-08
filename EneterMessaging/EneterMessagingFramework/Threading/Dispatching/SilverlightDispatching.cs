@@ -15,7 +15,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Dispatcher that invokes incoming methods in the Silverlight thread.
+    /// Invokes in the Silverlight thread.
     /// </summary>
     public class SilverlightDispatching : IThreadDispatcherProvider
     {

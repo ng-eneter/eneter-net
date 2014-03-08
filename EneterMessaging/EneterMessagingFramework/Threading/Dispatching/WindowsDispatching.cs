@@ -16,10 +16,10 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Threading.Dispatching
 {
     /// <summary>
-    /// Dispatcher that internally uses System.Windows.Threading.Dispatcher.
+    /// Invokes via .NET built in queue System.Windows.Threading.Dispatcher.
     /// </summary>
     /// <remarks>
-    /// E.g. in case of WPF it allows to execute methods in the UI thread.
+    /// E.g. in case of WPF it allows to receive message in the UI thread.
     /// </remarks>
     public class WindowsDispatching : IThreadDispatcherProvider
     {
