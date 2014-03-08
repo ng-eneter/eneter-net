@@ -116,7 +116,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                ClearConnection(true);
+                CleanAfterConnection(true);
             }
         }
 
@@ -187,7 +187,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
 
-                    ThreadPool.QueueUserWorkItem(x => ClearConnection(false));
+                    ThreadPool.QueueUserWorkItem(x => CleanAfterConnection(false));
+
+                    // The connection is closed so stop listening to messages.
+                    return false;
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
@@ -205,7 +208,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        private void ClearConnection(bool sendCloseMessageFlag)
+        private void CleanAfterConnection(bool sendCloseMessageFlag)
         {
             using (EneterTrace.Entering())
             {
