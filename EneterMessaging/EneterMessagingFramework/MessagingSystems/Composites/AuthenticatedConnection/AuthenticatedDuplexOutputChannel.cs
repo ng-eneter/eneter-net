@@ -25,7 +25,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         public AuthenticatedDuplexOutputChannel(IDuplexOutputChannel underlyingOutputChannel,
             GetLoginMessage getLoginMessageCallback,
             GetHandshakeResponseMessage getHandshakeResponseMessageCallback,
-            TimeSpan authenticationTimeout)
+            TimeSpan authenticationTimeout,
+            IThreadDispatcher threadDispatcher)
         {
             using (EneterTrace.Entering())
             {
@@ -36,6 +37,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                 myUnderlyingOutputChannel.ConnectionClosed += OnConnectionClosed;
                 myUnderlyingOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
+
+                myThreadDispatcher = threadDispatcher;
             }
         }
 
@@ -175,7 +178,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 if (aCloseNotifyFlag)
                 {
 
-                    Notify<DuplexChannelEventArgs>(ConnectionClosed, e, false);
+                    myThreadDispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionClosed, e, false));
                 }
             }
         }
@@ -189,7 +192,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 if (myIsConnectionAcknowledged)
                 {
                     // If the connection is properly established via handshaking.
-                    Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, e, true);
+                    myThreadDispatcher.Invoke(() => Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, e, true));
                     return;
                 }
 
@@ -217,7 +220,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                         // Notify the connection is open.
                         DuplexChannelEventArgs anEventArgs = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, e.SenderAddress);
-                        Notify<DuplexChannelEventArgs>(ConnectionOpened, anEventArgs, false);
+                        myThreadDispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionOpened, anEventArgs, false));
                     }
                 }
                 else
@@ -292,6 +295,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         }
 
 
+        private IThreadDispatcher myThreadDispatcher;
         private IDuplexOutputChannel myUnderlyingOutputChannel;
         private GetLoginMessage myGetLoginMessageCallback;
         private GetHandshakeResponseMessage myGetHandshakeResponseMessageCallback;

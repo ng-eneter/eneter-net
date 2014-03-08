@@ -9,6 +9,7 @@ using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
@@ -332,6 +333,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 myGetHandShakeMessageCallback = getHandshakeMessageCallback;
                 myGetHandshakeResponseMessageCallback = getHandshakeResponseMessageCallback;
                 myAuthenticateCallback = authenticateCallback;
+
+                OutputChannelThreading = new SyncDispatching();
             }
         }
 
@@ -360,7 +363,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
 
                 IDuplexOutputChannel anUnderlyingOutputChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId);
-                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback, AuthenticationTimeout);
+                IThreadDispatcher aThreadDispatcher = OutputChannelThreading.GetDispatcher();
+                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback, AuthenticationTimeout, aThreadDispatcher);
             }
         }
         
@@ -389,7 +393,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
 
                 IDuplexOutputChannel anUnderlyingOutputChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId, responseReceiverId);
-                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback, AuthenticationTimeout);
+                IThreadDispatcher aThreadDispatcher = OutputChannelThreading.GetDispatcher();
+                return new AuthenticatedDuplexOutputChannel(anUnderlyingOutputChannel, myGetLoginMessageCallback, myGetHandshakeResponseMessageCallback, AuthenticationTimeout, aThreadDispatcher);
             }
         }
 
@@ -430,6 +435,20 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// Timeout is set to 30 seconds by default.
         /// </remarks>
         public TimeSpan AuthenticationTimeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets the threading mode for the authenticated output channel.
+        /// </summary>
+        /// <remarks>
+        /// When opening connection the authenticated output channel communicates with the authenticated input channel.
+        /// During this communication the openConnection() is blocked until the whole authentication communication is performed.
+        /// It means if openConnection() is called from the same thread into which the underlying duplex output channel
+        /// routes events the openConneciton() would get into the deadlock (because the underlying output channel would
+        /// route authentication messages into the same thread).<br/>
+        /// <br/>
+        /// Therefore it is possible to set the threading mode of the authenticated output channel independently. 
+        /// </remarks>
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
 
         private IMessagingSystemFactory myUnderlyingMessaging;

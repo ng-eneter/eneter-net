@@ -224,7 +224,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedReliableMessages
                 aSentMessageId = aSender.SendRequestMessage(2000);
 
                 // Wait for the signal that the message is received.
-                Assert.IsTrue(aMessagesProcessedEvent.WaitOne(1000));
+                Assert.IsTrue(aMessagesProcessedEvent.WaitOne(2000));
             }
             finally
             {
@@ -272,7 +272,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedReliableMessages
                 aSentMessageId = aReceiver.SendResponseMessage(aSender.AttachedDuplexOutputChannel.ResponseReceiverId, 2000);
 
                 // Wait for the signal that the message is received.
-                Assert.IsTrue(aMessagesProcessedEvent.WaitOne(1000));
+                Assert.IsTrue(aMessagesProcessedEvent.WaitOne(2000));
             }
             finally
             {
