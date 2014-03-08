@@ -121,10 +121,10 @@
   <data name="EneterSigner" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\EneterSigner.pfx;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="MyClientCertificate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MyClientCertificate.cer;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="UTestClient" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UTestClient.cer;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="MyLocalCertificate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MyLocalCertificate.cer;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="UTestServer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UTestServer.pfx;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

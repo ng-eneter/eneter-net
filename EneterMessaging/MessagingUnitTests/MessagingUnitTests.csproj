@@ -196,6 +196,8 @@
     <None Include="Resources\EneterSigner.pfx" />
     <None Include="Resources\MyClientCertificate.cer" />
     <None Include="Resources\MyLocalCertificate.cer" />
+    <None Include="Resources\UTestClient.cer" />
+    <None Include="Resources\UTestServer.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EneterMessagingFramework\EneterMessagingFrameworkNet40.csproj">
