@@ -8,7 +8,7 @@
     
     <introduction>
       <para>
-        <literal>Eneter Messaging Framework</literal> is a cross-platform middleware offering functionality for the interprocess communication.
+        <literal>Eneter Messaging Framework</literal> is a cross-platform middleware for the interprocess communication.
       </para>
       <para>
         The goal of the framework is to provide a <literal>lightweight</literal> and <literal>easy to use library</literal> that will work the same way on various platforms.

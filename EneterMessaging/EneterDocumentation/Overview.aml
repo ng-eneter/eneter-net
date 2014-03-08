@@ -9,8 +9,8 @@
     <introduction>
       <para>
       <literal>Eneter Messaging Framework</literal> is a lightweight framework for the interprocess communication.<br/>
-      It is easy to use and it works across various platforms. The framework provides communication components
-      that can be used to create communication scenarios fitting your needs.
+      It is easy to use and it works across multiple platforms. The framework provides communication components
+      you can use to create various communication scenarios.
       </para>
       <autoOutline />
     </introduction>
@@ -19,9 +19,8 @@
       <title>Supported Platforms</title>
       <content>
         <para>
-        The framework is provided for multiple platforms.
-        Therefore, you can use it for communication between two .NET applications but also
-        for the communication between Java, Android and .NET applications.
+        The framework is provided for multiple platforms. You can use it to communicate between applications
+        from the same platform as well as for the communication between applications running on different platforms.
         </para>
         <para>
           The following platforms are supported:
@@ -82,12 +81,13 @@
       <title>Sending-Receiving Messages</title>
       <content>
         <para>
-          To implement the communication between applications, the framework provides functionality to send and receive messages.
-          Communication can be one-way or request-response and messages can be:
+          To implement the communication between applications, the framework provides functionality to send and receive messages
+          as well as the communication using RPC (Remote Procudure Calls):
         </para>
 		    <list class="bullet">
 		      <listItem><para><legacyItalic>String Messages</legacyItalic> - for sending and receiving text messages. <codeEntityReference>N:Eneter.Messaging.EndPoints.StringMessages</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Typed Messages</legacyItalic> - for sending and receiving data structures of specified types (strongly typed messages). <codeEntityReference>N:Eneter.Messaging.EndPoints.TypedMessages</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>Remote Procudure Calls</legacyItalic> - for invoking methods in another application. (Works accross platforms!) <codeEntityReference>N:Eneter.Messaging.EndPoints.Rpc</codeEntityReference></para></listItem>
 		    </list>
       </content>
     </section>
@@ -96,10 +96,11 @@
       <title>Routing Messages</title>
       <content>
         <para>
-          It provides components that can be placed on the communication path to control the routing behavior.
+          It provides components to control routing of messages between applications:
         </para>
 		    <list class="bullet">
-		      <listItem><para><legacyItalic>Broker</legacyItalic> - for publish-subscribe scenarios (publisher sends messages to the broker and the broker notifies all subscribers). <codeEntityReference>N:Eneter.Messaging.Nodes.Broker</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>Message Bus</legacyItalic> - for publishing multiple services on one place.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.MessageBus</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>Broker</legacyItalic> - for publish-subscribe scenarios (publisher sends messages to the broker and the broker notifies all subscribers). <codeEntityReference>N:Eneter.Messaging.Nodes.Broker</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Dispatcher</legacyItalic> - for routing messages to all connected receivers (e.g. for a service listening to TCP and HTTP at the same time). <codeEntityReference>N:Eneter.Messaging.Nodes.Dispatcher</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Router</legacyItalic> - for routing messages to preconfigured addresses. <codeEntityReference>N:Eneter.Messaging.Nodes.Router</codeEntityReference></para></listItem>
           <listItem><para><legacyItalic>Backup Router</legacyItalic> - for routing messages to a backup service if the service is not available. <codeEntityReference>N:Eneter.Messaging.Nodes.BackupRouter</codeEntityReference></para></listItem>
@@ -113,7 +114,7 @@
       <title>Reliability</title>
       <content>
         <para>
-        The communication across the network is typically less reliable as a local call in inside a process. The network connection can be interrupted or a receiving application can be temporarily unavailable. If your communication scenario requires overcome these issues, the framework provides:
+        The communication across the network is typically less reliable as a local call inside a process. The network connection can be interrupted or a receiving application can be temporarily unavailable. If your communication scenario requires overcome these issues, the framework provides:
         </para>
 		    <list class="bullet">
 		      <listItem><para><legacyItalic>Monitoring of connection availability</legacyItalic> - for early detection of a disconnection. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit</codeEntityReference></para></listItem>
@@ -127,10 +128,13 @@
       <title>Security</title>
       <content>
         <para>
-          The communication across the network is easy to observe and confidential data can be acquired by unauthorized persons. Therefore, you may want to protect your data:
+          The communication across the network is easy to observe and confidential data can be acquired by unauthorized persons. Therefore, you may want to protect your communication:
         </para>
 		    <list class="bullet">
-		      <listItem><para>SSL or serializer using a cryptographic algorithm AES, RSA or RSA based digital signature.</para></listItem>
+          <listItem><para><legacyItalic>Authenticated Connection</legacyItalic> - for verifying the identity of clients connecting to the service.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>Encrypting Messages</legacyItalic> - AES or RSA serializers.<codeEntityReference>N:Eneter.Messaging.DataProcessing.Serializing</codeEntityReference></para></listItem>
+          <listItem><para><legacyItalic>Digitaly Signed Messages</legacyItalic> - for protecting authenticity and message integrity.<codeEntityReference>T:Eneter.Messaging.DataProcessing.Serializing.RsaDigitalSignatureSerializer</codeEntityReference></para></listItem>
+		      <listItem><para><legacyItalic>SSL</legacyItalic> - for secured communication.</para></listItem>
 		    </list>
       </content>
     </section>
