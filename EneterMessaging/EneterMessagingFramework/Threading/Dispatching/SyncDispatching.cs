@@ -27,7 +27,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         }
 
         /// <summary>
-        /// Constructs dispatching where each GetDispatcher() returns a new instance of the dispatcher.
+        /// Constructs dispatching where each GetDispatcher() will return new instance of the dispatcher.
         /// </summary>
         public SyncDispatching()
             : this(false)
@@ -55,6 +55,10 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// <summary>
         /// Returns dispatcher that sync all incoming methods into one thread.
         /// </summary>
+        /// <remarks>
+        /// If SyncDispatching was created with isDispatcherShared true then it always returns the same instance
+        /// of the thread dispatcher. Otherwise it always creates the new one. 
+        /// </remarks>
         /// <returns></returns>
         public IThreadDispatcher GetDispatcher()
         {
