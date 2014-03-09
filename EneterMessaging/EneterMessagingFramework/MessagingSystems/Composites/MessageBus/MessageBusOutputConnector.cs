@@ -70,14 +70,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 lock (myConnectionManipulator)
                 {
+                    myResponseMessageHandler = null;
+
                     if (myMessageBusOutputChannel != null)
                     {
                         myMessageBusOutputChannel.CloseConnection();
                         myMessageBusOutputChannel.ResponseMessageReceived -= OnMessageFromMessageBusReceived;
                         myMessageBusOutputChannel.ConnectionClosed -= OnConnectionWithMessageBusClosed;
                     }
-
-                    myResponseMessageHandler = null;
                 }
             }
         }
