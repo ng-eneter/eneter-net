@@ -204,7 +204,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
 
 
-                return aProtocolMessage != null;
+                return true;
             }
         }
 
