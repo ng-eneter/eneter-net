@@ -204,7 +204,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     {
                         if (!myResponseMessageHandler(aContext))
                         {
-                            // Disconnected.
+                            // Handler requests stop receiving.
+                            myStopReceivingRequestedFlag = true;
                             break;
                         }
                     }
