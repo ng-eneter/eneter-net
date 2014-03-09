@@ -15,7 +15,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     /// <remarks>
     /// The monitoring is realized by sending 'ping' messages and receiving 'ping' responses.
     /// If the sending of the 'ping' fails or the 'ping' response is not received within the specified
-    /// time, the connection is considered to be broken.
+    /// time, the connection is considered broken.
     /// </remarks>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

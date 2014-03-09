@@ -20,7 +20,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
             ChannelId = "net.pipe://127.0.0.1/ChannelId/";
             Serializer = new XmlStringSerializer();
             UnderlyingMessaging = new NamedPipeMessagingSystemFactory(10, 500);
-            MessagingSystemFactory = new MonitoredMessagingFactory(UnderlyingMessaging);
+            MessagingSystemFactory = new MonitoredMessagingFactory(UnderlyingMessaging, Serializer,
+                TimeSpan.FromMilliseconds(1000),
+                // e.g. if the communication is very intensive then it may take more time until the response is received.
+                TimeSpan.FromMilliseconds(10000));
         }
     }
 }

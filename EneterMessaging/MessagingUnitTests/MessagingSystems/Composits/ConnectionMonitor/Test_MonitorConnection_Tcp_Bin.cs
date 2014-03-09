@@ -21,7 +21,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
             ChannelId = "tcp://127.0.0.1:7080/";
             Serializer = new BinarySerializer();
             UnderlyingMessaging = new TcpMessagingSystemFactory();
-            MessagingSystemFactory = new MonitoredMessagingFactory(UnderlyingMessaging, Serializer, TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(2000));
+            MessagingSystemFactory = new MonitoredMessagingFactory(UnderlyingMessaging, Serializer,
+                TimeSpan.FromMilliseconds(1000),
+                // e.g. if the communication is very intensive then it may take more time until the response is received.
+                TimeSpan.FromMilliseconds(5000)); 
         }
 
     }
