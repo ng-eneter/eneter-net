@@ -105,7 +105,6 @@
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\MonitorConnectionTesterBase.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\ReconnecterBaseTester.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Pipe_Xml.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Tcp_Bin.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitotConnection_Sync_Bin.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Pipe.cs" />
