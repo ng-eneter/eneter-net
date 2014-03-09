@@ -126,8 +126,8 @@ namespace Eneter.Messaging.DataProcessing.Streaming
         /// <returns></returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 if (myIsClosed)
                 {
                     return 0;
@@ -183,7 +183,7 @@ namespace Eneter.Messaging.DataProcessing.Streaming
 
                     return aReadSize;
                 }
-            }
+            //}
         }
 
         /// <summary>

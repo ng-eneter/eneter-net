@@ -403,6 +403,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 {
                     aConnectionStatusWhenConnectionClosed = aDuplexOutputChannel.IsConnected;
 
+                    Thread.Sleep(100);
+
                     // Try to open from the handler.
                     aDuplexOutputChannel.OpenConnection();
 

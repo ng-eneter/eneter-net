@@ -199,8 +199,8 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         /// <returns></returns>
         private TMessage WaitForQueueCall(Func<TMessage> func)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 lock (myMessageQueue)
                 {
                     while (myIsBlockingMode && myMessageQueue.Count == 0)
@@ -221,13 +221,13 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
 
                     return func();
                 }
-            }
+            //}
         }
 
         private TMessage WaitForQueueCall(Func<TMessage> func, int millisecondsTimeout)
         {
-            using (EneterTrace.Entering())
-            {
+            //using (EneterTrace.Entering())
+            //{
                 lock (myMessageQueue)
                 {
                     while (myIsBlockingMode && myMessageQueue.Count == 0)
@@ -251,7 +251,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
 
                     return func();
                 }
-            }
+            //}
         }
 
         /// <summary>
