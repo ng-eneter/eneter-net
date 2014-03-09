@@ -642,6 +642,7 @@
     </Compile>
     <Compile Include="Threading\Dispatching\SyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\WindowsDispatching.cs" />
+    <Compile Include="Threading\Dispatching\WinFormsDispatching.cs" />
     <Compile Include="Threading\Dispatching\_NamespaceDoc.cs" />
   </ItemGroup>
   <ItemGroup>

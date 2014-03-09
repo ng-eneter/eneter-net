@@ -71,6 +71,7 @@
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -583,6 +584,7 @@
     <Compile Include="Threading\Dispatching\SilverlightDispatching.cs" />
     <Compile Include="Threading\Dispatching\SyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\WindowsDispatching.cs" />
+    <Compile Include="Threading\Dispatching\WinFormsDispatching.cs" />
     <Compile Include="Threading\Dispatching\_NamespaceDoc.cs" />
   </ItemGroup>
   <ItemGroup>
