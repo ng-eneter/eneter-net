@@ -93,7 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
             }
         }
 
@@ -180,6 +180,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private IProtocolFormatter myProtocolFormatter;
 
         private UdpConnectorFactory myConnectorFactory;
+
+        private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }
 

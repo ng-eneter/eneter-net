@@ -162,6 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                 myConnectorFactory = new ConnectorFactory();
                 myProtocolFormatter = new EneterStringProtocolFormatter();
                 myDispatcher = new NoDispatching().GetDispatcher();
+                myDispatcherAfterMessageDecoded = myDispatcher;
             }
         }
 
@@ -183,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -207,7 +208,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -227,11 +228,12 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             using (EneterTrace.Entering())
             {
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, myDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
             }
         }
 
         private IThreadDispatcher myDispatcher;
+        private IThreadDispatcher myDispatcherAfterMessageDecoded;
         private ConnectorFactory myConnectorFactory;
         private IProtocolFormatter<string> myProtocolFormatter;
     }

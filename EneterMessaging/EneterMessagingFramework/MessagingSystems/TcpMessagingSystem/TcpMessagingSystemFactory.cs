@@ -249,7 +249,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, anOutputConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -289,7 +289,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, anOutputConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -324,7 +324,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, SendBufferSize, ReceiveBufferSize);
                 IInputConnector anInputConnector = aFactory.CreateInputConnector(channelId);
 
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
 #else
                 throw new NotSupportedException("The Tcp duplex input channel is not supported in Silverlight.");
 #endif
@@ -453,6 +453,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 
         private IProtocolFormatter<byte[]> myProtocolFormatter;
+        private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }
 

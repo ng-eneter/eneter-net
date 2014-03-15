@@ -28,7 +28,15 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
             public void OpenConnection()
             {
-                OutputChannel.OpenConnection();
+                try
+                {
+                    OutputChannel.OpenConnection();
+                }
+                catch (Exception err)
+                {
+                    OpenConnectionError = err;
+                }
+
                 ConnectionOpenEvent.Set();
             }
 
@@ -57,7 +65,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             public int NumberOfFailedResponses { get; private set; }
             public IDuplexOutputChannel OutputChannel { get; private set; }
 
+            public Exception OpenConnectionError { get; private set; }
             public ManualResetEvent ConnectionOpenEvent { get; private set; }
+
             public ManualResetEvent ResponsesReceivedEvent { get; private set; }
 
             private int myExpectedNumberOfResponses;
@@ -241,6 +251,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             finally
             {
                 anInputChannel.StopListening();
+
+                // Wait for traces.
+                Thread.Sleep(100);
             }
 
 
@@ -888,6 +901,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 foreach (TDuplexClient aClient in aClients)
                 {
                     aClient.ConnectionOpenEvent.WaitOne();
+                    if (aClient.OpenConnectionError != null)
+                    {
+                        throw aClient.OpenConnectionError;
+                    }
+
                     //Assert.IsTrue(aClient.ConnectionOpenEvent.WaitOne(100000));
                 }
 

@@ -311,7 +311,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myConnectorFactory, myProtocolFormatter, true);
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, true);
             }
         }
 
@@ -340,7 +341,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myConnectorFactory, myProtocolFormatter, true);
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, true);
             }
         }
 
@@ -364,8 +366,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 IThreadDispatcher aThreadDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-
-                return new DefaultDuplexInputChannel(channelId, aThreadDispatcher, anInputConnector, myProtocolFormatter);
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
+                return new DefaultDuplexInputChannel(channelId, aThreadDispatcher, aDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
             }
         }
 
@@ -390,6 +392,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
         private SharedMemoryConnectorFactory myConnectorFactory;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
+
+        private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }
 }
 

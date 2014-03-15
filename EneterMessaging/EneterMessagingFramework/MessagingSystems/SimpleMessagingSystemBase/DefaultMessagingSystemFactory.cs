@@ -23,9 +23,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 myOutputConnectorFactory = new DefaultOutputConnectorFactory(messagingProvider);
                 myInputConnectorFactory = new DefaultInputConnectorFactory(messagingProvider);
                 myProtocolFormatter = protocolFromatter;
-                
-                InputChannelThreading = new NoDispatching();
-                OutputChannelThreading = InputChannelThreading;
+
+
+                NoDispatching aNoDispatching = new NoDispatching();
+                InputChannelThreading = aNoDispatching;
+                OutputChannelThreading = aNoDispatching;
+
+                myDispatcherAfterMessageDecoded = aNoDispatching.GetDispatcher();
             }
         }
 
@@ -34,7 +38,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myOutputConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, myOutputConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -43,7 +47,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myOutputConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myOutputConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -53,7 +57,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myInputConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
             }
         }
 
@@ -73,5 +77,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         private IOutputConnectorFactory myOutputConnectorFactory;
         private IInputConnectorFactory myInputConnectorFactory;
+        private IThreadDispatcher myDispatcherAfterMessageDecoded;
     }
 }

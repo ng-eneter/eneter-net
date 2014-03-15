@@ -172,7 +172,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aFactory, myProtocolFormatter, false);
             }
         }
 
@@ -205,7 +205,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory, myProtocolFormatter, false);
             }
         }
 
@@ -232,7 +232,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
                 IInputConnector anInputConnector = anInputConnectorFactory.CreateInputConnector(channelId);
 
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
 #else
                 throw new NotSupportedException("The WebSocket duplex input channel is not supported in Silverlight.");
 #endif
@@ -320,6 +320,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #endif
 
         private IProtocolFormatter myProtocolFormatter;
+        private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }
 

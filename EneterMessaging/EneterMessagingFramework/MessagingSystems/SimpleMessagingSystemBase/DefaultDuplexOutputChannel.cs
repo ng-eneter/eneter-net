@@ -22,7 +22,9 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-        public DefaultDuplexOutputChannel(string channelId, string responseReceiverId, IThreadDispatcher dispatcher,
+        public DefaultDuplexOutputChannel(string channelId, string responseReceiverId,
+            IThreadDispatcher eventDispatcher,
+            IThreadDispatcher dispatcherAfterResponseReading,
             IOutputConnectorFactory outputConnectorFactory, IProtocolFormatter protocolFormatter, bool startReceiverAfterSendOpenRequest)
         {
             using (EneterTrace.Entering())
@@ -48,7 +50,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 myProtocolFormatter = protocolFormatter;
 
-                Dispatcher = dispatcher;
+                Dispatcher = eventDispatcher;
+
+                // Internal dispatcher used when the message is decoded.
+                // E.g. Shared memory meesaging needs to return looping immediately the protocol message is decoded
+                //      so that other senders are not blocked.
+                myDispatchingAfterResponseReading = dispatcherAfterResponseReading;
+
                 myOutputConnector = outputConnectorFactory.CreateOutputConnector(ChannelId, ResponseReceiverId);
                 myStartReceiverAfterSendOpenRequest = startReceiverAfterSendOpenRequest;
             }
@@ -73,6 +81,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                     try
                     {
+                        myConnectionIsCorrectlyOpen = true;
+
                         if (!myStartReceiverAfterSendOpenRequest)
                         {
                             // Connect and start listening to response messages.
@@ -87,14 +97,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             // Connect and start listening to response messages.
                             myOutputConnector.OpenConnection(HandleResponse);
                         }
-
-                        myConnectionIsCorrectlyOpen = true;
-
-                        // Invoke the event notifying, the connection was opened.
-                        ThreadPool.QueueUserWorkItem(x => Dispatcher.Invoke(() => Notify(ConnectionOpened)));
                     }
                     catch (Exception err)
                     {
+                        myConnectionIsCorrectlyOpen = false;
+
                         EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
 
                         try
@@ -109,6 +116,9 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         throw;
                     }
                 }
+
+                // Invoke the event notifying, the connection was opened.
+                Dispatcher.Invoke(() => Notify(ConnectionOpened));
             }
         }
 
@@ -182,21 +192,16 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     EneterTrace.Warning(TracedObject + "detected null response message. It means the listening to responses stopped.");
                 }
 
-
                 if (aProtocolMessage == null || aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
                     EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
-
-                    ThreadPool.QueueUserWorkItem(x => CleanAfterConnection(false));
-
-                    // The connection is closed so stop listening to messages.
+                    myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
                     return false;
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
                     EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
-
-                    Dispatcher.Invoke(() => NotifyResponseMessageReceived(aProtocolMessage.Message));
+                    myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(aProtocolMessage.Message)));
                 }
                 else
                 {
@@ -212,36 +217,45 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                bool aNotifyFlag;
+                bool aNotifyFlag = false;
 
-                lock (myConnectionManipulatorLock)
+                // If close connection is already being performed then do not close again.
+                // E.g. CloseConnection() and this will stop a response listening thread. This thread would come here and
+                //      would stop on the following lock -> deadlock.
+                if (!myCloseConnectionIsRunning)
                 {
-                    // Try to notify that the connection is closed
-                    if (sendCloseMessageFlag)
+                    lock (myConnectionManipulatorLock)
                     {
+                        myCloseConnectionIsRunning = true;
+
+                        // Try to notify that the connection is closed
+                        if (sendCloseMessageFlag)
+                        {
+                            try
+                            {
+                                // Send the close connection request.
+                                SenderUtil.SendCloseConnection(myOutputConnector, ResponseReceiverId, myProtocolFormatter);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                            }
+                        }
+
                         try
                         {
-                            // Send the close connection request.
-                            SenderUtil.SendCloseConnection(myOutputConnector, ResponseReceiverId, myProtocolFormatter);
+                            myOutputConnector.CloseConnection();
                         }
                         catch (Exception err)
                         {
                             EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
                         }
-                    }
 
-                    try
-                    {
-                        myOutputConnector.CloseConnection();
+                        // Note: the notification must run outside the lock because of potententional deadlock.
+                        aNotifyFlag = myConnectionIsCorrectlyOpen;
+                        myConnectionIsCorrectlyOpen = false;
+                        myCloseConnectionIsRunning = false;
                     }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
-                    }
-
-                    // Note: the notification must run outside the lock because of potententional deadlock.
-                    aNotifyFlag = myConnectionIsCorrectlyOpen;
-                    myConnectionIsCorrectlyOpen = false;
                 }
 
                 // Notify the connection closed only if it was successfuly open before.
@@ -296,9 +310,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         }
 
 
+        private IThreadDispatcher myDispatchingAfterResponseReading;
         private IOutputConnector myOutputConnector;
         private bool myStartReceiverAfterSendOpenRequest;
         private bool myConnectionIsCorrectlyOpen;
+        private bool myCloseConnectionIsRunning;
         private object myConnectionManipulatorLock = new object();
 
         private IProtocolFormatter myProtocolFormatter;

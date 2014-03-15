@@ -145,27 +145,30 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myTcpClient = null;
                     }
 
-#if COMPACT_FRAMEWORK
-                    if (myResponseReceiverThread != null)
-#else
-                    if (myResponseReceiverThread != null && myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
-#endif
+                    if (myResponseReceiverThread != null && Thread.CurrentThread.ManagedThreadId != myResponseReceiverThread.ManagedThreadId)
                     {
-                        if (!myResponseReceiverThread.Join(3000))
+#if COMPACT_FRAMEWORK
+                        // N.A.
+#else
+                        if (myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
+#endif
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
+                            if (!myResponseReceiverThread.Join(3000))
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
 
-                            try
-                            {
-                                myResponseReceiverThread.Abort();
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                try
+                                {
+                                    myResponseReceiverThread.Abort();
+                                }
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                }
                             }
                         }
+                        myResponseReceiverThread = null;
                     }
-                    myResponseReceiverThread = null;
 
                     myResponseMessageHandler = null;
                 }
@@ -242,7 +245,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 if (!myStopReceivingRequestedFlag)
                 {
                     // Try to clean the connection.
-                    ThreadPool.QueueUserWorkItem(x => CloseConnection());
+                    CloseConnection();
                 }
             }
         }

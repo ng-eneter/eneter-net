@@ -210,7 +210,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging);
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
-                myDispatcher = new NoDispatching().GetDispatcher();
+                OutputChannelThreading = new NoDispatching();
+                InputChannelThreading = OutputChannelThreading;
 
                 myProtocolFormatter = protocolFormatter;
             }
@@ -228,7 +229,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -245,7 +248,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myConnectorFactory, myProtocolFormatter, false);
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -261,17 +266,37 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+                IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, myDispatcher, anInputConnector, myProtocolFormatter);
+                DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, aDispatcher, aDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
                 anInputChannel.IncludeResponseReceiverIdToResponses = true;
                 return anInputChannel;
             }
         }
 
 
-        private IProtocolFormatter myProtocolFormatter;
+        /// <summary>
+        /// Provides thread dispatcher responsible for routing events from duplex input channel according to
+        /// desired threading model.
+        /// </summary>
+        /// <remarks>
+        /// Default setting is that all messages from all connected clients are routed one by one via a working thread.
+        /// </remarks>
+        public IThreadDispatcherProvider InputChannelThreading { get; set; }
 
-        private IThreadDispatcher myDispatcher;
+        /// <summary>
+        /// Provides thread dispatcher responsible for routing events from duplex output channel according to
+        /// desired threading strategy.
+        /// </summary>
+        /// <remarks>
+        /// Default setting is that received response messages are routed one by one via a working thread.
+        /// </remarks>
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
+
+
+        private IProtocolFormatter myProtocolFormatter;
         private MessageBusConnectorFactory myConnectorFactory;
+        private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }
 }

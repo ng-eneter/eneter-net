@@ -1,12 +1,12 @@
-﻿
-#if SILVERLIGHT && !WINDOWS_PHONE
-
-/*
+﻿/*
  * Project: Eneter.Messaging.Framework
  * Author:  Ondrej Uzovic
  * 
  * Copyright © Ondrej Uzovic 2013
 */
+
+
+#if SILVERLIGHT && !WINDOWS_PHONE
 
 using System;
 using Eneter.Messaging.Diagnostic;

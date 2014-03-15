@@ -172,19 +172,23 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                         EneterTrace.Warning(TracedObject + "failed to indicate the listening thread shall stop.", err);
                     }
 
-                    if (myListeningThread != null && myListeningThread.ThreadState != ThreadState.Unstarted)
+                    // Avoid deadlock.
+                    if (myListeningThread != null && Thread.CurrentThread.ManagedThreadId != myListeningThread.ManagedThreadId)
                     {
-                        if (!myListeningThread.Join(3000))
+                        if (myListeningThread.ThreadState != ThreadState.Unstarted)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myListeningThread.ManagedThreadId.ToString());
+                            if (!myListeningThread.Join(3000))
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myListeningThread.ManagedThreadId.ToString());
 
-                            try
-                            {
-                                myListeningThread.Abort();
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                try
+                                {
+                                    myListeningThread.Abort();
+                                }
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                }
                             }
                         }
                     }
@@ -254,7 +258,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                                 aSharedMemoryStream.Position = 0;
 
                                 // Note: The handler should read the message from the stream and process it in a different
-                                //       thread. So that the 'ready' state can be indicated as faast as possible.
+                                //       thread. So that the 'ready' state can be indicated as fast as possible.
                                 MessageContext aMessageContext = new MessageContext(aSharedMemoryStream, "", null);
                                 myMessageHandler(aMessageContext);
                             }
@@ -272,6 +276,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                 {
                     EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
 
+                    // The error means the connection was closed from outside.
                     anErrorFlag = true;
                 }
 
@@ -358,7 +363,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 EventWaitHandle anEventWaitHandle = null;
 
-                for (int i = 30; i >= 0; --i)
+                for (int i = 90; i >= 0; --i)
                 {
 
                     try

@@ -231,8 +231,9 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
                 IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myPollingFrequency);
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aClientConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, aClientConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -258,8 +259,9 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
                 IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myPollingFrequency);
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aClientConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, aClientConnectorFactory, myProtocolFormatter, false);
             }
         }
 
@@ -284,7 +286,8 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 #if !SILVERLIGHT
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myInputConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, anInputConnector, myProtocolFormatter);
+                IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, aDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
 #else
                 throw new NotSupportedException("Http duplex input channel is not supported in Silverlight.");
 #endif
@@ -321,5 +324,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 #if !SILVERLIGHT
         private IInputConnectorFactory myInputConnectorFactory;
 #endif
+
+        private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }
 }

@@ -1,23 +1,20 @@
-﻿
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2014
+*/
 
 #if SILVERLIGHT && !WINDOWS_PHONE
 
 using System;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Eneter.Messaging.Diagnostic;
 using System.Collections.Generic;
-using Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.Sequencing;
-using Eneter.Messaging.DataProcessing.Serializing;
+using System.Linq;
+using System.Windows;
 using System.Windows.Messaging;
+using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.Sequencing;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem

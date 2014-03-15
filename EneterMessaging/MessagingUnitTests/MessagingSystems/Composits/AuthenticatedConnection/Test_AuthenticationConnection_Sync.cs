@@ -41,6 +41,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
         {
             // Not applicable in synchronous messaging.
         }
+
+
+        public override void Duplex_13_DisconnectFromResponseReceiverConnected()
+        {
+            // N.A.
+        }
     }
 }
 

@@ -27,7 +27,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             TimeSpan aPingFrequency = TimeSpan.FromMilliseconds(50);
             TimeSpan aPingResponseTimeout = TimeSpan.FromMilliseconds(500);
             MessagingSystem = new MonitoredMessagingFactory(UnderlyingMessaging, aSerializer, aPingFrequency, aPingResponseTimeout);
-            ConnectionInterruptionFrequency = 5;
         }
 
 
@@ -117,6 +116,5 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
         protected string ChannelId { get; set; }
         protected IMessagingSystemFactory UnderlyingMessaging { get; set; }
         protected IMessagingSystemFactory MessagingSystem { get; set; }
-        protected int ConnectionInterruptionFrequency { get; set; }
     }
 }

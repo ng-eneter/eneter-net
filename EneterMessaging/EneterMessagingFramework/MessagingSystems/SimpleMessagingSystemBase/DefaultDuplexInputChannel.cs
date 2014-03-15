@@ -39,6 +39,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         public DefaultDuplexInputChannel(string channelId,  // address to listen
             IThreadDispatcher dispatcher,                         // threading model used to notify messages and events
+            IThreadDispatcher dispatchingAfterMessageReading,
             IInputConnector inputConnector,                 // listener used for listening to messages
             IProtocolFormatter protocolFormatter)           // how messages are encoded between channels
         {
@@ -51,7 +52,14 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
 
                 ChannelId = channelId;
+
                 Dispatcher = dispatcher;
+
+                // Internal dispatcher used when the message is decoded.
+                // E.g. Shared memory messaging needs to return looping immediately the protocol message is decoded
+                //      so that other senders are not blocked.
+                myDispatchingAfterMessageReading = dispatchingAfterMessageReading;
+
                 myProtocolFormatter = protocolFormatter;
                 myInputConnector = inputConnector;
 
@@ -102,6 +110,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 lock (myListeningManipulatorLock)
                 {
+                    myStopListeningIsRunning = true;
+
                     try
                     {
                         // Try to close connected clients.
@@ -120,6 +130,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     {
                         EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
                     }
+
+                    myStopListeningIsRunning = false;
                 }
             }
         }
@@ -221,54 +233,64 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 // If the listening thread stopped looping.
                 if (messageContext == null)
                 {
-                    // Try to correctly stop the whole listening.
-                    // Note: Use a different thread because 'StopListening' will try to stop
-                    //       this message listening thread and so the deadlock would occur.
-                    ThreadPool.QueueUserWorkItem(x => StopListening());
+                    // If the listening stopped because it was requested.
+                    if (myStopListeningIsRunning)
+                    {
+                        return false;
+                    }
 
+                    // The listening failed.
                     EneterTrace.Warning(TracedObject + "detected the listening was stopped.");
 
+                    // Try to correctly stop the whole listening.
+                    StopListening();
                     return false;
                 }
 
+                // Get the protocol message from incoming data.
                 ProtocolMessage aProtocolMessage = null;
-
-                // if there are message data available.
                 if (messageContext.Message != null)
                 {
-                    aProtocolMessage = GetProtocolMessage(messageContext.Message);
+                    if (messageContext.Message is Stream)
+                    {
+                        aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)messageContext.Message);
+                    }
+                    else
+                    {
+                        aProtocolMessage = myProtocolFormatter.DecodeMessage(messageContext.Message);
+                    }
                 }
 
                 // If some client disconnected from the server without sending the close message.
                 if (aProtocolMessage == null)
                 {
                     // Try to correctly close the client.
-                    ThreadPool.QueueUserWorkItem(x => CleanDisconnectedResponseReceiver(messageContext.ResponseSender, messageContext.SenderAddress));
+                    myDispatchingAfterMessageReading.Invoke(() => CleanAfterDisconnectedResponseReceiver(messageContext.ResponseSender, messageContext.SenderAddress));
 
                     // Stop listening for this client.
                     return false;
                 }
-
-                if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
+                else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
                     EneterTrace.Debug("REQUEST MESSAGE RECEIVED");
 
-                    // If the connection is not open then it will open it.
-                    CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
-
-                    Dispatcher.Invoke(() => NotifyMessageReceived(messageContext, aProtocolMessage));
+                    myDispatchingAfterMessageReading.Invoke(() =>
+                        {
+                            // If the connection is not open then it will open it.
+                            CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
+                            Dispatcher.Invoke(() => NotifyMessageReceived(messageContext, aProtocolMessage));
+                        });
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                 {
                     EneterTrace.Debug("CLIENT CONNECTION RECEIVED");
-
-                    // If the connection is not approved.
-                    CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
+                    myDispatchingAfterMessageReading.Invoke(() => CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId));
                 }
                 else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
-                    EneterTrace.Debug("CLIEN DISCONNECTION RECEIVED");
-                    ThreadPool.QueueUserWorkItem(x => CloseResponseMessageSender(aProtocolMessage.ResponseReceiverId, false));
+                    EneterTrace.Debug("CLIENT DISCONNECTION RECEIVED");
+                    myDispatchingAfterMessageReading.Invoke(() => CloseResponseMessageSender(aProtocolMessage.ResponseReceiverId, false));
+                    return false;
                 }
                 else
                 {
@@ -279,7 +301,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        private void CleanDisconnectedResponseReceiver(ISender responseSender, string senderAddress)
+        private void CleanAfterDisconnectedResponseReceiver(ISender responseSender, string senderAddress)
         {
             using (EneterTrace.Entering())
             {
@@ -349,7 +371,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 if (aNewConnectionFlag)
                 {
                     // Open connection comes from the client. So notify it from dispatcher threading.
-                    ThreadPool.QueueUserWorkItem(x => Dispatcher.Invoke(() => Notify(ResponseReceiverConnected, responseReceiverId, aConnectionContext.SenderAddress)));
+                    Dispatcher.Invoke(() => Notify(ResponseReceiverConnected, responseReceiverId, aConnectionContext.SenderAddress));
                 }
             }
         }
@@ -404,26 +426,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        // Utility method to decode the incoming message into the ProtocolMessage.
-        private ProtocolMessage GetProtocolMessage(object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                ProtocolMessage aProtocolMessage = null;
-
-                if (message is Stream)
-                {
-                    aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)message);
-                }
-                else
-                {
-                    aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
-                }
-
-                return aProtocolMessage;
-            }
-        }
-
         private void Notify(EventHandler<ResponseReceiverEventArgs> handler, string responseReceiverId, string senderAddress)
         {
             using (EneterTrace.Entering())
@@ -469,9 +471,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         private Dictionary<string, TConnectionContext> myConnectedClients = new Dictionary<string, TConnectionContext>();
 
+        private IThreadDispatcher myDispatchingAfterMessageReading;
         private IInputConnector myInputConnector;
         private IProtocolFormatter myProtocolFormatter;
 
+        private bool myStopListeningIsRunning;
         private object myListeningManipulatorLock = new object();
 
         private string TracedObject
