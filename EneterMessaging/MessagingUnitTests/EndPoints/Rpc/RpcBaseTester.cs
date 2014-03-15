@@ -20,14 +20,17 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public class OpenArgs : EventArgs
         {
             public string Name { get; set; }
+            public string InstanceId { get; set; }
         }
 
         public interface IHello
         {
             event EventHandler<OpenArgs> Open;
             event EventHandler Close;
+
             int Sum(int a, int b);
             string CreateString(string src);
+            string GetInstanceId();
             void Fail();
             void Timeout();
         }
@@ -37,6 +40,11 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             public event EventHandler<OpenArgs> Open;
             public event EventHandler Close;
 
+            public HelloService()
+            {
+                myInstanceId = Guid.NewGuid().ToString();
+            }
+
             public int Sum(int a, int b)
             {
                 return a + b;
@@ -45,6 +53,21 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             public string CreateString(string src)
             {
                 return src;
+            }
+
+            public string GetInstanceId()
+            {
+                if (Open != null)
+                {
+                    OpenArgs anArgs = new OpenArgs()
+                    {
+                        InstanceId = myInstanceId,
+                        Name = "Hello"
+                    };
+                    Open(this, anArgs);
+                }
+
+                return myInstanceId;
             }
 
             public void Fail()
@@ -72,6 +95,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                     Close(this, new EventArgs());
                 }
             }
+
+
+            private string myInstanceId;
         }
 
 
@@ -901,6 +927,64 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             anRpcFactory.CreateClient<OpenArgs>();
         }
 #endif
+
+        [Test]
+        public void PerClientInstanceService()
+        {
+            RpcFactory anRpcFactory = new RpcFactory(mySerializer);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(() => new HelloService());
+            
+            IRpcClient<IHello> anRpcClient1 = anRpcFactory.CreateClient<IHello>();
+            IRpcClient<IHello> anRpcClient2 = anRpcFactory.CreateClient<IHello>();
+
+            try
+            {
+                string aService1IdFromEvent = null;
+                anRpcClient1.Proxy.Open += (x, y) =>
+                    {
+                        aService1IdFromEvent = y.InstanceId;
+                    };
+
+                string aService2IdFromEvent = null;
+                anRpcClient2.Proxy.Open += (x, y) =>
+                    {
+                        aService2IdFromEvent = y.InstanceId;
+                    };
+
+                anRpcService.AttachDuplexInputChannel(myMessaging.CreateDuplexInputChannel(myChannelId));
+                anRpcClient1.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
+                anRpcClient2.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
+
+
+                string aServiceId1 = anRpcClient1.Proxy.GetInstanceId();
+                string aServiceId2 = anRpcClient2.Proxy.GetInstanceId();
+
+                Assert.IsFalse(string.IsNullOrEmpty(aServiceId1));
+                Assert.IsFalse(string.IsNullOrEmpty(aService1IdFromEvent));
+                Assert.IsFalse(string.IsNullOrEmpty(aServiceId2));
+                Assert.IsFalse(string.IsNullOrEmpty(aService2IdFromEvent));
+                Assert.AreEqual(aServiceId1, aService1IdFromEvent);
+                Assert.AreEqual(aServiceId2, aService2IdFromEvent);
+                Assert.AreNotEqual(aServiceId1, aServiceId2);
+            }
+            finally
+            {
+                if (anRpcClient1.IsDuplexOutputChannelAttached)
+                {
+                    anRpcClient1.DetachDuplexOutputChannel();
+                }
+                if (anRpcClient2.IsDuplexOutputChannelAttached)
+                {
+                    anRpcClient2.DetachDuplexOutputChannel();
+                }
+
+                if (anRpcService.IsDuplexInputChannelAttached)
+                {
+                    anRpcService.DetachDuplexInputChannel();
+                }
+            }
+        }
+
 
         protected IMessagingSystemFactory myMessaging;
         protected string myChannelId;
