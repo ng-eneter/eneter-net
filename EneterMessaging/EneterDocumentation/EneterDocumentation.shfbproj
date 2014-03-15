@@ -16,7 +16,7 @@
     <Name>EneterDocumentation</Name>
     <!-- SHFB properties -->
     <OutputPath>.\Help\</OutputPath>
-    <HtmlHelpName>Eneter.Messaging.Framework510.Doc</HtmlHelpName>
+    <HtmlHelpName>Eneter.Messaging.Framework600.Doc</HtmlHelpName>
     <Language>en-US</Language>
     <ApiFilter />
     <ComponentConfigurations>
@@ -94,7 +94,7 @@
     <PresentationStyle>VS2005</PresentationStyle>
     <Preliminary>False</Preliminary>
     <NamingMethod>MemberName</NamingMethod>
-    <HelpTitle>Eneter.Messaging.Framework 5.1 for .NET platforms</HelpTitle>
+    <HelpTitle>Eneter.Messaging.Framework 6.0 for .NET platforms</HelpTitle>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
@@ -105,8 +105,8 @@
     <CppCommentsFixup>False</CppCommentsFixup>
     <CleanIntermediates>True</CleanIntermediates>
     <FeedbackEMailAddress>eneter%40eneter.net</FeedbackEMailAddress>
-    <CopyrightText>Copyright &amp;#169%3b Ondrej Uzovic 2013, All Rights Reserved</CopyrightText>
-    <HelpFileVersion>5.1.0.0</HelpFileVersion>
+    <CopyrightText>Copyright &amp;#169%3b Ondrej Uzovic 2014, All Rights Reserved</CopyrightText>
+    <HelpFileVersion>6.0.0.0</HelpFileVersion>
     <PlugInNamespaces>ms.vsipcc+, ms.vsexpresscc+</PlugInNamespaces>
     <CollectionTocStyle>Hierarchical</CollectionTocStyle>
     <MSHelp2SdkLinkType>Msdn</MSHelp2SdkLinkType>
@@ -151,17 +151,12 @@
       <AlternateText>Communication Between AndroidandNET</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\DispatcherOneWayCommunication.gif">
-      <ImageId>DispatcherOneWayCommunication</ImageId>
-      <AlternateText>Dispatcher One Way Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
     <Image Include="Images\DispatcherRequestResponseCommunication.gif">
       <ImageId>DispatcherRequestResponseCommunication</ImageId>
       <AlternateText>Dispatcher Request Response Communication</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\EneterComponents.gif">
+    <Image Include="Images\EneterComponents.png">
       <ImageId>EneterComponents</ImageId>
       <AlternateText>Eneter Components</AlternateText>
       <CopyToMedia>True</CopyToMedia>
@@ -181,11 +176,6 @@
       <AlternateText>Publish-Subscribe Communication</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\RouterOneWayCommunication.gif">
-      <ImageId>RouterOneWayCommunication</ImageId>
-      <AlternateText>Router One Way Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
     <Image Include="Images\RouterRequestResponseCommunication.gif">
       <ImageId>RouterRequestResponseCommunication</ImageId>
       <AlternateText>Router Request Response Communication</AlternateText>
@@ -196,29 +186,14 @@
       <AlternateText>Silverlight Duplex Tcp Connection</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\StringOneWayCommunication.gif">
-      <ImageId>StringOneWayCommunication</ImageId>
-      <AlternateText>String One Way Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
     <Image Include="Images\StringRequestResponseCommunication.gif">
       <ImageId>StringRequestResponseCommunication</ImageId>
       <AlternateText>String Request Response Communication</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\TypedOneWayCommunication.gif">
-      <ImageId>TypedOneWayCommunication</ImageId>
-      <AlternateText>Typed One Way Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
     <Image Include="Images\TypedRequestResponseCommunication.gif">
       <ImageId>TypedRequestResponseCommunication</ImageId>
       <AlternateText>Typed Request Response Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
-    <Image Include="Images\WrapperOneWayCommunication.gif">
-      <ImageId>WrapperOneWayCommunication</ImageId>
-      <AlternateText>Wrapper One Way Communication</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
     <Image Include="Images\WrapperRequestResponseCommunication.gif">
