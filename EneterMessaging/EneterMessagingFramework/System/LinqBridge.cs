@@ -309,7 +309,10 @@ namespace System.Linq
 
 namespace System
 {
-    delegate TResult Func<TResult>();
+	/// <summary>
+	/// Delegate.
+	/// </summary>
+    public delegate TResult Func<TResult>();
     delegate TResult Func<T, TResult>(T a);
     delegate TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2);
     //delegate TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3);

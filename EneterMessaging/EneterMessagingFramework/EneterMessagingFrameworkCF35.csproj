@@ -91,6 +91,7 @@
     <Compile Include="EndPoints\Rpc\RpcMessage.cs" />
     <Compile Include="EndPoints\Rpc\RpcService.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
+    <Compile Include="EndPoints\Rpc\ServiceStub.cs" />
     <Compile Include="EndPoints\Rpc\_NamespaceDoc.cs" />
     <Compile Include="EndPoints\StringMessages\DuplexStringMessageReceiver.cs" />
     <Compile Include="EndPoints\StringMessages\DuplexStringMessageSender.cs" />
