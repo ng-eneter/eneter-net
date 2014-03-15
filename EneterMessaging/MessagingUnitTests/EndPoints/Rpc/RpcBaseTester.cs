@@ -119,7 +119,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public void RpcCall()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -153,7 +153,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public void RpcCall_NullArgument()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -186,7 +186,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public void DynamicRpcCall()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -219,7 +219,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public void RpcCallError()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -258,7 +258,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             anRpcFactory.RpcTimeout = TimeSpan.FromSeconds(1);
 
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -291,7 +291,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -343,7 +343,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -395,7 +395,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -452,7 +452,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -509,7 +509,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -572,7 +572,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -633,7 +633,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
             HelloService aService = new HelloService();
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -691,7 +691,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public void RpcCall_10000()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
             IRpcClient<IHello> anRpcClient = anRpcFactory.CreateClient<IHello>();
 
             try
@@ -756,7 +756,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             {
                 RpcTimeout = TimeSpan.FromSeconds(30)
             };
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(new HelloService());
 
             IRpcClient<IHello>[] aClients = new IRpcClient<IHello>[10];
             for (int i = 0; i < aClients.Length; ++i )
@@ -829,7 +829,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
             HelloService aService = new HelloService();
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(aService);
+            IRpcService<IHello> anRpcService = anRpcFactory.CreateSingleInstanceService<IHello>(aService);
 
             IRpcClient<IHello>[] aClients = new IRpcClient<IHello>[10];
             for (int i = 0; i < aClients.Length; ++i)
@@ -932,7 +932,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         public void PerClientInstanceService()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
-            IRpcService<IHello> anRpcService = anRpcFactory.CreateService<IHello>(() => new HelloService());
+            IRpcService<IHello> anRpcService = anRpcFactory.CreatePerClientInstanceService<IHello>(() => new HelloService());
             
             IRpcClient<IHello> anRpcClient1 = anRpcFactory.CreateClient<IHello>();
             IRpcClient<IHello> anRpcClient2 = anRpcFactory.CreateClient<IHello>();

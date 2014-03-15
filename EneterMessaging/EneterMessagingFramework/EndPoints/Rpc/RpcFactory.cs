@@ -148,7 +148,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// <typeparam name="TServiceInterface">service interface type</typeparam>
         /// <param name="service">instance implementing the given service interface</param>
         /// <returns>RpcService instance.</returns>
-        public IRpcService<TServiceInterface> CreateService<TServiceInterface>(TServiceInterface service) where TServiceInterface : class
+        public IRpcService<TServiceInterface> CreateSingleInstanceService<TServiceInterface>(TServiceInterface service) where TServiceInterface : class
         {
             using (EneterTrace.Entering())
             {
@@ -170,7 +170,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// <param name="serviceFactoryMethod">factory method used to create the service instance when the client is connected</param>
         /// 
         /// <returns></returns>
-        public IRpcService<TServiceInterface> CreateService<TServiceInterface>(Func<TServiceInterface> serviceFactoryMethod) where TServiceInterface : class
+        public IRpcService<TServiceInterface> CreatePerClientInstanceService<TServiceInterface>(Func<TServiceInterface> serviceFactoryMethod) where TServiceInterface : class
         {
             using (EneterTrace.Entering())
             {

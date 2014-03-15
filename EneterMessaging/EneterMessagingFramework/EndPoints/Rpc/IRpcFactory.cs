@@ -31,7 +31,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// <typeparam name="TServiceInterface">service interface type</typeparam>
         /// <param name="service">instance implementing the given service interface</param>
         /// <returns>RpcService instance.</returns>
-        IRpcService<TServiceInterface> CreateService<TServiceInterface>(TServiceInterface service) where TServiceInterface : class;
+        IRpcService<TServiceInterface> CreateSingleInstanceService<TServiceInterface>(TServiceInterface service) where TServiceInterface : class;
 
         /// <summary>
         /// Creates per-client-instance RPC service for the given interface.
@@ -43,6 +43,6 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// <param name="serviceFactoryMethod">factory method used to create the service instance when the client is connected</param>
         /// 
         /// <returns></returns>
-        IRpcService<TServiceInterface> CreateService<TServiceInterface>(Func<TServiceInterface> serviceFactoryMethod) where TServiceInterface : class;
+        IRpcService<TServiceInterface> CreatePerClientInstanceService<TServiceInterface>(Func<TServiceInterface> serviceFactoryMethod) where TServiceInterface : class;
     }
 }
