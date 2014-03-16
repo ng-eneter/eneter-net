@@ -448,7 +448,7 @@
                   When the method returns the RPC service creates the response message and sends it back to the RPC client.
                 </para>
                 <markup>
-                  <img src="../media/TypedRequestResponseCommunication.gif" width="100%"/>
+                  <img src="../media/EneterRemote-Procedure-Calls.png" width="100%"/>
                 </markup>
 
                 <para>
@@ -587,7 +587,7 @@
                 the connection between the client and the service.
               </para>
               <markup>
-                <img src="../media/BrokerCommunication.gif" width="100%"/>
+                <img src="../media/EneterMessageBus.png" width="100%"/>
               </markup>
 
               <table>

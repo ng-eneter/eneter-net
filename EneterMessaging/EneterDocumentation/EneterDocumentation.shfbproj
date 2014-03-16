@@ -141,6 +141,16 @@
     <ContentLayout Include="Content Layout.content" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Images\EneterRemote-Procedure-Calls.png">
+      <ImageId>EneterRemote-Procedure-Calls</ImageId>
+      <AlternateText>Eneter Remote-Procedure-Calls</AlternateText>
+      <CopyToMedia>True</CopyToMedia>
+    </Image>
+    <Image Include="Images\EneterMessageBus.png">
+      <ImageId>EneterMessageBus</ImageId>
+      <AlternateText>Eneter Message Bus</AlternateText>
+      <CopyToMedia>True</CopyToMedia>
+    </Image>
     <Image Include="Images\BrokerCommunication.gif">
       <ImageId>BrokerCommunication</ImageId>
       <AlternateText>Broker Communication</AlternateText>
