@@ -1,6 +1,29 @@
 Release Notes
 
 
+Version 6.0
+
+Release Date: 2014-03-16
+
+Supported Platforms:
+
+    Java 6 and Android 2.1 (or later)
+    .Net 3.5, .Net 4.0, .Net 4.5, Silverlight 3, Silverlight 4, Silverlight 5, Windows Phone 7, Windows Phone 7.1, Mono 2.6.4, Compact Framework 2.0 and Compact Framework 3.5
+
+New Features:
+
+    RPC (Remote Procedure Calls) working across platforms.
+    Message Bus for publishing multiple services from one place.
+    Authenticated Connection for verifying the client identity during connection.
+    Threading Modes possibilities to control into which thread are routed received messages.
+    Timeouts possibilities are improved.
+
+Changes in behavior:
+
+    One-way channels are discontinued - they can be fully replaced by duplex channels.
+
+
+
 Version 5.1
 
 Release Date: 2013-07-01
@@ -24,82 +47,10 @@ Changes in behavior:
     Bridge component removed from the framework.
     Broker and Channel Wrapper-Unwrapper are not compatible with previous versions of the framework.
 
-Cross-platform Notes:
-
-    Binary serializer cannot be used for the communication between Java and .NET based applications.
-
 Fixed Bugs:
 
     0000020 - SyncDuplexTypedMessageSender may not work correctly.
 
-Java 6, Android 2.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Router is not implemented yet
-    Rijndael serializer is not supported
-    Json serializer is not supported
-
-Silverlight 3, Silverlight 4, Silverlight 5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP and HTTP listener is not supported (only receiving of response messages is supported)
-    If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
-    SSL is not supported for the TCP communication
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Compact Framework 2.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Only XmlSerializer is supported
-    Tracing does not automatically detect namespaces and method names.
-
-Compact Framework 3.5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Only XmlSerializer and GZip are supported
-    Tracing does not automatically detect namespaces and method names
-
-Mono 2.6.4
-
-    Named pipe messaging is not supported
-    Shared memory messaging is not supported
-    SSL is not supported
-    DataContractXmlStringSerializer is not supported
-    BinarySerializer is not supported
-    Mono platform is less stable as .Net platform
-    GZip serializer is not supported
-    Json serializer is not supported
 
 
 
@@ -129,82 +80,10 @@ Changes in behavior:
     Commands were removed from the framework and will not be supported anymore.
     Typed Sequenced Messages were removed from the framework and will not be supported anymore.
 
-Cross-platform Notes:
-
-    Binary serializer cannot be used for the communication between Java and .NET based applications.
-
 Fixed Bugs:
 
     No serious bugs detected.
 
-Java 6, Android 2.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Router is not implemented yet
-    Rijndael serializer is not supported
-    Json serializer is not supported
-
-Silverlight 3, Silverlight 4, Silverlight 5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP and HTTP listener is not supported (only receiving of response messages is supported)
-    If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
-    SSL is not supported for the TCP communication
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Compact Framework 2.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Only XmlSerializer is supported
-    Tracing does not automatically detect namespaces and method names.
-
-Compact Framework 3.5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Only XmlSerializer and GZip are supported
-    Tracing does not automatically detect namespaces and method names
-
-Mono 2.6.4
-
-    Named pipe messaging is not supported
-    Shared memory messaging is not supported
-    SSL is not supported
-    DataContractXmlStringSerializer is not supported
-    BinarySerializer is not supported
-    Mono platform is less stable as .Net platform
-    GZip serializer is not supported
-    Json serializer is not supported
 
 
 
@@ -231,83 +110,6 @@ Cross-platform Notes:
 
     Binary serializer cannot be used for the communication between Java and .NET based applications.
 
-Fixed Bugs:
-
-    No serious bugs detected.
-
-Java 6, Android 2.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Acknowledged messages are not implemented yet
-    Router is not implemented yet
-    Load balancer not implemented yet
-    Commands are not implemeneted yet
-    Rijndael serializer is not supported
-    Json serializer is not supported
-
-Silverlight 3, Silverlight 4, Silverlight 5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP and HTTP listener is not supported (only receiving of response messages is supported)
-    If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
-    SSL is not supported for the TCP communication
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Compact Framework 2.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Only XmlSerializer is supported
-    Tracing does not automatically detect namespaces and method names.
-    Commands are not supported
-
-Compact Framework 3.5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Only XmlSerializer and GZip are supported
-    Tracing does not automatically detect namespaces and method names
-    Commands are not supported
-
-Mono 2.6.4
-
-    Named pipe messaging is not supported
-    Shared memory messaging is not supported
-    SSL is not supported
-    DataContractXmlStringSerializer is not supported
-    BinarySerializer is not supported
-    Mono platform is less stable as .Net platform
-    GZip serializer is not supported
-    Json serializer is not supported
 
 
 
@@ -329,71 +131,8 @@ Changes in behavior:
 
     No changes. Eneter 4.1 is compatible with Eneter 4.0.
 
-Cross-platform Notes:
 
-    Binary serializer cannot be used for the communication between Java and .NET based applications.
 
-Fixed Bugs:
-
-    No serious bugs detected.
-
-Java 6, Android 2.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    Acknowledged messages are not implemented yet
-    Router is not implemented yet
-    Load balancer not implemented yet
-    Commands are not implemeneted yet
-    Rijndael serializer is not supported
-    Json serializer is not supported
-
-Silverlight 3, Silverlight 4, Silverlight 5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP and HTTP listener is not supported (only receiving of response messages is supported)
-    If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
-    SSL is not supported for the TCP communication
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Json serializer is not supported
-    Load Balancer is not supported
-
-Mono 2.6.4
-
-    Named pipe messaging is not supported
-    Shared memory messaging is not supported
-    SSL is not supported
-    DataContractXmlStringSerializer is not supported
-    BinarySerializer is not supported
-    Mono platform is less stable as .Net platform
-    GZip serializer is not supported
-    Json serializer is not supported
 
 Version 4.0
 
@@ -416,66 +155,11 @@ Changes in behavior:
     The formatting was changed because the encoding information (i.e. Big or Little Endian, and UTF-8 or UTF-16) needs to be included in the message for the Cross-platform communication.
     However, the API is still the same. Therefore, to migrate to Eneter 4.0 just update references in your project and rebuild.
 
-Cross-platform Notes:
-
-    Binary serializer cannot be used for the communication between Java and .NET based applications.
-
 Fixed Bugs:
 
     0000013 - EneterTrace causes a security exception in Silverlight.
 
-Java 6, Android 2.1
 
-    Named pipes are not supported
-    Shared memory is not supported
-    Reliable acknowledged messages are not implemented yet
-    Router is not implemented yet
-    Load balancer not implemented yet
-    Commands are not implemeneted yet
-    Rijndael serializer is not supported
-
-Silverlight 3, Silverlight 4, Silverlight 5
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP and HTTP listener is not supported (only receiving of response messages is supported)
-    If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
-    SSL is not supported for the TCP communication
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.1
-
-    Named pipes are not supported
-    Shared memory is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7.0
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Load Balancer is not supported
-
-Mono 2.6.4
-
-    Named pipe messaging is not supported
-    Shared memory messaging is not supported
-    SSL is not supported
-    DataContractXmlStringSerializer is not supported
-    BinarySerializer is not supported
-    Mono platform is less stable as .Net platform
-    GZip serializer is not supported
 
 Version 3.0
 
@@ -506,38 +190,7 @@ Fixed Bugs:
     0000009 - Uri address cannot end with '/' in case of named pipes.
     0000008 - Opening of HTTP connection sometimes hangs on Windows Phone 7.
 
-Silverlight 3, Silverlight 4
 
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP and HTTP listener is not supported (only receiving of response messages is supported)
-    If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown
-    SSL is not supported for the TCP communication
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Load Balancer is not supported
-
-Windows Phone 7
-
-    Named pipes are not supported
-    Shared memory is not supported
-    TCP is not supported
-    HTTP listener is not supported (only receiving of response messages is supported)
-    BinarySerializer is not supported
-    Rijndael serializer is not supported
-    GZip serializer is not supported
-    Load Balancer is not supported
-
-Mono 2.6.4
-
-    Named pipe messaging is not supported
-    Shared memory messaging is not supported
-    SSL is not supported
-    DataContractXmlStringSerializer is not supported
-    BinarySerializer is not supported
-    Mono platform is less stable as .Net platform
-    GZip serializer is not supported
 
 Version 2.0
 
@@ -570,6 +223,8 @@ Fixed Bugs:
     0000007 - Memory leak in Silverlight client when the Tcp connection is closed.
     0000006 - The application sending messages via Tcp is not closed properly if the.
 
+
+
 Version 1.0
 
 Release Date: 2010-07-04
@@ -587,4 +242,3 @@ Features:
     TCP based messaging.
     TCP policy server for the communication between Silverlight and desktop applications.
     XML and Binary serializing.
-

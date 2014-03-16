@@ -15,25 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_03257B417222452E89163324AD6F57B9"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_099B46C995FB463988F91A9B62CBBDD3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_0B0A8610E3444395B020F60B07A02A3A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0B8205635A1B4982B9039592E3576B76"
+        "MsmKey" = "8:_0B254A8125CF4624A3483F2C78D3F252"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,31 +39,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0CD307AF7EB74BADB88CDF8DA96D866D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0E2E58A3136745B796FF0A7137918F70"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_0E977859D09B44D7B4E5E816A08DFB5C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0EC28F614D444D78BDFEED9D7983AC02"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0EF9BA83AEF54A389F96D41D1C93AF4C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -99,12 +69,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1C0FD501990E4F61B9B1F45EE7009CEF"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_1C5A52B5D0754F039AD944892D07E961"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -112,18 +76,6 @@
         "Entry"
         {
         "MsmKey" = "8:_1D5C2B3379814DF0BEFEE5D2F1268428"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1FCFBD43C67347808F4B2423D7DF4F2B"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_208350C381C44906B8367A26EA0E3963"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -147,12 +99,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_37265D4D62D6406A902280227A68EFC2"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4B03C826DB7F4828860FC7BB844084AD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -160,18 +106,6 @@
         "Entry"
         {
         "MsmKey" = "8:_4D7A757438694EE28AA462749166EFEB"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4E8D11A804FB47FD8B6AB5B602A3DC59"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4EF1EDD31C624188B11F49C2D557F478"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -195,31 +129,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_56ACA56DBC1F44BAA184B661B41C392A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_57CA187B046A4F61BAA6E543F09C0F80"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5A5252413F1E4343963430B8C2979562"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5C63F5F030964029BB101A4F68E2C055"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6496CC79F3FE4B138A71E58FA3249071"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -231,19 +141,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_67B5E4FED5114E7F9F8935A1BA6B7B3E"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_6FD040A99DBB4A25BD9CE065B1A6D387"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78E42221D146473EA17E13CF10DE32E1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -255,19 +153,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7B54EE940191442D8EB00148326E7E8C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_7C731674FEC146DF8EC1B4DE951E393C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7EA677967BAB425CABFF74F12139E34A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -285,49 +171,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_8D1059BEE12D435980CADA95AC01ECF8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_90CE9BCF3ABA428AB4F746AAEA10F763"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_9CC6F995CA4740A1846224D36911FC19"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A756B5A1134D4333BA06DE54C7E50C6C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A786D425DC93427CBFBB151299780DFE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B1CF974F30734EFAB2AB53206BC88190"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B5251534AC9F4B19B22C809DF756D8DF"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B5EEB4DA440C42F580651AA2C9371038"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -369,12 +213,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D7701A600EFF43B999B3B1504E02DC98"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_DAE42E5BE2F345E2B69682071D528C84"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -387,158 +225,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_DF72EF35EC304BCE9109C3E54CA10859"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E037CB8BE53E458CADCE9073E76FD633"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E72BFFA75EAA4306AF91CAAE5D2CFC89"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_ED70ADD82EC74E848DA98C20CF574A82"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_F33AB371A1734538BF4A13605AF58F55"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F5C6B2FCD4F3440C8747C5B377403C77"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F9178F388AF040C8BD7F17D8F72BB0E3"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A756B5A1134D4333BA06DE54C7E50C6C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F5C6B2FCD4F3440C8747C5B377403C77"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F33AB371A1734538BF4A13605AF58F55"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_ED70ADD82EC74E848DA98C20CF574A82"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D36AE16CF7A04BD29A5221DD27A76130"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_CDD5C4C56ECA41D0AC5A4C920F154BCA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C27FDCCBD8CF45358A35BDEB4ABB741D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B5EEB4DA440C42F580651AA2C9371038"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_90CE9BCF3ABA428AB4F746AAEA10F763"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7C731674FEC146DF8EC1B4DE951E393C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7B54EE940191442D8EB00148326E7E8C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_798F11F3D3C549C5B2EE0F97F40956FC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5C63F5F030964029BB101A4F68E2C055"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5A5252413F1E4343963430B8C2979562"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4EF1EDD31C624188B11F49C2D557F478"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_19D07B5F70A2411BA113C0F7CAA2EA15"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_15936F18AD164E22B744EE4DAE5F2039"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0EC28F614D444D78BDFEED9D7983AC02"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0E977859D09B44D7B4E5E816A08DFB5C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -550,13 +238,61 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0B8205635A1B4982B9039592E3576B76"
+        "OwnerKey" = "8:_0EC28F614D444D78BDFEED9D7983AC02"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0B0A8610E3444395B020F60B07A02A3A"
+        "OwnerKey" = "8:_15936F18AD164E22B744EE4DAE5F2039"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_19D07B5F70A2411BA113C0F7CAA2EA15"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5A5252413F1E4343963430B8C2979562"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_798F11F3D3C549C5B2EE0F97F40956FC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7C731674FEC146DF8EC1B4DE951E393C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_C27FDCCBD8CF45358A35BDEB4ABB741D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_CDD5C4C56ECA41D0AC5A4C920F154BCA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D36AE16CF7A04BD29A5221DD27A76130"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F33AB371A1734538BF4A13605AF58F55"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -659,26 +395,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_03257B417222452E89163324AD6F57B9"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net35\\Debug\\Eneter.Messaging.Framework.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_C4D5ECD03D1B4CA6A6AFD80E3FF47114"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_099B46C995FB463988F91A9B62CBBDD3"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Release\\Eneter.Messaging.Framework.Silverlight.XML"
@@ -699,44 +415,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0B0A8610E3444395B020F60B07A02A3A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0B254A8125CF4624A3483F2C78D3F252"
             {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Debug\\Eneter.Messaging.Framework.Silverlight.dll"
-            "TargetName" = "8:"
+            "SourcePath" = "8:..\\EneterDocumentation\\Help\\Eneter.Messaging.Framework600.Doc.chm"
+            "TargetName" = "8:Eneter.Messaging.Framework600.Doc.chm"
             "Tag" = "8:"
-            "Folder" = "8:_050F0D7B2CB5415BA21F5B1DC659EE3B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0B8205635A1B4982B9039592E3576B76"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight3\\Debug\\Eneter.Messaging.Framework.Silverlight.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_D033AFF9567E4C509EC3902E6FD48EE8"
+            "Folder" = "8:_A35EA19DE0E04E1AAFA85B63BF23D9A3"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -791,33 +475,18 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0CD307AF7EB74BADB88CDF8DA96D866D"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight3\\Debug\\Eneter.Messaging.Framework.Silverlight.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_D033AFF9567E4C509EC3902E6FD48EE8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0E2E58A3136745B796FF0A7137918F70"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_0E2E58A3136745B796FF0A7137918F70"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.CF.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Release\\Eneter.Messaging.Framework.CF.dll"
             "TargetName" = "8:"
@@ -837,39 +506,18 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0E977859D09B44D7B4E5E816A08DFB5C"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework35\\Debug\\Eneter.Messaging.Framework.CF.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_72561BE50CC34991A455E3FC1A2D4853"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0EC28F614D444D78BDFEED9D7983AC02"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_0EC28F614D444D78BDFEED9D7983AC02"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.Phone.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone71\\Release\\Eneter.Messaging.Framework.Phone.dll"
             "TargetName" = "8:"
@@ -889,33 +537,18 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0EF9BA83AEF54A389F96D41D1C93AF4C"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone71\\Debug\\Eneter.Messaging.Framework.Phone.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.Phone.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_D7E06C2FD76D4C80938F274D1CDC9B5B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_15936F18AD164E22B744EE4DAE5F2039"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_15936F18AD164E22B744EE4DAE5F2039"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net40\\Release\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
@@ -981,26 +614,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1C0FD501990E4F61B9B1F45EE7009CEF"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework35\\Debug\\Eneter.Messaging.Framework.CF.xml"
-            "TargetName" = "8:Eneter.Messaging.Framework.CF.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_72561BE50CC34991A455E3FC1A2D4853"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1C5A52B5D0754F039AD944892D07E961"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net45\\Debug\\Eneter.Messaging.Framework.XML"
@@ -1027,46 +640,6 @@
             "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.XML"
             "Tag" = "8:"
             "Folder" = "8:_5B969090345B451EB2CAAB04F4EDAB7F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1FCFBD43C67347808F4B2423D7DF4F2B"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Debug\\Eneter.Messaging.Framework.Silverlight.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_D55EE97F8D95454687E4E4939D04E185"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_208350C381C44906B8367A26EA0E3963"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Debug\\Eneter.Messaging.Framework.Silverlight.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_D55EE97F8D95454687E4E4939D04E185"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1141,26 +714,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_37265D4D62D6406A902280227A68EFC2"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Mono264\\Debug\\Eneter.Messaging.Framework.Mono.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.Mono.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_4C1CCE7AE07D471883CEEB31652B75CD"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B03C826DB7F4828860FC7BB844084AD"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Release\\Eneter.Messaging.Framework.CF.pdb"
@@ -1187,52 +740,6 @@
             "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.pdb"
             "Tag" = "8:"
             "Folder" = "8:_91CEFC4AFB674937B2C26C07E42ABF46"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4E8D11A804FB47FD8B6AB5B602A3DC59"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone71\\Debug\\Eneter.Messaging.Framework.Phone.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.Phone.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_D7E06C2FD76D4C80938F274D1CDC9B5B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4EF1EDD31C624188B11F49C2D557F478"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net40\\Debug\\Eneter.Messaging.Framework.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0C76BAF89B0744B4A8F6D4B69A2EAA95"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1307,104 +814,23 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_56ACA56DBC1F44BAA184B661B41C392A"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Mono264\\Debug\\Eneter.Messaging.Framework.Mono.xml"
-            "TargetName" = "8:Eneter.Messaging.Framework.Mono.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_4C1CCE7AE07D471883CEEB31652B75CD"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_57CA187B046A4F61BAA6E543F09C0F80"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net45\\Debug\\Eneter.Messaging.Framework.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_34897C6BFFE143F982669BA0D55F68D0"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5A5252413F1E4343963430B8C2979562"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_5A5252413F1E4343963430B8C2979562"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Release\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_91CEFC4AFB674937B2C26C07E42ABF46"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5C63F5F030964029BB101A4F68E2C055"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone71\\Debug\\Eneter.Messaging.Framework.Phone.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_D7E06C2FD76D4C80938F274D1CDC9B5B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6496CC79F3FE4B138A71E58FA3249071"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net40\\Debug\\Eneter.Messaging.Framework.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_0C76BAF89B0744B4A8F6D4B69A2EAA95"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1439,26 +865,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_67B5E4FED5114E7F9F8935A1BA6B7B3E"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Debug\\Eneter.Messaging.Framework.Phone.xml"
-            "TargetName" = "8:Eneter.Messaging.Framework.Phone.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_8318153E75F6418EA7B548BD2819517A"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6FD040A99DBB4A25BD9CE065B1A6D387"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Release\\Eneter.Messaging.Framework.Phone.xml"
@@ -1479,33 +885,18 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_78E42221D146473EA17E13CF10DE32E1"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight3\\Debug\\Eneter.Messaging.Framework.Silverlight.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_D033AFF9567E4C509EC3902E6FD48EE8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_798F11F3D3C549C5B2EE0F97F40956FC"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_798F11F3D3C549C5B2EE0F97F40956FC"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight3\\Release\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -1525,64 +916,23 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7B54EE940191442D8EB00148326E7E8C"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Mono264\\Debug\\Eneter.Messaging.Framework.Mono.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_4C1CCE7AE07D471883CEEB31652B75CD"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7C731674FEC146DF8EC1B4DE951E393C"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_7C731674FEC146DF8EC1B4DE951E393C"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.Phone.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Release\\Eneter.Messaging.Framework.Phone.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4556DF4074604D0E95B3652306D97532"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7EA677967BAB425CABFF74F12139E34A"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Debug\\Eneter.Messaging.Framework.CF.xml"
-            "TargetName" = "8:Eneter.Messaging.Framework.CF.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_41E307A1C53E4DE58C6EF5588F64DFF8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1637,170 +987,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8D1059BEE12D435980CADA95AC01ECF8"
-            {
-            "SourcePath" = "8:..\\EneterDocumentation\\Help\\Eneter.Messaging.Framework510.Doc.chm"
-            "TargetName" = "8:Eneter.Messaging.Framework510.Doc.chm"
-            "Tag" = "8:"
-            "Folder" = "8:_A35EA19DE0E04E1AAFA85B63BF23D9A3"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_90CE9BCF3ABA428AB4F746AAEA10F763"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net45\\Debug\\Eneter.Messaging.Framework.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_34897C6BFFE143F982669BA0D55F68D0"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9CC6F995CA4740A1846224D36911FC19"
             {
             "SourcePath" = "8:..\\LicenseAgreement.rtf"
             "TargetName" = "8:LicenseAgreement.rtf"
             "Tag" = "8:"
             "Folder" = "8:_F1690E4D6F634F37BDF358A7BEDE82E1"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A756B5A1134D4333BA06DE54C7E50C6C"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net35\\Debug\\Eneter.Messaging.Framework.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_C4D5ECD03D1B4CA6A6AFD80E3FF47114"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A786D425DC93427CBFBB151299780DFE"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Debug\\Eneter.Messaging.Framework.Silverlight.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_050F0D7B2CB5415BA21F5B1DC659EE3B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B1CF974F30734EFAB2AB53206BC88190"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Debug\\Eneter.Messaging.Framework.Phone.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.Phone.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_8318153E75F6418EA7B548BD2819517A"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B5251534AC9F4B19B22C809DF756D8DF"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Debug\\Eneter.Messaging.Framework.CF.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.CF.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_41E307A1C53E4DE58C6EF5588F64DFF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B5EEB4DA440C42F580651AA2C9371038"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Debug\\Eneter.Messaging.Framework.Silverlight.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_D55EE97F8D95454687E4E4939D04E185"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1839,9 +1031,14 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_C27FDCCBD8CF45358A35BDEB4ABB741D"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.Mono.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Mono264\\Release\\Eneter.Messaging.Framework.Mono.dll"
             "TargetName" = "8:"
@@ -1905,9 +1102,14 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_CDD5C4C56ECA41D0AC5A4C920F154BCA"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.Silverlight.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Release\\Eneter.Messaging.Framework.Silverlight.dll"
             "TargetName" = "8:"
@@ -1931,34 +1133,19 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_D36AE16CF7A04BD29A5221DD27A76130"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net35\\Release\\Eneter.Messaging.Framework.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3ABC0B29EED34FFFBE69258C7AE21CB2"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D7701A600EFF43B999B3B1504E02DC98"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework35\\Debug\\Eneter.Messaging.Framework.CF.pdb"
-            "TargetName" = "8:Eneter.Messaging.Framework.CF.pdb"
-            "Tag" = "8:"
-            "Folder" = "8:_72561BE50CC34991A455E3FC1A2D4853"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2013,150 +1200,23 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DF72EF35EC304BCE9109C3E54CA10859"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net35\\Debug\\Eneter.Messaging.Framework.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_C4D5ECD03D1B4CA6A6AFD80E3FF47114"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E037CB8BE53E458CADCE9073E76FD633"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net45\\Debug\\Eneter.Messaging.Framework.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_34897C6BFFE143F982669BA0D55F68D0"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E72BFFA75EAA4306AF91CAAE5D2CFC89"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Debug\\Eneter.Messaging.Framework.Silverlight.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_050F0D7B2CB5415BA21F5B1DC659EE3B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_ED70ADD82EC74E848DA98C20CF574A82"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework20\\Debug\\Eneter.Messaging.Framework.CF.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_41E307A1C53E4DE58C6EF5588F64DFF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F33AB371A1734538BF4A13605AF58F55"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_F33AB371A1734538BF4A13605AF58F55"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.CF.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\CompactFramework35\\Release\\Eneter.Messaging.Framework.CF.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_F5075ABD55BB43B08A931856F9B0054C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F5C6B2FCD4F3440C8747C5B377403C77"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone7\\Debug\\Eneter.Messaging.Framework.Phone.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_8318153E75F6418EA7B548BD2819517A"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F9178F388AF040C8BD7F17D8F72BB0E3"
-            {
-            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Net40\\Debug\\Eneter.Messaging.Framework.XML"
-            "TargetName" = "8:Eneter.Messaging.Framework.XML"
-            "Tag" = "8:"
-            "Folder" = "8:_0C76BAF89B0744B4A8F6D4B69A2EAA95"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2218,17 +1278,6 @@
                     "Property" = "8:_B48BBAC7996A4EFEB8F50D25AD319332"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_72561BE50CC34991A455E3FC1A2D4853"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_083C8AD0C72D4E598CBC00CF80F26A9F"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_F5075ABD55BB43B08A931856F9B0054C"
                             {
                             "Name" = "8:Release"
@@ -2262,17 +1311,6 @@
                                 {
                                 }
                             }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_D7E06C2FD76D4C80938F274D1CDC9B5B"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_73D554A9B9F9472A818AE7D04E1FB203"
-                                "Folders"
-                                {
-                                }
-                            }
                         }
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_300ADDD693D84077A0141D2157835633"
@@ -2291,17 +1329,6 @@
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
                             "Property" = "8:_C9F287B5241F43469E64397D9784EAE4"
-                                "Folders"
-                                {
-                                }
-                            }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_0C76BAF89B0744B4A8F6D4B69A2EAA95"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_568BA9117D294034B056071E648063CA"
                                 "Folders"
                                 {
                                 }
@@ -2328,17 +1355,6 @@
                                 {
                                 }
                             }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_D033AFF9567E4C509EC3902E6FD48EE8"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_5B05AA891C744D8582C204D85E0179DC"
-                                "Folders"
-                                {
-                                }
-                            }
                         }
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_793075898D62448EA65A0AACD83AC6AF"
@@ -2350,17 +1366,6 @@
                     "Property" = "8:_63EF068B0183488EBFC8F065F8ECE27A"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_4C1CCE7AE07D471883CEEB31652B75CD"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_D2949E3BC8DE41C3B7061F570E181804"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_8010CEB36AA54D5D9FAFA2B26631ECA7"
                             {
                             "Name" = "8:Release"
@@ -2383,17 +1388,6 @@
                     "Property" = "8:_FF5DC9116B9B42A7B394DF9D9EA7BE9F"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_050F0D7B2CB5415BA21F5B1DC659EE3B"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_0E39865A9C2E4B3B8B53BC015F1E0055"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_91CEFC4AFB674937B2C26C07E42ABF46"
                             {
                             "Name" = "8:Release"
@@ -2427,17 +1421,6 @@
                                 {
                                 }
                             }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_8318153E75F6418EA7B548BD2819517A"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_DD91A7AE3B334BFEA85AF8AB2A6DEFB0"
-                                "Folders"
-                                {
-                                }
-                            }
                         }
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_8A77B1001FC74A50A9D45E5CEA9DF0A1"
@@ -2460,17 +1443,6 @@
                                 {
                                 }
                             }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_C4D5ECD03D1B4CA6A6AFD80E3FF47114"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_513E8C554B774A4AA325EC3E1F3ED040"
-                                "Folders"
-                                {
-                                }
-                            }
                         }
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_A0327EEF41374AECA4BCEDAF32C63983"
@@ -2482,17 +1454,6 @@
                     "Property" = "8:_E5A55279D6C54078B03E932410F0F5AE"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_34897C6BFFE143F982669BA0D55F68D0"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_61C732A2D3F445B08507081A654FE920"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_DA7ECF67C1504463958CDE9DE21A3C1E"
                             {
                             "Name" = "8:Release"
@@ -2526,17 +1487,6 @@
                     "Property" = "8:_6FA12FF9CDD84D91A1BD0EC437F9ACE3"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_41E307A1C53E4DE58C6EF5588F64DFF8"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_18985364A64141D387733D6F6647879A"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_5C6106639AC34C58B4C259139F369657"
                             {
                             "Name" = "8:Release"
@@ -2559,17 +1509,6 @@
                     "Property" = "8:_670C1AF68CDA4DDD9CA83244764E3561"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_D55EE97F8D95454687E4E4939D04E185"
-                            {
-                            "Name" = "8:Debug"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_435E1266F1DB4C5198FA8D86CDDA552B"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_FE3F349C6A91465B8B7C56FC74C843FC"
                             {
                             "Name" = "8:Release"

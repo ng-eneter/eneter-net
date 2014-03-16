@@ -11,7 +11,7 @@
       <para>
       <markup>
       This license is a legal agreement between Ondrej Uzovic and you
-      for the software product <b>'Eneter.Messaging.Framework version 5.1'.</b>
+      for the software product <b>'Eneter.Messaging.Framework version 6.0'.</b>
       </markup>
       </para>
       <para>
@@ -21,8 +21,8 @@
     <!-- Add one or more top-level section elements.  These are collapsible.
          If using <autoOutline />, add an address attribute to identify it
          and specify a title so that it can be jumped to with a hyperlink. -->
-    <section address="LicenseForNonCommercialUse">
-      <title>License for Non-Commercial Use</title>
+    <section address="EneterFreeBinaryLicense">
+      <title>Eneter Free Binary License</title>
       <content>
         <!-- Uncomment this to create a sub-section outline
         <autoOutline /> -->
@@ -35,32 +35,17 @@
         </markup>
         </para>
         <para>
-        <legacyBold>Defintions:</legacyBold>
-        </para>
-        <para>
-        Non-commercial software product is a software product that does not produce any direct or indirect financial profit.
-        </para>
-        <para>
-        Non-commercial organization is an organization that is not intended to create any financial profit.
-        E.g. A company selling products to create a profit is NOT a non-comercial organization.
-        </para>
-        <para>
         </para>
         <para>
 			<list class="ordered">
 			  <listItem> <legacyBold>Grant of License</legacyBold>
 				<list class="bullet">
-				  <listItem>You may use the product for evaluation purposes to test its functionality.</listItem>
-				  <listItem>Non-commercial organizations or individual persons may integrate the product binary files into non-commercial software products.</listItem>
-				  <listItem>Non-commercial organizations or individual persons may distribute the necessary product binary files to end users as an integrated part of their non-commercial software products in accordance with terms of this license.</listItem>
+				  <listItem>You may use Eneter binary files in your commercial or non-commercial software applications.</listItem>
+				  <listItem>You may make as many copies of Eneter binary files as needed and distribute them in accordance with terms of this license.</listItem>
 				</list>
 			  </listItem>
 			  <listItem> <legacyBold>License Limitations</legacyBold>
 				<list class="bullet">
-				  <listItem>Commercial organizations CANNOT use this product other than for evaluation purposes.</listItem>
-				  <listItem>You CANNOT use this product for any commercial purposes. All commercial use is forbidden.</listItem>
-				  <listItem>You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.</listItem>
-				  <listItem>You CANNOT provide the product binary files to any third party, unless they are integrated with your non-commercial software solution.</listItem>
 				  <listItem>You are not allowed to reverse engineer, disassemble or attempt to get any source files.</listItem>
 				</list>
 			  </listItem>
@@ -85,8 +70,8 @@
     </section>
     
     
-    <section address="LicenseForCommercialUse">
-      <title>License for Commercial Use</title>
+    <section address="EneterSourceCodeLicense">
+      <title>Eneter Source Code License</title>
       <content>
         <!-- Uncomment this to create a sub-section outline
         <autoOutline /> -->
@@ -97,7 +82,9 @@
         By purchasing this license you agree to be bound by the following terms and conditions:
         </para>
         <para>
-        (DO NOT purchase this license, if you do not agree with the terms.)
+          <markup>
+            <font style="color:#FF0000">DO NOT purchase this license, if you do not agree with the terms.</font>
+          </markup>
         </para>
         <para>
         </para>
@@ -105,15 +92,16 @@
 			<list class="ordered">
 			  <listItem> <legacyBold>Grant of License</legacyBold>
 				<list class="bullet">
-				  <listItem>You may integrate the product binary files into your software products.</listItem>
-				  <listItem>You may distribute the necessary product binary files to your end users as an integrated part of your software products in accordance with terms of this license.</listItem>
+				  <listItem>You may use Eneter binary files in your commercial or non-commercial software applications.</listItem>
+				  <listItem>You may make as many copies of Eneter binary files as needed and distribute them in accordance with terms of this license.</listItem>
+          <listItem>You may use Eneter source codes for debugging and investigation purposes.</listItem>
+          <listItem>You may modify and compile Eneter source code in order to adjust the behavior.</listItem>
 				</list>
 			  </listItem>
 			  <listItem> <legacyBold>License Limitations</legacyBold>
 				<list class="bullet">
-				  <listItem>You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.</listItem>
-				  <listItem>You CANNOT provide the product binary files to any third party, unless they are integrated with your software solution.</listItem>
-				  <listItem>You are not allowed to reverse engineer, disassemble or attempt to get any source files.</listItem>
+				  <listItem>You CANNOT use Eneter source files as a basis for development of a derivative product or as a basis for development of another communication framework.</listItem>
+				  <listItem>You CANNOT provide Eneter source code or a part of the source code or a modified version of the source code to any third party.</listItem>
 				</list>
 			  </listItem>
 			  <listItem> <legacyBold>Copyright</legacyBold>
@@ -135,61 +123,6 @@
         </para>
       </content>
     </section>
-    
-    
-    <section address="LicenseForCommercialUseWithAvailableSourceCodes">
-      <title>License for Commercial Use with available Source Codes</title>
-      <content>
-        <!-- Uncomment this to create a sub-section outline
-        <autoOutline /> -->
-        <para>
-        To obtain this license you must purchase it.
-        </para>
-        <para>
-        By purchasing this license you agree to be bound by the following terms and conditions:
-        </para>
-        <para>
-        (DO NOT purchase this license, if you do not agree with the terms.)
-        </para>
-        <para>
-        </para>
-        <para>
-			<list class="ordered">
-			  <listItem> <legacyBold>Grant of License</legacyBold>
-				<list class="bullet">
-				  <listItem>You may integrate the product binary files into your software products.</listItem>
-				  <listItem>You may distribute the necessary product binary files to your end users as an integrated part of your software products in accordance with terms of this license.</listItem>
-				  <listItem>You may use the product source codes for debugging or investigation purposes during development and maintainance of your own software product.</listItem>
-				  <listItem>You may modify the product source code in order to adjust the behavior of the product.</listItem>
-				</list>
-			  </listItem>
-			  <listItem> <legacyBold>License Limitations</legacyBold>
-				<list class="bullet">
-				  <listItem>You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.</listItem>
-				  <listItem>You CANNOT provide the product source code or a part of the source code or a modified version of the source code to any third party.</listItem>
-				  <listItem>You CANNOT provide the product binary files to any third party, unless they are integrated with your software solution.</listItem>
-				</list>
-			  </listItem>
-			  <listItem> <legacyBold>Copyright</legacyBold>
-				<list class="bullet">
-				  <listItem>Title and copyrights in and to the Software (including the copyrights in the Software and including, but not limited to, any images, photographs, animations, video, audio, music, text, and "applets" incorporated into the Software), the accompanying printed materials (if any), and any copies of the Software are owned by Ondrej Uzovic. The Software is protected by copyright laws and international treaty provisions. Except as permitted by applicable law and this License, you may not modify, rent, lease, loan, sublicense, or create derivative works from the Software.</listItem>
-				</list>
-			  </listItem>
-			  <listItem> <legacyBold>Disclaimer of Warranty on Software</legacyBold>
-				<list class="bullet">
-				  <listItem>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</listItem>
-				</list>
-			  </listItem>
-			  <listItem> <legacyBold>Termination</legacyBold>
-				<list class="bullet">
-				  <listItem>This license lasts as long as you use the product in compliance with this license. If you fail to comply with any of terms of this license it will result in automatic termination of this agreement. In such case you agree to remove and destroy all copies of this product including source codes.</listItem>
-				</list>
-			  </listItem>
-			</list>
-        </para>
-      </content>
-    </section>
-    
     
     <relatedTopics>
       <!-- One or more of the following:

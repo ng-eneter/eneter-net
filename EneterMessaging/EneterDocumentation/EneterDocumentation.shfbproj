@@ -218,6 +218,7 @@
     <None Include="Examples\How to Request-Response Strongly Typed Messages.aml" />
     <None Include="Examples\How to Use Broker.aml" />
     <None Include="Examples\How to Use Dispatcher.aml" />
+    <None Include="Examples\How to Use Remote Procedure Calls.aml" />
     <None Include="Examples\MoreExamples.aml" />
     <None Include="License.aml" />
     <None Include="OtherPlatforms\CompactFramework20.shfbproj" />
