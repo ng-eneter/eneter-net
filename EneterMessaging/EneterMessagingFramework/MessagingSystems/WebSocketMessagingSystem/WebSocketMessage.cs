@@ -65,17 +65,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <returns>received text message</returns>
         public string GetWholeTextMessage()
         {
-            using (MemoryStream aMemStream = new MemoryStream())
+            if (!IsText)
             {
-                if (!IsText)
-                {
-                    throw new InvalidOperationException("This is not text message. WebSocketMessage.IsText != true.");
-                }
-
-                byte[] aMessageContent = GetWholeMessage();
-
-                return Encoding.UTF8.GetString(aMessageContent, 0, aMessageContent.Length);
+                throw new InvalidOperationException("This is not text message. WebSocketMessage.IsText != true.");
             }
+
+            byte[] aMessageContent = GetWholeMessage();
+
+            return Encoding.UTF8.GetString(aMessageContent, 0, aMessageContent.Length);
         }
 
         /// <summary>
