@@ -81,7 +81,14 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             {
                                 try
                                 {
+#if !COMPACT_FRAMEWORK
+									// This call also resolves the host name.
+									myTcpClient.Connect(myUri.Host, myUri.Port);
+#else
+                                    // Compact framework has problems with resolving host names.
+                                    // Therefore directly IPAddress is used.
                                     myTcpClient.Connect(IPAddress.Parse(myUri.Host), myUri.Port);
+#endif
                                 }
                                 catch (Exception err)
                                 {
