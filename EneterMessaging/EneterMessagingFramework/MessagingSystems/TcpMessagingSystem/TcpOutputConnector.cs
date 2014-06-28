@@ -82,7 +82,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                 try
                                 {
 #if !COMPACT_FRAMEWORK
-									// This call also resolves the host name.
+									// This call also resolves host names.
 									myTcpClient.Connect(myUri.Host, myUri.Port);
 #else
                                     // Compact framework has problems with resolving host names.
