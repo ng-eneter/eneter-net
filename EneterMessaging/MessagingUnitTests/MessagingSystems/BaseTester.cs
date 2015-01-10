@@ -168,6 +168,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             SendMessageReceiveResponse(ChannelId, "Message", "Respones", 10, 50);
         }
 
+        [Test]
+        public virtual void Duplex_05a_SendBroadcastResponse_50_10Clients()
+        {
+            SendBroadcastResponseMessage(ChannelId, "broadcastMessage", 10, 50);
+        }
 
         [Test]
         public virtual void Duplex_06_OpenCloseConnection()
@@ -973,6 +978,97 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             Assert.AreEqual(0, aService.NumberOfFailedMessages, "There are failed messages.");
             Assert.AreEqual(numberOfMessages * numberOfClients, aService.NumberOfReceivedMessages, "Number of sent messages differs from number of received.");
             
+        }
+
+
+        private void SendBroadcastResponseMessage(string channelId, string broadcastMessage,
+                                                int numberOfClients, int numberOfMessages)
+        {
+            // Create number of desired clients.
+            TDuplexClient[] aClients = new TDuplexClient[numberOfClients];
+            for (int i = 0; i < numberOfClients; ++i)
+            {
+                aClients[i] = new TDuplexClient(MessagingSystemFactory, channelId, broadcastMessage, numberOfMessages);
+            }
+
+            // Create service.
+            TDuplexService aService = new TDuplexService(MessagingSystemFactory, channelId, null, 0, broadcastMessage);
+
+            try
+            {
+                // Service starts listening.
+                aService.InputChannel.StartListening();
+
+                // Clients open connection in parallel.
+                foreach (TDuplexClient aClient in aClients)
+                {
+                    TDuplexClient aC = aClient;
+                    WaitCallback aW = x =>
+                    {
+                        //EneterTrace.Info("CONNECT CLIENT");
+                        aC.OpenConnection();
+                    };
+                    ThreadPool.QueueUserWorkItem(aW);
+
+                    Thread.Sleep(2);
+                }
+
+                // Wait until connections are open.
+                foreach (TDuplexClient aClient in aClients)
+                {
+                    aClient.ConnectionOpenEvent.WaitOne();
+                    if (aClient.OpenConnectionError != null)
+                    {
+                        throw aClient.OpenConnectionError;
+                    }
+
+                    //Assert.IsTrue(aClient.ConnectionOpenEvent.WaitOne(100000));
+                }
+
+                //EneterTrace.StartProfiler();
+
+                Stopwatch aStopWatch = new Stopwatch();
+                aStopWatch.Start();
+
+                // Service sends broadcast messages.
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    // Send the broadcast message.
+                    aService.InputChannel.SendResponseMessage(null, broadcastMessage);
+                }
+
+                // Wait until all messages are processed.
+                foreach (TDuplexClient aClient in aClients)
+                {
+                    //Assert.IsTrue(aClient.ResponsesReceivedEvent.WaitOne(timeOutForMessageProcessing));
+                    Assert.IsTrue(aClient.ResponsesReceivedEvent.WaitOne());
+                }
+
+                aStopWatch.Stop();
+                Console.WriteLine("Send messages to '" + ChannelId + "' completed. Elapsed time = " + aStopWatch.Elapsed);
+
+                //EneterTrace.StopProfiler();
+            }
+            finally
+            {
+                try
+                {
+                    foreach (TDuplexClient aClient in aClients)
+                    {
+                        aClient.OutputChannel.CloseConnection();
+                    }
+                }
+                finally
+                {
+                    aService.InputChannel.StopListening();
+                }
+            }
+
+            foreach (TDuplexClient aClient in aClients)
+            {
+                Assert.AreEqual(0, aClient.NumberOfFailedResponses, "There are failed response messages.");
+                Assert.AreEqual(numberOfMessages, aClient.NumberOfReceivedResponses, "Number of received responses differs from number of sent responses.");
+            }
         }
 
 

@@ -164,29 +164,51 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 lock (myConnectedClients)
                 {
-                    // Try to find the response sender
-                    TConnectionContext aConnectionContext;
-                    myConnectedClients.TryGetValue(responseReceiverId, out aConnectionContext);
-                    if (aConnectionContext == null)
+                    if (string.IsNullOrEmpty(responseReceiverId))
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendResponseNotConnectedFailure;
-                        EneterTrace.Error(aMessage);
-                        throw new InvalidOperationException(aMessage);
+                        // Send the response message to all connected clients.
+                        foreach (KeyValuePair<string, TConnectionContext> aConnectedClient in myConnectedClients)
+                        {
+                            try
+                            {
+                                // Send the response message.
+                                string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? aConnectedClient.Key : "";
+                                SenderUtil.SendMessage(aConnectedClient.Value.ResponseSender, aResponseReceiverId, message, myProtocolFormatter);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                                CloseResponseMessageSender(aConnectedClient.Key, true);
+                                
+                                // Note: Exception is not rethrown because if sending to one client fails it should not
+                                //       affect sending to other clients.
+                            }
+                        }
                     }
-
-                    try
+                    else
                     {
-                        // Send the response message.
-                        string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? responseReceiverId : "";
-                        SenderUtil.SendMessage(aConnectionContext.ResponseSender, aResponseReceiverId, message, myProtocolFormatter);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                        // Try to find the response sender
+                        TConnectionContext aConnectionContext;
+                        myConnectedClients.TryGetValue(responseReceiverId, out aConnectionContext);
+                        if (aConnectionContext == null)
+                        {
+                            string aMessage = TracedObject + ErrorHandler.SendResponseNotConnectedFailure;
+                            EneterTrace.Error(aMessage);
+                            throw new InvalidOperationException(aMessage);
+                        }
 
-                        CloseResponseMessageSender(responseReceiverId, true);
-
-                        throw;
+                        try
+                        {
+                            // Send the response message.
+                            string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? responseReceiverId : "";
+                            SenderUtil.SendMessage(aConnectionContext.ResponseSender, aResponseReceiverId, message, myProtocolFormatter);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                            CloseResponseMessageSender(responseReceiverId, true);
+                            throw;
+                        }
                     }
                 }
             }
@@ -199,6 +221,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 CloseResponseMessageSender(responseReceiverId, true);
             }
         }
+
 
         public IThreadDispatcher Dispatcher { get; private set; }
 
