@@ -21,10 +21,12 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
     internal class SharedMemoryReceiver
     {
-        public SharedMemoryReceiver(string memoryMappedFileName, bool useExistingMemoryMappedFile, int maxMessageSize, MemoryMappedFileSecurity memmoryMappedFileSecurity)
+        // Note: in order to be consistent with other messagings (e.g. TcpMessaging) value 0 for timeouts mean infinite time.
+        public SharedMemoryReceiver(string memoryMappedFileName, bool useExistingMemoryMappedFile, TimeSpan openTimeout, int maxMessageSize, MemoryMappedFileSecurity memmoryMappedFileSecurity)
         {
             using (EneterTrace.Entering())
             {
+                myOpenTimeout = (openTimeout == TimeSpan.Zero) ? TimeSpan.FromMilliseconds(-1) : openTimeout;
                 myMemoryMappedFileName = memoryMappedFileName;
                 myMaxMessageSize = maxMessageSize;
 
@@ -95,13 +97,13 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                         if (myUseExistingMemoryMappedFile)
                         {
                             // Open existing synchronization event handles.
-                            mySharedMemoryCreated = TryOpenExistingEventWaitHandle(myMemoryMappedFileName + "_ResponseSharedMemoryCreated");
-                            mySharedMemoryFilled = TryOpenExistingEventWaitHandle(myMemoryMappedFileName + "_SharedMemoryFilled");
-                            mySharedMemoryReady = TryOpenExistingEventWaitHandle(myMemoryMappedFileName + "_SharedMemoryReady");
+                            mySharedMemoryCreated = EventWaitHandleExt.OpenExisting(myMemoryMappedFileName + "_ResponseSharedMemoryCreated", myOpenTimeout);
+                            mySharedMemoryFilled = EventWaitHandleExt.OpenExisting(myMemoryMappedFileName + "_SharedMemoryFilled", myOpenTimeout);
+                            mySharedMemoryReady = EventWaitHandleExt.OpenExisting(myMemoryMappedFileName + "_SharedMemoryReady", myOpenTimeout);
 
                             // Wait until the memory mapped file exist.
                             // Note: The file shall be created by SharedMemorySender.
-                            if (!mySharedMemoryCreated.WaitOne(3000))
+                            if (!mySharedMemoryCreated.WaitOne(myOpenTimeout))
                             {
                                 throw new InvalidOperationException(TracedObject + "failed to open memory mapped file because it does not exist.");
                             }
@@ -257,7 +259,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                             {
                                 aSharedMemoryStream.Position = 0;
 
-                                // Note: The handler should read the message from the stream and process it in a different
+                                // Note: myMessageHandler(...) should read the message from the stream and process it in a different
                                 //       thread. So that the 'ready' state can be indicated as fast as possible.
                                 MessageContext aMessageContext = new MessageContext(aSharedMemoryStream, "", null);
                                 myMessageHandler(aMessageContext);
@@ -357,44 +359,6 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
-        private EventWaitHandle TryOpenExistingEventWaitHandle(string name)
-        {
-            using (EneterTrace.Entering())
-            {
-                EventWaitHandle anEventWaitHandle = null;
-
-                for (int i = 90; i >= 0; --i)
-                {
-
-                    try
-                    {
-                        anEventWaitHandle = EventWaitHandle.OpenExisting(name);
-
-                        // No exception, so the handle was open.
-                        break;
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        // The handle exists but we do not have enough access rights to use it.
-                        throw;
-                    }
-                    catch (WaitHandleCannotBeOpenedException)
-                    {
-                        // The handle does not exist.
-                        if (i == 0)
-                        {
-                            throw;
-                        }
-                    }
-
-                    // Wait a moment and try again. The handle can be meanwhile created.
-                    Thread.Sleep(100);
-                }
-
-                return anEventWaitHandle;
-            }
-        }
-
 
         private Func<MessageContext, bool> myMessageHandler;
 
@@ -408,6 +372,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         private EventWaitHandle mySharedMemoryFilled;
         private EventWaitHandleSecurity myEventWaitHandleSecurity;
         private MemoryMappedFileSecurity myMemmoryMappedFileSecurity;
+
+        private TimeSpan myOpenTimeout;
 
         private int myMaxMessageSize;
         private bool myUseExistingMemoryMappedFile;

@@ -13,6 +13,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using System;
 
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
@@ -212,10 +213,12 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
     {
         private class SharedMemoryConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
-            public SharedMemoryConnectorFactory(int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
+            public SharedMemoryConnectorFactory(TimeSpan connectTimeout, TimeSpan sendTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
             {
                 using (EneterTrace.Entering())
                 {
+                    myConnectTimeout = connectTimeout;
+                    mySendTimeout = sendTimeout;
                     myMaxMessageSize = maxMessageSize;
                     mySecurity = memoryMappedFileSecurity;
                 }
@@ -225,7 +228,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new SharedMemoryOutputConnector(inputConnectorAddress, outputConnectorAddress, myMaxMessageSize, mySecurity);
+                    return new SharedMemoryOutputConnector(inputConnectorAddress, outputConnectorAddress, myConnectTimeout, mySendTimeout, myMaxMessageSize, mySecurity);
                 }
             }
 
@@ -233,10 +236,12 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new SharedMemoryInputConnector(inputConnectorAddress, myMaxMessageSize, mySecurity);
+                    return new SharedMemoryInputConnector(inputConnectorAddress, mySendTimeout, myMaxMessageSize, mySecurity);
                 }
             }
 
+            private TimeSpan myConnectTimeout;
+            private TimeSpan mySendTimeout;
             private int myMaxMessageSize;
             private MemoryMappedFileSecurity mySecurity;
         }
@@ -280,8 +285,14 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myConnectorFactory = new SharedMemoryConnectorFactory(maxMessageSize, sharedMemorySecurity);
+                myMaxMessageSize = maxMessageSize;
                 myProtocolFormatter = protocolFormatter;
+                mySharedMemorySecurity = sharedMemorySecurity;
+
+                ConnectTimeout = TimeSpan.FromMilliseconds(30000);
+
+                // Infinite time for sending and receiving.
+                SendTimeout = TimeSpan.FromMilliseconds(0);
 
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
@@ -312,7 +323,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, true);
+                IOutputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(ConnectTimeout, SendTimeout, myMaxMessageSize, mySharedMemorySecurity);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, aConnectorFactory, myProtocolFormatter, true);
             }
         }
 
@@ -342,7 +354,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, true);
+                IOutputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(ConnectTimeout, SendTimeout, myMaxMessageSize, mySharedMemorySecurity);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, aConnectorFactory, myProtocolFormatter, true);
             }
         }
 
@@ -364,13 +377,26 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                IInputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(ConnectTimeout, SendTimeout, myMaxMessageSize, mySharedMemorySecurity);
                 IThreadDispatcher aThreadDispatcher = InputChannelThreading.GetDispatcher();
-                IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
+                IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
                 return new DefaultDuplexInputChannel(channelId, aThreadDispatcher, aDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
             }
         }
 
+        /// <summary>
+        /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.
+        /// </summary>
+        public TimeSpan ConnectTimeout { get; set; }
+
+        /// <summary>
+        /// Sets or gets timeout to send a message. Default is 0 what is infinite time.
+        /// </summary>
+        /// <remarks>
+        /// It is the maximum time to put the message into the shared memory.
+        /// </remarks>
+        public TimeSpan SendTimeout { get; set; }
 
         /// <summary>
         /// Factory that will create dispatchers responsible for routing events from duplex input channel according to
@@ -390,8 +416,9 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
-        private SharedMemoryConnectorFactory myConnectorFactory;
+        private int myMaxMessageSize;
         private IProtocolFormatter<byte[]> myProtocolFormatter;
+        private MemoryMappedFileSecurity mySharedMemorySecurity;
 
         private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }

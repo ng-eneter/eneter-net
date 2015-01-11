@@ -323,6 +323,7 @@
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\EventWaitHandleExt.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryInputConnector.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryOutputConnector.cs" />

@@ -23,7 +23,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.SharedMemoryMessagingSystem
             //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
-            MessagingSystemFactory = new SharedMemoryMessagingSystemFactory();
+            MessagingSystemFactory = new SharedMemoryMessagingSystemFactory()
+            {
+                ConnectTimeout = TimeSpan.FromMilliseconds(3000)
+            };
 
             ChannelId = "Channel1";
         }

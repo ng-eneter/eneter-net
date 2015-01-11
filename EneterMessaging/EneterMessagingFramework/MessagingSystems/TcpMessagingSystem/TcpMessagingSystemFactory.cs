@@ -410,7 +410,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         public int ReceiveBufferSize { get; set; }
 
         /// <summary>
-        /// Sets or gets timeout to send a message. Default is 0 what it infinite time.
+        /// Sets or gets timeout to send a message. Default is 0 what is infinite time.
         /// </summary>
         public TimeSpan SendTimeout { get; set; }
         

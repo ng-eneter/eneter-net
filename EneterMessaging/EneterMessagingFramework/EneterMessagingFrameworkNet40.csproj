@@ -72,6 +72,7 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\EventWaitHandleExt.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
     <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />

@@ -83,6 +83,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     {
                         myConnectionIsCorrectlyOpen = true;
 
+                        // If first the connection is open and then 'OpenConneciton' message is sent.
+                        // E.g. in case of TCP
                         if (!myStartReceiverAfterSendOpenRequest)
                         {
                             // Connect and start listening to response messages.
@@ -92,6 +94,12 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         // Send the open connection request.
                         SenderUtil.SendOpenConnection(myOutputConnector, ResponseReceiverId, myProtocolFormatter);
 
+                        // If first 'OpenConnection' request message is sent and the the connection can be open.
+                        // E.g. in case of Shared Memory messaging DuplexOutputChannel sends 'OpenConnecion' message
+                        //      to DuplexInputChannel. When DuplexInputChannel receives the message it creates
+                        //      shared memory for sending response messages to DuplexOutputChannel.
+                        //      Only then DuplexOutputChannel can open connection.
+                        //      Because only then the shared memory for response messages is created.
                         if (myStartReceiverAfterSendOpenRequest)
                         {
                             // Connect and start listening to response messages.
@@ -229,7 +237,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         myCloseConnectionIsRunning = true;
 
                         // Try to notify that the connection is closed
-                        if (sendCloseMessageFlag)
+                        // Note: if it is that first the connection is created and then 'OpenConnecion' message is sent (e.g. TCP)
+                        //       then try to send 'CloseConnection' message.
+                        //       But if it is that first 'OpenConnection' request message is sent and only then the connection is open (e.g. Shared Memory)
+                        //       then do not send 'CloseConnection' message is the connection is not open.
+                        //       It would just cause timeoute to realize the message cannot be sent.
+                        if (sendCloseMessageFlag && !myStartReceiverAfterSendOpenRequest ||
+                            sendCloseMessageFlag && myStartReceiverAfterSendOpenRequest && myOutputConnector.IsConnected)
                         {
                             try
                             {

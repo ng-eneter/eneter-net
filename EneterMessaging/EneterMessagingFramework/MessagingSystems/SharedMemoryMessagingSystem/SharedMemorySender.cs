@@ -20,22 +20,36 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
     internal class SharedMemorySender : ISender, IDisposable
     {
-        public SharedMemorySender(string memoryMappedFileName, bool useExistingMemoryMappedFile, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
+        // Note: in order to be consistent with other messagings (e.g. TcpMessaging) value 0 for timeouts mean infinite time.
+        public SharedMemorySender(string memoryMappedFileName, bool useExistingMemoryMappedFile, TimeSpan openTimeout, TimeSpan sendTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
         {
             using (EneterTrace.Entering())
             {
                 try
                 {
+                    mySendTimeout = (sendTimeout == TimeSpan.Zero) ? TimeSpan.FromMilliseconds(-1) : sendTimeout;
                     myUseExistingMemoryMappedFile = useExistingMemoryMappedFile;
                     myMaxMessageSize = maxMessageSize;
 
-                    // If the sender will work with already created shared memory.
+                    // If the shared memory file is created by SharedMemoryReceiver then open existing one.
                     if (useExistingMemoryMappedFile)
                     {
-                        mySharedMemoryReady = TryOpenExistingEventWaitHandle(memoryMappedFileName + "_SharedMemoryReady");
-                        mySharedMemoryFilled = TryOpenExistingEventWaitHandle(memoryMappedFileName + "_SharedMemoryFilled");
-                        mySharedMemoryCreated = TryOpenExistingEventWaitHandle(memoryMappedFileName + "_ResponseSharedMemoryCreated");
+                        TimeSpan anOpenTimeout = (openTimeout == TimeSpan.Zero) ? TimeSpan.FromMilliseconds(-1) : openTimeout;
+
+                        // Try to open synchronization handlers.
+                        mySharedMemoryReady = EventWaitHandleExt.OpenExisting(memoryMappedFileName + "_SharedMemoryReady", anOpenTimeout);
+                        mySharedMemoryFilled = EventWaitHandleExt.OpenExisting(memoryMappedFileName + "_SharedMemoryFilled", anOpenTimeout);
+                        mySharedMemoryCreated = EventWaitHandleExt.OpenExisting(memoryMappedFileName + "_ResponseSharedMemoryCreated", anOpenTimeout);
+
+                        // Wait until the memory mapped file exist and then open it.
+                        // Note: it shall be created by SharedMemoryReceiver.
+                        if (!mySharedMemoryCreated.WaitOne(anOpenTimeout))
+                        {
+                            throw new InvalidOperationException(TracedObject + "failed to open memory mapped file because it does not exist.");
+                        }
+                        myMemoryMappedFile = MemoryMappedFile.OpenExisting(memoryMappedFileName);
                     }
+                    // If the shared memory file shall be created by SharedMemorySender.
                     else
                     {
                         EventWaitHandleSecurity anEventWaitHandleSecurity = null;
@@ -51,30 +65,19 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                             anEventWaitHandleSecurity.AddAccessRule(anAccessRule);
                         }
 
+                        // Create synchronization handlers.
                         bool aDummy;
                         mySharedMemoryReady = new EventWaitHandle(false, EventResetMode.AutoReset, memoryMappedFileName + "_SharedMemoryReady", out aDummy, anEventWaitHandleSecurity);
                         mySharedMemoryFilled = new EventWaitHandle(false, EventResetMode.AutoReset, memoryMappedFileName + "_SharedMemoryFilled", out aDummy, anEventWaitHandleSecurity);
                         mySharedMemoryCreated = new EventWaitHandle(false, EventResetMode.ManualReset, memoryMappedFileName + "_ResponseSharedMemoryCreated", out aDummy, anEventWaitHandleSecurity);
-                    }
 
-                    if (useExistingMemoryMappedFile)
-                    {
-                        // Wait until the memory mapped file exist.
-                        // Note: The file shall be created by SharedMemorySender.
-                        if (!mySharedMemoryCreated.WaitOne(3000))
-                        {
-                            throw new InvalidOperationException(TracedObject + "failed to open memory mapped file because it does not exist.");
-                        }
-
-                        myMemoryMappedFile = MemoryMappedFile.OpenExisting(memoryMappedFileName);
-                    }
-                    else
-                    {
+                        // Create the memory mapped file.
                         myMemoryMappedFile = MemoryMappedFile.CreateNew(memoryMappedFileName, maxMessageSize, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.None, memoryMappedFileSecurity, HandleInheritability.None);
 
-                        // Indicate the shared memory was created.
+                        // Indicate the shared memory is created.
                         mySharedMemoryCreated.Set();
                     }
+
                     myMemoryMappedFileStream = myMemoryMappedFile.CreateViewStream();
                 }
                 catch (Exception err)
@@ -147,9 +150,15 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             using (EneterTrace.Entering())
             {
                 // Wait until the shared memory is ready for new data.
-                if (!mySharedMemoryCreated.WaitOne(0) || !mySharedMemoryReady.WaitOne(5000))
+                if (!mySharedMemoryCreated.WaitOne(0))
                 {
-                    string anErrorMessage = TracedObject + "failed to send the message because the SharedMemoryReceiver was not available.";
+                    string anErrorMessage = TracedObject + "failed to send the message because the shared memory was not created or it was already destroyed.";
+                    throw new InvalidOperationException(anErrorMessage);
+                }
+
+                if (!mySharedMemoryReady.WaitOne(mySendTimeout))
+                {
+                    string anErrorMessage = TracedObject + "failed to send the message because the shared memory was not available within the specified timeout: " + mySendTimeout;
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
@@ -175,48 +184,12 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
-        private EventWaitHandle TryOpenExistingEventWaitHandle(string name)
-        {
-            using (EneterTrace.Entering())
-            {
-                EventWaitHandle anEventWaitHandle = null;
-
-                for (int i = 30; i >= 0; --i)
-                {
-
-                    try
-                    {
-                        anEventWaitHandle = EventWaitHandle.OpenExisting(name);
-
-                        // No exception, so the handle was open.
-                        break;
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        // The handle exists but we do not have enough access rights to use it.
-                        throw;
-                    }
-                    catch (WaitHandleCannotBeOpenedException)
-                    {
-                        // The handle does not exist.
-                        if (i == 0)
-                        {
-                            throw;
-                        }
-                    }
-
-                    // Wait a moment and try again. The handle can be meanwhile created.
-                    Thread.Sleep(100);
-                }
-
-                return anEventWaitHandle;
-            }
-        }
-
 
         private bool myUseExistingMemoryMappedFile;
         private MemoryMappedFile myMemoryMappedFile;
         private MemoryMappedViewStream myMemoryMappedFileStream;
+
+        private TimeSpan mySendTimeout;
 
         private EventWaitHandle mySharedMemoryCreated;
         private EventWaitHandle mySharedMemoryReady;

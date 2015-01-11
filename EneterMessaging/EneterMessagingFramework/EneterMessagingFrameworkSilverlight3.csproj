@@ -385,6 +385,7 @@
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeReceiver.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeSender.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\EventWaitHandleExt.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryInputConnector.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryOutputConnector.cs" />
