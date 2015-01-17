@@ -57,6 +57,13 @@
     <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
     <Compile Include="EndPoints\Rpc\ServiceStub.cs" />
+    <Compile Include="EndPoints\TypedMessages\IMultiTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\IMultiTypedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedMessages\IMultiTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\MultiTypedMessage.cs" />
+    <Compile Include="EndPoints\TypedMessages\MultiTypedMessageReceiver.cs" />
+    <Compile Include="EndPoints\TypedMessages\MultiTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\MultiTypedMessagesFactory.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
