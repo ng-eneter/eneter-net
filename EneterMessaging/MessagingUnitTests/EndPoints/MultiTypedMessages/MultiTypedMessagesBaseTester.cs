@@ -12,6 +12,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
 {
     public abstract class MultiTypedMessagesBaseTester
     {
+        [Serializable]
         public class CustomClass
         {
             public string Name { get; set; }

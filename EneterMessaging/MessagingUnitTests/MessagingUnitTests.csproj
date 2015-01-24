@@ -80,6 +80,7 @@
     <Compile Include="DataProcessing\Streaming\Test_DynamicStream.cs" />
     <Compile Include="Diagnostic\Test_EneterTrace.cs" />
     <Compile Include="EndPoints\MultiTypedMessages\MultiTypedMessagesBaseTester.cs" />
+    <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncBin.cs" />
     <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncXml.cs" />
     <Compile Include="EndPoints\Rpc\RpcBaseTester.cs" />
     <Compile Include="EndPoints\Rpc\Test_Rpc_SharedMemory_Bin.cs" />
