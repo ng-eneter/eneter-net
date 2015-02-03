@@ -706,7 +706,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                 try
                 {
-                    DynamicStream aCurrentMessageStream = null;
+                    DynamicStream aContinuousMessageStream = null;
 
                     while (!myStopReceivingRequestedFlag)
                     {
@@ -741,11 +741,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             {
                                 Notify(myPongReceivedImpl);
                             }
-                            // If a new binary message starts.
+                            // If a new message starts.
                             else if (aFrame.FrameType == EFrameType.Binary || aFrame.FrameType == EFrameType.Text)
                             {
                                 // If a previous message is not finished then the new message is not expected -> protocol error.
-                                if (aCurrentMessageStream != null)
+                                if (aContinuousMessageStream != null)
                                 {
                                     EneterTrace.Warning(TracedObject + "detected unexpected new message. (previous message was not finished)");
 
@@ -754,34 +754,34 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                     break;
                                 }
 
-                                // Create stream where the message data will be writen.
-                                aCurrentMessageStream = new DynamicStream();
-                                aCurrentMessageStream.Write(aFrame.Message, 0, aFrame.Message.Length);
+                                WebSocketMessage aReceivedMessage = null;
 
-                                // If this frame is also the final frame then set the stream to unblocking mode.
-                                // Note: Due to performance, unblock the stream before the event is sent.
-                                //       So that the client will not wait for unblock.
+                                // If the message does not come in multiple frames then optimize the performance
+                                // and use MemoryStream instead of DynamicStream.
                                 if (aFrame.IsFinal)
                                 {
-                                    aCurrentMessageStream.IsBlockingMode = false;
+                                    MemoryStream aMessageStream = new MemoryStream(aFrame.Message);
+                                    aReceivedMessage = new WebSocketMessage(aFrame.FrameType == EFrameType.Text, aMessageStream);
+                                }
+                                // if the message is split to several frames then use DynamicStream so that writing of incoming
+                                // frames and reading of already received data can run in parallel.
+                                else
+                                {
+                                    // Create stream where the message data will be writen.
+                                    aContinuousMessageStream = new DynamicStream();
+                                    aContinuousMessageStream.Write(aFrame.Message, 0, aFrame.Message.Length);
+                                    aReceivedMessage = new WebSocketMessage(aFrame.FrameType == EFrameType.Text, aContinuousMessageStream);
                                 }
 
                                 // Put received message to the queue from where the processing thread will invoke the event MessageReceived.
                                 // Note: user will get events always in the same thread.
-                                WebSocketMessage aReceivedMessage = new WebSocketMessage(aFrame.FrameType == EFrameType.Text, aCurrentMessageStream);
                                 myMessageProcessingThread.EnqueueMessage(aReceivedMessage);
-
-                                if (aFrame.IsFinal)
-                                {
-                                    // The message is finalized.
-                                    aCurrentMessageStream = null;
-                                }
                             }
                             // If a message continues. (I.e. message is split into more fragments.)
                             else if (aFrame.FrameType == EFrameType.Continuation)
                             {
                                 // If the message does not exist then continuing frame does not have any sense -> protocol error.
-                                if (aCurrentMessageStream == null)
+                                if (aContinuousMessageStream == null)
                                 {
                                     EneterTrace.Warning(TracedObject + "detected unexpected continuing of a message. (none message was started before)");
 
@@ -790,13 +790,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                     break;
                                 }
 
-                                aCurrentMessageStream.Write(aFrame.Message, 0, aFrame.Message.Length);
+                                aContinuousMessageStream.Write(aFrame.Message, 0, aFrame.Message.Length);
 
                                 // If this is the final frame.
                                 if (aFrame.IsFinal)
                                 {
-                                    aCurrentMessageStream.IsBlockingMode = false;
-                                    aCurrentMessageStream = null;
+                                    aContinuousMessageStream.IsBlockingMode = false;
+                                    aContinuousMessageStream = null;
                                 }
                             }
                         }
