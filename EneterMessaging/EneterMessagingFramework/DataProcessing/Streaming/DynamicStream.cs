@@ -13,7 +13,7 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.DataProcessing.Streaming
 {
     /// <summary>
-    /// Stream that can be written and read at the same time.
+    /// Stream which can be written and read at the same time.
     /// </summary>
     /// <remarks>
     /// The dynamic stream supports writing of data by one thread and reading by another.
@@ -216,11 +216,11 @@ namespace Eneter.Messaging.DataProcessing.Streaming
         /// Writes data to the stream the way that it just stores the reference to the input data.
         /// </summary>
         /// <remarks>
-        /// It does not copyt the incoming data to the stream but instead of that it just stores the reference.
+        /// It does not copy the incoming data to the stream but instead of that it just stores the reference.
         /// This approach is very fast but the input byte[] array should not be modified after calling this method.
         /// </remarks>
         /// <param name="data">data to be written to the stream.</param>
-        /// <param name="offset">Starting podition in the buffer from where data will be read.</param>
+        /// <param name="offset">Starting position in the buffer from where data will be read.</param>
         /// <param name="count">Amount of data to be read from the buffer and written to the stream.</param>
         public void WriteWithoutCopying(byte[] data, int offset, int count)
         {
