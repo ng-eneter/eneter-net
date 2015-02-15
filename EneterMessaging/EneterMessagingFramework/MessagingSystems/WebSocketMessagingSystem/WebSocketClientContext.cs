@@ -339,7 +339,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                 {
                                     // Create stream where the message data will be writen.
                                     aContinuousMessageStream = new DynamicStream();
-                                    aContinuousMessageStream.Write(aFrame.Message, 0, aFrame.Message.Length);
+                                    aContinuousMessageStream.WriteWithoutCopying(aFrame.Message, 0, aFrame.Message.Length);
                                     aReceivedMessage = new WebSocketMessage(aFrame.FrameType == EFrameType.Text, aContinuousMessageStream);
                                 }
 
@@ -359,7 +359,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                     break;
                                 }
 
-                                aContinuousMessageStream.Write(aFrame.Message, 0, aFrame.Message.Length);
+                                aContinuousMessageStream.WriteWithoutCopying(aFrame.Message, 0, aFrame.Message.Length);
 
                                 // If this is the final frame.
                                 if (aFrame.IsFinal)
