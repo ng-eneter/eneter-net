@@ -16,15 +16,14 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     /// <remarks>
     /// The default implemention of all methods throws NotSupportedException.
     /// </remarks>
-    /// <typeparam name="T"></typeparam>
-    public abstract class ProtocolFormatterBase<T> : IProtocolFormatter<T>
+    public abstract class ProtocolFormatterBase : IProtocolFormatter
     {
         /// <summary>
         /// Returns encoded 'open connection' message.
         /// </summary>
         /// <param name="responseReceiverId"></param>
-        /// <returns></returns>
-        public abstract T EncodeOpenConnectionMessage(string responseReceiverId);
+        /// <returns</returns>
+        public abstract object EncodeOpenConnectionMessage(string responseReceiverId);
 
         /// <summary>
         /// Encodes 'open connection' message directly to the stream.
@@ -41,7 +40,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="responseReceiverId"></param>
         /// <returns></returns>
-        public abstract T EncodeCloseConnectionMessage(string responseReceiverId);
+        public abstract object EncodeCloseConnectionMessage(string responseReceiverId);
 
         /// <summary>
         /// Encodes 'close connection' message directly to the stream.
@@ -59,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <param name="responseReceiverId"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public abstract T EncodeMessage(string responseReceiverId, object message);
+        public abstract object EncodeMessage(string responseReceiverId, object message);
 
         /// <summary>
         /// Encodes 'request message' or 'response message' directly to the stream.
@@ -87,26 +86,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="readMessage"></param>
         /// <returns></returns>
-        public abstract ProtocolMessage DecodeMessage(T readMessage);
-
-        object IProtocolFormatter.EncodeOpenConnectionMessage(string responseReceiverId)
-        {
-            return EncodeOpenConnectionMessage(responseReceiverId);
-        }
-
-        object IProtocolFormatter.EncodeCloseConnectionMessage(string responseReceiverId)
-        {
-            return EncodeCloseConnectionMessage(responseReceiverId);
-        }
-
-        object IProtocolFormatter.EncodeMessage(string responseReceiverId, object message)
-        {
-            return EncodeMessage(responseReceiverId, message);
-        }
-
-        ProtocolMessage IProtocolFormatter.DecodeMessage(object readMessage)
-        {
-            return DecodeMessage((T)readMessage);
-        }
+        public abstract ProtocolMessage DecodeMessage(object readMessage);
     }
 }

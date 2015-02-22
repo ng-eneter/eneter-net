@@ -10,9 +10,8 @@ using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
-    internal class LocalProtocolFormatter : ProtocolFormatterBase<object>, IProtocolFormatter
+    internal class LocalProtocolFormatter : ProtocolFormatterBase, IProtocolFormatter
     {
-
         public override object EncodeOpenConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())

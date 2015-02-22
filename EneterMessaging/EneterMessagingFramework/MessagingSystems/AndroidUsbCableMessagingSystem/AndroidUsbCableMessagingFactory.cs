@@ -205,7 +205,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         /// <param name="protocolFormatter">Low level formatting used for encoding messages between channels.
         /// EneterProtocolFormatter() can be used by default.
         /// </param>
-        public AndroidUsbCableMessagingFactory(int adbHostPort, IProtocolFormatter<byte[]> protocolFormatter)
+        public AndroidUsbCableMessagingFactory(int adbHostPort, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
@@ -407,7 +407,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 
         private int myAdbHostPort;
         private TcpMessagingSystemFactory myUnderlyingTcpMessaging;
-        private IProtocolFormatter<byte[]> myProtocolFormatter;
+        private IProtocolFormatter myProtocolFormatter;
     }
 }
 

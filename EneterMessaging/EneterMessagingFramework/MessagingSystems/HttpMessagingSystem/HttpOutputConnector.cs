@@ -11,13 +11,14 @@ using System.Net;
 using System.Threading;
 using Eneter.Messaging.DataProcessing.Streaming;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
     internal class HttpOutputConnector : IOutputConnector
     {
-        public HttpOutputConnector(string httpServiceConnectorAddress, string responseReceiverId, int pollingFrequencyMiliseconds)
+        public HttpOutputConnector(string httpServiceConnectorAddress, string responseReceiverId, int pollingFrequencyMiliseconds, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
@@ -34,6 +35,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                 myResponseReceiverId = responseReceiverId;
                 myPollingFrequencyMiliseconds = pollingFrequencyMiliseconds;
+                myProtocolFormatter = protocolFormatter;
             }
         }
 
@@ -41,7 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                if (responseMessageHandler != null)
+                lock (myConnectionManipulatorLock)
                 {
                     myStopReceivingRequestedFlag = false;
 
@@ -56,6 +58,10 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     {
                         EneterTrace.Warning(TracedObject + "failed to start the thread listening to response messages within 1 second.");
                     }
+
+                    // Send open connection message.
+                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myResponseReceiverId);
+                    SendMessage(anEncodedMessage);
                 }
             }
         }
@@ -64,42 +70,66 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myStopReceivingRequestedFlag = true;
-                myStopPollingWaitingEvent.Set();
-
-                if (myResponseReceiverThread != null && Thread.CurrentThread.ManagedThreadId != myResponseReceiverThread.ManagedThreadId)
+                lock (myConnectionManipulatorLock)
                 {
+                    // Send close connection message.
+                    try
+                    {
+                        object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myResponseReceiverId);
+                        SendMessage(anEncodedMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                    }
+
+                    myStopReceivingRequestedFlag = true;
+                    myStopPollingWaitingEvent.Set();
+
+                    if (myResponseReceiverThread != null && Thread.CurrentThread.ManagedThreadId != myResponseReceiverThread.ManagedThreadId)
+                    {
 #if COMPACT_FRAMEWORK
                     //if (myResponseReceiverThread != null)
 #else
-                    if (myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
+                        if (myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
 #endif
-                    {
-                        if (!myResponseReceiverThread.Join(3000))
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
+                            if (!myResponseReceiverThread.Join(3000))
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
 
-                            try
-                            {
-                                myResponseReceiverThread.Abort();
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                try
+                                {
+                                    myResponseReceiverThread.Abort();
+                                }
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                }
                             }
                         }
                     }
+                    myResponseReceiverThread = null;
+                    myResponseMessageHandler = null;
                 }
-                myResponseReceiverThread = null;
-                myResponseMessageHandler = null;
             }
         }
 
         public bool IsConnected { get { return myIsListeningToResponses; } }
 
-        public bool IsStreamWritter { get { return false; } }
+        public void SendRequestMessage(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionManipulatorLock)
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(myResponseReceiverId, message);
+                    SendMessage(anEncodedMessage);
+                }
+            }
+        }
 
-        public void SendMessage(object message)
+        private void SendMessage(object message)
         {
             using (EneterTrace.Entering())
             {
@@ -113,10 +143,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             }
         }
 
-        public void SendMessage(Action<Stream> toStreamWritter)
-        {
-            throw new NotSupportedException("toStreamWritter is not supported.");
-        }
 
         private void DoPolling()
         {
@@ -149,11 +175,12 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                                 StreamUtil.ReadToEnd(aResponseStream, aBufferedResponse);
                                 aBufferedResponse.Position = 0;
 
-                                MessageContext aMessageContext = new MessageContext(aBufferedResponse, myUri.Host, null);
-
                                 // The response can contain more messages.
                                 while (!myStopReceivingRequestedFlag && aBufferedResponse.Position < aBufferedResponse.Length)
                                 {
+                                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)aBufferedResponse);
+                                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myUri.Host, null);
+
                                     if (!myResponseMessageHandler(aMessageContext))
                                     {
                                         EneterTrace.Warning(TracedObject + "failed to process all response messages.");
@@ -182,6 +209,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
         private Uri myUri;
         private string myResponseReceiverId;
+        private IProtocolFormatter myProtocolFormatter;
         private Thread myResponseReceiverThread;
         private volatile bool myIsListeningToResponses;
         private volatile bool myStopReceivingRequestedFlag;
@@ -190,7 +218,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
         private int myPollingFrequencyMiliseconds;
         private ManualResetEvent myStopPollingWaitingEvent = new ManualResetEvent(false);
-
+        private object myConnectionManipulatorLock = new object();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

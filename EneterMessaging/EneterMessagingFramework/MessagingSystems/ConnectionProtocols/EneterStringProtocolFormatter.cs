@@ -19,14 +19,14 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     /// Encoding to the string can be used if the messaging system does not allow tu use byte[].
     /// E.g. the messaging between Silverlight applications sends only string messages.
     /// </remarks>
-    public class EneterStringProtocolFormatter : ProtocolFormatterBase<string>, IProtocolFormatter<string>
+    public class EneterStringProtocolFormatter : ProtocolFormatterBase, IProtocolFormatter
     {
         /// <summary>
         /// Encodes open connection request.
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <returns></returns>
-        public override string EncodeOpenConnectionMessage(string responseReceiverId)
+        public override object EncodeOpenConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -40,7 +40,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <returns></returns>
-        public override string EncodeCloseConnectionMessage(string responseReceiverId)
+        public override object EncodeCloseConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -55,7 +55,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <param name="responseReceiverId">client id</param>
         /// <param name="message">the serialized content of the message</param>
         /// <returns></returns>
-        public override string EncodeMessage(string responseReceiverId, object message)
+        public override object EncodeMessage(string responseReceiverId, object message)
         {
             using (EneterTrace.Entering())
             {
@@ -65,24 +65,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         }
 
         /// <summary>
-        /// Decodes a message or a response message from the stream.
-        /// </summary>
-        /// <param name="readStream">stream containing the low-level message</param>
-        /// <returns></returns>
-        public override ProtocolMessage DecodeMessage(Stream readStream)
-        {
-            using (EneterTrace.Entering())
-            {
-                throw new NotSupportedException("Decoding a string message from the stream is not suported.");
-            }
-        }
-
-        /// <summary>
         /// Decodes a message or a response message from the byte[].
         /// </summary>
         /// <param name="encodedMessage">source of the low-level message</param>
         /// <returns></returns>
-        public override ProtocolMessage DecodeMessage(string encodedMessage)
+        public override ProtocolMessage DecodeMessage(object encodedMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -97,12 +84,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     return myNonProtocolMessage;
                 }
             }
-        }
-
-
-        ProtocolMessage IProtocolFormatter.DecodeMessage(object readMessage)
-        {
-            return DecodeMessage((string)readMessage);
         }
 
 

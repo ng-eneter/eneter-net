@@ -12,7 +12,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.HttpMessagingSystem;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {

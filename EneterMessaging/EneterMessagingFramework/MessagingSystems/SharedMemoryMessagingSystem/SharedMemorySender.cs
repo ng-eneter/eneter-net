@@ -18,7 +18,7 @@ using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
-    internal class SharedMemorySender : ISender, IDisposable
+    internal class SharedMemorySender : IDisposable
     {
         // Note: in order to be consistent with other messagings (e.g. TcpMessaging) value 0 for timeouts mean infinite time.
         public SharedMemorySender(string memoryMappedFileName, bool useExistingMemoryMappedFile, TimeSpan openTimeout, TimeSpan sendTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
@@ -135,14 +135,6 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     mySharedMemoryCreated = null;
                 }
             }
-        }
-
-        public bool IsStreamWritter { get { return true; } }
-        
-
-        public void SendMessage(object message)
-        {
-            throw new NotSupportedException("Sending of byte[] is not supported.");
         }
 
         public void SendMessage(Action<Stream> toStreamWritter)

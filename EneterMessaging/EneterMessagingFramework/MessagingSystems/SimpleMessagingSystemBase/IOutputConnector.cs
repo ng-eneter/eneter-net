@@ -13,10 +13,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
     /// <summary>
     /// Declares the output connector which provides a basic low-level functionality to open connection and send messages.
     /// </summary>
-    internal interface IOutputConnector : ISender
+    internal interface IOutputConnector
     {
-        void OpenConnection(Func<MessageContext, bool> responseMessageHandler);
-        void CloseConnection();
+        void OpenConnection(Action<MessageContext> responseMessageHandler);
+        void CloseConnection(bool sendCloseMessageFlag);
         bool IsConnected { get; }
+        void SendRequestMessage(object message);
     }
 }

@@ -14,6 +14,7 @@ using System.IO.Pipes;
 using System.Linq;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using System.IO;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
@@ -48,7 +49,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<Stream> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -68,7 +69,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                             ListeningInstance aListeningInstance = new ListeningInstance(myPipeName, myNumberOfInstances, myPipeSecurity);
                             myPipeServerListeners.Add(aListeningInstance);
 
-                            aListeningInstance.StartListening(x => messageHandler(new MessageContext(x, "", null)));
+                            aListeningInstance.StartListening(messageHandler);
                         }
                     }
                     catch (Exception err)

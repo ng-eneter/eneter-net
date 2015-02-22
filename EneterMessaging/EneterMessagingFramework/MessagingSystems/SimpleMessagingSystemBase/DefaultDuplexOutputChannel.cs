@@ -25,7 +25,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         public DefaultDuplexOutputChannel(string channelId, string responseReceiverId,
             IThreadDispatcher eventDispatcher,
             IThreadDispatcher dispatcherAfterResponseReading,
-            IOutputConnectorFactory outputConnectorFactory, IProtocolFormatter protocolFormatter, bool startReceiverAfterSendOpenRequest)
+            IOutputConnectorFactory outputConnectorFactory)
         {
             using (EneterTrace.Entering())
             {
@@ -48,8 +48,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     ResponseReceiverId = responseReceiverId;
                 }
 
-                myProtocolFormatter = protocolFormatter;
-
                 Dispatcher = eventDispatcher;
 
                 // Internal dispatcher used when the message is decoded.
@@ -58,7 +56,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 myDispatchingAfterResponseReading = dispatcherAfterResponseReading;
 
                 myOutputConnector = outputConnectorFactory.CreateOutputConnector(ChannelId, ResponseReceiverId);
-                myStartReceiverAfterSendOpenRequest = startReceiverAfterSendOpenRequest;
             }
         }
 
@@ -83,28 +80,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     {
                         myConnectionIsCorrectlyOpen = true;
 
-                        // If first the connection is open and then 'OpenConneciton' message is sent.
-                        // E.g. in case of TCP
-                        if (!myStartReceiverAfterSendOpenRequest)
-                        {
-                            // Connect and start listening to response messages.
-                            myOutputConnector.OpenConnection(HandleResponse);
-                        }
-
-                        // Send the open connection request.
-                        SenderUtil.SendOpenConnection(myOutputConnector, ResponseReceiverId, myProtocolFormatter);
-
-                        // If first 'OpenConnection' request message is sent and the the connection can be open.
-                        // E.g. in case of Shared Memory messaging DuplexOutputChannel sends 'OpenConnecion' message
-                        //      to DuplexInputChannel. When DuplexInputChannel receives the message it creates
-                        //      shared memory for sending response messages to DuplexOutputChannel.
-                        //      Only then DuplexOutputChannel can open connection.
-                        //      Because only then the shared memory for response messages is created.
-                        if (myStartReceiverAfterSendOpenRequest)
-                        {
-                            // Connect and start listening to response messages.
-                            myOutputConnector.OpenConnection(HandleResponse);
-                        }
+                        // Connect and start listening to response messages.
+                        myOutputConnector.OpenConnection(HandleResponse);
                     }
                     catch (Exception err)
                     {
@@ -114,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                         try
                         {
-                            CloseConnection();
+                            CleanAfterConnection(false);
                         }
                         catch
                         {
@@ -165,7 +142,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     try
                     {
                         // Send the message.
-                        SenderUtil.SendMessage(myOutputConnector, ResponseReceiverId, message, myProtocolFormatter);
+                        myOutputConnector.SendRequestMessage(message);
                     }
                     catch (Exception err)
                     {
@@ -178,46 +155,31 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         public IThreadDispatcher Dispatcher { get; private set; }
 
-        private bool HandleResponse(MessageContext messageContext)
+        private void HandleResponse(MessageContext messageContext)
         {
             using (EneterTrace.Entering())
             {
-                ProtocolMessage aProtocolMessage = null;
-
-                if (messageContext != null && messageContext.Message != null)
+                if (messageContext != null && messageContext.ProtocolMessage != null)
                 {
-                    if (messageContext.Message is Stream)
+                    if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                     {
-                        aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)messageContext.Message);
+                        EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
+                        myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
+                    }
+                    else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
+                    {
+                        EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
+                        myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(messageContext.ProtocolMessage.Message)));
                     }
                     else
                     {
-                        aProtocolMessage = myProtocolFormatter.DecodeMessage(messageContext.Message);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
                     }
                 }
                 else
                 {
                     EneterTrace.Warning(TracedObject + "detected null response message. It means the listening to responses stopped.");
                 }
-
-                if (aProtocolMessage == null || aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
-                {
-                    EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
-                    myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
-                    return false;
-                }
-                else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
-                {
-                    EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
-                    myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(aProtocolMessage.Message)));
-                }
-                else
-                {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
-                }
-
-
-                return true;
             }
         }
 
@@ -227,49 +189,21 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 bool aNotifyFlag = false;
 
-                // If close connection is already being performed then do not close again.
-                // E.g. CloseConnection() and this will stop a response listening thread. This thread would come here and
-                //      would stop on the following lock -> deadlock.
-                if (!myCloseConnectionIsRunning)
+                lock (myConnectionManipulatorLock)
                 {
-                    lock (myConnectionManipulatorLock)
+
+                    try
                     {
-                        myCloseConnectionIsRunning = true;
-
-                        // Try to notify that the connection is closed
-                        // Note: if it is that first the connection is created and then 'OpenConnecion' message is sent (e.g. TCP)
-                        //       then try to send 'CloseConnection' message.
-                        //       But if it is that first 'OpenConnection' request message is sent and only then the connection is open (e.g. Shared Memory)
-                        //       then do not send 'CloseConnection' message is the connection is not open.
-                        //       It would just cause timeoute to realize the message cannot be sent.
-                        if (sendCloseMessageFlag && !myStartReceiverAfterSendOpenRequest ||
-                            sendCloseMessageFlag && myStartReceiverAfterSendOpenRequest && myOutputConnector.IsConnected)
-                        {
-                            try
-                            {
-                                // Send the close connection request.
-                                SenderUtil.SendCloseConnection(myOutputConnector, ResponseReceiverId, myProtocolFormatter);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
-                            }
-                        }
-
-                        try
-                        {
-                            myOutputConnector.CloseConnection();
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
-                        }
-
-                        // Note: the notification must run outside the lock because of potententional deadlock.
-                        aNotifyFlag = myConnectionIsCorrectlyOpen;
-                        myConnectionIsCorrectlyOpen = false;
-                        myCloseConnectionIsRunning = false;
+                        myOutputConnector.CloseConnection(sendCloseMessageFlag);
                     }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                    }
+
+                    // Note: the notification must run outside the lock because of potententional deadlock.
+                    aNotifyFlag = myConnectionIsCorrectlyOpen;
+                    myConnectionIsCorrectlyOpen = false;
                 }
 
                 // Notify the connection closed only if it was successfuly open before.
@@ -326,12 +260,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         private IThreadDispatcher myDispatchingAfterResponseReading;
         private IOutputConnector myOutputConnector;
-        private bool myStartReceiverAfterSendOpenRequest;
         private bool myConnectionIsCorrectlyOpen;
-        private bool myCloseConnectionIsRunning;
         private object myConnectionManipulatorLock = new object();
-
-        private IProtocolFormatter myProtocolFormatter;
 
         private string TracedObject
         {

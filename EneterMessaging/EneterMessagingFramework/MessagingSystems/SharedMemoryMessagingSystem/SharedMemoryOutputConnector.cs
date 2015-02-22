@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
@@ -28,6 +29,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
     internal class SharedMemoryOutputConnector : IOutputConnector
     {
         public SharedMemoryOutputConnector(string outputMemoryMappedFileName, string inputMemoryMappedFileName,
+            IProtocolFormatter protocolFormatter,
             TimeSpan connectTimeout,
             TimeSpan sendTimeout,
             int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
@@ -36,6 +38,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 myOutputMemoryMappedFileName = outputMemoryMappedFileName;
                 myInputMemoryMappedFileName = inputMemoryMappedFileName;
+                myProtocolFormatter = protocolFormatter;
                 myConnectTimeout = connectTimeout;
                 mySendTimeout = sendTimeout;
                 myMaxMessageSize = maxMessageSize;
@@ -44,7 +47,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         }
 
 
-        public void OpenConnection(Func<MessageContext, bool> responseMessageHandler)
+        public void OpenConnection(Action<MessageContext> responseMessageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -56,38 +59,28 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     }
 
                     // If it shall listen to responses then check the responseMessageHandler.
-                    if (!String.IsNullOrEmpty(myInputMemoryMappedFileName))
+                    if (responseMessageHandler == null)
                     {
-                        if (responseMessageHandler == null)
-                        {
-                            throw new InvalidOperationException("responseMessageHandler is null.");
-                        }
+                        throw new InvalidOperationException("responseMessageHandler is null.");
                     }
 
-                    try
-                    {
-                        if (mySender == null)
-                        {
-                            mySender = new SharedMemorySender(myOutputMemoryMappedFileName, true, myConnectTimeout, mySendTimeout, myMaxMessageSize, mySecurity);
-                        }
+                    // If first 'OpenConnection' request message is sent and then the connection can be open.
+                    // In case of Shared Memory messaging DuplexOutputChannel sends 'OpenConnecion' message
+                    // to DuplexInputChannel. When DuplexInputChannel receives the message it creates
+                    // shared memory for sending response messages to DuplexOutputChannel.
+                    // Only then DuplexOutputChannel can open connection.
+                    // Because only then the shared memory for response messages is created.
+                    mySender = new SharedMemorySender(myOutputMemoryMappedFileName, true, myConnectTimeout, mySendTimeout, myMaxMessageSize, mySecurity);
+                    SendMessage(x => myProtocolFormatter.EncodeOpenConnectionMessage(myInputMemoryMappedFileName, x));
 
-                        // If it shall listen to response messages.
-                        if (responseMessageHandler != null)
-                        {
-                            myReceiver = new SharedMemoryReceiver(myInputMemoryMappedFileName, true, myConnectTimeout, myMaxMessageSize, mySecurity);
-                            myReceiver.StartListening(responseMessageHandler);
-                        }
-                    }
-                    catch
-                    {
-                        CloseConnection();
-                        throw;
-                    }
+                    myResponseMessageHandler = responseMessageHandler;
+                    myReceiver = new SharedMemoryReceiver(myInputMemoryMappedFileName, true, myConnectTimeout, myMaxMessageSize, mySecurity);
+                    myReceiver.StartListening(HandleResponseMessage);
                 }
             }
         }
 
-        public void CloseConnection()
+        public void CloseConnection(bool sendCloseMessageFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -101,6 +94,18 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                     if (mySender != null)
                     {
+                        if (sendCloseMessageFlag)
+                        {
+                            try
+                            {
+                                SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(myInputMemoryMappedFileName, x));
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
+                        }
+
                         mySender.Dispose();
                         mySender = null;
                     }
@@ -115,45 +120,43 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                 lock (myConnectionManipulatorLock)
                 {
                     // If responses are expected then listener is supposed to run in order to say the connection is open.
-                    if (!String.IsNullOrEmpty(myInputMemoryMappedFileName))
-                    {
-                        return myReceiver != null && myReceiver.IsListening;
-                    }
-
-                    return mySender != null;
+                    return myReceiver != null && myReceiver.IsListening;
                 }
             }
         }
 
-        public bool IsStreamWritter { get { return true; } }
-
-        public void SendMessage(object message)
-        {
-            throw new NotSupportedException("Sending of byte[] is not supported.");
-        }
-
-        public void SendMessage(Action<Stream> toStreamWritter)
+        public void SendRequestMessage(object message)
         {
             using (EneterTrace.Entering())
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    // Note: DuplexOutputChannel needs first to send open request so that shared memory input channel
-                    //       can create the shared memory for response messages. And only then the connection can be open.
-                    //       So it should be possible to send a message before OpenConnection is called.
-                    if (mySender == null)
-                    {
-                        mySender = new SharedMemorySender(myOutputMemoryMappedFileName, true, myConnectTimeout, mySendTimeout, myMaxMessageSize, mySecurity);
-                    }
-
-                    mySender.SendMessage(toStreamWritter);
+                    SendMessage(x => myProtocolFormatter.EncodeMessage(myInputMemoryMappedFileName, message, x));
                 }
             }
         }
 
+        private void SendMessage(Action<Stream> toStreamWritter)
+        {
+            using (EneterTrace.Entering())
+            {
+                mySender.SendMessage(toStreamWritter);
+            }
+        }
+
+        private void HandleResponseMessage(Stream message)
+        {
+            using (EneterTrace.Entering())
+            {
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)message);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                myResponseMessageHandler(aMessageContext);
+            }
+        }
 
         private string myOutputMemoryMappedFileName;
         private string myInputMemoryMappedFileName;
+        private IProtocolFormatter myProtocolFormatter;
         private int myMaxMessageSize;
         private MemoryMappedFileSecurity mySecurity;
 
@@ -164,6 +167,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
         private SharedMemorySender mySender;     // Sending request messages.
         private SharedMemoryReceiver myReceiver; // Receiving response messages.
+
+        private Action<MessageContext> myResponseMessageHandler;
         
 
         private string TracedObject { get { return GetType().Name + ' '; } }

@@ -9,10 +9,10 @@
 
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 
@@ -21,12 +21,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     internal class TcpOutputConnector : IOutputConnector
     {
-        public TcpOutputConnector(string ipAddressAndPort, ISecurityFactory clientSecurityFactory,
-            int connectTimeout,
-            int sendTimeout,
-            int receiveTimeout,
-            int sendBuffer,
-            int receiveBuffer)
+        public TcpOutputConnector(string ipAddressAndPort, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory, int connectTimeout, int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer)
         {
             using (EneterTrace.Entering())
             {
@@ -40,7 +35,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     throw;
                 }
 
+                myOutputConnectorAddress = outputConnectorAddress;
                 myClientSecurityFactory = clientSecurityFactory;
+                myProtocolFormatter = protocolFormatter;
                 myConnectTimeout = (connectTimeout != 0) ? connectTimeout : -1;
                 mySendTimeout = sendTimeout;
                 myReceiveTimeout = receiveTimeout;
@@ -49,8 +46,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-
-        public void OpenConnection(Func<MessageContext, bool> responseMessageHandler)
+        public void OpenConnection(Action<MessageContext> responseMessageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -61,78 +57,70 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         throw new InvalidOperationException(TracedObject + ErrorHandler.IsAlreadyConnected);
                     }
 
-                    try
-                    {
-                        AddressFamily anAddressFamily = (myUri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-                        myTcpClient = new TcpClient(anAddressFamily);
-                        myTcpClient.NoDelay = true;
+                    AddressFamily anAddressFamily = (myUri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+                    myTcpClient = new TcpClient(anAddressFamily);
+                    myTcpClient.NoDelay = true;
 #if !COMPACT_FRAMEWORK
-                        myTcpClient.SendTimeout = mySendTimeout;
-                        myTcpClient.ReceiveTimeout = myReceiveTimeout;
-                        myTcpClient.SendBufferSize = mySendBuffer;
-                        myTcpClient.ReceiveBufferSize = myReceiveBuffer;
+                    myTcpClient.SendTimeout = mySendTimeout;
+                    myTcpClient.ReceiveTimeout = myReceiveTimeout;
+                    myTcpClient.SendBufferSize = mySendBuffer;
+                    myTcpClient.ReceiveBufferSize = myReceiveBuffer;
 #endif
 
-                        // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
-                        //       Therefore it must be workerounded a little bit.
-                        Exception anException = null;
-                        ManualResetEvent aConnectionCompletedEvent = new ManualResetEvent(false);
-                        ThreadPool.QueueUserWorkItem(x =>
+                    // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
+                    //       Therefore it must be workerounded a little bit.
+                    Exception anException = null;
+                    ManualResetEvent aConnectionCompletedEvent = new ManualResetEvent(false);
+                    ThreadPool.QueueUserWorkItem(x =>
+                        {
+                            try
                             {
-                                try
-                                {
 #if !COMPACT_FRAMEWORK
-									// This call also resolves host names.
-									myTcpClient.Connect(myUri.Host, myUri.Port);
+								// This call also resolves host names.
+								myTcpClient.Connect(myUri.Host, myUri.Port);
 #else
-                                    // Compact framework has problems with resolving host names.
-                                    // Therefore directly IPAddress is used.
-                                    myTcpClient.Connect(IPAddress.Parse(myUri.Host), myUri.Port);
+                                // Compact framework has problems with resolving host names.
+                                // Therefore directly IPAddress is used.
+                                myTcpClient.Connect(IPAddress.Parse(myUri.Host), myUri.Port);
 #endif
-                                }
-                                catch (Exception err)
-                                {
-                                    anException = err;
-                                }
-                                aConnectionCompletedEvent.Set();
-                            });
-                        if (!aConnectionCompletedEvent.WaitOne(myConnectTimeout))
-                        {
-                            throw new TimeoutException(TracedObject + "failed to open connection within " + myConnectTimeout + " ms.");
-                        }
-                        if (anException != null)
-                        {
-                            throw anException;
-                        }
-
-                        myIpAddress = (myTcpClient.Client.LocalEndPoint != null) ? myTcpClient.Client.LocalEndPoint.ToString() : "";
-
-                        myClientStream = myClientSecurityFactory.CreateSecurityStreamAndAuthenticate(myTcpClient.GetStream());
-
-                        // If it shall listen to response messages.
-                        if (responseMessageHandler != null)
-                        {
-                            myStopReceivingRequestedFlag = false;
-
-                            myResponseMessageHandler = responseMessageHandler;
-
-                            myResponseReceiverThread = new Thread(DoResponseListening);
-                            myResponseReceiverThread.Start();
-
-                            // Wait until thread listening to response messages is running.
-                            myListeningToResponsesStartedEvent.WaitOne(1000);
-                        }
-                    }
-                    catch
+                            }
+                            catch (Exception err)
+                            {
+                                anException = err;
+                            }
+                            aConnectionCompletedEvent.Set();
+                        });
+                    if (!aConnectionCompletedEvent.WaitOne(myConnectTimeout))
                     {
-                        CloseConnection();
-                        throw;
+                        throw new TimeoutException(TracedObject + "failed to open connection within " + myConnectTimeout + " ms.");
                     }
+                    if (anException != null)
+                    {
+                        throw anException;
+                    }
+
+                    myIpAddress = (myTcpClient.Client.LocalEndPoint != null) ? myTcpClient.Client.LocalEndPoint.ToString() : "";
+
+                    myClientStream = myClientSecurityFactory.CreateSecurityStreamAndAuthenticate(myTcpClient.GetStream());
+
+                    // If it shall listen to response messages.
+                    myStopReceivingRequestedFlag = false;
+
+                    myResponseMessageHandler = responseMessageHandler;
+
+                    myResponseReceiverThread = new Thread(DoResponseListening);
+                    myResponseReceiverThread.Start();
+
+                    // Wait until thread listening to response messages is running.
+                    myListeningToResponsesStartedEvent.WaitOne(1000);
+
+                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                    SendMessage(anEncodedMessage);
                 }
             }
         }
 
-        public void CloseConnection()
+        public void CloseConnection(bool sendCloseMessageFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -142,6 +130,19 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                     if (myClientStream != null)
                     {
+                        if (sendCloseMessageFlag)
+                        {
+                            try
+                            {
+                                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
+                                SendMessage(anEncodedMessage);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
+                        }
+
                         myClientStream.Close();
                         myClientStream = null;
                     }
@@ -186,34 +187,30 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             get
             {
-                if (myResponseMessageHandler != null)
-                {
-                    return myIsListeningToResponses;
-                }
-
-                return myClientStream != null;
+                return myIsListeningToResponses;
             }
         }
 
-        public bool IsStreamWritter { get { return false; } }
-
-        public void SendMessage(object message)
+        public void SendRequestMessage(object message)
         {
             using (EneterTrace.Entering())
             {
                 lock (myOpenConnectionLock)
                 {
-                    byte[] aMessage = (byte[])message;
-                    myClientStream.Write(aMessage, 0, aMessage.Length);
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                    SendMessage(anEncodedMessage);
                 }
             }
         }
 
-        public void SendMessage(Action<Stream> toStreamWritter)
+        private void SendMessage(object message)
         {
-            throw new NotSupportedException("toStreamWritter is not supported.");
+            using (EneterTrace.Entering())
+            {
+                byte[] aMessage = (byte[])message;
+                myClientStream.Write(aMessage, 0, aMessage.Length);
+            }
         }
-
 
         private void DoResponseListening()
         {
@@ -224,14 +221,16 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 try
                 {
-                    MessageContext aContext = new MessageContext(myClientStream, myIpAddress, null);
-
                     while (!myStopReceivingRequestedFlag)
                     {
-                        if (!myResponseMessageHandler(aContext))
+                        ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)myClientStream);
+                        if (aProtocolMessage != null)
                         {
-                            // Handler requests stop receiving.
-                            myStopReceivingRequestedFlag = true;
+                            MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
+                            myResponseMessageHandler(aMessageContext);
+                        }
+                        else
+                        {
                             break;
                         }
                     }
@@ -248,11 +247,16 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 myIsListeningToResponses = false;
                 myListeningToResponsesStartedEvent.Reset();
 
-                // If this closing is not caused by CloseConnection method.
+                // If the connection was closed from service.
                 if (!myStopReceivingRequestedFlag)
                 {
+                    // Notify
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
+                    myResponseMessageHandler(aMessageContext);
+
                     // Try to clean the connection.
-                    CloseConnection();
+                    CloseConnection(false);
                 }
             }
         }
@@ -260,8 +264,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 
         private Uri myUri;
+        private string myOutputConnectorAddress;
         private TcpClient myTcpClient;
         private ISecurityFactory myClientSecurityFactory;
+        private IProtocolFormatter myProtocolFormatter;
         private int myConnectTimeout;
         private int mySendTimeout;
         private int myReceiveTimeout;
@@ -271,7 +277,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private string myIpAddress;
         private object myOpenConnectionLock = new object();
 
-        private Func<MessageContext, bool> myResponseMessageHandler;
+        private Action<MessageContext> myResponseMessageHandler;
         private Thread myResponseReceiverThread;
         private volatile bool myStopReceivingRequestedFlag;
         private volatile bool myIsListeningToResponses;

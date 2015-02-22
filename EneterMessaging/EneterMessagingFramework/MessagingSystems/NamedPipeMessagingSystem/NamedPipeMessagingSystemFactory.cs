@@ -132,7 +132,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         /// <param name="pipeConnectionTimeout">
         /// The maximum time in miliseconds, the output channel waits to connect the pipe and sends the message.</param>
         /// <param name="protocolFormatter">formatter of low-level messages between channels</param>
-        public NamedPipeMessagingSystemFactory(int numberOfInputchannelListeningThreads, int pipeConnectionTimeout, IProtocolFormatter<byte[]> protocolFormatter)
+        public NamedPipeMessagingSystemFactory(int numberOfInputchannelListeningThreads, int pipeConnectionTimeout, IProtocolFormatter protocolFormatter)
             : this(numberOfInputchannelListeningThreads, pipeConnectionTimeout, protocolFormatter, null)
         {
         }
@@ -176,7 +176,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         /// Pipe security.
         /// </param>
         public NamedPipeMessagingSystemFactory(int numberOfPipeInstances, int pipeConnectionTimeout,
-                                               IProtocolFormatter<byte[]> protocolFormatter,
+                                               IProtocolFormatter protocolFormatter,
                                                PipeSecurity pipeSecurity)
         {
             using (EneterTrace.Entering())
@@ -285,7 +285,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
         private NamedPipeConnectorFactory myConnectorFactory;
-        private IProtocolFormatter<byte[]> myProtocolFormatter;
+        private IProtocolFormatter myProtocolFormatter;
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }

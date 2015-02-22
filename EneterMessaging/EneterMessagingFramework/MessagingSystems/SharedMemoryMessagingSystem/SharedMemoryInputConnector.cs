@@ -8,18 +8,22 @@
 #if NET4 || NET45
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.MemoryMappedFiles;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
     internal class SharedMemoryInputConnector : IInputConnector
     {
-        public SharedMemoryInputConnector(string inputMemoryMappedFileName, TimeSpan sendResponseTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
+        public SharedMemoryInputConnector(string inputMemoryMappedFileName, IProtocolFormatter protocolFormatter, TimeSpan sendResponseTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
         {
             using (EneterTrace.Entering())
             {
+                myProtocolFormatter = protocolFormatter;
                 myMaxMessageSize = maxMessageSize;
                 mySendResponseTimeout = sendResponseTimeout;
                 mySecurity = memoryMappedFileSecurity;
@@ -30,7 +34,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<MessageContext> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -43,7 +47,8 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                     try
                     {
-                        myReceiver.StartListening(messageHandler);
+                        myRequestMessageHandler = messageHandler;
+                        myReceiver.StartListening(HandleRequestMessage);
                     }
                     catch
                     {
@@ -61,6 +66,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                 lock (myListenerManipulatorLock)
                 {
                     myReceiver.StopListening();
+                    myRequestMessageHandler = null;
                 }
             }
         }
@@ -76,19 +82,99 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
-        // Note: It creates memory mapped file for each connected output connector (client).
-        //       The memory mapped file is used to send response messages to the output connector.
-        //       The output connector opens it as an existing memory mapped file.
-        public ISender CreateResponseSender(string responseReceiverAddress)
+        public void SendResponseMessage(string outputConnectorAddress, object message)
         {
             using (EneterTrace.Entering())
             {
-                TimeSpan aDummyOpenTimeout = TimeSpan.Zero;
-                return new SharedMemorySender(responseReceiverAddress, false, aDummyOpenTimeout, mySendResponseTimeout, myMaxMessageSize, mySecurity);
+                lock (myConnectedClients)
+                {
+                    SharedMemorySender aClientSender;
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
+
+                    if (aClientSender != null)
+                    {
+                        aClientSender.SendMessage(x => myProtocolFormatter.EncodeMessage(outputConnectorAddress, message, x));
+                    }
+                }
+            }
+        }
+
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectedClients)
+                {
+                    SharedMemorySender aClientSender;
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
+
+                    if (aClientSender != null)
+                    {
+                        try
+                        {
+                            aClientSender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress, x));
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning("failed to send the close message.", err);
+                        }
+
+                        myConnectedClients.Remove(outputConnectorAddress);
+                        aClientSender.Dispose();
+                    }
+                }
+            }
+        }
+
+        private void HandleRequestMessage(Stream message)
+        {
+            using (EneterTrace.Entering())
+            {
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
+
+                if (aProtocolMessage != null)
+                {
+                    if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
+                    {
+                        // If it is open connection then add the new connected client.
+                        if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                        {
+                            lock (myConnectedClients)
+                            {
+                                if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
+                                {
+                                    TimeSpan aDummyOpenTimeout = TimeSpan.Zero;
+                                    SharedMemorySender aClientSender = new SharedMemorySender(aProtocolMessage.ResponseReceiverId, false, aDummyOpenTimeout, mySendResponseTimeout, myMaxMessageSize, mySecurity);
+
+                                    myConnectedClients[aProtocolMessage.ResponseReceiverId] = aClientSender;
+                                }
+                            }
+                        }
+                        else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                        {
+                            lock (myConnectedClients)
+                            {
+                                SharedMemorySender aClientSender;
+                                myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aClientSender);
+
+                                if (aClientSender != null)
+                                {
+                                    myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
+
+                                    aClientSender.Dispose();
+                                }
+                            }
+                        }
+
+                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                        myRequestMessageHandler(aMessageContext);
+                    }
+                }
             }
         }
 
 
+        private IProtocolFormatter myProtocolFormatter;
         private int myMaxMessageSize;
         private MemoryMappedFileSecurity mySecurity;
 
@@ -96,6 +182,10 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
         private object myListenerManipulatorLock = new object();
         private SharedMemoryReceiver myReceiver;
+
+        private Action<MessageContext> myRequestMessageHandler;
+
+        private Dictionary<string, SharedMemorySender> myConnectedClients = new Dictionary<string, SharedMemorySender>();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

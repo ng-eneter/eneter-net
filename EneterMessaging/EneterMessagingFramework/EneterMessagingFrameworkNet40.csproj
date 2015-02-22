@@ -64,26 +64,84 @@
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageReceiver.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessagesFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexInputChannel.cs" />
-    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedDuplexOutputChannel.cs" />
-    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\AuthenticatedMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\AuthenticatedConnection\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBusFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBus.cs">
+    <Compile Include="MessagingSystems\ConnectionProtocols\InteroperableProtocolFormatter.cs" />
+    <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
-    <Compile Include="MessagingSystems\Composites\MessageBus\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\EventWaitHandleExt.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\EventWaitHandleExt.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryInputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryMessagingSystemFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryOutputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryReceiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemorySender.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\IHostListenerFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\PathListenerProviderBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientNegotiateFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientSslFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ISecurityFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\NonSecurityFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ServerNegotiateFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ServerSslFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpInputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListenerProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector_Silverlight.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpPolicyServer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
@@ -138,69 +196,7 @@
     <Compile Include="EndPoints\Rpc\ProxyProvider.cs" />
     <Compile Include="EndPoints\Rpc\RpcService.cs" />
     <Compile Include="EndPoints\Rpc\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbCableMessagingFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbDuplexOutputChannel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\LocalProtocolFormatter.cs" />
-    <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputConnector.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListener_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListenerFactory_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpPolicyServer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker_Silverlight.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpInputConnector.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\ServerUri_Silverlight.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\ListeningInstance.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeOutputConnector.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemFactory.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeReceiver.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeSender.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeInputConnector.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryOutputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryMessagingSystemFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryReceiver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemorySender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryInputConnector.cs" />
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightReceiver.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightSender.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\DefaultOutputConnectorFactory.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\DefaultInputConnectorFactory.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\ISender.cs" />
@@ -214,116 +210,6 @@
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\DefaultInputConnector.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\DefaultOutputConnector.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\MessageContext.cs" />
-    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SenderUtil.cs" />
-    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\IHostListenerFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\PathListenerProviderBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientNegotiateFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientSslFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ISecurityFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\NonSecurityFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ServerNegotiateFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ServerSslFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\Security\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListenerProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpPolicyServer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpInputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpOutputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpMessagingSystemFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpInputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\EFrameType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\IWebSocketClientContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketClient.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketOutputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketClientContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketFormatter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketFrame.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketHostListener.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketHostListenerFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketListener.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketMessage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketMessagingSystemFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketInputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Nodes\BackupRouter\BackupConnectionRouter.cs" />
     <Compile Include="Nodes\BackupRouter\BackupConnectionRouterFactory.cs" />
     <Compile Include="Nodes\BackupRouter\IBackupConnectionRouter.cs" />
@@ -464,32 +350,11 @@
     <Compile Include="Infrastructure\ConnectionProvider\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexInputChannel.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexOutputChannel.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseMessageSender.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseReceiverContext.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitorChannelMessage.cs" />
-    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexInputChannel.cs" />
-    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexOutputChannel.cs" />
-    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\Reconnecter.cs" />
-    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\Composites\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterStringProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\IProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolMessage.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\_NamespaceDoc.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\Fragment.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentDataFactory.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentFinalizer.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentSequencer.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\IFragmentProcessor.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\IMultiInstanceFragmentProcessor.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\MultiInstanceFragmentProcessor.cs" />
     <Compile Include="MessagingSystems\MessagingSystemBase\DuplexChannelEventArgs.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -511,9 +376,6 @@
     <Compile Include="MessagingSystems\MessagingSystemBase\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightFragmentMessage.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightMessagingSystemFactory.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IMessagingProvider.cs">
       <SubType>Code</SubType>
     </Compile>

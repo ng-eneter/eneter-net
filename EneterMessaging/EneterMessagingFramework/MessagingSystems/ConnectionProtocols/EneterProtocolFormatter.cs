@@ -15,14 +15,14 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     /// <summary>
     /// Implements encoding/decoding of low-level messages into eneter format.
     /// </summary>
-    public class EneterProtocolFormatter : ProtocolFormatterBase<byte[]>, IProtocolFormatter<byte[]>
+    public class EneterProtocolFormatter : IProtocolFormatter
     {
         /// <summary>
         /// Encodes open connection request.
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <returns></returns>
-        public override byte[] EncodeOpenConnectionMessage(string responseReceiverId)
+        public object EncodeOpenConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -39,7 +39,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="responseReceiverId"></param>
         /// <param name="outputSream"></param>
-        public override void EncodeOpenConnectionMessage(string responseReceiverId, Stream outputSream)
+        public void EncodeOpenConnectionMessage(string responseReceiverId, Stream outputSream)
         {
             using (EneterTrace.Entering())
             {
@@ -58,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <returns></returns>
-        public override byte[] EncodeCloseConnectionMessage(string responseReceiverId)
+        public object EncodeCloseConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -75,7 +75,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="responseReceiverId"></param>
         /// <param name="outputSream"></param>
-        public override void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream)
+        public void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream)
         {
             using (EneterTrace.Entering())
             {
@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <param name="responseReceiverId">client id</param>
         /// <param name="message">the serialized content of the message</param>
         /// <returns></returns>
-        public override byte[] EncodeMessage(string responseReceiverId, object message)
+        public object EncodeMessage(string responseReceiverId, object message)
         {
             using (EneterTrace.Entering())
             {
@@ -113,7 +113,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <param name="responseReceiverId"></param>
         /// <param name="message"></param>
         /// <param name="outputSream"></param>
-        public override void EncodeMessage(string responseReceiverId, object message, Stream outputSream)
+        public void EncodeMessage(string responseReceiverId, object message, Stream outputSream)
         {
             using (EneterTrace.Entering())
             {
@@ -134,7 +134,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="readStream">stream containing the low-level message</param>
         /// <returns></returns>
-        public override ProtocolMessage DecodeMessage(Stream readStream)
+        public ProtocolMessage DecodeMessage(Stream readStream)
         {
             using (EneterTrace.Entering())
             {
@@ -233,7 +233,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </summary>
         /// <param name="readMessage">source of the low-level message</param>
         /// <returns></returns>
-        public override ProtocolMessage DecodeMessage(byte[] readMessage)
+        public ProtocolMessage DecodeMessage(object readMessage)
         {
             using (EneterTrace.Entering())
             {

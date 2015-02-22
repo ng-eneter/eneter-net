@@ -131,7 +131,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// <param name="inactivityTimeout">maximum time (measured by duplex input channel), the duplex output channel does not have to poll
         /// for response messages. If the time is exceeded, the duplex output channel is considered as disconnected.</param>
         /// <param name="protocolFormatter">formatter for low-level messages between duplex output channel and duplex input channel</param>
-        public HttpMessagingSystemFactory(int pollingFrequency, int inactivityTimeout, IProtocolFormatter<byte[]> protocolFormatter)
+        public HttpMessagingSystemFactory(int pollingFrequency, int inactivityTimeout, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
@@ -319,7 +319,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// </summary>
         private int myPollingFrequency;
 
-        private IProtocolFormatter<byte[]> myProtocolFormatter;
+        private IProtocolFormatter myProtocolFormatter;
 
 #if !SILVERLIGHT
         private IInputConnectorFactory myInputConnectorFactory;

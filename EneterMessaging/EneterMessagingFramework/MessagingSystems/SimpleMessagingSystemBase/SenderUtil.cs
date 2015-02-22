@@ -24,7 +24,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 else
                 {
                     object anEncodedMessage = protocolFormatter.EncodeOpenConnectionMessage(responseReceiverId);
-                    sender.SendMessage(anEncodedMessage);
+
+                    // If open connection message is supported by the protocol formatter.
+                    // Note: if it is null it means the connection can be open without an explicit open connection message.
+                    if (anEncodedMessage != null)
+                    {
+                        sender.SendMessage(anEncodedMessage);
+                    }
                 }
             }
         }
@@ -40,7 +46,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 else
                 {
                     object anEncodedMessage = protocolFormatter.EncodeCloseConnectionMessage(responseReceiverId);
-                    sender.SendMessage(anEncodedMessage);
+
+                    // If close connection message is supported by the protocol formatter.
+                    // Note: if it is null it means the connection can be closed without an explicit close connection message.
+                    if (anEncodedMessage != null)
+                    {
+                        sender.SendMessage(anEncodedMessage);
+                    }
                 }
             }
         }

@@ -14,14 +14,16 @@ using System.Net.Sockets;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using System.Collections.Generic;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     internal class TcpInputConnector : IInputConnector
     {
-        private class ResponseSender : ISender, IDisposable
+        private class TClientContext
         {
-            public ResponseSender(Stream clientStream)
+            public TClientContext(Stream clientStream)
             {
                 using (EneterTrace.Entering())
                 {
@@ -29,10 +31,12 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 }
             }
 
-            public void Dispose()
+            public void CloseConnection()
             {
                 using (EneterTrace.Entering())
                 {
+                    IsClosedFromService = true;
+
                     if (myClientStream != null)
                     {
                         myClientStream.Close();
@@ -40,9 +44,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 }
             }
 
-            public bool IsStreamWritter { get { return false; } }
-
-            public void SendMessage(object message)
+            public void SendResponseMessage(object message)
             {
                 using (EneterTrace.Entering())
                 {
@@ -54,16 +56,13 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 }
             }
 
-            public void SendMessage(Action<Stream> toStreamWritter)
-            {
-                throw new NotSupportedException("Sending via the stream is not supported.");
-            }
+            public bool IsClosedFromService { get; private set; }
 
             private Stream myClientStream;
             private object mySenderLock = new object();
         }
 
-        public TcpInputConnector(string ipAddressAndPort, ISecurityFactory securityFactory,
+        public TcpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory,
             int sendTimeout,
             int receiveTimeout,
             int sendBuffer,
@@ -85,17 +84,22 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
 
                     myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aUri.Port);
+                    myProtocolFormatter = protocolFormatter;
                     mySecurityStreamFactory = securityFactory;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
                     mySendBuffer = sendBuffer;
                     myReceiveBuffer = receiveBuffer;
+
+                    // Check if protocol encodes open and close messages.
+                    myProtocolUsesOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage("test") != null;
+                    myProtocolUsesCloseConnectionMessage = myProtocolFormatter.EncodeCloseConnectionMessage("test") != null;
                 }
             }
         }
 
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<MessageContext> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -123,11 +127,40 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
         public bool IsListening { get { return myTcpListenerProvider.IsListening; } }
 
-        public ISender CreateResponseSender(string responseReceiverAddress)
+        public void SendResponseMessage(string outputConnectorAddress, object message)
         {
-            throw new NotSupportedException("CreateResponseSender is not supported in TcpServiceConnector.");
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                lock (myConnectedClients)
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                }
+
+                if (aClientContext != null)
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    aClientContext.SendResponseMessage(anEncodedMessage);
+                }
+            }
         }
 
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                lock (myConnectedClients)
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                }
+
+                if (aClientContext != null)
+                {
+                    aClientContext.CloseConnection();
+                }
+            }
+        }
 
         private void HandleConnection(TcpClient tcpClient)
         {
@@ -137,6 +170,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 string aClientIp = (anEndPoint != null) ? anEndPoint.Address.ToString() : "";
 
                 Stream anInputOutputStream = null;
+
+                TClientContext aClientContext = null;
+                string aClientId = null;
 
                 try
                 {
@@ -150,19 +186,85 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     // If the security communication is required, then wrap the network stream into the security stream.
                     anInputOutputStream = mySecurityStreamFactory.CreateSecurityStreamAndAuthenticate(tcpClient.GetStream());
 
-                    ResponseSender aResponseSender = new ResponseSender(anInputOutputStream);
-                    MessageContext aMessageContext = new MessageContext(anInputOutputStream, aClientIp, aResponseSender);
+                    // If protocol formatter does not use OpenConnection message.
+                    if (!myProtocolUsesOpenConnectionMessage)
+                    {
+                        aClientContext = new TClientContext(anInputOutputStream);
+
+                        // Generate client id.
+                        aClientId = Guid.NewGuid().ToString();
+                        lock (myConnectedClients)
+                        {
+                            myConnectedClients[aClientId] = aClientContext;
+                        }
+
+                        ProtocolMessage anOpenConnectionProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aClientId, null);
+                        MessageContext aMessageContext = new MessageContext(anOpenConnectionProtocolMessage, aClientIp);
+                        myMessageHandler(aMessageContext);
+                    }
 
                     // While the stop of listening is not requested and the connection is not closed.
                     bool aConnectionIsOpen = true;
                     while (aConnectionIsOpen)
                     {
-                        aConnectionIsOpen = myMessageHandler(aMessageContext);
-                    }
+                        ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)anInputOutputStream);
+                        if (aProtocolMessage != null)
+                        {
+                            MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
 
+                            // If protocol formatter uses open connection message to create the connection.
+                            if (myProtocolUsesOpenConnectionMessage && aClientContext == null)
+                            {
+                                if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                                {
+                                    aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
+                                    aClientContext = new TClientContext(anInputOutputStream);
+
+                                    lock (myConnectedClients)
+                                    {
+                                        myConnectedClients[aClientId] = aClientContext;
+                                    }
+                                }
+                            }
+
+                            // For security reasons ignore close connection message in TCP.
+                            // Note: So that it is not possible that somebody will just send a close message which will have id of somebody else.
+                            //       The TCP connection will be closed when the client closes the socket.
+                            if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                            {
+                            }
+                            else
+                            {
+                                myMessageHandler(aMessageContext);
+                            }
+                        }
+                        else
+                        {
+                            aConnectionIsOpen = false;
+                        }
+                    }
                 }
                 finally
                 {
+                    // Remove client from connected clients.
+                    if (aClientId != null)
+                    {
+                        lock (myConnectedClients)
+                        {
+                            myConnectedClients.Remove(aClientId);
+                        }
+                    }
+
+                    // If the disconnection comes from the client (and not from the service).
+                    if (aClientContext != null && !aClientContext.IsClosedFromService)
+                    {
+                        ProtocolMessage aCloseProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aClientId, null);
+                        MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
+
+                        // Notify duplex input channel about the disconnection.
+                        myMessageHandler(aMessageContext);
+                    }
+
                     if (anInputOutputStream != null)
                     {
                         anInputOutputStream.Close();
@@ -174,12 +276,20 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
         private TcpListenerProvider myTcpListenerProvider;
         private ISecurityFactory mySecurityStreamFactory;
-        private Func<MessageContext, bool> myMessageHandler;
+
+        private IProtocolFormatter myProtocolFormatter;
+        private bool myProtocolUsesOpenConnectionMessage;
+        private bool myProtocolUsesCloseConnectionMessage;
+
+        private Action<MessageContext> myMessageHandler;
         private int mySendTimeout;
         private int myReceiveTimeout;
         private int mySendBuffer;
         private int myReceiveBuffer;
 
+        private Dictionary<string, TClientContext> myConnectedClients = new Dictionary<string, TClientContext>();
+
+        
     }
 }
 

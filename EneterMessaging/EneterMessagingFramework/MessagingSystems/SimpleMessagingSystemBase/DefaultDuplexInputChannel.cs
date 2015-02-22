@@ -8,9 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
@@ -20,19 +17,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 {
     internal class DefaultDuplexInputChannel : IDuplexInputChannel
     {
-        // Represents connection with a client.
-        private class TConnectionContext
-        {
-            public TConnectionContext(ISender responseSender, string senderAddress)
-            {
-                ResponseSender = responseSender;
-                SenderAddress = senderAddress;
-            }
-
-            public string SenderAddress { get; private set; }
-            public ISender ResponseSender { get; private set; }
-        }
-
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
@@ -40,8 +24,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         public DefaultDuplexInputChannel(string channelId,  // address to listen
             IThreadDispatcher dispatcher,                         // threading model used to notify messages and events
             IThreadDispatcher dispatchingAfterMessageReading,
-            IInputConnector inputConnector,                 // listener used for listening to messages
-            IProtocolFormatter protocolFormatter)           // how messages are encoded between channels
+            IInputConnector inputConnector)                 // listener used for listening to messages
         {
             using (EneterTrace.Entering())
             {
@@ -60,14 +43,9 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 //      so that other senders are not blocked.
                 myDispatchingAfterMessageReading = dispatchingAfterMessageReading;
 
-                myProtocolFormatter = protocolFormatter;
                 myInputConnector = inputConnector;
-
-                IncludeResponseReceiverIdToResponses = false;
             }
         }
-
-        public bool IncludeResponseReceiverIdToResponses { private get; set; }
 
         public string ChannelId { get; private set; }
 
@@ -110,8 +88,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 lock (myListeningManipulatorLock)
                 {
-                    myStopListeningIsRunning = true;
-
                     try
                     {
                         // Try to close connected clients.
@@ -130,8 +106,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     {
                         EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
                     }
-
-                    myStopListeningIsRunning = false;
                 }
             }
         }
@@ -162,53 +136,41 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     throw new InvalidOperationException(aMessage);
                 }
 
-                lock (myConnectedClients)
+                if (string.IsNullOrEmpty(responseReceiverId))
                 {
-                    if (string.IsNullOrEmpty(responseReceiverId))
+                    lock (myConnectedClients)
                     {
                         // Send the response message to all connected clients.
-                        foreach (KeyValuePair<string, TConnectionContext> aConnectedClient in myConnectedClients)
+                        foreach (KeyValuePair<string, string> aConnectedClient in myConnectedClients)
                         {
                             try
                             {
                                 // Send the response message.
-                                string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? aConnectedClient.Key : "";
-                                SenderUtil.SendMessage(aConnectedClient.Value.ResponseSender, aResponseReceiverId, message, myProtocolFormatter);
+                                myInputConnector.SendResponseMessage(aConnectedClient.Key, message);
                             }
                             catch (Exception err)
                             {
                                 EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
-                                CloseResponseMessageSender(aConnectedClient.Key, true);
-                                
+                                CloseConnection(aConnectedClient.Key, true);
+
                                 // Note: Exception is not rethrown because if sending to one client fails it should not
                                 //       affect sending to other clients.
                             }
                         }
                     }
-                    else
+                }
+                else
+                {
+                    try
                     {
-                        // Try to find the response sender
-                        TConnectionContext aConnectionContext;
-                        myConnectedClients.TryGetValue(responseReceiverId, out aConnectionContext);
-                        if (aConnectionContext == null)
-                        {
-                            string aMessage = TracedObject + ErrorHandler.SendResponseNotConnectedFailure;
-                            EneterTrace.Error(aMessage);
-                            throw new InvalidOperationException(aMessage);
-                        }
-
-                        try
-                        {
-                            // Send the response message.
-                            string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? responseReceiverId : "";
-                            SenderUtil.SendMessage(aConnectionContext.ResponseSender, aResponseReceiverId, message, myProtocolFormatter);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
-                            CloseResponseMessageSender(responseReceiverId, true);
-                            throw;
-                        }
+                        // Send the response message.
+                        myInputConnector.SendResponseMessage(responseReceiverId, message);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                        CloseConnection(responseReceiverId, true);
+                        throw;
                     }
                 }
             }
@@ -218,7 +180,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                CloseResponseMessageSender(responseReceiverId, true);
+                CloseConnection(responseReceiverId, true);
             }
         }
 
@@ -231,17 +193,16 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 lock (myConnectedClients)
                 {
-                    foreach (KeyValuePair<string, TConnectionContext> aConnection in myConnectedClients)
+                    foreach (KeyValuePair<string, string> aConnection in myConnectedClients)
                     {
-                        if (aConnection.Value.ResponseSender is IDisposable)
-                        {
-                            ((IDisposable)aConnection.Value.ResponseSender).Dispose();
-                        }
-
-                        // Note: we must assign receiver id to a separate variable because aConnection is same instance for all iterations.
+                        // Note: we must assign receiver id (and sender address) to a separate variable because aConnection is the same instance for all iterations.
                         //       And so the client could get incorrect id in the notified event.
                         string aResponseReceiverId = aConnection.Key;
-                        Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, aResponseReceiverId, aConnection.Value.SenderAddress));
+                        string aSenderAddress = aConnection.Value;
+
+                        myInputConnector.CloseConnection(aResponseReceiverId);
+
+                        Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, aResponseReceiverId, aSenderAddress));
                     }
                     myConnectedClients.Clear();
                 }
@@ -249,109 +210,37 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         }
 
         // Note: This method is called from the message receiving thread.
-        private bool HandleMessage(MessageContext messageContext)
+        private void HandleMessage(MessageContext messageContext)
         {
             using (EneterTrace.Entering())
             {
-                // If the listening thread stopped looping.
-                if (messageContext == null)
-                {
-                    // If the listening stopped because it was requested.
-                    if (myStopListeningIsRunning)
-                    {
-                        return false;
-                    }
-
-                    // The listening failed.
-                    EneterTrace.Warning(TracedObject + "detected the listening was stopped.");
-
-                    // Try to correctly stop the whole listening.
-                    StopListening();
-                    return false;
-                }
-
-                // Get the protocol message from incoming data.
-                ProtocolMessage aProtocolMessage = null;
-                if (messageContext.Message != null)
-                {
-                    if (messageContext.Message is Stream)
-                    {
-                        aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)messageContext.Message);
-                    }
-                    else
-                    {
-                        aProtocolMessage = myProtocolFormatter.DecodeMessage(messageContext.Message);
-                    }
-                }
-
-                // If some client disconnected from the server without sending the close message.
-                if (aProtocolMessage == null)
-                {
-                    // Try to correctly close the client.
-                    myDispatchingAfterMessageReading.Invoke(() => CleanAfterDisconnectedResponseReceiver(messageContext.ResponseSender, messageContext.SenderAddress));
-
-                    // Stop listening for this client.
-                    return false;
-                }
-                else if (aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
+                if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
                     EneterTrace.Debug("REQUEST MESSAGE RECEIVED");
 
                     myDispatchingAfterMessageReading.Invoke(() =>
                         {
-                            // If the connection is not open then it will open it.
-                            CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId);
-                            Dispatcher.Invoke(() => NotifyMessageReceived(messageContext, aProtocolMessage));
+                            // If the connection is not open then open it.
+                            OpenConnection(messageContext.ProtocolMessage.ResponseReceiverId, messageContext.SenderAddress);
+                            Dispatcher.Invoke(() => NotifyMessageReceived(messageContext, messageContext.ProtocolMessage));
                         });
                 }
-                else if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                 {
                     EneterTrace.Debug("CLIENT CONNECTION RECEIVED");
-                    myDispatchingAfterMessageReading.Invoke(() => CreateResponseMessageSender(messageContext, aProtocolMessage.ResponseReceiverId));
+                    myDispatchingAfterMessageReading.Invoke(() => OpenConnection(messageContext.ProtocolMessage.ResponseReceiverId, messageContext.SenderAddress));
                 }
-                else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
                     EneterTrace.Debug("CLIENT DISCONNECTION RECEIVED");
-                    myDispatchingAfterMessageReading.Invoke(() => CloseResponseMessageSender(aProtocolMessage.ResponseReceiverId, false));
-                    return false;
+                    myDispatchingAfterMessageReading.Invoke(() => CloseConnection(messageContext.ProtocolMessage.ResponseReceiverId, false));
                 }
                 else
                 {
                     EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
                 }
-
-                return true;
             }
         }
-
-        private void CleanAfterDisconnectedResponseReceiver(ISender responseSender, string senderAddress)
-        {
-            using (EneterTrace.Entering())
-            {
-                // Some client got disconnected without sending the 'close' messages.
-                // So try to identify closed response receiver and clean it.
-                KeyValuePair<string, TConnectionContext> aPair;
-                lock (myConnectedClients)
-                {
-                    // Note: KeyValuePair is a struct so the default value is not null.
-                    aPair = myConnectedClients.FirstOrDefault(x => x.Value.ResponseSender == responseSender);
-                }
-
-                if (!String.IsNullOrEmpty(aPair.Key))
-                {
-                    CloseResponseMessageSender(aPair.Key, false);
-                }
-                else
-                {
-                    // Decoding the message returned null.
-                    // This can happen if a client closed the connection and the stream was closed.
-                    // e.g. in case of Named Pipes.
-
-                    // nothing to do here.
-                }
-            }
-        }
-
 
         /// <summary>
         /// Creates the connection if does not exist.
@@ -360,31 +249,18 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         /// <param name="messageContext"></param>
         /// <param name="responseReceiverId"></param>
         /// <returns></returns>
-        private void CreateResponseMessageSender(MessageContext messageContext, string responseReceiverId)
+        private void OpenConnection(string responseReceiverId, string senderAddress)
         {
             using (EneterTrace.Entering())
             {
                 bool aNewConnectionFlag = false;
 
                 // If the connection is not open yet.
-                TConnectionContext aConnectionContext;
                 lock (myConnectedClients)
                 {
-                    myConnectedClients.TryGetValue(responseReceiverId, out aConnectionContext);
-
-                    if (aConnectionContext == null)
+                    if (!myConnectedClients.ContainsKey(responseReceiverId))
                     {
-                        // Get the response sender.
-                        // Some messagings send the response sender in the message context and some
-                        // provides the factory to create it.
-                        ISender aResponseSender = messageContext.ResponseSender;
-                        if (aResponseSender == null)
-                        {
-                            aResponseSender = myInputConnector.CreateResponseSender(responseReceiverId);
-                        }
-
-                        aConnectionContext = new TConnectionContext(aResponseSender, messageContext.SenderAddress);
-                        myConnectedClients[responseReceiverId] = aConnectionContext;
+                        myConnectedClients[responseReceiverId] = senderAddress;
 
                         // Connection was created.
                         aNewConnectionFlag = true;
@@ -394,44 +270,35 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 if (aNewConnectionFlag)
                 {
                     // Open connection comes from the client. So notify it from dispatcher threading.
-                    Dispatcher.Invoke(() => Notify(ResponseReceiverConnected, responseReceiverId, aConnectionContext.SenderAddress));
+                    Dispatcher.Invoke(() => Notify(ResponseReceiverConnected, responseReceiverId, senderAddress));
                 }
             }
         }
 
-        private void CloseResponseMessageSender(string responseReceiverId, bool sendCloseMessageFlag)
+        private void CloseConnection(string responseReceiverId, bool sendCloseMessageFlag)
         {
             using (EneterTrace.Entering())
             {
-                TConnectionContext aConnectionContext = null;
-
+                string aSenderAddress = "";
+                bool aConnecionExisted = false;
                 try
                 {
                     lock (myConnectedClients)
                     {
-                        myConnectedClients.TryGetValue(responseReceiverId, out aConnectionContext);
-                        myConnectedClients.Remove(responseReceiverId);
+                        myConnectedClients.TryGetValue(responseReceiverId, out aSenderAddress);
+                        aConnecionExisted = myConnectedClients.Remove(responseReceiverId);
                     }
 
-                    if (aConnectionContext != null)
+                    if (aConnecionExisted && sendCloseMessageFlag)
                     {
-                        if (sendCloseMessageFlag)
+                        try
                         {
-                            try
-                            {
-                                // Try to send close connection message.
-                                string aResponseReceiverId = IncludeResponseReceiverIdToResponses ? responseReceiverId : "";
-                                SenderUtil.SendCloseConnection(aConnectionContext.ResponseSender, aResponseReceiverId, myProtocolFormatter);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
-                            }
+                            // Try to send close connection message.
+                            myInputConnector.CloseConnection(responseReceiverId);
                         }
-
-                        if (aConnectionContext.ResponseSender is IDisposable)
+                        catch (Exception err)
                         {
-                            ((IDisposable) aConnectionContext.ResponseSender).Dispose();
+                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
                         }
                     }
                 }
@@ -441,10 +308,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
 
                 // If a connection was closed.
-                if (aConnectionContext != null)
+                if (aConnecionExisted)
                 {
                     // Notify the connection was closed.
-                    Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, responseReceiverId, aConnectionContext.SenderAddress));
+                    Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, responseReceiverId, aSenderAddress));
                 }
             }
         }
@@ -492,13 +359,12 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         }
 
 
-        private Dictionary<string, TConnectionContext> myConnectedClients = new Dictionary<string, TConnectionContext>();
+        // Key = responseReceiverId, Value = senderAddress
+        private Dictionary<string, string> myConnectedClients = new Dictionary<string, string>();
 
         private IThreadDispatcher myDispatchingAfterMessageReading;
         private IInputConnector myInputConnector;
-        private IProtocolFormatter myProtocolFormatter;
 
-        private bool myStopListeningIsRunning;
         private object myListeningManipulatorLock = new object();
 
         private string TracedObject

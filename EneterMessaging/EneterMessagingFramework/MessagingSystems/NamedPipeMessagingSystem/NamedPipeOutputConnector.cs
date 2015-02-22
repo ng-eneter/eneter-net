@@ -12,19 +12,21 @@ using System.IO;
 using System.IO.Pipes;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
     internal class NamedPipeOutputConnector : IOutputConnector
     {
-        public NamedPipeOutputConnector(string serviceConnectorAddress, string clientConnectorAddress, int timeOut, int numberOfListeningInstances, PipeSecurity security)
+        public NamedPipeOutputConnector(string inputConnectorAddress, string outputConnectorAddress, int timeOut, int numberOfListeningInstances, IProtocolFormatter protocolFormatter, PipeSecurity security)
         {
             using (EneterTrace.Entering())
             {
-                myServiceConnectorAddress = serviceConnectorAddress;
-                myClientConnectorAddress = clientConnectorAddress;
+                myInputConnectorAddress = inputConnectorAddress;
+                myOutputConnectorAddress = outputConnectorAddress;
                 myTimeout = timeOut;
                 myNumberOfListeningInstances = numberOfListeningInstances;
+                myProtocolFormatter = protocolFormatter;
                 mySecurity = security;
             }
         }
@@ -40,22 +42,15 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                         throw new InvalidOperationException(TracedObject + ErrorHandler.IsAlreadyConnected);
                     }
 
-                    try
-                    {
-                        mySender = new NamedPipeSender(myServiceConnectorAddress, myTimeout);
+                    mySender = new NamedPipeSender(myInputConnectorAddress, myTimeout);
 
-                        // If it shall receive response messages.
-                        if (responseMessageHandler != null)
-                        {
-                            myResponseReceiver = new NamedPipeReceiver(myClientConnectorAddress, myNumberOfListeningInstances, myTimeout, mySecurity);
-                            myResponseReceiver.StartListening(responseMessageHandler);
-                        }
-                    }
-                    catch
-                    {
-                        CloseConnection();
-                        throw;
-                    }
+                    myResponseMessageHandler = responseMessageHandler;
+                    myResponseReceiver = new NamedPipeReceiver(myOutputConnectorAddress, myNumberOfListeningInstances, myTimeout, mySecurity);
+                    myResponseReceiver.StartListening(HandleResponseMessages);
+
+                    // Send the open connection request.
+                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                    mySender.SendMessage(anEncodedMessage);
                 }
             }
         }
@@ -74,6 +69,17 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 
                     if (mySender != null)
                     {
+                        // Send close connection message.
+                        try
+                        {
+                            object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
+                            mySender.SendMessage(anEncodedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                        }
+
                         mySender.Dispose();
                         mySender = null;
                     }
@@ -85,42 +91,41 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             get
             {
-                // If one-way communication.
-                if (myResponseReceiver == null)
-                {
-                    return mySender != null;
-                }
-
                 return myResponseReceiver.IsListening;
             }
         }
 
-        public bool IsStreamWritter { get { return false; } }
-
-        public void SendMessage(object message)
+        public void SendRequestMessage(object message)
         {
             using (EneterTrace.Entering())
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    mySender.SendMessage(message);
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                    mySender.SendMessage(anEncodedMessage);
                 }
             }
         }
 
-        public void SendMessage(Action<Stream> toStreamWritter)
+        private void HandleResponseMessages(Stream message)
         {
-            throw new NotSupportedException("NamedPipeClientConnector does not suport toStreamWritter.");
+            using (EneterTrace.Entering())
+            {
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)message);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "", null);
+                myResponseMessageHandler(aMessageContext);
+            }
         }
 
-
-        private string myServiceConnectorAddress;
-        private string myClientConnectorAddress;
+        private string myInputConnectorAddress;
+        private string myOutputConnectorAddress;
         private int myNumberOfListeningInstances;
         private int myTimeout;
         private PipeSecurity mySecurity;
         private NamedPipeSender mySender;
         private NamedPipeReceiver myResponseReceiver;
+        private IProtocolFormatter myProtocolFormatter;
+        private Func<MessageContext, bool> myResponseMessageHandler;
 
         private object myConnectionManipulatorLock = new object();
 

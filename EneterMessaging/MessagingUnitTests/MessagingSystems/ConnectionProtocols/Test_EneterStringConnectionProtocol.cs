@@ -13,9 +13,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         [Test]
         public void WriteOpenConnectionRequest()
         {
-            IProtocolFormatter<string> aProtocolFormater = new EneterStringProtocolFormatter();
+            IProtocolFormatter aProtocolFormater = new EneterStringProtocolFormatter();
 
-            string anOpenConnectionMessage = aProtocolFormater.EncodeOpenConnectionMessage("ResponseReceiver_1");
+            string anOpenConnectionMessage = (string)aProtocolFormater.EncodeOpenConnectionMessage("ResponseReceiver_1");
 
             ProtocolMessage aProtocolMessage = aProtocolFormater.DecodeMessage(anOpenConnectionMessage);
 
@@ -27,9 +27,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         [Test]
         public void WriteCloseConnectionRequest()
         {
-            IProtocolFormatter<string> aProtocolFormater = new EneterStringProtocolFormatter();
+            IProtocolFormatter aProtocolFormater = new EneterStringProtocolFormatter();
 
-            string anOpenConnectionMessage = aProtocolFormater.EncodeCloseConnectionMessage("ResponseReceiver_1");
+            string anOpenConnectionMessage = (string)aProtocolFormater.EncodeCloseConnectionMessage("ResponseReceiver_1");
 
             ProtocolMessage aProtocolMessage = aProtocolFormater.DecodeMessage(anOpenConnectionMessage);
 
@@ -41,10 +41,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         [Test]
         public void WriteRequestMessage()
         {
-            IProtocolFormatter<string> aProtocolFormater = new EneterStringProtocolFormatter();
+            IProtocolFormatter aProtocolFormater = new EneterStringProtocolFormatter();
 
             string aMessage = "Hello";
-            string anOpenConnectionMessage = aProtocolFormater.EncodeMessage("ResponseReceiver_1", aMessage);
+            string anOpenConnectionMessage = (string)aProtocolFormater.EncodeMessage("ResponseReceiver_1", aMessage);
 
             ProtocolMessage aProtocolMessage = aProtocolFormater.DecodeMessage(anOpenConnectionMessage);
 

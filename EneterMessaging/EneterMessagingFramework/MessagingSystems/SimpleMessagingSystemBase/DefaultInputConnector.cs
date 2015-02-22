@@ -9,54 +9,24 @@
 using System;
 using System.IO;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 {
     internal class DefaultInputConnector : IInputConnector
     {
-        private class DefaultResponseSender : ISender
-        {
-            public DefaultResponseSender(string clientConnectorAddress, IMessagingProvider messagingProvider)
-            {
-                using (EneterTrace.Entering())
-                {
-                    myClientConnectorAddress = clientConnectorAddress;
-                    myMessagingProvider = messagingProvider;
-                }
-            }
-
-            public bool IsStreamWritter { get { return false; } }
-
-            public void SendMessage(object message)
-            {
-                using (EneterTrace.Entering())
-                {
-                    myMessagingProvider.SendMessage(myClientConnectorAddress, message);
-                }
-            }
-
-            public void SendMessage(Action<Stream> toStreamWriter)
-            {
-                throw new NotSupportedException("To stream writer is not supported.");
-            }
-
-            private string myClientConnectorAddress;
-            private IMessagingProvider myMessagingProvider;
-        }
-
-
-
-        public DefaultInputConnector(string serviceConnectorAddress, IMessagingProvider messagingProvider)
+        public DefaultInputConnector(string inputConnectorAddress, IMessagingProvider messagingProvider, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
-                myServiceConnectorAddress = serviceConnectorAddress;
+                myInputConnectorAddress = inputConnectorAddress;
                 myMessagingProvider = messagingProvider;
+                myProtocolFormatter = protocolFormatter;
             }
         }
 
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<MessageContext> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -67,7 +37,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         throw new ArgumentNullException("Input parameter messageHandler is null.");
                     }
 
-                    myMessagingProvider.RegisterMessageHandler(myServiceConnectorAddress, x => messageHandler(new MessageContext(x, "", null)));
+                    myMessageHandler = messageHandler;
+                    myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, HandleRequestMessage);
                     myIsListeningFlag = true;
                 }
             }
@@ -80,7 +51,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 lock (myListeningManipulatorLock)
                 {
                     myIsListeningFlag = false;
-                    myMessagingProvider.UnregisterMessageHandler(myServiceConnectorAddress);
+                    myMessagingProvider.UnregisterMessageHandler(myInputConnectorAddress);
+                    myMessageHandler = null;
                 }
             }
         }
@@ -96,18 +68,39 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        public ISender CreateResponseSender(string responseReceiverAddress)
+        public void SendResponseMessage(string outputConnectorAddress, object message)
         {
             using (EneterTrace.Entering())
             {
-                ISender aResponseSender = new DefaultResponseSender(responseReceiverAddress, myMessagingProvider);
-                return aResponseSender;
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                myMessagingProvider.SendMessage(outputConnectorAddress, anEncodedMessage);
             }
         }
 
-        private string myServiceConnectorAddress;
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                myMessagingProvider.SendMessage(outputConnectorAddress, anEncodedMessage);
+            }
+        }
+
+        private void HandleRequestMessage(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                myMessageHandler(aMessageContext);
+            }
+        }
+
+        private string myInputConnectorAddress;
         private IMessagingProvider myMessagingProvider;
+        private IProtocolFormatter myProtocolFormatter;
         private object myListeningManipulatorLock = new object();
         private bool myIsListeningFlag;
+        private Action<MessageContext> myMessageHandler;
     }
 }

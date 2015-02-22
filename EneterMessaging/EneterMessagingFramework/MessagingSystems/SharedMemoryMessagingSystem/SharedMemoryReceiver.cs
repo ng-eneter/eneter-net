@@ -51,7 +51,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<Stream> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -261,8 +261,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                                 // Note: myMessageHandler(...) should read the message from the stream and process it in a different
                                 //       thread. So that the 'ready' state can be indicated as fast as possible.
-                                MessageContext aMessageContext = new MessageContext(aSharedMemoryStream, "", null);
-                                myMessageHandler(aMessageContext);
+                                myMessageHandler(aSharedMemoryStream);
                             }
                             catch (Exception err)
                             {
@@ -284,7 +283,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                 if (anErrorFlag)
                 {
-                    Func<MessageContext, bool> aMessageHandler = myMessageHandler;
+                    Action<Stream> aMessageHandler = myMessageHandler;
 
                     CloseSharedMemory();
 
@@ -360,7 +359,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         }
 
 
-        private Func<MessageContext, bool> myMessageHandler;
+        private Action<Stream> myMessageHandler;
 
         private volatile bool myStopListeningRequested;
         private ManualResetEvent myListeningStartedEvent = new ManualResetEvent(false);

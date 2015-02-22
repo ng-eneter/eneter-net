@@ -79,71 +79,20 @@
     <Compile Include="DataProcessing\Serializing\Test_XmlStringSerializer.cs" />
     <Compile Include="DataProcessing\Streaming\Test_DynamicStream.cs" />
     <Compile Include="Diagnostic\Test_EneterTrace.cs" />
-    <Compile Include="EndPoints\MultiTypedMessages\MultiTypedMessagesBaseTester.cs" />
-    <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncBin.cs" />
-    <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncXml.cs" />
-    <Compile Include="EndPoints\Rpc\RpcBaseTester.cs" />
-    <Compile Include="EndPoints\Rpc\Test_Rpc_SharedMemory_Bin.cs" />
-    <Compile Include="EndPoints\Rpc\Test_Rpc_Sync_Xml.cs" />
-    <Compile Include="EndPoints\Rpc\Test_Rpc_Tcp_Bin.cs" />
-    <Compile Include="EndPoints\StringRequestResponse\StringRequestResponseBaseTester.cs" />
-    <Compile Include="EndPoints\StringRequestResponse\Test_StringRequestResponse_NamedPipeMessaging.cs" />
-    <Compile Include="EndPoints\StringRequestResponse\Test_StringRequestResponse_SynchronousMessaging.cs" />
-    <Compile Include="EndPoints\SyncTypedMessages\SyncTypedMessagesBaseTester.cs" />
-    <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Sync_Xml.cs" />
-    <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Tcp_Xml.cs" />
-    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Sync_Xml.cs" />
-    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Tcp_Xml.cs" />
-    <Compile Include="EndPoints\TypedReliableMessages\TypedReliableMessagesBaseTester.cs" />
-    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_NamedPipe_Bin.cs" />
-    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_BinarySerializer.cs" />
-    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_XmlStringSerializer.cs" />
-    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_Tcp_Bin.cs" />
-    <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs" />
-    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs" />
-    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticatedConnection_Tcp.cs" />
-    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticationConnection_Sync.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\MonitorConnectionTesterBase.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\ReconnecterBaseTester.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Tcp_Bin.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitotConnection_Sync_Bin.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Pipe.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Sync.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Tcp.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_ThreadPool.cs" />
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Sync.cs" />
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp.cs" />
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Ws.cs" />
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_TestMessaeBusMessaging_SharedMemory.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Sync_Xml.cs" />
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterStringConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\BaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemBaseTester.cs">
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\Test_SharedMemoryMessagingSystem.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpMessagingSystem_Synchronous.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpPolicyServer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemBaseTester.cs" />
-    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\Test_NamedPipeMessagingLocalMachine.cs" />
-    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\Test_SharedMemoryMessagingSystem.cs" />
     <Compile Include="MessagingSystems\SynchronousMessagingSystem\Test_SynchronousMessagingSystem.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemBase.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_NegotiatonSecurity.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -160,21 +109,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\Test_ThreadPoolMessaging.cs" />
-    <Compile Include="MessagingSystems\UdpMessagingSystem\Test_UdpMessagingSystem.cs" />
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\Test_WebSocketListener.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\WebSocketMessagingSystem\Test_WebSocketMessaging.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nodes\BackupRuter\Test_BackupRouter.cs" />
-    <Compile Include="Nodes\Broker\Test_Broker.cs" />
-    <Compile Include="Nodes\ChannelWrapper\Mock_DuplexInputChannelAttachable.cs" />
-    <Compile Include="Nodes\ChannelWrapper\Mock_DuplexOutputChannelAttachable.cs" />
-    <Compile Include="Nodes\ChannelWrapper\Tester_DuplexChannelWrapper.cs" />
-    <Compile Include="Nodes\Dispatcher\Test_DuplexDispatcher.cs" />
-    <Compile Include="Nodes\LoadBalancer\Test_LoadBalancer.cs" />
-    <Compile Include="Nodes\Router\Test_DuplexRouter.cs" />
     <Compile Include="PerformanceTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

@@ -14,9 +14,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         [Test]
         public void WriteOpenConnectionRequest()
         {
-            IProtocolFormatter<byte[]> aProtocolFormater = new EneterProtocolFormatter();
+            IProtocolFormatter aProtocolFormater = new EneterProtocolFormatter();
 
-            byte[] anOpenConnectionMessage = aProtocolFormater.EncodeOpenConnectionMessage("ResponseReceiver_1");
+            byte[] anOpenConnectionMessage = (byte[])aProtocolFormater.EncodeOpenConnectionMessage("ResponseReceiver_1");
 
             ProtocolMessage aProtocolMessage = aProtocolFormater.DecodeMessage(new MemoryStream(anOpenConnectionMessage));
 
@@ -28,9 +28,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         [Test]
         public void WriteCloseConnectionRequest()
         {
-            IProtocolFormatter<byte[]> aProtocolFormater = new EneterProtocolFormatter();
+            IProtocolFormatter aProtocolFormater = new EneterProtocolFormatter();
 
-            byte[] anCloseConnectionMessage = aProtocolFormater.EncodeCloseConnectionMessage("ResponseReceiver_1");
+            byte[] anCloseConnectionMessage = (byte[])aProtocolFormater.EncodeCloseConnectionMessage("ResponseReceiver_1");
 
             ProtocolMessage aProtocolMessage = aProtocolFormater.DecodeMessage(new MemoryStream(anCloseConnectionMessage));
 
@@ -42,10 +42,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         [Test]
         public void WriteRequestMessage()
         {
-            IProtocolFormatter<byte[]> aProtocolFormater = new EneterProtocolFormatter();
+            IProtocolFormatter aProtocolFormater = new EneterProtocolFormatter();
 
             String aMessage = "Hello";
-            byte[] aRequestMessage = aProtocolFormater.EncodeMessage("ResponseReceiver_1", aMessage);
+            byte[] aRequestMessage = (byte[])aProtocolFormater.EncodeMessage("ResponseReceiver_1", aMessage);
 
             ProtocolMessage aProtocolMessage = aProtocolFormater.DecodeMessage(new MemoryStream(aRequestMessage));
 

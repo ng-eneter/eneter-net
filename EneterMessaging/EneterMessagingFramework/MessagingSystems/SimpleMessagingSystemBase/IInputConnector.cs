@@ -20,7 +20,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         /// <param name="messageHandler">handler processing incoming messages. If it returns true the connection stays
         /// open and listener can loop for a next messages. If it returns false the listener shall not loop for the
         /// next message.</param>
-        void StartListening(Func<MessageContext, bool> messageHandler);
+        void StartListening(Action<MessageContext> messageHandler);
 
         /// <summary>
         /// Stops listening to messages.
@@ -32,12 +32,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         /// </summary>
         bool IsListening { get; }
 
-        /// <summary>
-        /// In case the response receiver address comes inside the message
-        /// the duplex input channel calls this method to get the response receiver.
-        /// </summary>
-        /// <param name="responseReceiverAddress"></param>
-        /// <returns></returns>
-        ISender CreateResponseSender(string responseReceiverAddress);
+        void SendResponseMessage(string outputConnectorAddress, object message);
+
+        void CloseConnection(string outputConnectorAddress);
     }
 }
