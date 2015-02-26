@@ -89,6 +89,20 @@
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\Fragment.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentDataFactory.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentFinalizer.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentSequencer.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\IFragmentProcessor.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\IMultiInstanceFragmentProcessor.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\MultiInstanceFragmentProcessor.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightFragmentMessage.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightMessagingSystemFactory.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightReceiver.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightSender.cs" />
+    <Compile Include="MessagingSystems\SilverlightMessagingSystem\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerBase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -140,6 +154,48 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\EFrameType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\IWebSocketClientContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketClient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketClientContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketFormatter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketFrame.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketHostListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketHostListenerFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketInputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketMessage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketMessagingSystemFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketOutputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\WebSocketMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />

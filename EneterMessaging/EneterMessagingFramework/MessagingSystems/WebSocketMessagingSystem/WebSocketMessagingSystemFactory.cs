@@ -38,10 +38,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #if !SILVERLIGHT
         private class WebSocketInputConnectorFactory : IInputConnectorFactory
         {
-            public WebSocketInputConnectorFactory(ISecurityFactory serverSecurityFactory, int sendTimeout, int receiveTimeout)
+            public WebSocketInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory serverSecurityFactory, int sendTimeout, int receiveTimeout)
             {
                 using (EneterTrace.Entering())
                 {
+                    myProtocolFormatter = protocolFormatter;
                     myServerSecurityFactory = serverSecurityFactory;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
@@ -52,10 +53,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketInputConnector(inputConnectorAddress, myServerSecurityFactory, mySendTimeout, myReceiveTimeout);
+                    return new WebSocketInputConnector(inputConnectorAddress, myProtocolFormatter, myServerSecurityFactory, mySendTimeout, myReceiveTimeout);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private ISecurityFactory myServerSecurityFactory;
             private int mySendTimeout;
             private int myReceiveTimeout;
@@ -63,10 +65,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
         private class WebSocketOutputConnectorFactory : IOutputConnectorFactory
         {
-            public WebSocketOutputConnectorFactory(ISecurityFactory clientSecurityFactory, int connectionTimeout, int sendTimeout, int receiveTimeout)
+            public WebSocketOutputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory, int connectionTimeout, int sendTimeout, int receiveTimeout)
             {
                 using (EneterTrace.Entering())
                 {
+                    myProtocolFormatter = protocolFormatter;
                     myClientSecurityFactory = clientSecurityFactory;
                     myConnectionTimeout = connectionTimeout;
                     mySendTimeout = sendTimeout;
@@ -78,10 +81,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketOutputConnector(inputConnectorAddress, myClientSecurityFactory, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
+                    return new WebSocketOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myClientSecurityFactory, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private ISecurityFactory myClientSecurityFactory;
             private int myConnectionTimeout;
             private int mySendTimeout;
@@ -166,13 +170,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
 
 #if !SILVERLIGHT
-                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(ClientSecurityStreamFactory,
+                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #else
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
             }
         }
 
@@ -199,13 +203,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
 
 #if !SILVERLIGHT
-                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(ClientSecurityStreamFactory,
+                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #else
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
             }
         }
 
@@ -228,11 +232,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #if !SILVERLIGHT
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
-                IInputConnectorFactory anInputConnectorFactory = new WebSocketInputConnectorFactory(ServerSecurityStreamFactory,
+                IInputConnectorFactory anInputConnectorFactory = new WebSocketInputConnectorFactory(myProtocolFormatter, ServerSecurityStreamFactory,
                     (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
                 IInputConnector anInputConnector = anInputConnectorFactory.CreateInputConnector(channelId);
 
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
 #else
                 throw new NotSupportedException("The WebSocket duplex input channel is not supported in Silverlight.");
 #endif

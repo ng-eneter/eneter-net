@@ -130,18 +130,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                     if (myClientStream != null)
                     {
-                        if (sendCloseMessageFlag)
-                        {
-                            try
-                            {
-                                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
-                                SendMessage(anEncodedMessage);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
-                            }
-                        }
+                        // Note: do not send a close message in TCP. Just close the socket.
 
                         myClientStream.Close();
                         myClientStream = null;

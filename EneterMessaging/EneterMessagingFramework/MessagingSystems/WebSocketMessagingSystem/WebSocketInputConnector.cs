@@ -13,48 +13,44 @@ using System.IO;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     internal class WebSocketInputConnector : IInputConnector
     {
-        private class WebSocketResponseSender : ISender, IDisposable
+        private class TClientContext
         {
-            public WebSocketResponseSender(IWebSocketClientContext clientContext)
+            public TClientContext(IWebSocketClientContext client)
             {
                 using (EneterTrace.Entering())
                 {
-                    myClientContext = clientContext;
+                    myClient = client;
                 }
             }
 
-            public void Dispose()
+            public void CloseConnection()
             {
                 using (EneterTrace.Entering())
                 {
-                    myClientContext.CloseConnection();
+                    IsClosedFromService = true;
+                    myClient.CloseConnection();
                 }
             }
 
-            public bool IsStreamWritter { get { return false; } }
-            
-            public void SendMessage(object message)
+            public void SendResponseMessage(object message)
             {
                 using (EneterTrace.Entering())
                 {
-                    myClientContext.SendMessage(message);
+                    myClient.SendMessage(message);
                 }
             }
 
-            public void SendMessage(Action<Stream> toStreamWritter)
-            {
-                throw new NotSupportedException();
-            }
-
-            private IWebSocketClientContext myClientContext;
+            public bool IsClosedFromService { get; private set; }
+            public IWebSocketClientContext myClient;
         }
 
-        public WebSocketInputConnector(string wsUriAddress, ISecurityFactory securityFactory, int sendTimeout, int receiveTimeout)
+        public WebSocketInputConnector(string wsUriAddress, IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory, int sendTimeout, int receiveTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -69,13 +65,17 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     throw;
                 }
 
+                myProtocolFormatter = protocolFormatter;
                 myListener = new WebSocketListener(aUri, securityFactory);
                 mySendTimeout = sendTimeout;
                 myReceiveTimeout = receiveTimeout;
+
+                // Check if protocol encodes open and close messages.
+                myProtocolUsesOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage("test") != null;
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<MessageContext> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -88,7 +88,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     }
                     catch
                     {
-                        myMessageHandler = null;
+                        StopListening();
                         throw;
                     }
                 }
@@ -118,22 +118,67 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-        public ISender CreateResponseSender(string responseReceiverAddress)
+        public void SendResponseMessage(string outputConnectorAddress, object message)
         {
-            throw new NotSupportedException("CreateResponseSender is not supported in WebSocketServiceConnector.");
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                lock (myConnectedClients)
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                }
+
+                if (aClientContext != null)
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    aClientContext.SendResponseMessage(anEncodedMessage);
+                }
+            }
+        }
+
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                lock (myConnectedClients)
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                }
+
+                if (aClientContext != null)
+                {
+                    aClientContext.CloseConnection();
+                }
+            }
         }
 
         private void HandleConnection(IWebSocketClientContext client)
         {
             using (EneterTrace.Entering())
             {
+                string aClientIp = (client.ClientEndPoint != null) ? client.ClientEndPoint.Address.ToString() : "";
+
+                TClientContext aClientContext = new TClientContext(client);
+                string aClientId = null;
                 try
                 {
                     client.SendTimeout = mySendTimeout;
                     client.ReceiveTimeout = myReceiveTimeout;
 
-                    string aClientIp = (client.ClientEndPoint != null) ? client.ClientEndPoint.Address.ToString() : "";
-                    ISender aResponseSender = new WebSocketResponseSender(client);
+                    // If protocol formatter does not use OpenConnection message.
+                    if (!myProtocolUsesOpenConnectionMessage)
+                    {
+                        aClientId = Guid.NewGuid().ToString();
+                        lock (myConnectedClients)
+                        {
+                            myConnectedClients[aClientId] = aClientContext;
+                        }
+
+                        ProtocolMessage anOpenConnectionProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aClientId, null);
+                        MessageContext aMessageContext = new MessageContext(anOpenConnectionProtocolMessage, aClientIp);
+                        myMessageHandler(aMessageContext);
+                    }
 
                     bool isConnectionOpen = true;
                     while (isConnectionOpen)
@@ -143,10 +188,31 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                         if (aWebSocketMessage != null && myMessageHandler != null)
                         {
-                            MessageContext aContext = new MessageContext(aWebSocketMessage.InputStream, aClientIp, aResponseSender);
-                            if (!myMessageHandler(aContext))
+                            ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)aWebSocketMessage.InputStream);
+
+                            // Note: security reasons ignore close connection message in WebSockets.
+                            //       So that it is not possible that somebody will just send a close message which will have id of somebody else.
+                            //       The connection will be closed when the client closes the socket.
+                            if (aProtocolMessage != null && aProtocolMessage.MessageType != EProtocolMessageType.CloseConnectionRequest)
                             {
-                                isConnectionOpen = false;
+                                MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
+
+                                // If protocol formatter uses open connection message to create the connection.
+                                if (myProtocolUsesOpenConnectionMessage)
+                                {
+                                    if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                                    {
+                                        aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
+
+                                        lock (myConnectedClients)
+                                        {
+                                            myConnectedClients[aClientId] = aClientContext;
+                                        }
+                                    }
+                                }
+
+                                // Notify message.
+                                myMessageHandler(aMessageContext);
                             }
                         }
                         else
@@ -157,17 +223,40 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 }
                 finally
                 {
+                    // Remove client from connected clients.
+                    if (aClientId != null)
+                    {
+                        lock (myConnectedClients)
+                        {
+                            myConnectedClients.Remove(aClientId);
+                        }
+                    }
+
+                    // If the disconnection comes from the client (and not from the service).
+                    if (!aClientContext.IsClosedFromService)
+                    {
+                        ProtocolMessage aCloseProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aClientId, null);
+                        MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
+
+                        // Notify duplex input channel about the disconnection.
+                        myMessageHandler(aMessageContext);
+                    }
+
                     client.CloseConnection();
                 }
             }
         }
 
 
+        private IProtocolFormatter myProtocolFormatter;
+        private bool myProtocolUsesOpenConnectionMessage;
+
         private WebSocketListener myListener;
-        private Func<MessageContext, bool> myMessageHandler;
+        private Action<MessageContext> myMessageHandler;
         private object myListenerManipulatorLock = new object();
         private int mySendTimeout;
         private int myReceiveTimeout;
+        private Dictionary<string, TClientContext> myConnectedClients = new Dictionary<string, TClientContext>();
     }
 }
 

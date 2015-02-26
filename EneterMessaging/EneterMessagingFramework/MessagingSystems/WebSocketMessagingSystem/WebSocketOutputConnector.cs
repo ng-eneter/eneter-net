@@ -18,6 +18,7 @@ using System.Windows;
 
 #if !SILVERLIGHT
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 #endif
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
@@ -25,7 +26,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
     internal class WebSocketOutputConnector : IOutputConnector
     {
 #if !SILVERLIGHT
-        public WebSocketOutputConnector(string inputConnectorAddress, ISecurityFactory clientSecurityFactory,
+        public WebSocketOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
             int connectTimeout,
             int sendTimeout,
             int receiveTimeout)
@@ -55,22 +56,21 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 myClient = new WebSocketClient(aUri);
 #endif
 
+                myOutputConnectorAddress = outputConnectorAddress;
+                myProtocolFormatter = protocolFormatter;
                 myClient.ConnectTimeout = connectTimeout;
                 myClient.SendTimeout = sendTimeout;
                 myClient.ReceiveTimeout = receiveTimeout;
             }
         }
 
-        public void OpenConnection(Func<MessageContext, bool> responseMessageHandler)
+        public void OpenConnection(Action<MessageContext> responseMessageHandler)
         {
             using (EneterTrace.Entering())
             {
-                if (responseMessageHandler != null)
-                {
-                    myClient.ConnectionClosed += OnWebSocketConnectionClosed;
-                    myClient.MessageReceived += OnWebSocketMessageReceived;
-                    myResponseMessageHandler = responseMessageHandler;
-                }
+                myResponseMessageHandler = responseMessageHandler;
+                myClient.ConnectionClosed += OnWebSocketConnectionClosed;
+                myClient.MessageReceived += OnWebSocketMessageReceived;
 
                 myClient.OpenConnection();
 
@@ -79,37 +79,35 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #else
                 myIpAddress = "";
 #endif
+
+                object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                myClient.SendMessage(anEncodedMessage);
             }
         }
 
-        public void CloseConnection()
+        public void CloseConnection(bool sendCloseMessageFlag)
         {
             using (EneterTrace.Entering())
             {
+                // Note: do not send a close message in WebSockets. Just close the socket.
+
                 myClient.CloseConnection();
                 myClient.MessageReceived -= OnWebSocketMessageReceived;
                 myClient.ConnectionClosed -= OnWebSocketConnectionClosed;
+                myResponseMessageHandler = null;
             }
         }
 
         public bool IsConnected { get { return myClient.IsConnected; } }
 
-
-        public bool IsStreamWritter { get { return false; } }
-
-        public void SendMessage(object message)
+        public void SendRequestMessage(object message)
         {
             using (EneterTrace.Entering())
             {
-                myClient.SendMessage(message);
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                myClient.SendMessage(anEncodedMessage);
             }
         }
-
-        public void SendMessage(Action<Stream> toStreamWritter)
-        {
-            throw new NotSupportedException();
-        }
-
 
         private void OnWebSocketConnectionClosed(object sender, EventArgs e)
         {
@@ -117,8 +115,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 if (myResponseMessageHandler != null)
                 {
-                    // With null indicate the connection was closed.
-                    myResponseMessageHandler(null);
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
+                    myResponseMessageHandler(aMessageContext);
                 }
             }
         }
@@ -129,11 +128,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 if (myResponseMessageHandler != null)
                 {
-                    MessageContext aContext = new MessageContext(e.InputStream, myIpAddress, this);
+                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)e.InputStream);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
 
                     try
                     {
-                        myResponseMessageHandler(aContext);
+                        myResponseMessageHandler(aMessageContext);
                     }
                     catch (Exception err)
                     {
@@ -144,8 +144,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         }
 
 
+        private string myOutputConnectorAddress;
+        private IProtocolFormatter myProtocolFormatter;
         private WebSocketClient myClient;
-        private Func<MessageContext, bool> myResponseMessageHandler;
+        private Action<MessageContext> myResponseMessageHandler;
         private string myIpAddress;
 
         private string TracedObject { get { return GetType().Name + ' '; } }

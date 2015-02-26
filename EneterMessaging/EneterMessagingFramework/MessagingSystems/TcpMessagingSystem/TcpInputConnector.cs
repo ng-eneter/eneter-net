@@ -36,11 +36,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 using (EneterTrace.Entering())
                 {
                     IsClosedFromService = true;
-
-                    if (myClientStream != null)
-                    {
-                        myClientStream.Close();
-                    }
+                    myClientStream.Close();
                 }
             }
 
@@ -93,7 +89,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                     // Check if protocol encodes open and close messages.
                     myProtocolUsesOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage("test") != null;
-                    myProtocolUsesCloseConnectionMessage = myProtocolFormatter.EncodeCloseConnectionMessage("test") != null;
                 }
             }
         }
@@ -185,12 +180,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                     // If the security communication is required, then wrap the network stream into the security stream.
                     anInputOutputStream = mySecurityStreamFactory.CreateSecurityStreamAndAuthenticate(tcpClient.GetStream());
+                    aClientContext = new TClientContext(anInputOutputStream);
 
                     // If protocol formatter does not use OpenConnection message.
                     if (!myProtocolUsesOpenConnectionMessage)
                     {
-                        aClientContext = new TClientContext(anInputOutputStream);
-
                         // Generate client id.
                         aClientId = Guid.NewGuid().ToString();
                         lock (myConnectedClients)
@@ -208,7 +202,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     while (aConnectionIsOpen)
                     {
                         ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)anInputOutputStream);
-                        if (aProtocolMessage != null)
+
+                        // Note: security reasons ignore close connection message in TCP.
+                        //       So that it is not possible that somebody will just send a close message which will have id of somebody else.
+                        //       The TCP connection will be closed when the client closes the socket.
+                        if (aProtocolMessage != null && aProtocolMessage.MessageType != EProtocolMessageType.CloseConnectionRequest)
                         {
                             MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
 
@@ -218,7 +216,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                 if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                                 {
                                     aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
-                                    aClientContext = new TClientContext(anInputOutputStream);
 
                                     lock (myConnectedClients)
                                     {
@@ -227,16 +224,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                 }
                             }
 
-                            // For security reasons ignore close connection message in TCP.
-                            // Note: So that it is not possible that somebody will just send a close message which will have id of somebody else.
-                            //       The TCP connection will be closed when the client closes the socket.
-                            if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
-                            {
-                            }
-                            else
-                            {
-                                myMessageHandler(aMessageContext);
-                            }
+                            // Notify message.
+                            myMessageHandler(aMessageContext);
                         }
                         else
                         {
@@ -279,7 +268,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
         private IProtocolFormatter myProtocolFormatter;
         private bool myProtocolUsesOpenConnectionMessage;
-        private bool myProtocolUsesCloseConnectionMessage;
 
         private Action<MessageContext> myMessageHandler;
         private int mySendTimeout;
