@@ -11,10 +11,8 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
-using Eneter.Messaging.Threading.Dispatching;
 using Eneter.Messaging.DataProcessing.MessageQueueing;
+using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
@@ -30,7 +28,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<byte[], EndPoint> messageHandler)
         {
             using (EneterTrace.Entering())
             {
@@ -214,25 +212,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             {
                                 try
                                 {
-                                    MessageContext aMessageContext;
-
-                                    // If this is service then we need to create the sender for response messages.
-                                    if (myIsService)
-                                    {
-                                        // Get the sender IP address.
-                                        string aSenderIp = (aSenderEndPoint != null) ? ((IPEndPoint)aSenderEndPoint).Address.ToString() : "";
-
-                                        // Create the response sender.
-                                        UdpSender aResponseSender = new UdpSender(mySocket, aSenderEndPoint);
-
-                                        aMessageContext = new MessageContext(aDatagram, aSenderIp, aResponseSender);
-                                    }
-                                    else
-                                    {
-                                        aMessageContext = new MessageContext(aDatagram, "", null);
-                                    }
-
-                                    myMessageHandler(aMessageContext);
+                                    myMessageHandler(aDatagram, aSenderEndPoint);
                                 }
                                 catch (Exception err)
                                 {
@@ -257,7 +237,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         {
                             try
                             {
-                                myMessageHandler(null);
+                                myMessageHandler(null, null);
                             }
                             catch (Exception err)
                             {
@@ -279,7 +259,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private object myListeningManipulatorLock = new object();
         private Thread myListeningThread;
         private ManualResetEvent myListeningToResponsesStartedEvent = new ManualResetEvent(false);
-        private Func<MessageContext, bool> myMessageHandler;
+        private Action<byte[], EndPoint> myMessageHandler;
         private SingleThreadExecutor myWorkingThreadDispatcher;
 
         private string TracedObject

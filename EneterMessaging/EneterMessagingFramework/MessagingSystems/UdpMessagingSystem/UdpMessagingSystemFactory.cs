@@ -26,11 +26,19 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     {
         private class UdpConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
+            public UdpConnectorFactory(IProtocolFormatter protocolFormatter)
+            {
+                using (EneterTrace.Entering())
+                {
+                    myProtocolFormatter = protocolFormatter;
+                }
+            }
+
             public IOutputConnector CreateOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
             {
                 using (EneterTrace.Entering())
                 {
-                    return new UdpOutputConnector(inputConnectorAddress);
+                    return new UdpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter);
                 }
             }
 
@@ -38,9 +46,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new UdpInputConnector(inputConnectorAddress);
+                    return new UdpInputConnector(inputConnectorAddress, myProtocolFormatter);
                 }
             }
+
+            private IProtocolFormatter myProtocolFormatter;
         }
 
         /// <summary>
@@ -59,8 +69,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myProtocolFormatter = protocolFromatter;
-                myConnectorFactory = new UdpConnectorFactory();
+                myConnectorFactory = new UdpConnectorFactory(protocolFromatter);
 
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
@@ -93,7 +102,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory);
             }
         }
 
@@ -125,7 +134,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory);
             }
         }
 
@@ -153,7 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
             }
         }
 
@@ -177,7 +186,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
 
-        private IProtocolFormatter myProtocolFormatter;
 
         private UdpConnectorFactory myConnectorFactory;
 

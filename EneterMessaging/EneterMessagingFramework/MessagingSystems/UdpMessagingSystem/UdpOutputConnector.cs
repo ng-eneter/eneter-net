@@ -8,17 +8,17 @@
 #if !SILVERLIGHT
 
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpOutputConnector : IOutputConnector
     {
-        public UdpOutputConnector(string ipAddressAndPort)
+        public UdpOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
@@ -33,40 +33,50 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     EneterTrace.Error(ipAddressAndPort + ErrorHandler.InvalidUriAddress, err);
                     throw;
                 }
-
                 myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), anServiceUri.Port);
+                myOutpuConnectorAddress = outpuConnectorAddress;
+                myProtocolFormatter = protocolFormatter;
             }
         }
 
-        public void OpenConnection(Func<MessageContext, bool> responseMessageHandler)
+        public void OpenConnection(Action<MessageContext> responseMessageHandler)
         {
             using (EneterTrace.Entering())
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    if (responseMessageHandler != null)
-                    {
-                        myResponseReceiver = new UdpReceiver(myServiceEndpoint, false);
-                        myResponseReceiver.StartListening(responseMessageHandler);
+                    myResponseMessageHandler = responseMessageHandler;
+                    myResponseReceiver = new UdpReceiver(myServiceEndpoint, false);
+                    myResponseReceiver.StartListening(OnResponseMessageReceived);
 
-                        // Get connected socket.
-                        myClientSocket = myResponseReceiver.UdpSocket;
-                    }
-                    else
-                    {
-                        myClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                        myClientSocket.Connect(myServiceEndpoint);
-                    }
+                    // Get connected socket.
+                    myClientSocket = myResponseReceiver.UdpSocket;
+
+                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
+                    SendMessage(anEncodedMessage);
                 }
             }
         }
 
-        public void CloseConnection()
+        public void CloseConnection(bool sendCloseMessageFlag)
         {
             using (EneterTrace.Entering())
             {
                 lock (myConnectionManipulatorLock)
                 {
+                    if (sendCloseMessageFlag)
+                    {
+                        try
+                        {
+                            object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
+                            SendMessage(anEncodedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                        }
+                    }
+
                     if (myResponseReceiver != null)
                     {
                         myResponseReceiver.StopListening();
@@ -99,9 +109,16 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        public bool IsStreamWritter { get { return false; } }
+        public void SendRequestMessage(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutpuConnectorAddress, message);
+                SendMessage(anEncodedMessage);
+            }
+        }
 
-        public void SendMessage(object message)
+        private void SendMessage(object message)
         {
             using (EneterTrace.Entering())
             {
@@ -118,12 +135,21 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        public void SendMessage(Action<Stream> toStreamWritter)
+
+        private void OnResponseMessageReceived(byte[] datagram, EndPoint dummy)
         {
-            throw new NotSupportedException("toStreamWritter is not supported.");
+            using (EneterTrace.Entering())
+            {
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                myResponseMessageHandler(aMessageContext);
+            }
         }
 
+        private IProtocolFormatter myProtocolFormatter;
+        private string myOutpuConnectorAddress;
         private IPEndPoint myServiceEndpoint;
+        private Action<MessageContext> myResponseMessageHandler;
         private Socket myClientSocket;
         private UdpReceiver myResponseReceiver;
         private object myConnectionManipulatorLock = new object();

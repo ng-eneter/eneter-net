@@ -7,7 +7,6 @@
 
 
 using System;
-using System.IO;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
@@ -34,11 +33,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     if (messageHandler == null)
                     {
-                        throw new ArgumentNullException("Input parameter messageHandler is null.");
+                        throw new ArgumentNullException("messageHandler is null.");
                     }
 
                     myMessageHandler = messageHandler;
-                    myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, HandleRequestMessage);
+                    myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
                     myIsListeningFlag = true;
                 }
             }
@@ -86,13 +85,21 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        private void HandleRequestMessage(object message)
+        private void OnRequestMessageReceived(object message)
         {
             using (EneterTrace.Entering())
             {
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
-                myMessageHandler(aMessageContext);
+
+                try
+                {
+                    myMessageHandler(aMessageContext);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
             }
         }
 
@@ -102,5 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         private object myListeningManipulatorLock = new object();
         private bool myIsListeningFlag;
         private Action<MessageContext> myMessageHandler;
+
+        private string TracedObject { get { return GetType().Name; } }
     }
 }

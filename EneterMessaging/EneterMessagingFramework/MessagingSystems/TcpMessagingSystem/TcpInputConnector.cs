@@ -8,14 +8,14 @@
 #if !SILVERLIGHT
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
-using System.Collections.Generic;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -98,15 +98,23 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                try
+                if (messageHandler == null)
                 {
-                    myMessageHandler = messageHandler;
-                    myTcpListenerProvider.StartListening(HandleConnection);
+                    throw new ArgumentNullException("messageHandler is null.");
                 }
-                catch
+
+                lock (myListeningManipulatorLock)
                 {
-                    myMessageHandler = null;
-                    throw;
+                    try
+                    {
+                        myMessageHandler = messageHandler;
+                        myTcpListenerProvider.StartListening(HandleConnection);
+                    }
+                    catch
+                    {
+                        myMessageHandler = null;
+                        throw;
+                    }
                 }
             }
         }
@@ -115,12 +123,24 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myTcpListenerProvider.StopListening();
-                myMessageHandler = null;
+                lock (myListeningManipulatorLock)
+                {
+                    myTcpListenerProvider.StopListening();
+                    myMessageHandler = null;
+                }
             }
         }
 
-        public bool IsListening { get { return myTcpListenerProvider.IsListening; } }
+        public bool IsListening
+        {
+            get
+            {
+                lock (myListeningManipulatorLock)
+                {
+                    return myTcpListenerProvider.IsListening;
+                }
+            }
+        }
 
         public void SendResponseMessage(string outputConnectorAddress, object message)
         {
@@ -132,11 +152,13 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
 
-                if (aClientContext != null)
+                if (aClientContext == null)
                 {
-                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                    aClientContext.SendResponseMessage(anEncodedMessage);
+                    throw new InvalidOperationException("Output connector '" + outputConnectorAddress + "' was not found.");
                 }
+
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                aClientContext.SendResponseMessage(anEncodedMessage);
             }
         }
 
@@ -211,7 +233,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
 
                             // If protocol formatter uses open connection message to create the connection.
-                            if (myProtocolUsesOpenConnectionMessage && aClientContext == null)
+                            if (myProtocolUsesOpenConnectionMessage)
                             {
                                 if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                                 {
@@ -219,13 +241,27 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                                     lock (myConnectedClients)
                                     {
-                                        myConnectedClients[aClientId] = aClientContext;
+                                        if (!myConnectedClients.ContainsKey(aClientId))
+                                        {
+                                            myConnectedClients[aClientId] = aClientContext;
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidOperationException("Client id '" + aClientId + "' is already open.");
+                                        }
                                     }
                                 }
                             }
 
-                            // Notify message.
-                            myMessageHandler(aMessageContext);
+                            try
+                            {
+                                // Notify message.
+                                myMessageHandler(aMessageContext);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                            }
                         }
                         else
                         {
@@ -275,9 +311,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private int mySendBuffer;
         private int myReceiveBuffer;
 
+        private object myListeningManipulatorLock = new object();
+
         private Dictionary<string, TClientContext> myConnectedClients = new Dictionary<string, TClientContext>();
 
-        
+        private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
 

@@ -7,7 +7,6 @@
 
 
 using System;
-using System.IO;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
@@ -34,7 +33,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     if (responseMessageHandler == null)
                     {
-                        throw new ArgumentNullException("Input parameter responseMessageHandler is null.");
+                        throw new ArgumentNullException("responseMessageHandler is null.");
                     }
 
                     myResponseMessageHandler = responseMessageHandler;
@@ -44,7 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                     // Send the open connection request.
                     object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
-                    SendMessage(anEncodedMessage);
+                    myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
 
                     myIsConnected = true;
                 }
@@ -65,7 +64,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             try
                             {
                                 object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
-                                SendMessage(anEncodedMessage);
+                                myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
                             }
                             catch (Exception err)
                             {
@@ -104,16 +103,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 lock (myConnectionManipulatorLock)
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
-                    SendMessage(anEncodedMessage);
+                    myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
                 }
-            }
-        }
-
-        private void SendMessage(object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                myMessagingProvider.SendMessage(myInputConnectorAddress, message);
             }
         }
 
@@ -123,7 +114,15 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
-                myResponseMessageHandler(aMessageContext);
+
+                try
+                {
+                    myResponseMessageHandler(aMessageContext);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
             }
         }
 

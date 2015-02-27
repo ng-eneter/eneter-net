@@ -50,11 +50,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myOpenConnectionLock)
+                lock (myConnectionManipulatorLock)
                 {
-                    if (IsConnected)
+                    if (responseMessageHandler == null)
                     {
-                        throw new InvalidOperationException(TracedObject + ErrorHandler.IsAlreadyConnected);
+                        throw new ArgumentNullException("responseMessageHandler is null.");
                     }
 
                     AddressFamily anAddressFamily = (myUri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
@@ -114,8 +114,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     // Wait until thread listening to response messages is running.
                     myListeningToResponsesStartedEvent.WaitOne(1000);
 
-                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
-                    SendMessage(anEncodedMessage);
+                    byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                    myClientStream.Write(anEncodedMessage, 0, anEncodedMessage.Length);
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myOpenConnectionLock)
+                lock (myConnectionManipulatorLock)
                 {
                     myStopReceivingRequestedFlag = true;
 
@@ -176,7 +176,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             get
             {
-                return myIsListeningToResponses;
+                lock (myConnectionManipulatorLock)
+                {
+                    return myIsListeningToResponses;
+                }
             }
         }
 
@@ -184,20 +187,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myOpenConnectionLock)
+                lock (myConnectionManipulatorLock)
                 {
-                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
-                    SendMessage(anEncodedMessage);
+                    byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                    myClientStream.Write(anEncodedMessage, 0, anEncodedMessage.Length);
                 }
-            }
-        }
-
-        private void SendMessage(object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                byte[] aMessage = (byte[])message;
-                myClientStream.Write(aMessage, 0, aMessage.Length);
             }
         }
 
@@ -264,7 +258,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private int myReceiveBuffer;
         private Stream myClientStream;
         private string myIpAddress;
-        private object myOpenConnectionLock = new object();
+        private object myConnectionManipulatorLock = new object();
 
         private Action<MessageContext> myResponseMessageHandler;
         private Thread myResponseReceiverThread;
