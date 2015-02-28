@@ -221,7 +221,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     myDispatchingAfterMessageReading.Invoke(() =>
                         {
                             // If the connection is not open then open it.
-                            OpenConnection(messageContext.ProtocolMessage.ResponseReceiverId, messageContext.SenderAddress);
+                            //OpenConnection(messageContext.ProtocolMessage.ResponseReceiverId, messageContext.SenderAddress);
                             Dispatcher.Invoke(() => NotifyMessageReceived(messageContext, messageContext.ProtocolMessage));
                         });
                 }

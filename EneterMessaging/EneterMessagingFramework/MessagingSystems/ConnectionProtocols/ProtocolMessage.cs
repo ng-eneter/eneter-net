@@ -14,11 +14,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     public enum EProtocolMessageType
     {
         /// <summary>
-        /// Unknown message.
-        /// </summary>
-        Unknown,
-
-        /// <summary>
         /// Open connection request message.
         /// </summary>
         OpenConnectionRequest,

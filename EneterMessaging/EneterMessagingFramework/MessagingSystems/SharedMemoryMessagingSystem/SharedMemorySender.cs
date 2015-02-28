@@ -14,7 +14,6 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {

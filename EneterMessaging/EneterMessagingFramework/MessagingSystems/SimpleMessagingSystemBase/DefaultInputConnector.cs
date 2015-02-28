@@ -36,9 +36,17 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         throw new ArgumentNullException("messageHandler is null.");
                     }
 
-                    myMessageHandler = messageHandler;
-                    myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
-                    myIsListeningFlag = true;
+                    try
+                    {
+                        myMessageHandler = messageHandler;
+                        myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
+                        myIsListeningFlag = true;
+                    }
+                    catch
+                    {
+                        StopListening();
+                        throw;
+                    }
                 }
             }
         }
@@ -90,15 +98,18 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             using (EneterTrace.Entering())
             {
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
-                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                if (aProtocolMessage != null)
+                {
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
 
-                try
-                {
-                    myMessageHandler(aMessageContext);
-                }
-                catch (Exception err)
-                {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    try
+                    {
+                        myMessageHandler(aMessageContext);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
                 }
             }
         }

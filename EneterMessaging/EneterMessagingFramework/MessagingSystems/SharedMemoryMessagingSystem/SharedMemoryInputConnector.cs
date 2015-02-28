@@ -19,7 +19,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
     internal class SharedMemoryInputConnector : IInputConnector
     {
-        public SharedMemoryInputConnector(string inputMemoryMappedFileName, IProtocolFormatter protocolFormatter, TimeSpan sendResponseTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
+        public SharedMemoryInputConnector(string inputConnectorAddress, IProtocolFormatter protocolFormatter, TimeSpan sendResponseTimeout, int maxMessageSize, MemoryMappedFileSecurity memoryMappedFileSecurity)
         {
             using (EneterTrace.Entering())
             {
@@ -30,7 +30,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                 // Note: openTimeout is not used if SharedMemoryReceiver creates memory mapped file.
                 TimeSpan aDummyOpenTimout = TimeSpan.Zero;
-                myReceiver = new SharedMemoryReceiver(inputMemoryMappedFileName, false, aDummyOpenTimout, myMaxMessageSize, mySecurity);
+                myReceiver = new SharedMemoryReceiver(inputConnectorAddress, false, aDummyOpenTimout, myMaxMessageSize, mySecurity);
             }
         }
 
@@ -38,13 +38,13 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                if (messageHandler == null)
+                {
+                    throw new ArgumentNullException("messageHandler is null.");
+                }
+
                 lock (myListenerManipulatorLock)
                 {
-                    if (IsListening)
-                    {
-                        throw new InvalidOperationException(TracedObject + ErrorHandler.IsAlreadyListening);
-                    }
-
                     try
                     {
                         myRequestMessageHandler = messageHandler;
@@ -86,16 +86,18 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                SharedMemorySender aClientSender;
                 lock (myConnectedClients)
                 {
-                    SharedMemorySender aClientSender;
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
-
-                    if (aClientSender != null)
-                    {
-                        aClientSender.SendMessage(x => myProtocolFormatter.EncodeMessage(outputConnectorAddress, message, x));
-                    }
                 }
+
+                if (aClientSender == null)
+                {
+                    throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
+                }
+
+                aClientSender.SendMessage(x => myProtocolFormatter.EncodeMessage(outputConnectorAddress, message, x));
             }
         }
 
@@ -103,25 +105,28 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                SharedMemorySender aClientSender;
                 lock (myConnectedClients)
                 {
-                    SharedMemorySender aClientSender;
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
-
                     if (aClientSender != null)
                     {
-                        try
-                        {
-                            aClientSender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress, x));
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning("failed to send the close message.", err);
-                        }
-
                         myConnectedClients.Remove(outputConnectorAddress);
-                        aClientSender.Dispose();
                     }
+                }
+
+                if (aClientSender != null)
+                {
+                    try
+                    {
+                        aClientSender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress, x));
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning("failed to send the close message.", err);
+                    }
+
+                    aClientSender.Dispose();
                 }
             }
         }
@@ -134,10 +139,10 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                 if (aProtocolMessage != null)
                 {
-                    if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
+                    // If it is open connection then add the new connected client.
+                    if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                     {
-                        // If it is open connection then add the new connected client.
-                        if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                        if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
                             lock (myConnectedClients)
                             {
@@ -148,9 +153,20 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 
                                     myConnectedClients[aProtocolMessage.ResponseReceiverId] = aClientSender;
                                 }
+                                else
+                                {
+                                    EneterTrace.Warning(TracedObject + "could not open connection for client '" + aProtocolMessage.ResponseReceiverId + "' because the client with same id is already connected.");
+                                }
                             }
                         }
-                        else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                        else
+                        {
+                            EneterTrace.Warning(TracedObject + "could not connect a client because response recevier id was not available in open connection message.");
+                        }
+                    }
+                    else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                    {
+                        if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
                             lock (myConnectedClients)
                             {
@@ -165,9 +181,17 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                                 }
                             }
                         }
+                    }
 
-                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    try
+                    {
                         myRequestMessageHandler(aMessageContext);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                     }
                 }
             }

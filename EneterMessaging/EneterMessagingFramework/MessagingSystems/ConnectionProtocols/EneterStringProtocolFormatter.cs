@@ -81,13 +81,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                 catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + "detected that the encoded message is not serialized XML of ProtocolMessage class.", err);
-                    return myNonProtocolMessage;
+                    return null;
                 }
             }
         }
 
-
-        private static readonly ProtocolMessage myNonProtocolMessage = new ProtocolMessage(EProtocolMessageType.Unknown, "", null);
 
         private ISerializer mySerializer = new XmlStringSerializer();
 

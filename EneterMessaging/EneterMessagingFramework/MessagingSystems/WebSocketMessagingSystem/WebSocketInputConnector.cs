@@ -79,6 +79,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                if (messageHandler == null)
+                {
+                    throw new ArgumentNullException("messageHandler is null.");
+                }
+
                 lock (myListenerManipulatorLock)
                 {
                     try
@@ -128,11 +133,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
 
-                if (aClientContext != null)
+                if (aClientContext == null)
                 {
-                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                    aClientContext.SendResponseMessage(anEncodedMessage);
+                    throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
+
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                aClientContext.SendResponseMessage(anEncodedMessage);
             }
         }
 
@@ -198,21 +205,47 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
 
                                 // If protocol formatter uses open connection message to create the connection.
-                                if (myProtocolUsesOpenConnectionMessage)
+                                if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest &&
+                                    myProtocolUsesOpenConnectionMessage)
                                 {
-                                    if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                                    // Note: if client id is already set then it means this client has already open connection.
+                                    if (string.IsNullOrEmpty(aClientId))
                                     {
                                         aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
 
                                         lock (myConnectedClients)
                                         {
-                                            myConnectedClients[aClientId] = aClientContext;
+                                            if (!myConnectedClients.ContainsKey(aClientId))
+                                            {
+                                                myConnectedClients[aClientId] = aClientContext;
+                                            }
+                                            else
+                                            {
+                                                // Note: if the client id already exists then the connection cannot be open
+                                                //       and the connection with this  client will be closed.
+                                                EneterTrace.Warning(TracedObject + "could not open connection for client '" + aClientId + "' because the client with same id is already connected.");
+                                                break;
+                                            }
                                         }
+                                    }
+                                    else
+                                    {
+                                        EneterTrace.Warning(TracedObject + "the client '" + aClientId + "' has already open connection.");
                                     }
                                 }
 
                                 // Notify message.
-                                myMessageHandler(aMessageContext);
+                                try
+                                {
+                                    // Ensure that nobody will try to use id of somebody else.
+                                    aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
+
+                                    myMessageHandler(aMessageContext);
+                                }
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                }
                             }
                         }
                         else
@@ -239,7 +272,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
 
                         // Notify duplex input channel about the disconnection.
-                        myMessageHandler(aMessageContext);
+                        try
+                        {
+                            myMessageHandler(aMessageContext);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        }
                     }
 
                     client.CloseConnection();
@@ -257,6 +297,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private int mySendTimeout;
         private int myReceiveTimeout;
         private Dictionary<string, TClientContext> myConnectedClients = new Dictionary<string, TClientContext>();
+
+        private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
 

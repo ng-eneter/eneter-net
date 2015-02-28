@@ -43,17 +43,27 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                if (responseMessageHandler == null)
+                {
+                    throw new ArgumentNullException("responseMessageHandler is null.");
+                }
+
                 lock (myConnectionManipulatorLock)
                 {
-                    myResponseMessageHandler = responseMessageHandler;
-                    myResponseReceiver = new UdpReceiver(myServiceEndpoint, false);
-                    myResponseReceiver.StartListening(OnResponseMessageReceived);
+                    try
+                    {
+                        myResponseMessageHandler = responseMessageHandler;
+                        myResponseReceiver = new UdpReceiver(myServiceEndpoint, false);
+                        myResponseReceiver.StartListening(OnResponseMessageReceived);
 
-                    // Get connected socket.
-                    myClientSocket = myResponseReceiver.UdpSocket;
-
-                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
-                    SendMessage(anEncodedMessage);
+                        byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
+                        myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                    }
+                    catch
+                    {
+                        CloseConnection(false);
+                        throw;
+                    }
                 }
             }
         }
@@ -64,29 +74,23 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    if (sendCloseMessageFlag)
-                    {
-                        try
-                        {
-                            object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
-                            SendMessage(anEncodedMessage);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
-                        }
-                    }
-
                     if (myResponseReceiver != null)
                     {
+                        if (sendCloseMessageFlag)
+                        {
+                            try
+                            {
+                                byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
+                                myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
+                        }
+
                         myResponseReceiver.StopListening();
                         myResponseReceiver = null;
-                    }
-
-                    if (myClientSocket != null)
-                    {
-                        myClientSocket.Close();
-                        myClientSocket = null;
                     }
                 }
             }
@@ -98,13 +102,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    // If one-way communication.
-                    if (myResponseReceiver == null)
-                    {
-                        return myClientSocket != null;
-                    }
-
-                    return myResponseReceiver.IsListening;
+                    return myResponseReceiver != null && myResponseReceiver.IsListening;
                 }
             }
         }
@@ -113,28 +111,13 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutpuConnectorAddress, message);
-                SendMessage(anEncodedMessage);
-            }
-        }
-
-        private void SendMessage(object message)
-        {
-            using (EneterTrace.Entering())
-            {
                 lock (myConnectionManipulatorLock)
                 {
-                    if (!IsConnected)
-                    {
-                        throw new InvalidOperationException(TracedObject + ErrorHandler.SendMessageNotConnectedFailure);
-                    }
-
-                    byte[] aMessageData = (byte[])message;
-                    myClientSocket.SendTo(aMessageData, myServiceEndpoint);
+                    byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutpuConnectorAddress, message);
+                    myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
                 }
             }
         }
-
 
         private void OnResponseMessageReceived(byte[] datagram, EndPoint dummy)
         {
@@ -142,7 +125,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
-                myResponseMessageHandler(aMessageContext);
+
+                try
+                {
+                    myResponseMessageHandler(aMessageContext);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
             }
         }
 
@@ -150,7 +141,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private string myOutpuConnectorAddress;
         private IPEndPoint myServiceEndpoint;
         private Action<MessageContext> myResponseMessageHandler;
-        private Socket myClientSocket;
         private UdpReceiver myResponseReceiver;
         private object myConnectionManipulatorLock = new object();
 

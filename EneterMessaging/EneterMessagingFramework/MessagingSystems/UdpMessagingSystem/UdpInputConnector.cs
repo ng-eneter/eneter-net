@@ -86,11 +86,24 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                if (messageHandler == null)
+                {
+                    throw new ArgumentNullException("messageHandler is null.");
+                }
+
                 lock (myListenerManipulatorLock)
                 {
-                    myMessageHandler = messageHandler;
-                    myReceiver = new UdpReceiver(myServiceEndpoint, true);
-                    myReceiver.StartListening(OnRequestMessageReceived);
+                    try
+                    {
+                        myMessageHandler = messageHandler;
+                        myReceiver = new UdpReceiver(myServiceEndpoint, true);
+                        myReceiver.StartListening(OnRequestMessageReceived);
+                    }
+                    catch
+                    {
+                        StopListening();
+                        throw;
+                    }
                 }
             }
         }
@@ -130,15 +143,13 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
 
-                if (aClientContext != null)
+                if (aClientContext == null)
                 {
-                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                    aClientContext.SendResponseMessage(anEncodedMessage);
+                    throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
-                else
-                {
-                    throw new InvalidOperationException("Could not send the message because the response receiver '" + outputConnectorAddress + "' was not found.");
-                }
+
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                aClientContext.SendResponseMessage(anEncodedMessage);
             }
         }
 
@@ -177,32 +188,49 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
                 if (aProtocolMessage != null)
                 {
-                    if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
-                    {
-                        MessageContext aMessageContext = null;
+                    MessageContext aMessageContext = null;
 
-                        if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                    if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                    {
+                        if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
                             lock (myConnectedClients)
                             {
-                                TClientContext aClientContext = new TClientContext(myReceiver.UdpSocket, clientAddress);
-                                myConnectedClients[aProtocolMessage.ResponseReceiverId] = aClientContext;
+                                if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
+                                {
+                                    TClientContext aClientContext = new TClientContext(myReceiver.UdpSocket, clientAddress);
+                                    myConnectedClients[aProtocolMessage.ResponseReceiverId] = aClientContext;
+                                }
+                                else
+                                {
+                                    EneterTrace.Warning(TracedObject + "could not open connection for client '" + aProtocolMessage.ResponseReceiverId + "' because the client with same id is already connected.");
+                                }
                             }
                         }
-
-                        try
+                        else
                         {
-                            aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
-                            myMessageHandler(aMessageContext);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                            EneterTrace.Warning(TracedObject + "could not connect a client because response recevier id was not available in open connection message.");
                         }
                     }
-                    else
+                    else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                     {
-                        EneterTrace.Warning(TracedObject + "could not process " + aProtocolMessage.MessageType + " because response receiver id was null or empty string.");
+                        if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
+                        {
+                            lock (myConnectedClients)
+                            {
+                                myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
+                            }
+                        }
+                    }
+
+                    try
+                    {
+                        aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
+                        myMessageHandler(aMessageContext);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                     }
                 }
             }

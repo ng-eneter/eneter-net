@@ -29,23 +29,31 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
+                if (responseMessageHandler == null)
+                {
+                    throw new ArgumentNullException("responseMessageHandler is null.");
+                }
+
                 lock (myConnectionManipulatorLock)
                 {
-                    if (responseMessageHandler == null)
+                    try
                     {
-                        throw new ArgumentNullException("responseMessageHandler is null.");
+                        myResponseMessageHandler = responseMessageHandler;
+                        myMessagingProvider.RegisterMessageHandler(myOutputConnectorAddress, HandleResponseMessage);
+
+                        myIsResponseListenerRegistered = true;
+
+                        // Send the open connection request.
+                        object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                        myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
+
+                        myIsConnected = true;
                     }
-
-                    myResponseMessageHandler = responseMessageHandler;
-                    myMessagingProvider.RegisterMessageHandler(myOutputConnectorAddress, HandleResponseMessage);
-
-                    myIsResponseListenerRegistered = true;
-
-                    // Send the open connection request.
-                    object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
-                    myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
-
-                    myIsConnected = true;
+                    catch
+                    {
+                        CloseConnection(false);
+                        throw;
+                    }
                 }
             }
         }

@@ -153,7 +153,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     if (h[0] != 'E' || h[1] != 'N' || h[2] != 'E' || h[3] != 'T' || h[4] != 'E' || h[5] != 'R')
                     {
                         EneterTrace.Warning(TracedObject + "detected unknown protocol format.");
-                        return myNonProtocolMessage;
+                        return null;
                     }
 
                     // Get endian encoding (Big Endian or Little Endian)
@@ -161,7 +161,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     if (anEndianEncodingId != LITTLE_ENDIAN && anEndianEncodingId != BIG_ENDIAN)
                     {
                         EneterTrace.Warning(TracedObject + "detected unknown endian encoding.");
-                        return myNonProtocolMessage;
+                        return null;
                     }
 
 
@@ -170,7 +170,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     if (aStringEncodingId != UTF8 && aStringEncodingId != UTF16)
                     {
                         EneterTrace.Warning(TracedObject + "detected unknown string encoding.");
-                        return myNonProtocolMessage;
+                        return null;
                     }
 
 
@@ -195,7 +195,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     else
                     {
                         EneterTrace.Warning(TracedObject + "detected unknown string encoding.");
-                        aProtocolMessage = myNonProtocolMessage;
+                        aProtocolMessage = null;
                     }
 
                     return aProtocolMessage;
@@ -223,7 +223,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     // Note: Just because somebody sends and invalid string the loop reading messages should
                     //       not be disturbed/interrupted by an exception.
                     //       The reading must continue with the next message.
-                    return myNonProtocolMessage;
+                    return null;
                 }
             }
         }
@@ -431,8 +431,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         private const byte OPEN_CONNECTION_REQUEST = 10;
         private const byte CLOSE_CONNECTION_REQUEST = 20;
         private const byte REQUEST_MESSAGE = 40;
-
-        private static readonly ProtocolMessage myNonProtocolMessage = new ProtocolMessage(EProtocolMessageType.Unknown, "", null);
 
 
         private string TracedObject

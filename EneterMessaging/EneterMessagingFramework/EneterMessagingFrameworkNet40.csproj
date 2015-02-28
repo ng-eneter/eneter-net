@@ -270,7 +270,6 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\LocalProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\DefaultOutputConnectorFactory.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\DefaultInputConnectorFactory.cs" />
-    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\ISender.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IInputConnector.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IInputConnectorFactory.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IOutputConnector.cs" />

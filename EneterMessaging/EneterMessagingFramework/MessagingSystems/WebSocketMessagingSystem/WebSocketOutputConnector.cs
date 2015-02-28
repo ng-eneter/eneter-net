@@ -68,20 +68,36 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myResponseMessageHandler = responseMessageHandler;
-                myClient.ConnectionClosed += OnWebSocketConnectionClosed;
-                myClient.MessageReceived += OnWebSocketMessageReceived;
+                if (responseMessageHandler == null)
+                {
+                    throw new ArgumentNullException("responseMessageHandler is null.");
+                }
 
-                myClient.OpenConnection();
+                lock (myConnectionManipulatorLock)
+                {
+                    try
+                    {
+                        myResponseMessageHandler = responseMessageHandler;
+                        myClient.ConnectionClosed += OnWebSocketConnectionClosed;
+                        myClient.MessageReceived += OnWebSocketMessageReceived;
+
+                        myClient.OpenConnection();
 
 #if !SILVERLIGHT
-                myIpAddress = (myClient.LocalEndPoint != null) ? myClient.LocalEndPoint.ToString() : "";
+                        myIpAddress = (myClient.LocalEndPoint != null) ? myClient.LocalEndPoint.ToString() : "";
 #else
-                myIpAddress = "";
+                        myIpAddress = "";
 #endif
 
-                object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
-                myClient.SendMessage(anEncodedMessage);
+                        object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                        myClient.SendMessage(anEncodedMessage);
+                    }
+                    catch
+                    {
+                        CloseConnection(false);
+                        throw;
+                    }
+                }
             }
         }
 
@@ -89,12 +105,15 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                // Note: do not send a close message in WebSockets. Just close the socket.
+                lock (myConnectionManipulatorLock)
+                {
+                    // Note: do not send a close message in WebSockets. Just close the socket.
 
-                myClient.CloseConnection();
-                myClient.MessageReceived -= OnWebSocketMessageReceived;
-                myClient.ConnectionClosed -= OnWebSocketConnectionClosed;
-                myResponseMessageHandler = null;
+                    myClient.CloseConnection();
+                    myClient.MessageReceived -= OnWebSocketMessageReceived;
+                    myClient.ConnectionClosed -= OnWebSocketConnectionClosed;
+                    myResponseMessageHandler = null;
+                }
             }
         }
 
@@ -104,8 +123,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
-                myClient.SendMessage(anEncodedMessage);
+                lock (myConnectionManipulatorLock)
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                    myClient.SendMessage(anEncodedMessage);
+                }
             }
         }
 
@@ -113,11 +135,16 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                if (myResponseMessageHandler != null)
+                ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
+
+                try
                 {
-                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
-                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
                     myResponseMessageHandler(aMessageContext);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }
@@ -126,19 +153,16 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                if (myResponseMessageHandler != null)
-                {
-                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)e.InputStream);
-                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)e.InputStream);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
 
-                    try
-                    {
-                        myResponseMessageHandler(aMessageContext);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
+                try
+                {
+                    myResponseMessageHandler(aMessageContext);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }
@@ -149,6 +173,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private WebSocketClient myClient;
         private Action<MessageContext> myResponseMessageHandler;
         private string myIpAddress;
+        private object myConnectionManipulatorLock = new object();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

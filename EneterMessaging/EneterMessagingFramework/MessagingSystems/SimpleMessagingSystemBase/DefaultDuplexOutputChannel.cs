@@ -157,9 +157,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                if (messageContext != null && messageContext.ProtocolMessage != null)
+                if (messageContext != null)
                 {
-                    if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                    if (messageContext.ProtocolMessage == null ||
+                        messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                     {
                         EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
                         myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
@@ -176,7 +177,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
                 else
                 {
-                    EneterTrace.Warning(TracedObject + "detected null response message. It means the listening to responses stopped.");
+                    EneterTrace.Error(TracedObject + "detected null MessageContext.");
                 }
             }
         }

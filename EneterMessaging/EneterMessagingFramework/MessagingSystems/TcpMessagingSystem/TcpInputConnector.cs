@@ -35,7 +35,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    IsClosedFromService = true;
+                    IsClosedByService = true;
                     myClientStream.Close();
                 }
             }
@@ -52,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 }
             }
 
-            public bool IsClosedFromService { get; private set; }
+            public bool IsClosedByService { get; private set; }
 
             private Stream myClientStream;
             private object mySenderLock = new object();
@@ -112,7 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
                     catch
                     {
-                        myMessageHandler = null;
+                        StopListening();
                         throw;
                     }
                 }
@@ -154,7 +154,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 if (aClientContext == null)
                 {
-                    throw new InvalidOperationException("Output connector '" + outputConnectorAddress + "' was not found.");
+                    throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
 
                 object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
@@ -204,7 +204,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     anInputOutputStream = mySecurityStreamFactory.CreateSecurityStreamAndAuthenticate(tcpClient.GetStream());
                     aClientContext = new TClientContext(anInputOutputStream);
 
-                    // If protocol formatter does not use OpenConnection message.
+                    // If current protocol formatter does not support OpenConnection message
+                    // then open the connection now.
                     if (!myProtocolUsesOpenConnectionMessage)
                     {
                         // Generate client id.
@@ -216,26 +217,36 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                         ProtocolMessage anOpenConnectionProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aClientId, null);
                         MessageContext aMessageContext = new MessageContext(anOpenConnectionProtocolMessage, aClientIp);
-                        myMessageHandler(aMessageContext);
+
+                        try
+                        {
+                            myMessageHandler(aMessageContext);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        }
                     }
 
                     // While the stop of listening is not requested and the connection is not closed.
-                    bool aConnectionIsOpen = true;
-                    while (aConnectionIsOpen)
+                    while (true)
                     {
                         ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)anInputOutputStream);
 
-                        // Note: security reasons ignore close connection message in TCP.
+                        // Note: Due to security reasons ignore close connection message in TCP.
                         //       So that it is not possible that somebody will just send a close message which will have id of somebody else.
                         //       The TCP connection will be closed when the client closes the socket.
                         if (aProtocolMessage != null && aProtocolMessage.MessageType != EProtocolMessageType.CloseConnectionRequest)
                         {
                             MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
 
-                            // If protocol formatter uses open connection message to create the connection.
-                            if (myProtocolUsesOpenConnectionMessage)
+                            // If open connection message is received and the current protocol formatter uses open connection message
+                            // then create the connection now.
+                            if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest &&
+                                myProtocolUsesOpenConnectionMessage)
                             {
-                                if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                                // Note: if client id is already set then it means this client has already open connection.
+                                if (string.IsNullOrEmpty(aClientId))
                                 {
                                     aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
 
@@ -247,14 +258,24 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                         }
                                         else
                                         {
-                                            throw new InvalidOperationException("Client id '" + aClientId + "' is already open.");
+                                            // Note: if the client id already exists then the connection cannot be open
+                                            //       and the connection with this  client will be closed.
+                                            EneterTrace.Warning(TracedObject + "could not open connection for client '" + aClientId + "' because the client with same id is already connected.");
+                                            break;
                                         }
                                     }
+                                }
+                                else
+                                {
+                                    EneterTrace.Warning(TracedObject + "the client '" + aClientId + "' has already open connection.");
                                 }
                             }
 
                             try
                             {
+                                // Ensure that nobody will try to use id of somebody else.
+                                aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
+
                                 // Notify message.
                                 myMessageHandler(aMessageContext);
                             }
@@ -265,7 +286,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         }
                         else
                         {
-                            aConnectionIsOpen = false;
+                            break;
                         }
                     }
                 }
@@ -281,13 +302,20 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
 
                     // If the disconnection comes from the client (and not from the service).
-                    if (aClientContext != null && !aClientContext.IsClosedFromService)
+                    if (aClientContext != null && !aClientContext.IsClosedByService)
                     {
                         ProtocolMessage aCloseProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aClientId, null);
                         MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
 
                         // Notify duplex input channel about the disconnection.
-                        myMessageHandler(aMessageContext);
+                        try
+                        {
+                            myMessageHandler(aMessageContext);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        }
                     }
 
                     if (anInputOutputStream != null)
