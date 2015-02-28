@@ -162,12 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 else
                 {
                     EneterTrace.Debug("MESSAGE FOR SERVICE RECEIVED");
-
-                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
-                    if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
-                    {
-                        ForwardMessageToService(e.ResponseReceiverId, e.Message);
-                    }
+                    ForwardMessageToService(e.ResponseReceiverId, e.Message);
                 }
             }
         }
@@ -367,19 +362,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
                     if (aProtocolMessage != null)
                     {
-                        // A service sends a response message to a client.
-                        if (aProtocolMessage.MessageType != EProtocolMessageType.Unknown)
-                        {
-                            EneterTrace.Debug("MESSAGE FOR CLIENT RECEIVED");
-                            ForwardMessageToClient(aProtocolMessage.ResponseReceiverId, e.Message);
-                        }
-                        else
-                        {
-                            string anErrorMessage = TracedObject + "detected incorrect message format. The service will be disconnected.";
-                            EneterTrace.Warning(anErrorMessage);
-
-                            CloseConnection(myServiceConnector, e.ResponseReceiverId);
-                        }
+                        EneterTrace.Debug("MESSAGE FOR CLIENT RECEIVED");
+                        ForwardMessageToClient(aProtocolMessage.ResponseReceiverId, e.Message);
+                    }
+                    else
+                    {
+                        CloseConnection(myServiceConnector, e.ResponseReceiverId);
                     }
                 }
                 catch (Exception err)

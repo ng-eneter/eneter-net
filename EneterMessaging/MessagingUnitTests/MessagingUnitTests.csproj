@@ -79,6 +79,72 @@
     <Compile Include="DataProcessing\Serializing\Test_XmlStringSerializer.cs" />
     <Compile Include="DataProcessing\Streaming\Test_DynamicStream.cs" />
     <Compile Include="Diagnostic\Test_EneterTrace.cs" />
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticatedConnection_Tcp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticationConnection_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Sync_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\MonitorConnectionTesterBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\ReconnecterBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Tcp_Bin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitotConnection_Sync_Bin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Pipe.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_Tcp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_ThreadPool.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Ws.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_TestMessaeBusMessaging_SharedMemory.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterStringConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\BaseTester.cs">

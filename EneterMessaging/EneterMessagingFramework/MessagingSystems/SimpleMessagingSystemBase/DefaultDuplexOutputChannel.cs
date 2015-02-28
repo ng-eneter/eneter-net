@@ -157,27 +157,21 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                if (messageContext != null)
+                if (messageContext == null ||
+                    messageContext.ProtocolMessage == null ||
+                    messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
-                    if (messageContext.ProtocolMessage == null ||
-                        messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
-                    {
-                        EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
-                        myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
-                    }
-                    else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
-                    {
-                        EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
-                        myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(messageContext.ProtocolMessage.Message)));
-                    }
-                    else
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
-                    }
+                    EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
+                    myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
+                }
+                else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
+                {
+                    EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
+                    myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(messageContext.ProtocolMessage.Message)));
                 }
                 else
                 {
-                    EneterTrace.Error(TracedObject + "detected null MessageContext.");
+                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
                 }
             }
         }

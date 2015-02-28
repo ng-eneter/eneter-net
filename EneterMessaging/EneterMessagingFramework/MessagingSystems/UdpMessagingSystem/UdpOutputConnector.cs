@@ -124,7 +124,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        public void CleanConnection(bool sendMessageFlag)
+        private void CleanConnection(bool sendMessageFlag)
         {
             using (EneterTrace.Entering())
             {

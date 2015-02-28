@@ -6,8 +6,8 @@
 */
 
 using System;
-using System.IO;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
@@ -15,64 +15,41 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBusInputConnector : IInputConnector
     {
-        private class ResponseSender : ISender
-        {
-            public ResponseSender(IDuplexOutputChannel messageBusOutputChannel)
-            {
-                using (EneterTrace.Entering())
-                {
-                    myMessageBusOutputChannel = messageBusOutputChannel;
-                }
-            }
-
-            public bool IsStreamWritter
-            {
-                get { return false; }
-            }
-
-            public void SendMessage(object message)
-            {
-                using (EneterTrace.Entering())
-                {
-                    myMessageBusOutputChannel.SendMessage(message);
-                }
-            }
-
-            public void SendMessage(Action<Stream> toStreamWritter)
-            {
-                throw new NotSupportedException();
-            }
-
-            private IDuplexOutputChannel myMessageBusOutputChannel;
-        }
-
-        public MessageBusInputConnector(IDuplexOutputChannel messageBusOutputChannel)
+        public MessageBusInputConnector(IProtocolFormatter protocolFormatter, IDuplexOutputChannel messageBusOutputChannel)
         {
             using (EneterTrace.Entering())
             {
+                myProtocolFormatter = protocolFormatter;
                 myMessageBusOutputChannel = messageBusOutputChannel;
-                myResponseSender = new ResponseSender(myMessageBusOutputChannel);
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<MessageContext> messageHandler)
         {
             using (EneterTrace.Entering())
             {
-                try
+                if (messageHandler == null)
                 {
-                    myMessageHandler = messageHandler;
-                    myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
-                    myMessageBusOutputChannel.ConnectionClosed += OnConnectionWithMessageBusClosed;
-
-                    // Open the connection with the service.
-                    // Note: the response receiver id of this output channel represents the service id inside the message bus.
-                    myMessageBusOutputChannel.OpenConnection();
+                    throw new ArgumentNullException("messageHandler is null.");
                 }
-                catch
+
+                lock (myListeningManipulatorLock)
                 {
-                    StopListening();
-                    throw;
+                    try
+                    {
+                        myMessageHandler = messageHandler;
+                        myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
+                        myMessageBusOutputChannel.ConnectionClosed += OnConnectionWithMessageBusClosed;
+
+                        // Register service in the message bus.
+                        // Note: the response receiver id of this output channel represents the service id inside the message bus.
+                        myMessageBusOutputChannel.OpenConnection();
+                    }
+                    catch
+                    {
+                        StopListening();
+                        throw;
+                    }
                 }
             }
         }
@@ -81,36 +58,56 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                if (myMessageBusOutputChannel != null)
+                lock (myListeningManipulatorLock)
                 {
                     myMessageBusOutputChannel.CloseConnection();
                     myMessageBusOutputChannel.ResponseMessageReceived -= OnMessageFromMessageBusReceived;
                     myMessageBusOutputChannel.ConnectionClosed -= OnConnectionWithMessageBusClosed;
+                    myMessageHandler = null;
                 }
-
-                myMessageHandler = null;
             }
         }
 
         public bool IsListening
         {
-            get { return myMessageBusOutputChannel.IsConnected; }
+            get
+            {
+                lock (myListeningManipulatorLock)
+                {
+                    return myMessageBusOutputChannel.IsConnected;
+                }
+            }
         }
 
-        public ISender CreateResponseSender(string clientId)
+        public void SendResponseMessage(string outputConnectorAddress, object message)
         {
-            throw new NotSupportedException("CreateResponseSender is not supported.");
+            using (EneterTrace.Entering())
+            {
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                myMessageBusOutputChannel.SendMessage(anEncodedMessage);
+            }
+        }
+
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                myMessageBusOutputChannel.SendMessage(anEncodedMessage);
+            }
         }
 
         private void OnMessageFromMessageBusReceived(object sender, DuplexChannelMessageEventArgs e)
         {
             using (EneterTrace.Entering())
             {
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
+
                 if (myMessageHandler != null)
                 {
                     try
                     {
-                        MessageContext aMessageContext = new MessageContext(e.Message, e.SenderAddress, myResponseSender);
                         myMessageHandler(aMessageContext);
                     }
                     catch (Exception err)
@@ -139,10 +136,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-
-        private ISender myResponseSender;
+        private IProtocolFormatter myProtocolFormatter;
         private IDuplexOutputChannel myMessageBusOutputChannel;
-        private Func<MessageContext, bool> myMessageHandler;
+        private Action<MessageContext> myMessageHandler;
+        private object myListeningManipulatorLock = new object();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

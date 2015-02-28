@@ -104,7 +104,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                     try
                     {
-                        myMessageHandler(aMessageContext);
+                        if (myMessageHandler != null)
+                        {
+                            myMessageHandler(aMessageContext);
+                        }
                     }
                     catch (Exception err)
                     {
