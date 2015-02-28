@@ -121,14 +121,14 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
                     catch
                     {
-                        CloseConnection(false);
+                        CloseConnection();
                         throw;
                     }
                 }
             }
         }
 
-        public void CloseConnection(bool sendCloseMessageFlag)
+        public void CloseConnection()
         {
             using (EneterTrace.Entering())
             {
@@ -248,21 +248,21 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 // If the connection was closed from the service.
                 if (!myStopReceivingRequestedFlag)
                 {
+                    Action<MessageContext> aResponseHandler = myResponseMessageHandler;
+                    CloseConnection();
+
                     // Notify
                     ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
 
                     try
                     {
-                        myResponseMessageHandler(aMessageContext);
+                        aResponseHandler(aMessageContext);
                     }
                     catch (Exception err)
                     {
                         EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
                     }
-
-                    // Try to clean the connection.
-                    CloseConnection(false);
                 }
             }
         }

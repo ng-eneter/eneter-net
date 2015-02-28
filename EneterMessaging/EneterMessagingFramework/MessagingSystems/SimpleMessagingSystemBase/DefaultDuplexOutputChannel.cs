@@ -190,14 +190,16 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 lock (myConnectionManipulatorLock)
                 {
-
-                    try
+                    if (sendCloseMessageFlag)
                     {
-                        myOutputConnector.CloseConnection(sendCloseMessageFlag);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                        try
+                        {
+                            myOutputConnector.CloseConnection();
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                        }
                     }
 
                     // Note: the notification must run outside the lock because of potententional deadlock.

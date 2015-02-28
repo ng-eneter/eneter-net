@@ -76,43 +76,18 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     }
                     catch
                     {
-                        CloseConnection(false);
+                        CloseConnection();
                         throw;
                     }
                 }
             }
         }
 
-        public void CloseConnection(bool sendCloseMessageFlag)
+        public void CloseConnection()
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
-                {
-                    if (myReceiver != null)
-                    {
-                        myReceiver.StopListening();
-                        myReceiver = null;
-                    }
-
-                    if (mySender != null)
-                    {
-                        if (sendCloseMessageFlag)
-                        {
-                            try
-                            {
-                                mySender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress, x));
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
-                            }
-                        }
-
-                        mySender.Dispose();
-                        mySender = null;
-                    }
-                }
+                CleanConnection(true);
             }
         }
 
@@ -143,16 +118,56 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                Action<MessageContext> aResponseHandler = myResponseMessageHandler;
+
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)message);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
 
+                if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                {
+                    CleanConnection(false);
+                }
+
                 try
                 {
-                    myResponseMessageHandler(aMessageContext);
+                    aResponseHandler(aMessageContext);
                 }
                 catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
+            }
+        }
+
+        public void CleanConnection(bool sendMessageFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionManipulatorLock)
+                {
+                    if (myReceiver != null)
+                    {
+                        myReceiver.StopListening();
+                        myReceiver = null;
+                    }
+
+                    if (mySender != null)
+                    {
+                        if (sendMessageFlag)
+                        {
+                            try
+                            {
+                                mySender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress, x));
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
+                        }
+
+                        mySender.Dispose();
+                        mySender = null;
+                    }
                 }
             }
         }

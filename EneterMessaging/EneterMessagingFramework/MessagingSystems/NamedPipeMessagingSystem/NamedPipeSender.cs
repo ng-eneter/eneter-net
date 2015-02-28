@@ -8,17 +8,15 @@
 #if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK
 
 using System;
-using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
-    internal class NamedPipeSender : ISender, IDisposable
+    internal class NamedPipeSender : IDisposable
     {
-        public NamedPipeSender(string uriPipeName, int timeOut)
+        public NamedPipeSender(string uriPipeName, int connectionTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -43,9 +41,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     }
 
                     myClientStream = new NamedPipeClientStream(aServerName, aPipeName, PipeDirection.Out, PipeOptions.Asynchronous);
-                    myClientStream.Connect(timeOut);
-
-                    myTimeout = timeOut;
+                    myClientStream.Connect(connectionTimeout);
                 }
                 catch (Exception err)
                 {
@@ -86,34 +82,18 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             }
         }
 
-        public bool IsStreamWritter { get { return false; } }
-
         public void SendMessage(object message)
         {
             using (EneterTrace.Entering())
             {
-                try
-                {
-                    byte[] aMessage = (byte[])message;
-                    myClientStream.Write(aMessage, 0, aMessage.Length);
-                    //myClientStream.Flush();
-                }
-                catch (Exception err)
-                {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
-                    throw;
-                }
+                byte[] aMessage = (byte[])message;
+                myClientStream.Write(aMessage, 0, aMessage.Length);
+                //myClientStream.Flush();
             }
-        }
-
-        public void SendMessage(Action<Stream> toStreamWritter)
-        {
-            throw new NotSupportedException();
         }
 
 
         private NamedPipeClientStream myClientStream;
-        private int myTimeout;
 
         private string TracedObject { get { return GetType().Name + " "; } }
     }

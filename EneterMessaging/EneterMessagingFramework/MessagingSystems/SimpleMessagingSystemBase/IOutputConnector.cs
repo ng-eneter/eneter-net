@@ -16,7 +16,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
     internal interface IOutputConnector
     {
         void OpenConnection(Action<MessageContext> responseMessageHandler);
-        void CloseConnection(bool sendCloseMessageFlag);
+        void CloseConnection();
         bool IsConnected { get; }
         void SendRequestMessage(object message);
     }

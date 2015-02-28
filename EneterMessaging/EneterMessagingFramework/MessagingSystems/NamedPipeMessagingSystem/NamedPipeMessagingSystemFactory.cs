@@ -37,11 +37,12 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
     {
         private class NamedPipeConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
-            public NamedPipeConnectorFactory(int timeOut, int numberOfListeningInstances, PipeSecurity security)
+            public NamedPipeConnectorFactory(IProtocolFormatter protocolFormatter, int connectionTimeout, int numberOfListeningInstances, PipeSecurity security)
             {
                 using (EneterTrace.Entering())
                 {
-                    myTimeout = timeOut;
+                    myProtocolFormatter = protocolFormatter;
+                    myConnectionTimeout = connectionTimeout;
                     myNumberOfListeningInstances = numberOfListeningInstances;
                     mySecurity = security;
                 }
@@ -51,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new NamedPipeOutputConnector(inputConnectorAddress, outputConnectorAddress, myTimeout, myNumberOfListeningInstances, mySecurity);
+                    return new NamedPipeOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, myNumberOfListeningInstances, mySecurity);
                 }
             }
 
@@ -59,12 +60,13 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new NamedPipeInputConnector(inputConnecterAddress, myTimeout, myNumberOfListeningInstances, mySecurity);
+                    return new NamedPipeInputConnector(inputConnecterAddress, myProtocolFormatter, myConnectionTimeout, myNumberOfListeningInstances, mySecurity);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private int myNumberOfListeningInstances;
-            private int myTimeout;
+            private int myConnectionTimeout;
             private PipeSecurity mySecurity;
         }
 
@@ -73,7 +75,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         /// Constructs the factory with default parameters.
         /// </summary>
         /// <remarks>
-        /// The default parameters are: 10 serving threads, 10 seconds timeout for the disconnection.
+        /// The default parameters are: 10 serving threads, 10 seconds for connection timeout.
         /// </remarks>
         public NamedPipeMessagingSystemFactory()
             : this(10, 10000, new EneterProtocolFormatter(), null)
@@ -181,8 +183,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myConnectorFactory = new NamedPipeConnectorFactory(pipeConnectionTimeout, numberOfPipeInstances, pipeSecurity);
-                myProtocolFormatter = protocolFormatter;
+                myConnectorFactory = new NamedPipeConnectorFactory(protocolFormatter, pipeConnectionTimeout, numberOfPipeInstances, pipeSecurity);
 
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
@@ -215,7 +216,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                 aResponseReceiverId += "_" + Guid.NewGuid().ToString() + "/";
 
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory);
             }
         }
 
@@ -240,7 +241,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory);
             }
         }
 
@@ -261,7 +262,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
             }
         }
 
@@ -285,7 +286,6 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
         private NamedPipeConnectorFactory myConnectorFactory;
-        private IProtocolFormatter myProtocolFormatter;
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }

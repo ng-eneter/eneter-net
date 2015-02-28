@@ -94,14 +94,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     }
                     catch
                     {
-                        CloseConnection(false);
+                        CloseConnection();
                         throw;
                     }
                 }
             }
         }
 
-        public void CloseConnection(bool sendCloseMessageFlag)
+        public void CloseConnection()
         {
             using (EneterTrace.Entering())
             {
@@ -109,10 +109,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 {
                     // Note: do not send a close message in WebSockets. Just close the socket.
 
+                    // Note: this must be before myClient.CloseConnection().
+                    myResponseMessageHandler = null;
+
                     myClient.CloseConnection();
                     myClient.MessageReceived -= OnWebSocketMessageReceived;
                     myClient.ConnectionClosed -= OnWebSocketConnectionClosed;
-                    myResponseMessageHandler = null;
                 }
             }
         }
@@ -135,12 +137,24 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                Action<MessageContext> aResponseHandler;
+                lock (myConnectionManipulatorLock)
+                {
+                    aResponseHandler = myResponseMessageHandler;
+                    CloseConnection();
+                }
+
                 ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
 
                 try
                 {
-                    myResponseMessageHandler(aMessageContext);
+                    // If the connection closed is not caused that the client callled CloseConnection()
+                    // but the connection was closed from the service.
+                    if (aResponseHandler != null)
+                    {
+                        aResponseHandler(aMessageContext);
+                    }
                 }
                 catch (Exception err)
                 {

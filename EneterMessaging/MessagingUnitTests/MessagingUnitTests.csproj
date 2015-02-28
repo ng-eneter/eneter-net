@@ -84,6 +84,12 @@
     <Compile Include="MessagingSystems\BaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\NamedPipeMessagingSystem\Test_NamedPipeMessagingLocalMachine.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\Test_SharedMemoryMessagingSystem.cs">
       <SubType>Code</SubType>
     </Compile>

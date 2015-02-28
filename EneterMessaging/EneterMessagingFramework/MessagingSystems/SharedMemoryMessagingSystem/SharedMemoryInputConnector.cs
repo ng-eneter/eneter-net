@@ -101,6 +101,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
+        // When service disconnects a client.
         public void CloseConnection(string outputConnectorAddress)
         {
             using (EneterTrace.Entering())
@@ -164,6 +165,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                             EneterTrace.Warning(TracedObject + "could not connect a client because response recevier id was not available in open connection message.");
                         }
                     }
+                    // When a client closes connection with the service.
                     else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))

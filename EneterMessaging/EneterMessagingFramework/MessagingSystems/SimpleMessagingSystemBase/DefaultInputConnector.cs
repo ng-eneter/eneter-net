@@ -29,13 +29,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
+                if (messageHandler == null)
+                {
+                    throw new ArgumentNullException("messageHandler is null.");
+                }
+
                 lock (myListeningManipulatorLock)
                 {
-                    if (messageHandler == null)
-                    {
-                        throw new ArgumentNullException("messageHandler is null.");
-                    }
-
                     try
                     {
                         myMessageHandler = messageHandler;

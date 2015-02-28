@@ -51,45 +51,18 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     }
                     catch
                     {
-                        CloseConnection(false);
+                        CloseConnection();
                         throw;
                     }
                 }
             }
         }
 
-        public void CloseConnection(bool sendCloseMessageFlag)
+        public void CloseConnection()
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
-                {
-                    if (myIsConnected)
-                    {
-                        if (sendCloseMessageFlag)
-                        {
-                            // Send close connection message.
-                            try
-                            {
-                                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
-                                myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
-                            }
-                        }
-
-                        myIsConnected = false;
-                    }
-
-                    if (myIsResponseListenerRegistered)
-                    {
-                        myMessagingProvider.UnregisterMessageHandler(myOutputConnectorAddress);
-                        myResponseMessageHandler = null;
-                        myIsResponseListenerRegistered = false;
-                    }
-                }
+                CleanConnection(true);
             }
         }
 
@@ -120,16 +93,55 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
+                Action<MessageContext> aResponseHandler = myResponseMessageHandler;
+
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
 
+                if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                {
+                    CleanConnection(false);
+                }
+
                 try
                 {
-                    myResponseMessageHandler(aMessageContext);
+                    aResponseHandler(aMessageContext);
                 }
                 catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
+            }
+        }
+
+        private void CleanConnection(bool sendMessageFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionManipulatorLock)
+                {
+                    if (myIsConnected)
+                    {
+                        // Send close connection message.
+                        try
+                        {
+                            object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
+                            myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                        }
+
+                        myIsConnected = false;
+                    }
+
+                    if (myIsResponseListenerRegistered)
+                    {
+                        myMessagingProvider.UnregisterMessageHandler(myOutputConnectorAddress);
+                        myResponseMessageHandler = null;
+                        myIsResponseListenerRegistered = false;
+                    }
                 }
             }
         }

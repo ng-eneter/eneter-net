@@ -61,38 +61,18 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     }
                     catch
                     {
-                        CloseConnection(false);
+                        CloseConnection();
                         throw;
                     }
                 }
             }
         }
 
-        public void CloseConnection(bool sendCloseMessageFlag)
+        public void CloseConnection()
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
-                {
-                    if (myResponseReceiver != null)
-                    {
-                        if (sendCloseMessageFlag)
-                        {
-                            try
-                            {
-                                byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
-                                myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
-                            }
-                        }
-
-                        myResponseReceiver.StopListening();
-                        myResponseReceiver = null;
-                    }
-                }
+                CleanConnection(true);
             }
         }
 
@@ -123,16 +103,53 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                Action<MessageContext> aResponseHandler = myResponseMessageHandler;
+
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
                 MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
 
+                if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                {
+                    CleanConnection(false);
+                }
+
                 try
                 {
-                    myResponseMessageHandler(aMessageContext);
+                    aResponseHandler(aMessageContext);
                 }
                 catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
+            }
+        }
+
+        public void CleanConnection(bool sendMessageFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionManipulatorLock)
+                {
+                    myResponseMessageHandler = null;
+
+                    if (myResponseReceiver != null)
+                    {
+                        if (sendMessageFlag)
+                        {
+                            try
+                            {
+                                byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
+                                myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
+                        }
+
+                        myResponseReceiver.StopListening();
+                        myResponseReceiver = null;
+                    }
                 }
             }
         }
