@@ -39,7 +39,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     {
                         myMessageHandler = messageHandler;
                         myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
-                        myMessageBusOutputChannel.ConnectionClosed += OnConnectionWithMessageBusClosed;
 
                         // Register service in the message bus.
                         // Note: the response receiver id of this output channel represents the service id inside the message bus.
@@ -62,7 +61,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     myMessageBusOutputChannel.CloseConnection();
                     myMessageBusOutputChannel.ResponseMessageReceived -= OnMessageFromMessageBusReceived;
-                    myMessageBusOutputChannel.ConnectionClosed -= OnConnectionWithMessageBusClosed;
                     myMessageHandler = null;
                 }
             }
@@ -118,23 +116,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        private void OnConnectionWithMessageBusClosed(object sender, DuplexChannelEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                if (myMessageHandler != null)
-                {
-                    try
-                    {
-                        myMessageHandler(null);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
-                }
-            }
-        }
 
         private IProtocolFormatter myProtocolFormatter;
         private IDuplexOutputChannel myMessageBusOutputChannel;

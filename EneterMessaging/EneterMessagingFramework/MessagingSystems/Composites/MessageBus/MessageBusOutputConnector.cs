@@ -46,10 +46,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         myMessageBusOutputChannel.ConnectionClosed += OnConnectionWithMessageBusClosed;
                         myMessageBusOutputChannel.OpenConnection();
 
+                        myOpenConnectionConfirmed.Reset();
+
                         // Tell message bus which service shall be associated with this connection.
                         myMessageBusOutputChannel.SendMessage(myInputConnectorAddress);
-
-                        myOpenConnectionConfirmed.Reset();
 
                         if (!myOpenConnectionConfirmed.WaitOne(30000))
                         {

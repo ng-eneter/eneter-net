@@ -17,8 +17,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
         [SetUp]
         public void Setup()
         {
-            EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
-            EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             IMessagingSystemFactory anUnderlyingMessaging = new SynchronousMessagingSystemFactory();
 
