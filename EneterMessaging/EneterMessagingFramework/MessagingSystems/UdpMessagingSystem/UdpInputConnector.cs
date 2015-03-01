@@ -8,12 +8,12 @@
 #if !SILVERLIGHT
 
 using System;
-using System.Net;
-using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using System.Collections.Generic;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using System.Net;
 using System.Net.Sockets;
+using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {

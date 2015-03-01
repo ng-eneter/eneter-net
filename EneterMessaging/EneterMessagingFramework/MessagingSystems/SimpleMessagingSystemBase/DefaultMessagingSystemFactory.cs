@@ -6,7 +6,6 @@
 */
 
 
-using Eneter.Messaging.DataProcessing.MessageQueueing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;

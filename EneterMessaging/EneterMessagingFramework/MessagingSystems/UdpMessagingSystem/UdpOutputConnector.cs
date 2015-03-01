@@ -9,7 +9,6 @@
 
 using System;
 using System.Net;
-using System.Net.Sockets;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;

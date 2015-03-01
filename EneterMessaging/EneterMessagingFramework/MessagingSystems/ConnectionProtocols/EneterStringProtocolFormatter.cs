@@ -6,7 +6,6 @@
 */
 
 using System;
-using System.IO;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 

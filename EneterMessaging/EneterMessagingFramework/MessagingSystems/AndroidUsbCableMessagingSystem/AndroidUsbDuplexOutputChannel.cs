@@ -16,7 +16,6 @@ using System.Text;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem

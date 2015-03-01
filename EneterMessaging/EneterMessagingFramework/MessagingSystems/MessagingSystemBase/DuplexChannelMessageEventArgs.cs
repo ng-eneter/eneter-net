@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-using System;
 
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {

@@ -10,11 +10,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
-using System.IO;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {

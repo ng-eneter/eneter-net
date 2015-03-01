@@ -7,13 +7,13 @@
 
 #if NET4 || NET45
 
+using System;
 using System.IO.MemoryMappedFiles;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
-using System;
 
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {

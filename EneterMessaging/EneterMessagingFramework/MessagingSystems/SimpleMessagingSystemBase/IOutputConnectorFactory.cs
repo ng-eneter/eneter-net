@@ -6,9 +6,6 @@
 */
 
 
-
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
-
 namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 {
     internal interface IOutputConnectorFactory
