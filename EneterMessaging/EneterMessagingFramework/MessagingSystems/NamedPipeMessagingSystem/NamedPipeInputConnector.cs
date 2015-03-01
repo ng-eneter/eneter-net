@@ -175,7 +175,20 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                         {
                             lock (myConnectedClients)
                             {
-                                myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
+                                NamedPipeSender aClientContext;
+                                lock (myConnectedClients)
+                                {
+                                    myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aClientContext);
+                                    if (aClientContext != null)
+                                    {
+                                        myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
+                                    }
+                                }
+
+                                if (aClientContext != null)
+                                {
+                                    aClientContext.Dispose();
+                                }
                             }
                         }
                     }
