@@ -15,16 +15,18 @@ using System.Net;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
     internal class HttpInputConnector : IInputConnector
     {
-        private class HttpResponseSender : ISender, IDisposable
+        private class HttpResponseSender : IDisposable
         {
-            public HttpResponseSender(string responseReceiverId)
+            public HttpResponseSender(string responseReceiverId, string clientIp)
             {
                 ResponseReceiverId = responseReceiverId;
+                ClientIp = clientIp;
                 LastPollingActivityTime = DateTime.Now;
             }
 
@@ -41,9 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 }
             }
 
-            public bool IsStreamWritter { get { return false; } }
-
-            public void SendMessage(object message)
+            public void SendResponseMessage(object message)
             {
                 using (EneterTrace.Entering())
                 {
@@ -59,12 +59,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     }
                 }
             }
-
-            public void SendMessage(Action<Stream> toStreamWritter)
-            {
-                throw new NotSupportedException("Http ResponseSender is not a stream sender.");
-            }
-
 
             // Note: this method must be available after the dispose.
             public byte[] DequeueCollectedMessages()
@@ -101,15 +95,17 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 }
             }
 
-
             public string ResponseReceiverId { get; private set; }
+
+            public string ClientIp { get; private set; }
+
             public DateTime LastPollingActivityTime { get; private set; }
             public bool IsDisposed { get; private set; }
             
             private Queue<byte[]> myMessages = new Queue<byte[]>();
         }
 
-        public HttpInputConnector(string httpAddress, int responseReceiverInactivityTimeout)
+        public HttpInputConnector(string httpAddress, IProtocolFormatter protocolFormatter, int responseReceiverInactivityTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -126,6 +122,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 }
                 myHttpListenerProvider = new HttpListenerProvider(aUri.AbsoluteUri);
 
+                myProtocolFormatter = protocolFormatter;
                 myResponseReceiverInactivityTimeout = responseReceiverInactivityTimeout;
 
 
@@ -137,12 +134,28 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<MessageContext> messageHandler)
         {
             using (EneterTrace.Entering())
             {
-                myMessageHandler = messageHandler;
-                myHttpListenerProvider.StartListening(HandleConnection);
+                if (messageHandler == null)
+                {
+                    throw new ArgumentNullException("messageHandler is null.");
+                }
+
+                lock (myListeningManipulatorLock)
+                {
+                    try
+                    {
+                        myMessageHandler = messageHandler;
+                        myHttpListenerProvider.StartListening(HandleConnection);
+                    }
+                    catch
+                    {
+                        StopListening();
+                        throw;
+                    }
+                }
             }
         }
 
@@ -150,38 +163,78 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myHttpListenerProvider.StopListening();
-                myMessageHandler = null;
+                lock (myListeningManipulatorLock)
+                {
+                    myHttpListenerProvider.StopListening();
+                    myMessageHandler = null;
+                }
             }
         }
 
-        public bool IsListening { get { return myHttpListenerProvider.IsListening; } }
+        public bool IsListening
+        {
+            get
+            {
+                lock (myListeningManipulatorLock)
+                {
+                    return myHttpListenerProvider.IsListening;
+                }
+            }
+        }
 
-        public ISender CreateResponseSender(string responseReceiverAddress)
+        public void SendResponseMessage(string outputConnectorAddress, object message)
         {
             using (EneterTrace.Entering())
             {
-                lock (myResponseSenders)
+                HttpResponseSender aClientContext;
+                lock (myConnectedClients)
                 {
-                    // If there are some disposed senders then remove them.
-                    myResponseSenders.RemoveWhere(x => x.IsDisposed);
+                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == outputConnectorAddress);
+                }
 
-                    // If does not exist create one.
-                    HttpResponseSender aResponseSender = myResponseSenders.FirstOrDefault(x => x.ResponseReceiverId == responseReceiverAddress);
-                    if (aResponseSender == null)
+                if (aClientContext == null)
+                {
+                    throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
+                }
+
+                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                aClientContext.SendResponseMessage(anEncodedMessage);
+            }
+        }
+
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                HttpResponseSender aClientContext;
+                lock (myConnectedClients)
+                {
+                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == outputConnectorAddress);
+
+                    // Note: we cannot remove the client context from myConnectedClients because the following close message
+                    //       will be put to the queue. And if it is removed from myConnectedClients then the client context
+                    //       would not be found during polling and the close connection message woiuld never be sent to the client.
+                    //       
+                    //       The removing of the client context works like this:
+                    //       The client gets the close connection message. The client processes it and stops polling.
+                    //       On the service side the time detects the client sopped polling and so it removes
+                    //       the client context from my connected clients.
+                }
+
+                if (aClientContext != null)
+                {
+                    try
                     {
-                        aResponseSender = new HttpResponseSender(responseReceiverAddress);
-                        myResponseSenders.Add(aResponseSender);
-
-                        // If this is the only sender then start the timer measuring the inactivity to detect if the client is disconnected.
-                        // If it is not the only sender, then the timer is already running.
-                        if (myResponseSenders.Count == 1)
-                        {
-                            myResponseReceiverInactivityTimer.Change(myResponseReceiverInactivityTimeout, -1);
-                        }
+                        // Send close connection message.
+                        object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                        aClientContext.SendResponseMessage(anEncodedMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning("failed to send the close message.", err);
                     }
 
-                    return aResponseSender;
+                    aClientContext.Dispose();
                 }
             }
         }
@@ -191,7 +244,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                // If polling.
+                // If polling. (when client polls to get response messages)
                 if (httpRequestContext.HttpMethod == "GET")
                 {
                     // Get responseReceiverId.
@@ -200,17 +253,17 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     {
                         string aResponseReceiverId = aQueryItems[0].Substring(4);
 
-                        // Find the sender for the response receiver.
-                        HttpResponseSender aResponseSender = null;
-                        lock (myResponseSenders)
+                        // Find the client.
+                        HttpResponseSender aClientContext;
+                        lock (myConnectedClients)
                         {
-                            aResponseSender = myResponseSenders.FirstOrDefault(x => x.ResponseReceiverId == aResponseReceiverId);
+                            aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aResponseReceiverId);
                         }
 
-                        if (aResponseSender != null)
+                        if (aClientContext != null)
                         {
                             // Response collected messages.
-                            byte[] aMessages = aResponseSender.DequeueCollectedMessages();
+                            byte[] aMessages = aClientContext.DequeueCollectedMessages();
                             if (aMessages != null)
                             {
                                 httpRequestContext.Response(aMessages);
@@ -232,14 +285,83 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     }
                 }
                 else
+                // Client sends a request message.
                 {
                     byte[] aMessage = httpRequestContext.GetRequestMessage();
 
                     IPEndPoint anEndPoint = httpRequestContext.RemoteEndPoint as IPEndPoint;
                     string aClientIp = (anEndPoint != null) ? anEndPoint.Address.ToString() : "";
-                    MessageContext aMessageContext = new MessageContext(aMessage, aClientIp, null);
 
-                    if (!myMessageHandler(aMessageContext))
+                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(aMessage);
+
+                    bool anIsProcessingOk = true;
+                    if (aProtocolMessage != null && !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
+                    {
+                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
+
+                        if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
+                        {
+                            lock (myConnectedClients)
+                            {
+                                HttpResponseSender aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
+                                if (aClientContext != null && aClientContext.IsDisposed)
+                                {
+                                    // The client with the same id exists but was closed and disposed.
+                                    // It is just that the timer did not remove it. So delete it now.
+                                    myConnectedClients.Remove(aClientContext);
+                                    aClientContext = null;
+                                }
+
+                                if (aClientContext == null)
+                                {
+                                    aClientContext = new HttpResponseSender(aProtocolMessage.ResponseReceiverId, aClientIp);
+                                    myConnectedClients.Add(aClientContext);
+
+                                    // If this is the only sender then start the timer measuring the inactivity to detect if the client is disconnected.
+                                    // If it is not the only sender, then the timer is already running.
+                                    if (myConnectedClients.Count == 1)
+                                    {
+                                        myResponseReceiverInactivityTimer.Change(myResponseReceiverInactivityTimeout, -1);
+                                    }
+                                }
+                                else
+                                {
+                                    EneterTrace.Warning(TracedObject + "could not open connection for client '" + aProtocolMessage.ResponseReceiverId + "' because the client with same id is already connected.");
+                                    anIsProcessingOk = false;
+                                }
+                            }
+                        }
+                        else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                        {
+                            lock (myConnectedClients)
+                            {
+                                HttpResponseSender aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
+
+                                if (aClientContext != null)
+                                {
+                                    // Note: the disconnection comes from the client.
+                                    //       It means the client closed the connection and will not poll anymore.
+                                    //       Therefore the client context can be removed.
+                                    myConnectedClients.Remove(aClientContext);
+                                    aClientContext.Dispose();
+                                }
+                            }
+                        }
+
+                        if (anIsProcessingOk)
+                        {
+                            try
+                            {
+                                myMessageHandler(aMessageContext);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                            }
+                        }
+                    }
+                    
+                    if (!anIsProcessingOk)
                     {
                         // The request was not processed.
                         httpRequestContext.ResponseError(404);
@@ -252,12 +374,15 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myResponseSenders)
+                List<HttpResponseSender> aClientsToNotify = new List<HttpResponseSender>();
+                bool aStartTimerFlag = false;
+
+                lock (myConnectedClients)
                 {
                     DateTime aTime = DateTime.Now;
 
                     // Check the connection for each connected duplex output channel.
-                    myResponseSenders.RemoveWhere(x =>
+                    myConnectedClients.RemoveWhere(x =>
                         {
                             // If the last polling activity time exceeded the maximum allowed time then
                             // it is considered the connection is closed.
@@ -266,8 +391,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                                 // If the connection was broken unexpectidly then the message handler must be notified.
                                 if (!x.IsDisposed)
                                 {
-                                    MessageContext aMessageContext = new MessageContext(null, "", x);
-                                    myMessageHandler(aMessageContext);
+                                    aClientsToNotify.Add(x);
                                 }
 
                                 // Indicate to remove the item.
@@ -279,20 +403,47 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         });
 
                     // If there connected clients we need to check if they are active.
-                    if (myResponseSenders.Count > 0)
+                    if (myConnectedClients.Count > 0)
                     {
-                        myResponseReceiverInactivityTimer.Change(myResponseReceiverInactivityTimeout, -1);
+                        aStartTimerFlag = true;
                     }
+                }
+
+                foreach (HttpResponseSender aClientContext in aClientsToNotify)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aClientContext.ResponseReceiverId, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientContext.ClientIp);
+
+                    try
+                    {
+                        if (myMessageHandler != null)
+                        {
+                            myMessageHandler(aMessageContext);
+                        }
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
+                }
+
+                if (aStartTimerFlag)
+                {
+                    myResponseReceiverInactivityTimer.Change(myResponseReceiverInactivityTimeout, -1);
                 }
             }
         }
 
 
+        private IProtocolFormatter myProtocolFormatter;
         private HttpListenerProvider myHttpListenerProvider;
-        private Func<MessageContext, bool> myMessageHandler;
-        private HashSet<HttpResponseSender> myResponseSenders = new HashSet<HttpResponseSender>();
+        private Action<MessageContext> myMessageHandler;
+        private object myListeningManipulatorLock = new object();
         private Timer myResponseReceiverInactivityTimer;
         private int myResponseReceiverInactivityTimeout;
+        private HashSet<HttpResponseSender> myConnectedClients = new HashSet<HttpResponseSender>();
+
+        private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
 

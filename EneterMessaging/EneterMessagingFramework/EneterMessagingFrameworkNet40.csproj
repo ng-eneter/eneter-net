@@ -158,6 +158,37 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListenerFactory_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListener_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpInputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputConnector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpPolicyServer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext_CompactFramework.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker_Silverlight.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\ServerUri_Silverlight.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\ListeningInstance.cs">
       <SubType>Code</SubType>
     </Compile>

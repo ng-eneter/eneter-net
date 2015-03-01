@@ -251,13 +251,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     Action<MessageContext> aResponseHandler = myResponseMessageHandler;
                     CloseConnection();
 
-                    // Notify
-                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
-                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, myIpAddress);
-
                     try
                     {
-                        aResponseHandler(aMessageContext);
+                        aResponseHandler(null);
                     }
                     catch (Exception err)
                     {

@@ -38,10 +38,11 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 #if !SILVERLIGHT
         private class HttpInputConnectorFactory : IInputConnectorFactory
         {
-            public HttpInputConnectorFactory(int responseReceiverInactivityTimeout)
+            public HttpInputConnectorFactory(IProtocolFormatter protocolFormatter, int responseReceiverInactivityTimeout)
             {
                 using (EneterTrace.Entering())
                 {
+                    myProtocolFormatter = protocolFormatter;
                     myOutputConnectorInactivityTimeout = responseReceiverInactivityTimeout;
                 }
             }
@@ -50,20 +51,22 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new HttpInputConnector(inputConnectorAddress, myOutputConnectorInactivityTimeout);
+                    return new HttpInputConnector(inputConnectorAddress, myProtocolFormatter, myOutputConnectorInactivityTimeout);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private int myOutputConnectorInactivityTimeout;
         }
 #endif
 
         private class HttpOutputConnectorFactory : IOutputConnectorFactory
         {
-            public HttpOutputConnectorFactory(int pollingFrequency)
+            public HttpOutputConnectorFactory(IProtocolFormatter protocolFormatter, int pollingFrequency)
             {
                 using (EneterTrace.Entering())
                 {
+                    myProtocolFormatter = protocolFormatter;
                     myPollingFrequency = pollingFrequency;
                 }
             }
@@ -72,10 +75,11 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new HttpOutputConnector(inputConnectorAddress, outputConnectorAddress, myPollingFrequency);
+                    return new HttpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myPollingFrequency);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private int myPollingFrequency;
         }
 
@@ -141,7 +145,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
 
-                myInputConnectorFactory = new HttpInputConnectorFactory(inactivityTimeout);
+                myInputConnectorFactory = new HttpInputConnectorFactory(protocolFormatter, inactivityTimeout);
             }
         }
 #else
@@ -232,8 +236,8 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myPollingFrequency);
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, aClientConnectorFactory, myProtocolFormatter, false);
+                IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myProtocolFormatter, myPollingFrequency);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, aClientConnectorFactory);
             }
         }
 
@@ -260,8 +264,8 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myPollingFrequency);
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, aClientConnectorFactory, myProtocolFormatter, false);
+                IOutputConnectorFactory aClientConnectorFactory = new HttpOutputConnectorFactory(myProtocolFormatter, myPollingFrequency);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, aClientConnectorFactory);
             }
         }
 
@@ -287,7 +291,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myInputConnectorFactory.CreateInputConnector(channelId);
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                return new DefaultDuplexInputChannel(channelId, aDispatcher, aDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, aDispatcher, aDispatcherAfterMessageDecoded, anInputConnector);
 #else
                 throw new NotSupportedException("Http duplex input channel is not supported in Silverlight.");
 #endif

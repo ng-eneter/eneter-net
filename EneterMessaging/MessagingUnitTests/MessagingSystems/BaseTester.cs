@@ -157,6 +157,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         }
 
         [Test]
+        public virtual void Duplex_03_Send1_10MB()
+        {
+            SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 1);
+        }
+
+        [Test]
         public virtual void Duplex_04_Send50000()
         {
             SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 50000);
@@ -1025,6 +1031,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     //Assert.IsTrue(aClient.ConnectionOpenEvent.WaitOne(100000));
                 }
 
+                // Give some time to duplex input channel to activate all connected clients.
+                // Note: When the duplex output channel indicates the connection is open
+                //       the client still does not have to be fully activated inside duplex input channel.
+                //       This is not the problem for communication across computers but local communication
+                //       can be too fast.
+                Thread.Sleep(10000);
+
                 //EneterTrace.StartProfiler();
 
                 Stopwatch aStopWatch = new Stopwatch();
@@ -1036,6 +1049,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     // Send the broadcast message.
                     aService.InputChannel.SendResponseMessage(null, broadcastMessage);
                 }
+
+                //EneterTrace.Info("All broadcasts are sent.");
 
                 // Wait until all messages are processed.
                 foreach (TDuplexClient aClient in aClients)

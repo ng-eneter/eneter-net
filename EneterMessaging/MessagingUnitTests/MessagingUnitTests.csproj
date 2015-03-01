@@ -79,6 +79,69 @@
     <Compile Include="DataProcessing\Serializing\Test_XmlStringSerializer.cs" />
     <Compile Include="DataProcessing\Streaming\Test_DynamicStream.cs" />
     <Compile Include="Diagnostic\Test_EneterTrace.cs" />
+    <Compile Include="EndPoints\MultiTypedMessages\MultiTypedMessagesBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncBin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncXml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\Rpc\RpcBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\Rpc\Test_Rpc_SharedMemory_Bin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\Rpc\Test_Rpc_Sync_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\Rpc\Test_Rpc_Tcp_Bin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringRequestResponse\StringRequestResponseBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringRequestResponse\Test_StringRequestResponse_NamedPipeMessaging.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\StringRequestResponse\Test_StringRequestResponse_SynchronousMessaging.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\SyncTypedMessages\SyncTypedMessagesBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Sync_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Tcp_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Sync_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Tcp_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedReliableMessages\TypedReliableMessagesBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_NamedPipe_Bin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_BinarySerializer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_XmlStringSerializer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_Tcp_Bin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -89,6 +152,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs">
@@ -148,6 +214,15 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterStringConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\BaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpMessagingSystem_Synchronous.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpPolicyServer.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemBaseTester.cs">
