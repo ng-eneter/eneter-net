@@ -363,7 +363,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
         private static string ReadHttp(Stream inputStream)
         {
-            using (EneterTrace.Entering())
+            //using (EneterTrace.Entering())
             {
                 // Read HTTP header.
                 using (MemoryStream anHttpHeaderBuffer = new MemoryStream())

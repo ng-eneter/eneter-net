@@ -122,15 +122,18 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     if (myIsConnected)
                     {
-                        // Send close connection message.
-                        try
+                        if (sendMessageFlag)
                         {
-                            object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
-                            myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            // Send close connection message.
+                            try
+                            {
+                                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
+                                myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
                         }
 
                         myIsConnected = false;

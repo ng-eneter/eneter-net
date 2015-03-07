@@ -12,127 +12,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 {
     public abstract class BaseTester
     {
-        private class TDuplexClient
-        {
-            public TDuplexClient(IMessagingSystemFactory messaging, string channelId, string expectedResponseMessage,
-                int expectedNumberOfResponseMessages)
-            {
-                OutputChannel = messaging.CreateDuplexOutputChannel(channelId);
-                OutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
-
-                ConnectionOpenEvent = new ManualResetEvent(false);
-                ResponsesReceivedEvent = new ManualResetEvent(false);
-                myExpectedResponseMessage = expectedResponseMessage;
-                myExpectedNumberOfResponses = expectedNumberOfResponseMessages;
-            }
-
-            public void OpenConnection()
-            {
-                try
-                {
-                    OutputChannel.OpenConnection();
-                }
-                catch (Exception err)
-                {
-                    OpenConnectionError = err;
-                }
-
-                ConnectionOpenEvent.Set();
-            }
-
-            private void OnResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e)
-            {
-                lock (myResponseReceiverLock)
-                {
-                    ++NumberOfReceivedResponses;
-
-                    //EneterTrace.Info("Received Responses: " + NumberOfReceivedResponses);
-
-                    if (myExpectedResponseMessage != (string)e.Message)
-                    {
-                        ++NumberOfFailedResponses;
-                    }
-
-                    // Release helper thread when all messages are received.
-                    if (NumberOfReceivedResponses == myExpectedNumberOfResponses)
-                    {
-                        ResponsesReceivedEvent.Set();
-                    }
-                }
-            }
-
-            public int NumberOfReceivedResponses { get; private set; }
-            public int NumberOfFailedResponses { get; private set; }
-            public IDuplexOutputChannel OutputChannel { get; private set; }
-
-            public Exception OpenConnectionError { get; private set; }
-            public ManualResetEvent ConnectionOpenEvent { get; private set; }
-
-            public ManualResetEvent ResponsesReceivedEvent { get; private set; }
-
-            private int myExpectedNumberOfResponses;
-            private string myExpectedResponseMessage;
-            private object myResponseReceiverLock = new object();
-        }
-
-        private class TDuplexService
-        {
-            public TDuplexService(IMessagingSystemFactory messaging, string channelId, string expextedMessage,
-                int expextedNumberOfMessages,
-                string responseMessage)
-            {
-                InputChannel = messaging.CreateDuplexInputChannel(channelId);
-                InputChannel.MessageReceived += OnMessageReceived;
-
-                MessagesReceivedEvent = new ManualResetEvent(false);
-
-                myExpectedMessage = expextedMessage;
-                myExpectedNumberOfMessages = expextedNumberOfMessages;
-                myResponseMessage = responseMessage;
-            }
-
-            private void OnMessageReceived(object sender, DuplexChannelMessageEventArgs e)
-            {
-                // Some messaging system can have a parallel access therefore we must ensure
-                // that results are put to the list synchronously.
-                lock (myLock)
-                {
-                    ++NumberOfReceivedMessages;
-
-                    //EneterTrace.Info("Received Messages: " + NumberOfReceivedMessages);
-
-                    if (NumberOfReceivedMessages == myExpectedNumberOfMessages)
-                    {
-                        MessagesReceivedEvent.Set();
-                    }
-
-                    if (InputChannel.ChannelId != e.ChannelId || myExpectedMessage != (string)e.Message)
-                    {
-                        ++NumberOfFailedMessages;
-                    }
-                    else
-                    {
-                        // everything is ok -> send the response
-                        InputChannel.SendResponseMessage(e.ResponseReceiverId, myResponseMessage);
-                    }
-                }
-            }
-
-
-            public IDuplexInputChannel InputChannel { get; private set; }
-            public ManualResetEvent MessagesReceivedEvent { get; private set; }
-
-            public int NumberOfReceivedMessages { get; private set; }
-            public int NumberOfFailedMessages { get; private set; }
-
-            private int myExpectedNumberOfMessages;
-            private string myExpectedMessage;
-            private string myResponseMessage;
-            private object myLock = new object();
-        }
-
-
-
         public BaseTester()
         {
             ChannelId = "Channel1";
@@ -141,257 +20,150 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_01_Send1()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Response", 1, 1);
+            SendMessageReceiveResponse(ChannelId, "Message", "Response", 1, 1, 500, 500);
         }
 
         [Test]
         public virtual void Duplex_02_Send500()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 500);
-        }
-
-        //[Test]
-        public virtual void Duplex_03_Send100_10MB()
-        {
-            SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 100);
+            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 500, 1000, 1000);
         }
 
         [Test]
         public virtual void Duplex_03_Send1_10MB()
         {
-            SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 1);
+            SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 1, 1000, 1000);
         }
 
         [Test]
         public virtual void Duplex_04_Send50000()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 50000);
+            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 50000, 500, 20000);
         }
 
         [Test]
         public virtual void Duplex_05_Send50_10Prallel()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 10, 50);
+            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 10, 50, 1000, 2000);
         }
 
         [Test]
         public virtual void Duplex_05a_SendBroadcastResponse_50_10Clients()
         {
-            SendBroadcastResponseMessage(ChannelId, "broadcastMessage", 10, 50);
+            SendBroadcastResponseMessage(ChannelId, "broadcastMessage", 10, 50, 1000, 2000);
         }
 
         [Test]
         public virtual void Duplex_06_OpenCloseConnection()
         {
-            IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
-            IDuplexOutputChannel anOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
-
-            AutoResetEvent aResponseReceiverConnectedEvent = new AutoResetEvent(false);
-            string aConnectedReceiver = "";
-            anInputChannel.ResponseReceiverConnected += (x, y) =>
-                {
-                    aConnectedReceiver = y.ResponseReceiverId;
-
-                    aResponseReceiverConnectedEvent.Set();
-                };
-
-            AutoResetEvent aResponseReceiverDisconnectedEvent = new AutoResetEvent(false);
-            string aDisconnectedReceiver = "";
-            anInputChannel.ResponseReceiverDisconnected += (x, y) =>
-                {
-                    aDisconnectedReceiver = y.ResponseReceiverId;
-
-                    aResponseReceiverDisconnectedEvent.Set();
-                };
-
-
-
-            AutoResetEvent aConnectionOpenedEvent = new AutoResetEvent(false);
-            DuplexChannelEventArgs aConnectionOpenedEventArgs = null;
-            anOutputChannel.ConnectionOpened += (x, y) =>
-                {
-                    aConnectionOpenedEventArgs = y;
-                    aConnectionOpenedEvent.Set();
-                };
-
-            AutoResetEvent aConnectionClosedEvent = new AutoResetEvent(false);
-            DuplexChannelEventArgs aConnectionClosedEventArgs = null;
-            anOutputChannel.ConnectionClosed += (x, y) =>
-                {
-                    aConnectionClosedEventArgs = y;
-                    aConnectionClosedEvent.Set();
-                };
-
+            ClientMock aClient = new ClientMock(MessagingSystemFactory, ChannelId);
+            ServiceMock aService = new ServiceMock(MessagingSystemFactory, ChannelId);
 
             try
             {
-                anInputChannel.StartListening();
+                aService.InputChannel.StartListening();
 
                 // Open the connection.
-                anOutputChannel.OpenConnection();
-                Assert.IsTrue(anOutputChannel.IsConnected);
+                aClient.OutputChannel.OpenConnection();
+                Assert.IsTrue(aClient.OutputChannel.IsConnected);
 
                 // handling open connection on the client side.
                 EneterTrace.Info("1");
-                aConnectionOpenedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ChannelId, aConnectionOpenedEventArgs.ChannelId);
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionOpenedEventArgs.ResponseReceiverId);
+                aClient.WaitUntilConnectionOpenIsNotified(1000);
+                Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedOpenConnection.ChannelId);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.OutputChannel.ResponseReceiverId);
 
                 // handling open connection on the service side.
                 EneterTrace.Info("2");
-                aResponseReceiverConnectedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectedReceiver);
+                aService.WaitUntilResponseReceiversAreConnected(1, 1000);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.ConnectedResponseReceivers.First().ResponseReceiverId);
 
-                anOutputChannel.CloseConnection();
-                Assert.IsFalse(anOutputChannel.IsConnected);
+                aClient.OutputChannel.CloseConnection();
+                Assert.IsFalse(aClient.OutputChannel.IsConnected);
 
                 EneterTrace.Info("3");
-                aConnectionClosedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ChannelId, aConnectionClosedEventArgs.ChannelId);
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionClosedEventArgs.ResponseReceiverId);
+                aClient.WaitUntilConnectionClosedIsNotified(1000);
+                Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedCloseConnection.ChannelId);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.NotifiedCloseConnection.ResponseReceiverId);
 
                 EneterTrace.Info("4");
-                aResponseReceiverDisconnectedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aDisconnectedReceiver);
-            }
-            catch
-            {
-                anOutputChannel.CloseConnection();
-                throw;
+                aService.WaitUntilAllResponseReceiversAreDisconnected(1000);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.DisconnectedResponseReceivers.First().ResponseReceiverId);
             }
             finally
             {
-                anInputChannel.StopListening();
+                aClient.OutputChannel.CloseConnection();
+                aService.InputChannel.StopListening();
 
                 // Wait for traces.
                 Thread.Sleep(100);
             }
-
-
-            Assert.AreNotEqual("", aConnectedReceiver);
-            Assert.AreNotEqual("", aDisconnectedReceiver);
-            Assert.AreEqual(aConnectedReceiver, aDisconnectedReceiver);
-
         }
 
         [Test]
         public virtual void Duplex_06_OpenCloseOpenSend()
         {
-            IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
-            IDuplexOutputChannel anOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
-
-            AutoResetEvent aResponseReceiverConnectedEvent = new AutoResetEvent(false);
-            string aConnectedReceiver = "";
-            anInputChannel.ResponseReceiverConnected += (x, y) =>
-            {
-                aConnectedReceiver = y.ResponseReceiverId;
-
-                aResponseReceiverConnectedEvent.Set();
-            };
-
-            AutoResetEvent aResponseReceiverDisconnectedEvent = new AutoResetEvent(false);
-            string aDisconnectedReceiver = "";
-            anInputChannel.ResponseReceiverDisconnected += (x, y) =>
-            {
-                aDisconnectedReceiver = y.ResponseReceiverId;
-
-                aResponseReceiverDisconnectedEvent.Set();
-            };
-
-            AutoResetEvent aRequestMessageReceivedEvent = new AutoResetEvent(false);
-            anInputChannel.MessageReceived += (x, y) =>
-            {
-                aRequestMessageReceivedEvent.Set();
-
-                // send back the response.
-                anInputChannel.SendResponseMessage(y.ResponseReceiverId, "Hi");
-            };
-
-
-            AutoResetEvent aConnectionOpenedEvent = new AutoResetEvent(false);
-            DuplexChannelEventArgs aConnectionOpenedEventArgs = null;
-            anOutputChannel.ConnectionOpened += (x, y) =>
-            {
-                aConnectionOpenedEventArgs = y;
-                aConnectionOpenedEvent.Set();
-            };
-
-            AutoResetEvent aConnectionClosedEvent = new AutoResetEvent(false);
-            DuplexChannelEventArgs aConnectionClosedEventArgs = null;
-            anOutputChannel.ConnectionClosed += (x, y) =>
-            {
-                aConnectionClosedEventArgs = y;
-                aConnectionClosedEvent.Set();
-            };
-
-            AutoResetEvent aResponseReceivedEvent = new AutoResetEvent(false);
-            anOutputChannel.ResponseMessageReceived += (x, y) =>
-                {
-                    aResponseReceivedEvent.Set();
-                };
-
+            ClientMock aClient = new ClientMock(MessagingSystemFactory, ChannelId);
+            ServiceMock aService = new ServiceMock(MessagingSystemFactory, ChannelId);
+            aService.DoOnMessageReceived_SendResponse("Hi");
 
             try
             {
-                anInputChannel.StartListening();
+                aService.InputChannel.StartListening();
 
                 // Client opens the connection.
-                EneterTrace.Debug("Open1");
-                anOutputChannel.OpenConnection();
-                Assert.IsTrue(anOutputChannel.IsConnected);
+                aClient.OutputChannel.OpenConnection();
+                Assert.IsTrue(aClient.OutputChannel.IsConnected);
 
-                // handling open connection on the client side.
-                aConnectionOpenedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ChannelId, aConnectionOpenedEventArgs.ChannelId);
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionOpenedEventArgs.ResponseReceiverId);
+                aClient.WaitUntilConnectionOpenIsNotified(1000);
+                Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedOpenConnection.ChannelId);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.OutputChannel.ResponseReceiverId);
 
-                // handling open connection on the service side.
-                aResponseReceiverConnectedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectedReceiver);
-
+                aService.WaitUntilResponseReceiversAreConnected(1, 1000);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.ConnectedResponseReceivers.First().ResponseReceiverId);
 
                 // Client closes the connection.
-                EneterTrace.Debug("Close1");
-                anOutputChannel.CloseConnection();
-                Assert.IsFalse(anOutputChannel.IsConnected);
+                aClient.OutputChannel.CloseConnection();
+                Assert.IsFalse(aClient.OutputChannel.IsConnected);
 
-                aConnectionClosedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ChannelId, aConnectionClosedEventArgs.ChannelId);
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionClosedEventArgs.ResponseReceiverId);
+                aClient.WaitUntilConnectionClosedIsNotified(1000);
+                Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedCloseConnection.ChannelId);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.NotifiedCloseConnection.ResponseReceiverId);
 
-                aResponseReceiverDisconnectedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aDisconnectedReceiver);
-
-                // Messaging system e.g. MessageBus can be more complex and needs some time to really close the connection.
-                // Therefore give some time. Investigate how to improve it.
-                Thread.Sleep(500);
-
-                // Client opens the connection.
-                EneterTrace.Debug("Open2");
-                anOutputChannel.OpenConnection();
-                Assert.IsTrue(anOutputChannel.IsConnected);
-
-                // handling open connection on the client side.
-                aConnectionOpenedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ChannelId, aConnectionOpenedEventArgs.ChannelId);
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectionOpenedEventArgs.ResponseReceiverId);
-
-                // handling open connection on the service side.
-                aResponseReceiverConnectedEvent.WaitOne();
-                Assert.AreEqual(anOutputChannel.ResponseReceiverId, aConnectedReceiver);
+                aService.WaitUntilAllResponseReceiversAreDisconnected(1000);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.DisconnectedResponseReceivers.First().ResponseReceiverId);
 
 
-                // Client sends a message.
-                EneterTrace.Debug("Hello message sending.");
-                anOutputChannel.SendMessage("Hello");
+                aClient.ClearTestResults();
+                aService.ClearTestResults();
 
-                aRequestMessageReceivedEvent.WaitOne();
-                aResponseReceivedEvent.WaitOne();
+
+                // Client opens the connection 2nd time.
+                aClient.OutputChannel.OpenConnection();
+                Assert.IsTrue(aClient.OutputChannel.IsConnected);
+
+                aClient.WaitUntilConnectionOpenIsNotified(1000);
+                Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedOpenConnection.ChannelId);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.OutputChannel.ResponseReceiverId);
+
+                aService.WaitUntilResponseReceiversAreConnected(1, 1000);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.ConnectedResponseReceivers.First().ResponseReceiverId);
+
+                // Client sends the message.
+                aClient.OutputChannel.SendMessage("Hello");
+
+                aClient.WaitUntilResponseMessagesAreReceived(1, 1000);
+
+                Assert.AreEqual("Hello", aService.ReceivedMessages.First().Message);
+                Assert.AreEqual("Hi", aClient.ReceivedMessages.First().Message);
             }
             finally
             {
-                anOutputChannel.CloseConnection();
-                anInputChannel.StopListening();
+                aClient.OutputChannel.CloseConnection();
+                aService.InputChannel.StopListening();
+
+                // Wait for traces.
+                Thread.Sleep(100);
             }
         }
 
@@ -448,7 +220,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
                 aDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
 
-                aConnectionReopenEvent.WaitOne();
+                aConnectionReopenEvent.WaitIfNotDebugging(1000);
 
                 Assert.IsFalse(aConnectionStatusWhenConnectionClosed);
             }
@@ -483,7 +255,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 anOutputChannel.OpenConnection();
                 Assert.IsTrue(anOutputChannel.IsConnected);
 
-                aResponseReceiverConnectedEvent.WaitOne();
+                aResponseReceiverConnectedEvent.WaitIfNotDebugging(1000);
 
                 // Duplex input channel stops to listen.
                 anInputChannel.StopListening();
@@ -513,7 +285,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         }
 
         [Test]
-        public virtual void Duplex_09_StopListeing()
+        public virtual void Duplex_09_StopListening()
         {
             IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
 
@@ -560,13 +332,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 Assert.IsTrue(anOutputChannel2.IsConnected);
                 Assert.IsTrue(anOutputChannel3.IsConnected);
 
-                anAllConnected.WaitOne();
+                anAllConnected.WaitIfNotDebugging(1000);
 
                 // Stop listening.
                 anInputChannel.StopListening();
                 Assert.IsFalse(anInputChannel.IsListening);
 
-                anAllDisconnected.WaitOne();
+                anAllDisconnected.WaitIfNotDebugging(1000);
 
                 // Wait if e.g. more that three disconnects are delivered then error.
                 Thread.Sleep(200);
@@ -628,13 +400,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aDuplexOutputChannel.OpenConnection();
 
                 // Wait until the connection is established.
-                aResponseReceiverConnectedEvent.WaitOne();
+                aResponseReceiverConnectedEvent.WaitIfNotDebugging(1000);
 
                 // Disconnect response receiver from the duplex input channel.
                 aDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
 
                 // Wait until the response receiver is disconnected.
-                aConnectionClosedEvent.WaitOne();
+                aConnectionClosedEvent.WaitIfNotDebugging(1000);
 
                 Assert.IsTrue(aResponseReceiverConnectedFlag);
                 Assert.IsTrue(aConnectionClosedReceivedInOutputChannelFlag);
@@ -642,7 +414,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 Assert.IsFalse(aResponseMessageReceivedFlag);
 
                 // Disconnect response receiver shall generate the client disconnected event.
-                aResponseReceiverDisconnectedEvent.WaitOne();
+                aResponseReceiverDisconnectedEvent.WaitIfNotDebugging(1000);
                 Assert.IsTrue(aResponseReceiverDisconnectedFlag);
             }
             finally
@@ -694,7 +466,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aDuplexOutputChannel1.OpenConnection();
 
                 // Wait until connected.
-                aResponseReceiverConnectedEvent.WaitOne();
+                aResponseReceiverConnectedEvent.WaitIfNotDebugging(1000);
                 Assert.AreEqual(aDuplexOutputChannel1.ResponseReceiverId, aConnectedResponseReceiver);
                 Assert.IsTrue(aDuplexOutputChannel1.IsConnected);
 
@@ -702,7 +474,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aDuplexOutputChannel2.OpenConnection();
 
                 // Wait until connected.
-                aResponseReceiverConnectedEvent.WaitOne();
+                aResponseReceiverConnectedEvent.WaitIfNotDebugging(1000);
                 Assert.AreEqual(aDuplexOutputChannel2.ResponseReceiverId, aConnectedResponseReceiver);
                 Assert.IsTrue(aDuplexOutputChannel2.IsConnected);
 
@@ -711,7 +483,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aDuplexOutputChannel1.CloseConnection();
 
                 // Wait until disconnected
-                aResponseReceiverDisconnectedEvent.WaitOne();
+                aResponseReceiverDisconnectedEvent.WaitIfNotDebugging(1000);
                 Thread.Sleep(100); // maybe other unwanted disconnection - give them some time.
                 Assert.IsFalse(aDuplexOutputChannel1.IsConnected);
                 Assert.IsTrue(aDuplexOutputChannel2.IsConnected);
@@ -720,7 +492,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 // The second duplex output channel must still work.
                 aDuplexOutputChannel2.SendMessage("Message");
 
-                aMessageReceivedEvent.WaitOne();
+                aMessageReceivedEvent.WaitIfNotDebugging(1000);
                 Assert.AreEqual("Message", aReceivedMessage);
             }
             finally
@@ -765,7 +537,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 // Open connection - the event will try to close the connection.
                 aDuplexOutputChannel.OpenConnection();
 
-                aConnectionClosedEvent.WaitOne();
+                aConnectionClosedEvent.WaitIfNotDebugging(1000);
 
                 //EneterTrace.StopProfiler();
 
@@ -813,7 +585,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 // Open connection - the event will try to close the connection.
                 aDuplexOutputChannel.OpenConnection();
 
-                aConnectionClosedEvent.WaitOne();
+                aConnectionClosedEvent.WaitIfNotDebugging(1000);
 
                 Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, aConnectedResponseReceiver);
                 Assert.IsTrue(isDisconnectedFlag);
@@ -862,7 +634,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     // If the 2nd connection throws an exception it is ok.
                 }
 
-                aConnection2Closed.WaitOne();
+                aConnection2Closed.WaitIfNotDebugging(1000);
 
                 Assert.IsTrue(aDuplexOutputChannel1.IsConnected);
                 Assert.IsFalse(aDuplexOutputChannel1.IsConnected);
@@ -875,217 +647,116 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             }
         }
 
-
         private void SendMessageReceiveResponse(string channelId, string message, string responseMessage,
-                                                int numberOfClients, int numberOfMessages)
+                                                int numberOfClients, int numberOfMessages,
+                                                int openConnectionTimeout,
+                                                int allMessagesReceivedTimeout)
         {
-            // Create number of desired clients.
-            TDuplexClient[] aClients = new TDuplexClient[numberOfClients];
-            for (int i = 0; i < numberOfClients; ++i)
-            {
-                aClients[i] = new TDuplexClient(MessagingSystemFactory, channelId, responseMessage, numberOfMessages);
-            }
+            ThreadPool.SetMinThreads(50, 2);
 
-            // Create service.
-            TDuplexService aService = new TDuplexService(MessagingSystemFactory, channelId, message, numberOfMessages * numberOfClients, responseMessage);
+            ClientMockFarm aClientFarm = new ClientMockFarm(MessagingSystemFactory, channelId, numberOfClients);
+
+            ServiceMock aService = new ServiceMock(MessagingSystemFactory, channelId);
+            aService.DoOnMessageReceived_SendResponse(responseMessage);
 
             try
             {
-                // Service starts listening.
-                aService.InputChannel.StartListening();
-
-                // Clients open connection in parallel.
-                foreach (TDuplexClient aClient in aClients)
-                {
-                    TDuplexClient aC = aClient;
-                    WaitCallback aW = x =>
-                        {
-                            //EneterTrace.Info("CONNECT CLIENT");
-                            aC.OpenConnection();
-                        };
-                    ThreadPool.QueueUserWorkItem(aW);
-
-                    Thread.Sleep(2);
-                }
-
-                // Wait until connections are open.
-                foreach (TDuplexClient aClient in aClients)
-                {
-                    aClient.ConnectionOpenEvent.WaitOne();
-                    if (aClient.OpenConnectionError != null)
-                    {
-                        throw aClient.OpenConnectionError;
-                    }
-
-                    //Assert.IsTrue(aClient.ConnectionOpenEvent.WaitOne(100000));
-                }
-
                 //EneterTrace.StartProfiler();
+
+                aService.InputChannel.StartListening();
+                aClientFarm.OpenConnectionsAsync();
+
+                aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
+                aService.WaitUntilResponseReceiversAreConnected(numberOfClients, openConnectionTimeout);
+                Assert.AreEqual(aClientFarm.Clients.Count(), aService.ConnectedResponseReceivers.Count());
+                foreach (ClientMock aClient in aClientFarm.Clients)
+                {
+                    Assert.IsTrue(aService.ConnectedResponseReceivers.Any(x => x.ResponseReceiverId == aClient.OutputChannel.ResponseReceiverId));
+                }
 
                 Stopwatch aStopWatch = new Stopwatch();
                 aStopWatch.Start();
 
-                // Clients send messages in parallel.
-                int idx = 0;
-                foreach (TDuplexClient aClient in aClients)
-                {
-                    int aIdx = idx;
-                    TDuplexClient aC = aClient;
-                    WaitCallback aW = x =>
-                    {
-                        //EneterTrace.Info("Client idx = " + aIdx);
-
-                        for (int j = 0; j < numberOfMessages; ++j)
-                        {
-                            // Send messages.
-                            aC.OutputChannel.SendMessage(message);
-                        }
-                    };
-                    ThreadPool.QueueUserWorkItem(aW);
-
-                    Thread.Sleep(2);
-
-                    ++idx;
-                }
-
-                // Wait until all messages are processed.
-                foreach (TDuplexClient aClient in aClients)
-                {
-                    //Assert.IsTrue(aClient.ResponsesReceivedEvent.WaitOne(timeOutForMessageProcessing));
-                    Assert.IsTrue(aClient.ResponsesReceivedEvent.WaitOne());
-                }
+                aClientFarm.SendMessageAsync(message, numberOfMessages);
+                aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
 
                 aStopWatch.Stop();
                 Console.WriteLine("Send messages to '" + ChannelId + "' completed. Elapsed time = " + aStopWatch.Elapsed);
 
-                //EneterTrace.StopProfiler();
+                Assert.AreEqual(numberOfMessages * numberOfClients, aService.ReceivedMessages.Count());
+                Assert.AreEqual(numberOfMessages * numberOfClients, aClientFarm.ReceivedResponses.Count());
+                foreach (DuplexChannelMessageEventArgs aMessage in aService.ReceivedMessages)
+                {
+                    Assert.AreEqual(message, aMessage.Message);
+                }
+                foreach (DuplexChannelMessageEventArgs aResponseMessage in aClientFarm.ReceivedResponses)
+                {
+                    Assert.AreEqual(responseMessage, aResponseMessage.Message);
+                }
             }
             finally
             {
-                try
-                {
-                    foreach (TDuplexClient aClient in aClients)
-                    {
-                        aClient.OutputChannel.CloseConnection();
-                    }
-                }
-                finally
-                {
-                    aService.InputChannel.StopListening();
-                }
-            }
+                EneterTrace.Debug("CLEANING AFTER TEST");
 
-            foreach (TDuplexClient aClient in aClients)
-            {
-                Assert.AreEqual(0, aClient.NumberOfFailedResponses, "There are failed response messages.");
-                Assert.AreEqual(numberOfMessages, aClient.NumberOfReceivedResponses, "Number of received responses differs from number of sent responses.");
-            }
+                aClientFarm.CloseAllConnections();
+                aService.InputChannel.StopListening();
 
-            Assert.AreEqual(0, aService.NumberOfFailedMessages, "There are failed messages.");
-            Assert.AreEqual(numberOfMessages * numberOfClients, aService.NumberOfReceivedMessages, "Number of sent messages differs from number of received.");
-            
+                //EneterTrace.StopProfiler();
+                Thread.Sleep(200);
+            }
         }
-
 
         private void SendBroadcastResponseMessage(string channelId, string broadcastMessage,
-                                                int numberOfClients, int numberOfMessages)
+                                                int numberOfClients, int numberOfMessages,
+                                                int openConnectionTimeout,
+                                                int allMessagesReceivedTimeout)
         {
-            // Create number of desired clients.
-            TDuplexClient[] aClients = new TDuplexClient[numberOfClients];
-            for (int i = 0; i < numberOfClients; ++i)
-            {
-                aClients[i] = new TDuplexClient(MessagingSystemFactory, channelId, broadcastMessage, numberOfMessages);
-            }
+            ThreadPool.SetMinThreads(50, 2);
 
-            // Create service.
-            TDuplexService aService = new TDuplexService(MessagingSystemFactory, channelId, null, 0, broadcastMessage);
+            ClientMockFarm aClientFarm = new ClientMockFarm(MessagingSystemFactory, channelId, numberOfClients);
+            ServiceMock aService = new ServiceMock(MessagingSystemFactory, channelId);
 
             try
             {
-                // Service starts listening.
                 aService.InputChannel.StartListening();
+                aClientFarm.OpenConnectionsAsync();
 
-                // Clients open connection in parallel.
-                foreach (TDuplexClient aClient in aClients)
+                aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
+                aService.WaitUntilResponseReceiversAreConnected(numberOfClients, openConnectionTimeout);
+                Assert.AreEqual(aClientFarm.Clients.Count(), aService.ConnectedResponseReceivers.Count());
+                foreach (ClientMock aClient in aClientFarm.Clients)
                 {
-                    TDuplexClient aC = aClient;
-                    WaitCallback aW = x =>
-                    {
-                        //EneterTrace.Info("CONNECT CLIENT");
-                        aC.OpenConnection();
-                    };
-                    ThreadPool.QueueUserWorkItem(aW);
-
-                    Thread.Sleep(2);
+                    Assert.IsTrue(aService.ConnectedResponseReceivers.Any(x => x.ResponseReceiverId == aClient.OutputChannel.ResponseReceiverId));
                 }
-
-                // Wait until connections are open.
-                foreach (TDuplexClient aClient in aClients)
-                {
-                    aClient.ConnectionOpenEvent.WaitOne();
-                    if (aClient.OpenConnectionError != null)
-                    {
-                        throw aClient.OpenConnectionError;
-                    }
-
-                    //Assert.IsTrue(aClient.ConnectionOpenEvent.WaitOne(100000));
-                }
-
-                // Give some time to duplex input channel to activate all connected clients.
-                // Note: When the duplex output channel indicates the connection is open
-                //       the client still does not have to be fully activated inside duplex input channel.
-                //       This is not the problem for communication across computers but local communication
-                //       can be too fast.
-                Thread.Sleep(10000);
-
-                //EneterTrace.StartProfiler();
 
                 Stopwatch aStopWatch = new Stopwatch();
                 aStopWatch.Start();
 
-                // Service sends broadcast messages.
                 for (int i = 0; i < numberOfMessages; ++i)
                 {
-                    // Send the broadcast message.
                     aService.InputChannel.SendResponseMessage(null, broadcastMessage);
                 }
-
-                //EneterTrace.Info("All broadcasts are sent.");
-
-                // Wait until all messages are processed.
-                foreach (TDuplexClient aClient in aClients)
-                {
-                    //Assert.IsTrue(aClient.ResponsesReceivedEvent.WaitOne(timeOutForMessageProcessing));
-                    Assert.IsTrue(aClient.ResponsesReceivedEvent.WaitOne());
-                }
+                aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
 
                 aStopWatch.Stop();
                 Console.WriteLine("Send messages to '" + ChannelId + "' completed. Elapsed time = " + aStopWatch.Elapsed);
 
-                //EneterTrace.StopProfiler();
+                foreach (DuplexChannelMessageEventArgs aResponseMessage in aClientFarm.ReceivedResponses)
+                {
+                    Assert.AreEqual(broadcastMessage, aResponseMessage.Message);
+                }
             }
             finally
             {
-                try
-                {
-                    foreach (TDuplexClient aClient in aClients)
-                    {
-                        aClient.OutputChannel.CloseConnection();
-                    }
-                }
-                finally
-                {
-                    aService.InputChannel.StopListening();
-                }
-            }
+                EneterTrace.Debug("CLEANING AFTER TEST");
 
-            foreach (TDuplexClient aClient in aClients)
-            {
-                Assert.AreEqual(0, aClient.NumberOfFailedResponses, "There are failed response messages.");
-                Assert.AreEqual(numberOfMessages, aClient.NumberOfReceivedResponses, "Number of received responses differs from number of sent responses.");
+                aClientFarm.CloseAllConnections();
+                aService.InputChannel.StopListening();
+
+                //EneterTrace.StopProfiler();
+                Thread.Sleep(500);
             }
         }
-
 
         protected IMessagingSystemFactory MessagingSystemFactory { get; set; }
 

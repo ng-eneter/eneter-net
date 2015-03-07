@@ -142,6 +142,9 @@
     <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EventWaitHandleExt.cs" />
+    <Compile Include="MessagingSystems\ClientMockFarm.cs" />
+    <Compile Include="MessagingSystems\ServiceMock.cs" />
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -231,6 +234,7 @@
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\Test_NamedPipeMessagingLocalMachine.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\ClientMock.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\Test_SharedMemoryMessagingSystem.cs">
       <SubType>Code</SubType>
     </Compile>

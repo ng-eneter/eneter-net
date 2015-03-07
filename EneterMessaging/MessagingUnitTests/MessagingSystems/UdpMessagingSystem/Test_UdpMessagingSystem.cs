@@ -32,12 +32,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
 
         [Ignore]
         [Test]
-        public override void Duplex_03_Send100_10MB()
-        {
-        }
-
-        [Ignore]
-        [Test]
         public override void Duplex_03_Send1_10MB()
         {
         }

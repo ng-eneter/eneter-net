@@ -70,13 +70,45 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                lock (myAuthenticatedConnections)
+                if (!IsListening)
                 {
-                    if (!myAuthenticatedConnections.Contains(responseReceiverId))
+                    string aMessage = TracedObject + ErrorHandler.SendResponseNotListeningFailure;
+                    EneterTrace.Error(aMessage);
+                    throw new InvalidOperationException(aMessage);
+                }
+
+                if (string.IsNullOrEmpty(responseReceiverId))
+                {
+                    lock (myAuthenticatedConnections)
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendResponseNotConnectedFailure;
-                        EneterTrace.Error(aMessage);
-                        throw new InvalidOperationException(aMessage);
+                        // Send the response message to all connected clients.
+                        foreach (string aConnectedClient in myAuthenticatedConnections)
+                        {
+                            try
+                            {
+                                // Send the response message.
+                                myUnderlayingInputChannel.SendResponseMessage(aConnectedClient, message);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+
+                                // Note: Exception is not rethrown because if sending to one client fails it should not
+                                //       affect sending to other clients.
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    lock (myAuthenticatedConnections)
+                    {
+                        if (!myAuthenticatedConnections.Contains(responseReceiverId))
+                        {
+                            string aMessage = TracedObject + ErrorHandler.SendResponseNotConnectedFailure;
+                            EneterTrace.Error(aMessage);
+                            throw new InvalidOperationException(aMessage);
+                        }
                     }
 
                     myUnderlayingInputChannel.SendResponseMessage(responseReceiverId, message);
