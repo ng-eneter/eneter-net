@@ -201,10 +201,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                // Update the time for the response receiver.
-                // If the response receiver does not exist, then create it.
-                UpdateResponseReceiverContext(e.ResponseReceiverId, e.SenderAddress, true, true);
-
                 // Note: this method is called from the underlying channel. Therefore it is called in the correct thread.
                 Notify<DuplexChannelMessageEventArgs>(MessageReceived, e, true);
             }
@@ -228,7 +224,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         // Create the response receiver context - it allows to enqueue response messages before connection of
                         // the response receiver.
                         aResponseReceiverContext = new ResponseReceiverContext(responseReceiverId, clientAddress, myUnderlyingInputChannel);
-                        aResponseReceiverContext.SetConnectionState(isConnected);
                         myResponseReceivers.Add(aResponseReceiverContext);
 
                         // If it is the first response receiver, then start the timer checking which response receivers
@@ -242,12 +237,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     // Update the connection status.
                     if (aResponseReceiverContext != null)
                     {
-                        aResponseReceiverContext.SetConnectionState(isConnected);
+                        aResponseReceiverContext.IsResponseReceiverConnected = isConnected;
 
-                        if (!String.IsNullOrEmpty(clientAddress))
-                        {
-                            aResponseReceiverContext.ClientAddress = clientAddress;
-                        }
+                        // In case the client was connected after the response message was sent the client address is not set.
+                        // Therefore try to set it now too.
+                        aResponseReceiverContext.ClientAddress = clientAddress;
                     }
                 }
             }
@@ -275,7 +269,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         {
                             // If disconnected and max offline time is exceeded. 
                             if (!x.IsResponseReceiverConnected &&
-                                aCurrentCheckTime - x.LastConnectionChangeTime > myMaxOfflineTime)
+                                aCurrentCheckTime - x.DisconnectionStartedAt > myMaxOfflineTime)
                             {
                                 aTimeoutedResponseReceivers.Add(x);
 

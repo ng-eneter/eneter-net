@@ -39,7 +39,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         myThreadIsSendingFlag = true;
                         mySendingThreadStoppedEvent.Reset();
 
-                        WaitCallback aSender = x => MessageSender();
+                        WaitCallback aSender = x => DoResponseMessageSending();
                         ThreadPool.QueueUserWorkItem(aSender);
                     }
                 }
@@ -67,7 +67,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        private void MessageSender()
+        private void DoResponseMessageSending()
         {
             using (EneterTrace.Entering())
             {
