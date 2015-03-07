@@ -48,7 +48,7 @@ namespace Eneter.Messaging.DataProcessing.Streaming
             {
                 while (true)
                 {
-                    byte[] aBuffer = new byte[4096];
+                    byte[] aBuffer = new byte[32768];
                     int aSize = inputStream.Read(aBuffer, 0, aBuffer.Length);
 
                     if (aSize == 0)
