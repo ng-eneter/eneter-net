@@ -117,7 +117,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myListeningToResponsesStartedEvent.WaitOne(1000);
 
                         byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
-                        myClientStream.Write(anEncodedMessage, 0, anEncodedMessage.Length);
+                        if (anEncodedMessage != null)
+                        {
+                            myClientStream.Write(anEncodedMessage, 0, anEncodedMessage.Length);
+                        }
                     }
                     catch
                     {

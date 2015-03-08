@@ -23,13 +23,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_01_Send1()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Response", 1, 1, 500, 500);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 1, 500, 500);
         }
 
         [Test]
         public virtual void Duplex_02_Send500()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 500, 1000, 1000);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 500, 1000, 1000);
         }
 
         [Test]
@@ -41,19 +41,19 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_04_Send50000()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 1, 50000, 500, 20000);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 50000, 500, 20000);
         }
 
         [Test]
         public virtual void Duplex_05_Send50_10Prallel()
         {
-            SendMessageReceiveResponse(ChannelId, "Message", "Respones", 10, 50, 1000, 2000);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 10, 50, 1000, 2000);
         }
 
         [Test]
         public virtual void Duplex_05a_SendBroadcastResponse_50_10Clients()
         {
-            SendBroadcastResponseMessage(ChannelId, "broadcastMessage", 10, 50, 1000, 2000);
+            SendBroadcastResponseMessage(ChannelId, myResponseMessage, 10, 50, 1000, 2000);
         }
 
         [Test]
@@ -526,7 +526,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         }
 
 
-        private void SendMessageReceiveResponse(string channelId, string message, string responseMessage,
+        private void SendMessageReceiveResponse(string channelId, object message, object responseMessage,
                                                 int numberOfClients, int numberOfMessages,
                                                 int openConnectionTimeout,
                                                 int allMessagesReceivedTimeout)
@@ -589,7 +589,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             }
         }
 
-        private void SendBroadcastResponseMessage(string channelId, string broadcastMessage,
+        private void SendBroadcastResponseMessage(string channelId, object broadcastMessage,
                                                 int numberOfClients, int numberOfMessages,
                                                 int openConnectionTimeout,
                                                 int allMessagesReceivedTimeout)
@@ -607,9 +607,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
                 aService.WaitUntilResponseReceiversConnectNotified(numberOfClients, openConnectionTimeout);
                 Assert.AreEqual(aClientFarm.Clients.Count(), aService.ConnectedResponseReceivers.Count());
-                foreach (ClientMock aClient in aClientFarm.Clients)
+                if (CompareResponseReceiverId)
                 {
-                    Assert.IsTrue(aService.ConnectedResponseReceivers.Any(x => x.ResponseReceiverId == aClient.OutputChannel.ResponseReceiverId));
+                    foreach (ClientMock aClient in aClientFarm.Clients)
+                    {
+                        Assert.IsTrue(aService.ConnectedResponseReceivers.Any(x => x.ResponseReceiverId == aClient.OutputChannel.ResponseReceiverId));
+                    }
                 }
 
                 Stopwatch aStopWatch = new Stopwatch();
@@ -647,6 +650,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
         protected bool CompareResponseReceiverId = true;
 
-        private string myMessage_10MB = RandomDataGenerator.GetString(10000000);
+        protected object myRequestMessage = "Message";
+        protected object myResponseMessage = "Response";
+
+        protected string myMessage_10MB = RandomDataGenerator.GetString(10000000);
     }
 }
