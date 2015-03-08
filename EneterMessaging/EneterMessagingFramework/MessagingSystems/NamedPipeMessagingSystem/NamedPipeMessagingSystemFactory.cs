@@ -51,7 +51,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new NamedPipeOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, myNumberOfListeningInstances, mySecurity);
+                    return new NamedPipeOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, mySecurity);
                 }
             }
 

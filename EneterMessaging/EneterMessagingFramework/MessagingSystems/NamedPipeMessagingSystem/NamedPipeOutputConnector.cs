@@ -18,7 +18,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
     internal class NamedPipeOutputConnector : IOutputConnector
     {
-        public NamedPipeOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter, int timeOut, int numberOfListeningInstances, PipeSecurity security)
+        public NamedPipeOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter, int timeOut, PipeSecurity security)
         {
             using (EneterTrace.Entering())
             {
@@ -26,7 +26,6 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                 myOutputConnectorAddress = outputConnectorAddress;
                 myProtocolFormatter = protocolFormatter;
                 myTimeout = timeOut;
-                myNumberOfListeningInstances = numberOfListeningInstances;
                 mySecurity = security;
             }
         }
@@ -47,7 +46,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                         mySender = new NamedPipeSender(myInputConnectorAddress, myTimeout);
 
                         myResponseMessageHandler = responseMessageHandler;
-                        myResponseReceiver = new NamedPipeReceiver(myOutputConnectorAddress, myNumberOfListeningInstances, myTimeout, mySecurity);
+                        myResponseReceiver = new NamedPipeReceiver(myOutputConnectorAddress, 1, myTimeout, mySecurity);
                         myResponseReceiver.StartListening(HandleResponseMessages);
 
                         // Send the open connection request.
@@ -157,7 +156,6 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 
         private string myInputConnectorAddress;
         private string myOutputConnectorAddress;
-        private int myNumberOfListeningInstances;
         private int myTimeout;
         private PipeSecurity mySecurity;
         private NamedPipeSender mySender;
