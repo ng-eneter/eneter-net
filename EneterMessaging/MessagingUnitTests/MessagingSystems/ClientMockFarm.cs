@@ -74,6 +74,14 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             }
         }
 
+        public void WaitUntilAllConnectionsAreClosed(int milliseconds)
+        {
+            foreach (ClientMock aClient in myClients)
+            {
+                aClient.WaitUntilConnectionClosedIsNotified(milliseconds);
+            }
+        }
+
         public void DoOnConnectionClosed(Action<object, DuplexChannelEventArgs> doOnConnectionClosed)
         {
             foreach (ClientMock aClient in myClients)
@@ -129,12 +137,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             }
         }
 
-        public IEnumerable<ClientMock> Clients { get { return myClients; } }
-        public IEnumerable<DuplexChannelMessageEventArgs> ReceivedResponses
+        public List<ClientMock> Clients { get { return myClients; } }
+        public List<DuplexChannelMessageEventArgs> ReceivedResponses
         {
             get
             {
-                return myClients.SelectMany(x => x.ReceivedMessages);
+                return myClients.SelectMany(x => x.ReceivedMessages).ToList();
             }
         }
 

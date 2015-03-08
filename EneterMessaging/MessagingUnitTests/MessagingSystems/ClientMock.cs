@@ -96,7 +96,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             myResponseMessagesReceivedEvent.WaitIfNotDebugging(milliseconds);
         }
 
-        public IEnumerable<DuplexChannelMessageEventArgs> ReceivedMessages { get { return myReceivedMessages; } }
+        public List<DuplexChannelMessageEventArgs> ReceivedMessages { get { return myReceivedMessages; } }
 
 
 

@@ -30,7 +30,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
         public IDuplexInputChannel InputChannel { get; private set; }
 
-        public void WaitUntilResponseReceiversAreConnected(int numberOfExpectedReceivers, int milliseconds)
+        public void WaitUntilResponseReceiversConnectNotified(int numberOfExpectedReceivers, int milliseconds)
         {
             lock (myConnectedResponseReceivers)
             {
@@ -48,33 +48,67 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             myResponseReceiversAreConnectedEvent.WaitIfNotDebugging(milliseconds);
         }
 
-        public IEnumerable<ResponseReceiverEventArgs> ConnectedResponseReceivers { get { return myConnectedResponseReceivers; } }
-
-        public void WaitUntilAllResponseReceiversAreDisconnected(int milliseconds)
+        public void DoOnResponseReceiverConnected(Action<object, ResponseReceiverEventArgs> doOnResponseReceiverConnected)
         {
-            myAllResponseReceiversDisconnectedEvent.WaitIfNotDebugging(milliseconds);
+            myDoOnResponseReceiverConnected = doOnResponseReceiverConnected;
         }
 
-        public IEnumerable<ResponseReceiverEventArgs> DisconnectedResponseReceivers { get { return myDisconnectedResponseReceivers; } }
+        public List<ResponseReceiverEventArgs> ConnectedResponseReceivers { get { return myConnectedResponseReceivers; } }
+
+
+        public void WaitUntilAllResponseReceiversDisconnectNotified(int milliseconds)
+        {
+            using (EneterTrace.Entering())
+            {
+                myAllResponseReceiversDisconnectedEvent.WaitIfNotDebugging(milliseconds);
+            }
+        }
+
+        public void WaitUntilResponseRecieverIdDisconnectNotified(string responseReceiverId, int milliseconds)
+        {
+            using (EneterTrace.Entering())
+            {
+                // Note: it is correcto to use myConnectedResponseReceivers as lock and not myDisconnectedResponseReceivers.
+                lock (myConnectedResponseReceivers)
+                {
+                    if (myDisconnectedResponseReceivers.Any(x => x.ResponseReceiverId == responseReceiverId))
+                    {
+                        myExpectedResponseReceiverIdDisconnectedEvent.Set();
+                    }
+                    else
+                    {
+                        myExpectedDisconnectedResponseReceiverId = responseReceiverId;
+                        myExpectedResponseReceiverIdDisconnectedEvent.Reset();
+                    }
+                }
+
+                myExpectedResponseReceiverIdDisconnectedEvent.WaitIfNotDebugging(milliseconds);
+            }
+        }
+
+        public List<ResponseReceiverEventArgs> DisconnectedResponseReceivers { get { return myDisconnectedResponseReceivers; } }
 
         
 
         public void WaitUntilMessagesAreReceived(int numberOfExpectedMessages, int milliseconds)
         {
-            lock (myReceivedMessages)
+            using (EneterTrace.Entering())
             {
-                myNumberOfExpectedRequestMessages = numberOfExpectedMessages;
-                if (myReceivedMessages.Count == myNumberOfExpectedRequestMessages)
+                lock (myReceivedMessages)
                 {
-                    myRequestMessagesReceivedEvent.Set();
+                    myNumberOfExpectedRequestMessages = numberOfExpectedMessages;
+                    if (myReceivedMessages.Count == myNumberOfExpectedRequestMessages)
+                    {
+                        myRequestMessagesReceivedEvent.Set();
+                    }
+                    else
+                    {
+                        myRequestMessagesReceivedEvent.Reset();
+                    }
                 }
-                else
-                {
-                    myRequestMessagesReceivedEvent.Reset();
-                }
-            }
 
-            myRequestMessagesReceivedEvent.WaitIfNotDebugging(milliseconds);
+                myRequestMessagesReceivedEvent.WaitIfNotDebugging(milliseconds);
+            }
         }
 
         public void DoOnMessageReceived(Action<object, DuplexChannelMessageEventArgs> doOnMessageReceived)
@@ -86,7 +120,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             myDoOnMessageReceived = (x, y) => InputChannel.SendResponseMessage(y.ResponseReceiverId, responseMessage);
         }
 
-        public IEnumerable<DuplexChannelMessageEventArgs> ReceivedMessages { get { return myReceivedMessages; } }
+        public List<DuplexChannelMessageEventArgs> ReceivedMessages { get { return myReceivedMessages; } }
 
 
         private void OnResponseReceiverConnected(object sender, ResponseReceiverEventArgs e)
@@ -100,6 +134,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     if (myConnectedResponseReceivers.Count == myNumberOfExpectedReceivers)
                     {
                         myResponseReceiversAreConnectedEvent.Set();
+                    }
+
+                    if (myDoOnResponseReceiverConnected != null)
+                    {
+                        myDoOnResponseReceiverConnected(sender, e);
                     }
                 }
             }
@@ -117,6 +156,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     if (myConnectedResponseReceivers.Count == 0)
                     {
                         myAllResponseReceiversDisconnectedEvent.Set();
+                    }
+
+                    if (e.ResponseReceiverId == myExpectedDisconnectedResponseReceiverId)
+                    {
+                        myExpectedResponseReceiverIdDisconnectedEvent.Set();
                     }
                 }
             }
@@ -148,9 +192,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         private int myNumberOfExpectedReceivers;
         private ManualResetEvent myResponseReceiversAreConnectedEvent = new ManualResetEvent(false);
         private List<ResponseReceiverEventArgs> myConnectedResponseReceivers = new List<ResponseReceiverEventArgs>();
+        Action<object, ResponseReceiverEventArgs> myDoOnResponseReceiverConnected;
 
         private ManualResetEvent myAllResponseReceiversDisconnectedEvent = new ManualResetEvent(false);
         private List<ResponseReceiverEventArgs> myDisconnectedResponseReceivers = new List<ResponseReceiverEventArgs>();
+        private ManualResetEvent myExpectedResponseReceiverIdDisconnectedEvent = new ManualResetEvent(false);
+        private string myExpectedDisconnectedResponseReceiverId;
 
         private ManualResetEvent myRequestMessagesReceivedEvent = new ManualResetEvent(false);
         private List<DuplexChannelMessageEventArgs> myReceivedMessages = new List<DuplexChannelMessageEventArgs>();

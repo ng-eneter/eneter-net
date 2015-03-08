@@ -256,6 +256,7 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_Synchronous.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\Test_TcpMessagingSystem_Sync_Interoperable.cs" />
     <Compile Include="MessagingSystems\ThreadMessagingSystem\Test_ThreadMessagingSystem.cs">
       <SubType>Code</SubType>
     </Compile>
