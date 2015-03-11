@@ -118,7 +118,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         {
             ClientMock aClient = new ClientMock(MessagingSystemFactory, ChannelId);
             ServiceMock aService = new ServiceMock(MessagingSystemFactory, ChannelId);
-            aService.DoOnMessageReceived_SendResponse("Hi");
+            aService.DoOnMessageReceived_SendResponse(myResponseMessage);
 
             try
             {
@@ -174,12 +174,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 }
 
                 // Client sends the message.
-                aClient.OutputChannel.SendMessage("Hello");
+                aClient.OutputChannel.SendMessage(myRequestMessage);
 
                 aClient.WaitUntilResponseMessagesAreReceived(1, 1000);
 
-                Assert.AreEqual("Hello", aService.ReceivedMessages.First().Message);
-                Assert.AreEqual("Hi", aClient.ReceivedMessages.First().Message);
+                Assert.AreEqual(myRequestMessage, aService.ReceivedMessages.First().Message);
+                Assert.AreEqual(myResponseMessage, aClient.ReceivedMessages.First().Message);
             }
             finally
             {
@@ -293,7 +293,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 try
                 {
                     // Try to send a message via the duplex output channel.
-                    aClient.OutputChannel.SendMessage("Message");
+                    aClient.OutputChannel.SendMessage(myRequestMessage);
                 }
                 catch
                 {
@@ -417,11 +417,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 }
 
                 // Client 2 can send message.
-                aClients.Clients[1].OutputChannel.SendMessage("Hello");
+                aClients.Clients[1].OutputChannel.SendMessage(myRequestMessage);
 
                 aService.WaitUntilMessagesAreReceived(1, 1000);
 
-                Assert.AreEqual("Hello", aService.ReceivedMessages[0].Message as string);
+                Assert.AreEqual(myRequestMessage, aService.ReceivedMessages[0].Message);
             }
             finally
             {
@@ -653,6 +653,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         protected object myRequestMessage = "Message";
         protected object myResponseMessage = "Response";
 
-        protected string myMessage_10MB = RandomDataGenerator.GetString(10000000);
+        protected object myMessage_10MB = RandomDataGenerator.GetString(10000000);
     }
 }

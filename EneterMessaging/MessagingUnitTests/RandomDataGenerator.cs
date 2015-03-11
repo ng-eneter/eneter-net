@@ -21,10 +21,14 @@ namespace Eneter.MessagingUnitTests
             return aStringBuilder.ToString();
         }
 
-        public static void GetBytes(byte[] data)
+        public static byte[] GetBytes(int length)
         {
+            byte[] aResult = new byte[length];
+
             Random aRnd = new Random();
-            aRnd.NextBytes(data);
+            aRnd.NextBytes(aResult);
+
+            return aResult;
         }
     }
 }

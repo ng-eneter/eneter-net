@@ -90,7 +90,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #endif
 
                         object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
-                        myClient.SendMessage(anEncodedMessage);
+                        if (anEncodedMessage != null)
+                        {
+                            myClient.SendMessage(anEncodedMessage);
+                        }
                     }
                     catch
                     {
