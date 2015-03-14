@@ -8,7 +8,7 @@
 //#if !COMPACT_FRAMEWORK20
 
 using System;
-using System.IO;
+using System.IO;    
 using System.Text;
 using Eneter.Messaging.Diagnostic;
 
@@ -115,6 +115,136 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 return aDecodedData;
             }
         }
+
+
+
+        public void Write(BinaryWriter writer, object data, bool isLittleEndianRequested)
+        {
+            if (data is string)
+            {
+                WriteString(writer, (string)data, isLittleEndianRequested);
+            }
+            else if (data is byte[])
+            {
+                WriteByteArray(writer, (byte[])data, isLittleEndianRequested);
+            }
+            else
+            {
+                throw new InvalidOperationException("Only byte[] or string is supported.");
+            }
+        }
+
+        public void WriteString(BinaryWriter writer, string data, bool isLittleEndianRequested)
+        {
+            // Write info, that encoded data is string.
+            writer.Write((byte)STRING_UTF8_ID);
+            WritePlainString(writer, data, Encoding.UTF8, isLittleEndianRequested);
+        }
+
+        public void WriteByteArray(BinaryWriter writer, byte[] data, bool isLittleEndianRequested)
+        {
+            // Write info, that encoded data is array of bytes.
+            writer.Write((byte)BYTES_ID);
+            WritePlainByteArray(writer, data, isLittleEndianRequested);
+        }
+
+        public object Read(BinaryReader reader, bool isLittleEndian)
+        {
+            byte aDataType = reader.ReadByte();
+            object aResult;
+
+            if (aDataType == BYTES_ID)
+            {
+                aResult = ReadPlainByteArray(reader, isLittleEndian);
+            }
+            else
+            {
+                Encoding anEncoding = null;
+
+                if (aDataType == STRING_UTF8_ID)
+                {
+                    anEncoding = Encoding.UTF8;
+                }
+                else if (aDataType == STRING_UTF16_LE_ID)
+                {
+                    anEncoding = Encoding.Unicode;
+                }
+                else if (aDataType == STRING_UTF16_BE_ID)
+                {
+                    anEncoding = Encoding.BigEndianUnicode;
+                }
+
+                aResult = ReadPlainString(reader, anEncoding, isLittleEndian);
+            }
+
+            return aResult;
+        }
+
+        public void WritePlainString(BinaryWriter writer, string data, Encoding stringEncoding, bool isLittleEndianRequested)
+        {
+            byte[] aDataBytes = stringEncoding.GetBytes(data);
+
+            WritePlainByteArray(writer, aDataBytes, isLittleEndianRequested);
+        }
+
+        public string ReadPlainString(BinaryReader reader, Encoding stringEncoding, bool isLittleEndian)
+        {
+            byte[] aStringBytes = ReadPlainByteArray(reader, isLittleEndian);
+
+            string aResult = stringEncoding.GetString(aStringBytes, 0, aStringBytes.Length);
+            return aResult;
+        }
+
+        public void WritePlainByteArray(BinaryWriter writer, byte[] data, bool isLittleEndianRequested)
+        {
+            // Length of the array.
+            WriteInt32(writer, data.Length, isLittleEndianRequested);
+
+            // Bytes.
+            writer.Write(data);
+        }
+
+        public byte[] ReadPlainByteArray(BinaryReader reader, bool isLittleEndian)
+        {
+            int aLength = ReadInt32(reader, isLittleEndian);
+            byte[] aData = reader.ReadBytes(aLength);
+
+            return aData;
+        }
+
+        public void WriteInt32(BinaryWriter writer, int value, bool isLittleEndianRequested)
+        {
+            // If the endianess of the machine is different than requested endianess then correct it.
+            if (BitConverter.IsLittleEndian != isLittleEndianRequested)
+            {
+                value = SwitchEndianess(value);
+            }
+
+            writer.Write((int)value);
+        }
+
+        public int ReadInt32(BinaryReader reader, bool isLittleEndian)
+        {
+            int aValue = reader.ReadInt32();
+
+            if (BitConverter.IsLittleEndian != isLittleEndian)
+            {
+                // If the endianess of the machine is same as requested endianess then just write.
+                aValue = SwitchEndianess(aValue);
+            }
+
+            return aValue;
+        }
+
+
+        private int SwitchEndianess(int i)
+        {
+            int anInt = ((i & 0x000000ff) << 24) + ((i & 0x0000ff00) << 8) +
+                        ((i & 0x00ff0000) >> 8) + (int)((i & 0xff000000) >> 24);
+
+            return anInt;
+        }
+
 
         private readonly byte STRING_UTF8_ID = 10;
         private readonly byte STRING_UTF16_LE_ID = 20;

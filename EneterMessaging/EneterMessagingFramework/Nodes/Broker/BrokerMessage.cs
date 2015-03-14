@@ -22,34 +22,34 @@ namespace Eneter.Messaging.Nodes.Broker
         /// <summary>
         /// Request to subscribe exactly for the specified message.
         /// </summary>
-        Subscribe,
+        Subscribe = 10,
 
         /// <summary>
         /// Request to subscribe for message type ids that match with the regular expression.
         /// I.e. regular expression is used to identify what message types shall be notified
         /// to the client.
         /// </summary>
-        SubscribeRegExp,
+        SubscribeRegExp = 20,
 
         /// <summary>
         /// Request to unsubscribe from exactly specified message.
         /// </summary>
-        Unsubscribe,
+        Unsubscribe = 30,
 
         /// <summary>
         /// Request to unsubscribe the regular expression.
         /// </summary>
-        UnsubscribeRegExp,
+        UnsubscribeRegExp = 40,
 
         /// <summary>
         /// Request to unsubscribe all messages and regular expressions.
         /// </summary>
-        UnsubscribeAll,
+        UnsubscribeAll = 50,
 
         /// <summary>
         /// Request to publish a message.
         /// </summary>
-        Publish
+        Publish = 60
     }
 
 

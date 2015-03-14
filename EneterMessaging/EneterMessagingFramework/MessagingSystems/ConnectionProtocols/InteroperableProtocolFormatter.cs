@@ -7,11 +7,21 @@
 
 using System;
 using System.IO;
+using Eneter.Messaging.DataProcessing.Serializing;
 
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
     public class InteroperableProtocolFormatter : IProtocolFormatter
     {
+        public InteroperableProtocolFormatter()
+            : this(true)
+        {
+        }
+
+        public InteroperableProtocolFormatter(bool isLittleEndian)
+        {
+            myIsLittleEndian = isLittleEndian;
+        }
 
         public object EncodeOpenConnectionMessage(string responseReceiverId)
         {
@@ -57,16 +67,17 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                 {
                     BinaryWriter aWriter = new BinaryWriter(outputSream);
 
-                    // Convert size to Big Endian.
-                    int aBigEndianSize = ChangeEndianess(aMessageData.Length);
-
-                    // Write size of the message.
-                    aWriter.Write(aBigEndianSize);
-
-                    // Write the message.
-                    aWriter.Write(aMessageData, 0, aMessageData.Length);
+                    myEncoderDecoder.WritePlainByteArray(aWriter, aMessageData, myIsLittleEndian);
                 }
             //}
+        }
+
+        public ProtocolMessage DecodeMessage(object readMessage)
+        {
+            using (MemoryStream aMemoryStream = new MemoryStream((byte[])readMessage))
+            {
+                return DecodeMessage((Stream)aMemoryStream);
+            }
         }
 
         public ProtocolMessage DecodeMessage(Stream readStream)
@@ -74,12 +85,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             try
             {
                 BinaryReader aReader = new BinaryReader(readStream);
-
-                // Read the size.
-                int aBigEndianSize = aReader.ReadInt32();
-                int aLittleEndianSize = ChangeEndianess(aBigEndianSize);
-
-                byte[] aMessageData = aReader.ReadBytes(aLittleEndianSize);
+                byte[] aMessageData = myEncoderDecoder.ReadPlainByteArray(aReader, myIsLittleEndian);
 
                 ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, "", aMessageData);
                 return aProtocolMessage;
@@ -101,21 +107,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
-        public ProtocolMessage DecodeMessage(object readMessage)
-        {
-            using (MemoryStream aMemoryStream = new MemoryStream((byte[])readMessage))
-            {
-                return DecodeMessage(aMemoryStream);
-            }
-        }
-
-        private int ChangeEndianess(int i)
-        {
-            int anInt = ((i & 0x000000ff) << 24) + ((i & 0x0000ff00) << 8) +
-                        ((i & 0x00ff0000) >> 8) + (int)((i & 0xff000000) >> 24);
-
-            return anInt;
-        }
-
+        private bool myIsLittleEndian;
+        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
     }
 }

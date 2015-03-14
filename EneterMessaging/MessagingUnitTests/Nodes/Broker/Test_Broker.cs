@@ -10,6 +10,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using System.Threading;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.MessagingUnitTests.Nodes.Broker
 {
@@ -275,43 +276,9 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
         {
             // Create channels
             IMessagingSystemFactory aMessagingSystem = new SynchronousMessagingSystemFactory();
-
-            IDuplexInputChannel aBrokerInputChannel = aMessagingSystem.CreateDuplexInputChannel("BrokerChannel");
-            IDuplexOutputChannel aClient1OutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
-            IDuplexOutputChannel aClient2OutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
-
-            // Specify in the factory that the publisher shall not be notified from its own published events.
-            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(false, new BinarySerializer());
-
-            IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
-            aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
-
-            IDuplexBrokerClient aClient1 = aBrokerFactory.CreateBrokerClient();
-            int aCount = 0;
-            aClient1.BrokerMessageReceived += (x, y) =>
-            {
-                ++aCount;
-            };
-            aClient1.AttachDuplexOutputChannel(aClient1OutputChannel);
-
-            IDuplexBrokerClient aClient2 = aBrokerFactory.CreateBrokerClient();
-            aClient2.AttachDuplexOutputChannel(aClient2OutputChannel);
-
-            var aTimer = new PerformanceTimer();
-            aTimer.Start();
-
-            aClient1.Subscribe("TypeA");
-
-            for (int i = 0; i < 50000; ++i)
-            {
-                // Notify the message.
-                aClient2.SendMessage("TypeA", "Message A");
-            }
-
-            aTimer.Stop();
-
-            // Client 2 should not get the notification.
-            Assert.AreEqual(50000, aCount);
+            string aBrokerAddress = "BrokerChannel";
+            ISerializer aSerializer = new XmlStringSerializer();
+            Notify(50000, aSerializer, aMessagingSystem, aBrokerAddress);
         }
 
         [Test]
@@ -320,15 +287,38 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             Random aRnd = new Random();
             int aPort = aRnd.Next(8000, 9000); 
 
-            // Create channels
             IMessagingSystemFactory aMessagingSystem = new TcpMessagingSystemFactory();
+            string aBrokerAddress = "tcp://127.0.0.1:" + aPort + "/";
 
-            IDuplexInputChannel aBrokerInputChannel = aMessagingSystem.CreateDuplexInputChannel("tcp://127.0.0.1:" + aPort + "/");
-            IDuplexOutputChannel aClient1OutputChannel = aMessagingSystem.CreateDuplexOutputChannel("tcp://127.0.0.1:" + aPort + "/");
-            IDuplexOutputChannel aClient2OutputChannel = aMessagingSystem.CreateDuplexOutputChannel("tcp://127.0.0.1:" + aPort + "/");
+            ISerializer aSerializer = new BinarySerializer();
+
+            Notify(50000, aSerializer, aMessagingSystem, aBrokerAddress);
+        }
+
+        [Test]
+        public void Notify_50000_TCP_Interop_BrokerSerializer()
+        {
+            Random aRnd = new Random();
+            int aPort = aRnd.Next(8000, 9000);
+
+            IProtocolFormatter aProtocolFormatter = new InteroperableProtocolFormatter();
+            IMessagingSystemFactory aMessagingSystem = new TcpMessagingSystemFactory(aProtocolFormatter);
+            string aBrokerAddress = "tcp://127.0.0.1:" + aPort + "/";
+
+            ISerializer aSerializer = new CustomBrokerSerializer();
+
+            Notify(50000, aSerializer, aMessagingSystem, aBrokerAddress);
+        }
+
+
+        private void Notify(int numberOfTimes, ISerializer serializer, IMessagingSystemFactory messaging, string aBrokerAddress)
+        {
+            IDuplexInputChannel aBrokerInputChannel = messaging.CreateDuplexInputChannel(aBrokerAddress);
+            IDuplexOutputChannel aClient1OutputChannel = messaging.CreateDuplexOutputChannel(aBrokerAddress);
+            IDuplexOutputChannel aClient2OutputChannel = messaging.CreateDuplexOutputChannel(aBrokerAddress);
 
             // Specify in the factory that the publisher shall not be notified from its own published events.
-            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(false, new BinarySerializer());
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(false, serializer);
 
             IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
             aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
@@ -339,7 +329,7 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             aClient1.BrokerMessageReceived += (x, y) =>
             {
                 ++aCount;
-                if (aCount == 50000)
+                if (aCount == numberOfTimes)
                 {
                     aCompletedEvent.Set();
                 }
@@ -356,7 +346,7 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
 
                 aClient1.Subscribe("TypeA");
 
-                for (int i = 0; i < 50000; ++i)
+                for (int i = 0; i < numberOfTimes; ++i)
                 {
                     // Notify the message.
                     aClient2.SendMessage("TypeA", "Message A");
@@ -367,7 +357,7 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
                 aTimer.Stop();
 
                 // Client 2 should not get the notification.
-                Assert.AreEqual(50000, aCount);
+                Assert.AreEqual(numberOfTimes, aCount);
             }
             finally
             {

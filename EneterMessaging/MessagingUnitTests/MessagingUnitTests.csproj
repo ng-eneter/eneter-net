@@ -271,6 +271,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\Test_WebSocketMessaging_Interoperable.cs" />
+    <Compile Include="Nodes\BackupRuter\Test_BackupRouter.cs" />
+    <Compile Include="Nodes\Broker\Test_Broker.cs" />
+    <Compile Include="Nodes\ChannelWrapper\Mock_DuplexInputChannelAttachable.cs" />
+    <Compile Include="Nodes\ChannelWrapper\Mock_DuplexOutputChannelAttachable.cs" />
+    <Compile Include="Nodes\ChannelWrapper\Tester_DuplexChannelWrapper.cs" />
+    <Compile Include="Nodes\Dispatcher\Test_DuplexDispatcher.cs" />
+    <Compile Include="Nodes\LoadBalancer\Test_LoadBalancer.cs" />
+    <Compile Include="Nodes\Router\Test_DuplexRouter.cs" />
     <Compile Include="PerformanceTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
