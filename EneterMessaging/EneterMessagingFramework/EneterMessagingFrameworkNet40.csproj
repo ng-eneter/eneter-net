@@ -355,6 +355,7 @@
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Nodes\Broker\CustomBrokerSerializer.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
