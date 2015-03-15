@@ -6,6 +6,7 @@
 */
 
 using System;
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
@@ -15,11 +16,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBusInputConnector : IInputConnector
     {
-        public MessageBusInputConnector(IProtocolFormatter protocolFormatter, IDuplexOutputChannel messageBusOutputChannel)
+        public MessageBusInputConnector(ISerializer serializer, IDuplexOutputChannel messageBusOutputChannel)
         {
             using (EneterTrace.Entering())
             {
-                myProtocolFormatter = protocolFormatter;
+                myServiceId = messageBusOutputChannel.ResponseReceiverId;
+                mySerializer = serializer;
                 myMessageBusOutputChannel = messageBusOutputChannel;
             }
         }
@@ -40,9 +42,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         myMessageHandler = messageHandler;
                         myMessageBusOutputChannel.ResponseMessageReceived += OnMessageFromMessageBusReceived;
 
-                        // Register service in the message bus.
-                        // Note: the response receiver id of this output channel represents the service id inside the message bus.
+                        // Open connection with the message bus.
                         myMessageBusOutputChannel.OpenConnection();
+
+                        // Register service in the message bus.
+                        MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.RegisterService, myServiceId, null);
+                        object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+
+                        myMessageBusOutputChannel.SendMessage(aSerializedMessage);
                     }
                     catch
                     {
@@ -77,21 +84,25 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        public void SendResponseMessage(string outputConnectorAddress, object message)
+        public void SendResponseMessage(string clientId, object message)
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                myMessageBusOutputChannel.SendMessage(anEncodedMessage);
+                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendMessage, clientId, message);
+                object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+
+                myMessageBusOutputChannel.SendMessage(aSerializedMessage);
             }
         }
 
-        public void CloseConnection(string outputConnectorAddress)
+        public void CloseConnection(string clientId)
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
-                myMessageBusOutputChannel.SendMessage(anEncodedMessage);
+                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.DisconnectClient, clientId, null);
+                object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+
+                myMessageBusOutputChannel.SendMessage(aSerializedMessage);
             }
         }
 
@@ -99,14 +110,51 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
-                MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
+                MessageBusMessage aMessageBusMessage;
+                try
+                {
+                    aMessageBusMessage = mySerializer.Deserialize<MessageBusMessage>(e.Message);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Error(TracedObject + "failed to deserialize message.", err);
+                    return;
+                }
 
+                if (aMessageBusMessage.Request == EMessageBusRequest.ConnectClient)
+                {
+                    MessageBusMessage aResponseMessage = new MessageBusMessage(EMessageBusRequest.ConfirmClient, aMessageBusMessage.Id, null);
+                    object aSerializedResponse = mySerializer.Serialize<MessageBusMessage>(aResponseMessage);
+                    myMessageBusOutputChannel.SendMessage(aSerializedResponse);
+
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aMessageBusMessage.Id, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
+                    NotifyMessageContext(aMessageContext);
+                }
+                else if (aMessageBusMessage.Request == EMessageBusRequest.DisconnectClient)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aMessageBusMessage.Id, aMessageBusMessage.MessageData);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
+                    NotifyMessageContext(aMessageContext);
+                }
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, aMessageBusMessage.Id, aMessageBusMessage.MessageData);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
                 if (myMessageHandler != null)
                 {
                     try
                     {
-                        myMessageHandler(aMessageContext);
+                        myMessageHandler(messageContext);
                     }
                     catch (Exception err)
                     {
@@ -117,7 +165,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         }
 
 
-        private IProtocolFormatter myProtocolFormatter;
+        private string myServiceId;
+        private ISerializer mySerializer;
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private Action<MessageContext> myMessageHandler;
         private object myListeningManipulatorLock = new object();

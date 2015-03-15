@@ -12,15 +12,42 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBus : IMessageBus
     {
+        private class TClientContext
+        {
+            public TClientContext(string clientResponseReceiverId, string serviceId, string serviceResponseReceiverId)
+            {
+                ClientResponseReceiverId = clientResponseReceiverId;
+                ServiceId = serviceId;
+                ServiceResponseReceiverId = serviceResponseReceiverId;
+            }
+
+            public string ClientResponseReceiverId { get; private set; }
+            public string ServiceId { get; private set; }
+            public string ServiceResponseReceiverId { get; private set; }
+        }
+
+        private class TServiceContext
+        {
+            public TServiceContext(string serviceId, string serviceResponseReceiverId)
+            {
+                ServiceId = serviceId;
+                ServiceResponseReceiverId = serviceResponseReceiverId;
+            }
+
+            public string ServiceId { get; private set; }
+            public string ServiceResponseReceiverId { get; private set; }
+        }
+
         // Helper class to wrap basic input channel functionality.
         private class TConnector : AttachableDuplexInputChannelBase
         {
@@ -54,25 +81,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
             protected override string TracedObject
             {
-                get { return GetType().Name + " ";  }
+                get { return GetType().Name + " "; }
             }
         }
-
 
 		public event EventHandler<MessageBusServiceEventArgs> ServiceRegistered;
 		public event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
 
-        public MessageBus(IProtocolFormatter protocolFormatter)
+        public MessageBus(ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
-                myProtocolFormatter = protocolFormatter;
-
+                mySerializer = serializer;
                 myServiceConnector = new TConnector();
                 myClientConnector = new TConnector();
 
-                myServiceConnector.ResponseReceiverConnected += OnServiceConnected;
                 myServiceConnector.ResponseReceiverDisconnected += OnServiceDisconnected;
                 myServiceConnector.MessageReceived += OnMessageFromServiceReceived;
 
@@ -80,6 +104,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 myClientConnector.MessageReceived += OnMessageFromClientReceived;
             }
         }
+
 
         // Attaches input channels for services and their channels and starts listening.
         public void AttachDuplexInputChannels(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel)
@@ -98,17 +123,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+                lock (myConnectionLock)
+                {
+                    myConnectedClients.Clear();
+                    myConnectedServices.Clear();
+                }
+
                 lock (myAttachDetachLock)
                 {
                     myClientConnector.DetachDuplexInputChannel();
                     myServiceConnector.DetachDuplexInputChannel();
-
-                    // Note: make sure 'lock (myAttachDetachLock)' is never used from 'lock (myConnectionsLock)'.
-                    lock (myConnectionsLock)
-                    {
-                        myConnectedClients.Clear();
-                        myConnectedServices.Clear();
-                    }
                 }
             }
         }
@@ -117,10 +141,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		{
 			get
 			{
-				lock (myConnectionsLock)
+				lock (myConnectionLock)
 				{
-					string[] aServices = new string[myConnectedServices.Count];
-					myConnectedServices.CopyTo(aServices);
+					List<string> aServices = new List<string>();
+                    foreach (TServiceContext aServiceContext in myConnectedServices)
+                    {
+                        aServices.Add(aServiceContext.ServiceId);
+                    }
+
 					return aServices;
 				}
 			}
@@ -131,7 +159,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 			using (EneterTrace.Entering())
 			{
 				UnregisterService(serviceAddress);
-				CloseConnection(myServiceConnector, serviceAddress);
 			}
 		}
 
@@ -140,8 +167,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                EneterTrace.Debug("CLIENT DISCONNECTION RECEIVED");
-                UnregisterClient(e.ResponseReceiverId);
+                UnregisterClient(e.ResponseReceiverId, true);
             }
         }
 
@@ -150,206 +176,181 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                // If the message content is string then this message contains the service to which the client
-                // wants to connect. Client is supposed to send this message immediatelly after OpenConnection().
-                if (e.Message is string)
+                MessageBusMessage aMessageBusMessage;
+                try
                 {
-                    EneterTrace.Debug("CLIENT CONNECTION RECEIVED");
-
-                    string aServiceId = (string)e.Message;
-                    RegisterClient(e.ResponseReceiverId, aServiceId);
+                    aMessageBusMessage = mySerializer.Deserialize<MessageBusMessage>(e.Message);
                 }
-                else
+                catch (Exception err)
                 {
-                    EneterTrace.Debug("MESSAGE FOR SERVICE RECEIVED");
+                    EneterTrace.Error(TracedObject + "failed to deserialize message from service. The service will be disconnected.", err);
+                    UnregisterClient(e.ResponseReceiverId, true);
+                    return;
+                }
+
+                if (aMessageBusMessage.Request == EMessageBusRequest.ConnectClient)
+                {
+                    EneterTrace.Debug("CLIENT OPENS CONNECTION TO '" + aMessageBusMessage.Id + "'.");
+                    RegisterClient(e.ResponseReceiverId, aMessageBusMessage.Id);
+                }
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                {
                     ForwardMessageToService(e.ResponseReceiverId, e.Message);
                 }
             }
         }
 
-        // Adds the client to the list of connected clients and sends open connection message to the service.
-        // If the service does not exist the client is disconnected.
-        private void RegisterClient(string clientId, string serviceId)
+        private void RegisterClient(string clientResponseReceiverId, string serviceId)
         {
             using (EneterTrace.Entering())
             {
-                bool anIsRegistered = false;
-                lock (myConnectionsLock)
+                bool anIsNewClientConnected = false;
+                TClientContext aClientContext = null;
+                lock (myConnectionLock)
                 {
-                    // If such client does not exist yet then this is an open connection message.
-                    if (!myConnectedClients.ContainsKey(clientId))
+                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId);
+
+                    // If such client does not exist yet.
+                    if (aClientContext == null)
                     {
-                        myConnectedClients[clientId] = serviceId;
-                        anIsRegistered = true;
+                        TServiceContext aServiceContext = myConnectedServices.FirstOrDefault(x => x.ServiceId == serviceId);
+
+                        // If requestedservice exists.
+                        if (aServiceContext != null)
+                        {
+                            aClientContext = new TClientContext(clientResponseReceiverId, serviceId, aServiceContext.ServiceResponseReceiverId);
+                            myConnectedClients.Add(aClientContext);
+                            anIsNewClientConnected = true;
+                        }
                     }
                 }
 
-                if (anIsRegistered)
+                if (anIsNewClientConnected)
                 {
-                    // Encode open connection message and send it to the service.
-                    object anOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage(clientId);
+                    // Send open connection message to the service.
                     try
                     {
-                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(serviceId, anOpenConnectionMessage);
+                        MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.ConnectClient, clientResponseReceiverId, null);
+                        object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+
+                        IDuplexInputChannel anInputChannel = myServiceConnector.AttachedDuplexInputChannel;
+                        if (anInputChannel != null)
+                        {
+                            anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
+                        }
                     }
                     catch (Exception err)
                     {
-                        string anErrorMessage = TracedObject + "failed to send message to the service '" + serviceId + "'.";
-                        EneterTrace.Error(anErrorMessage, err);
+                        EneterTrace.Warning(TracedObject + "failed to send open connection message to the service '" + aClientContext.ServiceId + "'.", err);
 
-                        lock (myConnectionsLock)
-                        {
-                            myConnectedClients.Remove(clientId);
-                        }
-                        CloseConnection(myClientConnector, clientId);
-
-                        UnregisterService(serviceId);
-                        CloseConnection(myServiceConnector, serviceId);
-
-                        throw;
-                    }
-
-                    // Confirm the connection was open.
-                    try
-                    {
-                        myClientConnector.AttachedDuplexInputChannel.SendResponseMessage(clientId, "OK");
-                    }
-                    catch (Exception err)
-                    {
-                        string anErrorMessage = TracedObject + "failed to confirm the connection was open.";
-                        EneterTrace.Error(anErrorMessage, err);
-
-                        lock (myConnectionsLock)
-                        {
-                            myConnectedClients.Remove(clientId);
-                        }
-                        CloseConnection(myClientConnector, clientId);
-
-                        throw;
+                        // Note: The service should not be disconnected from the message bus when not available.
+                        //       Because it can be "just" overloaded. So only this new client will be disconnected from the message bus.
+                        UnregisterClient(clientResponseReceiverId, false);
                     }
                 }
                 else
                 {
-                    string anErrorMessage = TracedObject + "did not register the client because the client with the same id already exists.";
-                    EneterTrace.Warning(anErrorMessage);
+                    EneterTrace.Warning(TracedObject + "failed to connect the client already exists. The connection will be closed.");
+                    UnregisterClient(clientResponseReceiverId, true);
                 }
             }
         }
 
-        private void UnregisterClient(string clientId)
+        private void UnregisterClient(string clientResponseReceiverId, bool sendCloseConnectionToServiceFlag)
         {
             using (EneterTrace.Entering())
             {
-                string aServiceId;
-                lock (myConnectionsLock)
+                TClientContext aClientContext = null;
+                lock (myConnectionLock)
                 {
-                    myConnectedClients.TryGetValue(clientId, out aServiceId);
-                    myConnectedClients.Remove(clientId);
+                    myConnectedClients.RemoveWhere(x =>
+                        {
+                            if (x.ClientResponseReceiverId == clientResponseReceiverId)
+                            {
+                                aClientContext = x;
+                                return true;
+                            }
+
+                            return false;
+                        });
                 }
 
-                if (!string.IsNullOrEmpty(aServiceId))
+                if (aClientContext != null)
                 {
-                    try
+                    if (sendCloseConnectionToServiceFlag)
                     {
-                        // Send close connection message to the service.
-                        object aCloseConnectionMessage = myProtocolFormatter.EncodeCloseConnectionMessage(clientId);
-                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, aCloseConnectionMessage);
+                        try
+                        {
+                            // Send close connection message to the service.
+                            MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.DisconnectClient, aClientContext.ClientResponseReceiverId, null);
+                            object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+
+                            IDuplexInputChannel anInputChannel = myServiceConnector.AttachedDuplexInputChannel;
+                            if (anInputChannel != null)
+                            {
+                                anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
+                            }
+                        }
+                        catch (Exception err)
+                        {
+                            string anErrorMessage = TracedObject + ErrorHandler.CloseConnectionFailure;
+                            EneterTrace.Warning(anErrorMessage, err);
+                        }
                     }
-                    catch (Exception err)
+
+                    IDuplexInputChannel anInputChannel1 = myClientConnector.AttachedDuplexInputChannel;
+                    if (anInputChannel1 != null)
                     {
-                        string anErrorMessage = TracedObject + ErrorHandler.CloseConnectionFailure;
-                        EneterTrace.Warning(anErrorMessage, err);
+                        anInputChannel1.DisconnectResponseReceiver(aClientContext.ClientResponseReceiverId);
                     }
                 }
             }
         }
 
-        private void ForwardMessageToService(string clientId, object encodedProtocolMessage)
+        private void ForwardMessageToService(string clientresponseReceiverId, object serializedMessage)
         {
             using (EneterTrace.Entering())
             {
-                string aServiceId = null;
-                lock (myConnectionsLock)
+                TClientContext aCientContext = null;
+                lock (myConnectionLock)
                 {
-                    myConnectedClients.TryGetValue(clientId, out aServiceId);
+                    aCientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientresponseReceiverId);
                 }
 
-                if (!string.IsNullOrEmpty(aServiceId))
+                if (aCientContext != null)
                 {
                     // Forward the incomming message to the service.
-                    try
+                    IDuplexInputChannel anInputChannel = myServiceConnector.AttachedDuplexInputChannel;
+                    if (anInputChannel != null)
                     {
-                        myServiceConnector.AttachedDuplexInputChannel.SendResponseMessage(aServiceId, encodedProtocolMessage);
-                    }
-                    catch (Exception err)
-                    {
-                        string anErrorMessage = TracedObject + "failed to send message to the service '" + aServiceId + "'.";
-                        EneterTrace.Error(anErrorMessage, err);
+                        try
+                        {
+                            anInputChannel.SendResponseMessage(aCientContext.ServiceResponseReceiverId, serializedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            string anErrorMessage = TracedObject + "failed to send message to the service '" + aCientContext.ServiceId + "'.";
+                            EneterTrace.Error(anErrorMessage, err);
 
-                        UnregisterService(aServiceId);
-                        CloseConnection(myServiceConnector, aServiceId);
-
-                        throw;
+                            UnregisterService(aCientContext.ServiceResponseReceiverId);
+                        }
                     }
                 }
                 else
                 {
-                    // The client is not registered. Maybe it was closed meanwhile. So  clean it.
-                    string anErrorMessage = TracedObject + "failed to send message to the service because the client has not had open connection with the message bus.";
+                    string anErrorMessage = TracedObject + "failed to send message to the service because the client was not found.";
                     EneterTrace.Warning(anErrorMessage);
-
-                    CloseConnection(myClientConnector, clientId);
                 }
             }
         }
 
-
-
-        // Service connects to the message bus.
-        private void OnServiceConnected(object sender, ResponseReceiverEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                EneterTrace.Debug("SERVICE CONNECTION RECEIVED");
-
-                RegisterService(e.ResponseReceiverId);
-
-				if (ServiceRegistered != null)
-				{
-					try
-					{
-						MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
-						ServiceRegistered(this, anEvent);
-					}
-					catch (Exception err)
-					{
-						EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
-					}
-				}
-            }
-        }
 
         // Service disconnected from the message bus.
         private void OnServiceDisconnected(object sender, ResponseReceiverEventArgs e)
         {
             using (EneterTrace.Entering())
             {
-                EneterTrace.Debug("SERVICE DISCONNECTION RECEIVED");
-
                 UnregisterService(e.ResponseReceiverId);
-
-				if (ServiceUnregistered != null)
-				{
-					try
-					{
-						MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(e.ResponseReceiverId);
-						ServiceUnregistered(this, anEvent);
-					}
-					catch (Exception err)
-					{
-						EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
-					}
-				}
             }
         }
 
@@ -357,125 +358,215 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
+                MessageBusMessage aMessageBusMessage;
                 try
                 {
-                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
-                    if (aProtocolMessage != null)
-                    {
-                        EneterTrace.Debug("MESSAGE FOR CLIENT RECEIVED");
-                        ForwardMessageToClient(aProtocolMessage.ResponseReceiverId, e.Message);
-                    }
-                    else
-                    {
-                        CloseConnection(myServiceConnector, e.ResponseReceiverId);
-                    }
+                    aMessageBusMessage = mySerializer.Deserialize<MessageBusMessage>(e.Message);
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + "failed to receive a message from the service. The service will be disconnected.", err);
+                    EneterTrace.Error(TracedObject + "failed to deserialize message from service. The service will be disconnected.", err);
+                    UnregisterService(e.ResponseReceiverId);
+                    return;
+                }
 
-                    CloseConnection(myServiceConnector, e.ResponseReceiverId);
+                if (aMessageBusMessage.Request == EMessageBusRequest.RegisterService)
+                {
+                    EneterTrace.Debug("REGISTER SERVICE: " + aMessageBusMessage.Id);
+                    RegisterService(aMessageBusMessage.Id, e.ResponseReceiverId);
+                }
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                {
+                    // Note: forward the same message - it does not have to be serialized again.
+                    ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message);
+                }
+                else if (aMessageBusMessage.Request == EMessageBusRequest.DisconnectClient)
+                {
+                    EneterTrace.Debug("SERVICE DISCONNECTs CLIENT");
+                    UnregisterClient(aMessageBusMessage.Id, false);
+                }
+                else if (aMessageBusMessage.Request == EMessageBusRequest.ConfirmClient)
+                {
+                    EneterTrace.Debug("SERVICE CONFIRMS CLIENT");
+                    ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message);
                 }
             }
         }
 
-        private void RegisterService(string serviceId)
+        private void RegisterService(string serviceId, string serviceResponseReceiverId)
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                bool anIsNewServiceRegistered = false;
+                TServiceContext aServiceContext = null;
+                lock (myConnectionLock)
                 {
-                    myConnectedServices.Add(serviceId);
+                    aServiceContext = myConnectedServices.FirstOrDefault(x => x.ServiceId == serviceId || x.ServiceResponseReceiverId == serviceResponseReceiverId);
+                    if (aServiceContext == null)
+                    {
+                        aServiceContext = new TServiceContext(serviceId, serviceResponseReceiverId);
+                        myConnectedServices.Add(aServiceContext);
+                        anIsNewServiceRegistered = true;
+                    }
+                }
+
+                if (anIsNewServiceRegistered)
+                {
+                    if (ServiceRegistered != null)
+                    {
+                        try
+                        {
+                            MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(serviceId);
+                            ServiceRegistered(this, anEvent);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+                        }
+                    }
+                }
+                else
+                {
+                    // If this connection has registered the same service then do nothing.
+                    if (aServiceContext.ServiceId == serviceId &&
+                        aServiceContext.ServiceResponseReceiverId == serviceResponseReceiverId)
+                    {
+                    }
+                    else if (aServiceContext.ServiceId != serviceId &&
+                        aServiceContext.ServiceResponseReceiverId == serviceResponseReceiverId)
+                    {
+                        EneterTrace.Warning("The connection has already registered a different service '" + aServiceContext.ServiceId + "'. Connection will be disconnected.");
+                        UnregisterService(serviceResponseReceiverId);
+                    }
+                    else if (aServiceContext.ServiceId == serviceId &&
+                             aServiceContext.ServiceResponseReceiverId == serviceResponseReceiverId)
+                    {
+                        EneterTrace.Warning("Service '" + serviceId + "' is already registered. Connection will be disconnected.");
+                        UnregisterService(serviceResponseReceiverId);
+                    }
                 }
             }
         }
 
-        private void UnregisterService(string serviceId)
+        private void UnregisterService(string serviceResponseReceiverId)
         {
             using (EneterTrace.Entering())
             {
                 List<string> aClientsToDisconnect = new List<string>();
 
-                lock (myConnectionsLock)
+                string aServiceId = null;
+                lock (myConnectionLock)
                 {
                     // Remove the service.
-                    myConnectedServices.Remove(serviceId);
+                    myConnectedServices.RemoveWhere(x =>
+                        {
+                            if (x.ServiceResponseReceiverId == serviceResponseReceiverId)
+                            {
+                                aServiceId = x.ServiceId;
+                                return true;
+                            }
+
+                            return false;
+                        });
 
                     // Remove all clients connected to the service.
-                    foreach (KeyValuePair<string, string> aClient in myConnectedClients)
-                    {
-                        if (aClient.Value == serviceId)
+                    myConnectedClients.RemoveWhere(x =>
                         {
-                            aClientsToDisconnect.Add(aClient.Key);
-                        }
-                    }
-                    foreach (string aClientId in aClientsToDisconnect)
-                    {
-                        myConnectedClients.Remove(aClientId);
-                    }
+                            if (x.ServiceResponseReceiverId == serviceResponseReceiverId)
+                            {
+                                aClientsToDisconnect.Add(x.ClientResponseReceiverId);
+
+                                // Indicate the item shall be removed.
+                                return true;
+                            }
+
+                            return false;
+                        });
                 }
 
                 // Close connections with clients.
-                foreach (string aClientId in aClientsToDisconnect)
+                if (myClientConnector.IsDuplexInputChannelAttached)
                 {
-                    CloseConnection(myClientConnector, aClientId);
+                    foreach (string aClientResponseReceiverId in aClientsToDisconnect)
+                    {
+                        IDuplexInputChannel anInputChannel = myClientConnector.AttachedDuplexInputChannel;
+                        if (anInputChannel != null)
+                        {
+                            anInputChannel.DisconnectResponseReceiver(aClientResponseReceiverId);
+                        }
+                    }
+                }
+
+                IDuplexInputChannel anInputChannel2 = myServiceConnector.AttachedDuplexInputChannel;
+                if (anInputChannel2 != null)
+                {
+                    anInputChannel2.DisconnectResponseReceiver(serviceResponseReceiverId);
+                }
+
+                if (ServiceUnregistered != null && !string.IsNullOrEmpty(aServiceId))
+                {
+                    EneterTrace.Debug("SERVICE '" + aServiceId + "' UNREGISTERED");
+
+                    try
+                    {
+                        MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(aServiceId);
+                        ServiceUnregistered(this, anEvent);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+                    }
                 }
             }
         }
 
-        private void ForwardMessageToClient(string clientId, object encodedProtocolMessage)
+        private void ForwardMessageToClient(string clientResponseReceiverId, string serviceResponseReceiverId, object serializedMessage)
         {
             using (EneterTrace.Entering())
             {
-                try
+                // Check if the requested client id has a connection with the service session which forwards the message.
+                // Note: this is to prevent that a sevice sends a message to a client which is not connected to it.
+                TClientContext aClientContext;
+                lock (myConnectionLock)
                 {
-                    myClientConnector.AttachedDuplexInputChannel.SendResponseMessage(clientId, encodedProtocolMessage);
+                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId && x.ServiceResponseReceiverId == serviceResponseReceiverId);
                 }
-                catch (Exception err)
+
+                if (aClientContext == null)
                 {
-                    string anErrorMessage = TracedObject + "failed to send message to the client.";
-                    EneterTrace.Error(anErrorMessage, err);
+                    // The associated client does not exist and the message canno be sent.
+                    EneterTrace.Warning(TracedObject + "failed to forwrd the message to client because the client was not found.");
+                    return;
+                }
 
-                    UnregisterClient(clientId);
-                    CloseConnection(myClientConnector, clientId);
+                IDuplexInputChannel anInputChannel = myClientConnector.AttachedDuplexInputChannel;
+                if (anInputChannel != null)
+                {
+                    try
+                    {
+                        anInputChannel.SendResponseMessage(clientResponseReceiverId, serializedMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        string anErrorMessage = TracedObject + "failed to send message to the client.";
+                        EneterTrace.Error(anErrorMessage, err);
 
-                    throw;
+                        UnregisterClient(aClientContext.ClientResponseReceiverId, true);
+                    }
                 }
             }
         }
-
-        
-        private void CloseConnection(TConnector connector, string responseReceiverId)
-        {
-            using (EneterTrace.Entering())
-            {
-                try
-                {
-                    connector.AttachedDuplexInputChannel.DisconnectResponseReceiver(responseReceiverId);
-                }
-                catch
-                {
-                }
-            }
-        }
-
 
 
 
         private object myAttachDetachLock = new object();
-        private object myConnectionsLock = new object();
+        private object myConnectionLock = new object();
+        private HashSet<TServiceContext> myConnectedServices = new HashSet<TServiceContext>();
+        private HashSet<TClientContext> myConnectedClients = new HashSet<TClientContext>();
 
-        // [service id]
-        private HashSet<string> myConnectedServices = new HashSet<string>();
-
-        // [client id, service id]
-        private Dictionary<string, string> myConnectedClients = new Dictionary<string, string>();
-        
-
-
+        private ISerializer mySerializer;
         private TConnector myServiceConnector;
         private TConnector myClientConnector;
-        private IProtocolFormatter myProtocolFormatter;
 
         private string TracedObject { get { return GetType().Name + " "; } }
     }

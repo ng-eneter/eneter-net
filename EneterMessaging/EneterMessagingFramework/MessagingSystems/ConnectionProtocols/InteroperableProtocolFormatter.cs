@@ -61,14 +61,8 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         {
             //using (EneterTrace.Entering())
             //{
-                byte[] aMessageData = (byte[])message;
-
-                if (aMessageData.Length > 0)
-                {
-                    BinaryWriter aWriter = new BinaryWriter(outputSream);
-
-                    myEncoderDecoder.WritePlainByteArray(aWriter, aMessageData, myIsLittleEndian);
-                }
+                BinaryWriter aWriter = new BinaryWriter(outputSream);
+                myEncoderDecoder.Write(aWriter, message, myIsLittleEndian);
             //}
         }
 
@@ -85,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             try
             {
                 BinaryReader aReader = new BinaryReader(readStream);
-                byte[] aMessageData = myEncoderDecoder.ReadPlainByteArray(aReader, myIsLittleEndian);
+                object aMessageData = myEncoderDecoder.Read(aReader, myIsLittleEndian);
 
                 ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, "", aMessageData);
                 return aProtocolMessage;

@@ -121,6 +121,7 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessage.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -23,7 +23,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_01_Send1()
         {
-            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 1, 500, 500);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 1, 1000, 500);
         }
 
         [Test]

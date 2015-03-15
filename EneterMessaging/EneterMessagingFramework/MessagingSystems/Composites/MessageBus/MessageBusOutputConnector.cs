@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading;
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
@@ -16,14 +17,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     internal class MessageBusOutputConnector : IOutputConnector
     {
-        public MessageBusOutputConnector(string inputConnectorAddress, IProtocolFormatter protocolFormatter, IDuplexOutputChannel messageBusOutputChannel)
+        public MessageBusOutputConnector(string inputConnectorAddress, ISerializer serializer, IDuplexOutputChannel messageBusOutputChannel,
+            TimeSpan openConnectionTimeout)
         {
             using (EneterTrace.Entering())
             {
-                myInputConnectorAddress = inputConnectorAddress;
-                myOutputConnectorAddress = messageBusOutputChannel.ResponseReceiverId;
-                myProtocolFormatter = protocolFormatter;
+                myServiceId = inputConnectorAddress;
+                myClientId = messageBusOutputChannel.ResponseReceiverId;
+                mySerializer = serializer;
                 myMessageBusOutputChannel = messageBusOutputChannel;
+                myOpenConnectionTimeout = openConnectionTimeout;
             }
         }
 
@@ -49,9 +52,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         myOpenConnectionConfirmed.Reset();
 
                         // Tell message bus which service shall be associated with this connection.
-                        myMessageBusOutputChannel.SendMessage(myInputConnectorAddress);
+                        MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.ConnectClient, myServiceId, null);
+                        object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+                        myMessageBusOutputChannel.SendMessage(aSerializedMessage);
 
-                        if (!myOpenConnectionConfirmed.WaitOne(30000))
+                        if (!myOpenConnectionConfirmed.WaitOne(myOpenConnectionTimeout))
                         {
                             throw new TimeoutException(TracedObject + "failed to open the connection within the timeout.");
                         }
@@ -102,8 +107,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
-                myMessageBusOutputChannel.SendMessage(anEncodedMessage);
+                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendMessage, myClientId, message);
+                object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+                myMessageBusOutputChannel.SendMessage(aSerializedMessage);
             }
         }
 
@@ -111,31 +117,41 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                // If it is a confirmation message that the connection was really open.
-                if (e.Message is string && ((string)e.Message) == "OK")
+                MessageBusMessage aMessageBusMessage;
+                try
+                {
+                    aMessageBusMessage = mySerializer.Deserialize<MessageBusMessage>(e.Message);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Error(TracedObject + "failed to deserialize message.", err);
+                    return;
+                }
+
+                if (aMessageBusMessage.Request == EMessageBusRequest.ConfirmClient)
                 {
                     // Indicate the connection is open and relase the waiting in the OpenConnection().
                     myOpenConnectionConfirmed.Set();
+
+                    EneterTrace.Debug("CONNECTION CONFIRMED");
                 }
-                else
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
                 {
                     Action<MessageContext> aResponseHandler = myResponseMessageHandler;
 
-                    ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(e.Message);
-                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
+                    if (aResponseHandler != null)
+                    {
+                        ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, myServiceId, aMessageBusMessage.MessageData);
+                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
 
-                    if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
-                    {
-                        CloseConnection();
-                    }
-
-                    try
-                    {
-                        aResponseHandler(aMessageContext);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        try
+                        {
+                            aResponseHandler(aMessageContext);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        }
                     }
                 }
             }
@@ -165,10 +181,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        private string myOutputConnectorAddress;
-        private IProtocolFormatter myProtocolFormatter;
+        private string myClientId;
+        private TimeSpan myOpenConnectionTimeout;
+        private ISerializer mySerializer;
         private IDuplexOutputChannel myMessageBusOutputChannel;
-        private string myInputConnectorAddress;
+        private string myServiceId;
         private Action<MessageContext> myResponseMessageHandler;
         private object myConnectionManipulator = new object();
         private ManualResetEvent myOpenConnectionConfirmed = new ManualResetEvent(false);

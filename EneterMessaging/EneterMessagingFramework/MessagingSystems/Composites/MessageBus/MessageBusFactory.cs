@@ -8,8 +8,8 @@
 
 #if !SILVERLIGHT
 
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
@@ -25,7 +25,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Default EneterProtocolFormatter is used.
         /// </remarks>
         public MessageBusFactory()
-            : this(new EneterProtocolFormatter())
+            : this(new XmlStringSerializer())
         {
         }
 
@@ -34,11 +34,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// </summary>
         /// <param name="protocolFormatter">This protocol formatter must be exactly same as is used by both channels that will be attached to the message bus.
         /// </param>
-        public MessageBusFactory(IProtocolFormatter protocolFormatter)
+        public MessageBusFactory(ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
-                myProtocolFormatter = protocolFormatter;
+                mySerializer = serializer;
             }
         }
 
@@ -50,11 +50,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                return new MessageBus(myProtocolFormatter);
+                return new MessageBus(mySerializer);
             }
         }
 
-        private IProtocolFormatter myProtocolFormatter;
+        private ISerializer mySerializer;
     }
 }
 

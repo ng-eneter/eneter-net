@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
-using Eneter.Messaging.MessagingSystems.Composites.MessageBus;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.Diagnostic;
-using System.IO;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
+using Eneter.Messaging.MessagingSystems.Composites.MessageBus;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessaging
 {
     [TestFixture]
-    public class Test_MessageBusMessaging_Sync : BaseTester
+    public class Test_MessageBusMessaging_Tcp_Interop : BaseTester
     {
         [SetUp]
         public void Setup()
@@ -20,20 +19,23 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
             //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
-            IMessagingSystemFactory anUnderlyingMessaging = new SynchronousMessagingSystemFactory();
+            // Generate random number for the port.
+            int aPort1 = RandomPortGenerator.GenerateInt();
+            int aPort2 = aPort1 + 10;
 
-            IDuplexInputChannel aMessageBusServiceInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("MyServicesAddress");
-            IDuplexInputChannel aMessageBusClientInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("MyClientsAddress");
+            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory(new InteroperableProtocolFormatter());
+
+            IDuplexInputChannel aMessageBusServiceInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("tcp://[::1]:" + aPort1 + "/");
+            IDuplexInputChannel aMessageBusClientInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("tcp://[::1]:" + aPort2 + "/");
             myMessageBus = new MessageBusFactory().CreateMessageBus();
             myMessageBus.AttachDuplexInputChannels(aMessageBusServiceInputChannel, aMessageBusClientInputChannel);
 
-            MessagingSystemFactory = new MessageBusMessagingFactory("MyServicesAddress", "MyClientsAddress", anUnderlyingMessaging)
-            {
-                OpenConnectionTimeout = TimeSpan.FromMilliseconds(3000)
-            };
+            MessagingSystemFactory = new MessageBusMessagingFactory("tcp://[::1]:" + aPort1 + "/", "tcp://[::1]:" + aPort2 + "/", anUnderlyingMessaging);
 
             // Address of the service in the message bus.
             ChannelId = "Service1_Address";
+
+            CompareResponseReceiverId = false;
         }
 
         [TearDown]
@@ -45,7 +47,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
                 myMessageBus = null;
             }
         }
-
 
         private IMessageBus myMessageBus;
     }

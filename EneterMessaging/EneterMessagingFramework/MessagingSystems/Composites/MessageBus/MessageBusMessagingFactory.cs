@@ -5,11 +5,12 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using System;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
@@ -150,13 +151,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     {
         private class MessageBusConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
-            public MessageBusConnectorFactory(string serviceConnectingAddress, string clientConnectingAddress, IProtocolFormatter protocolFormatter, IMessagingSystemFactory messageBusMessaging)
+            public MessageBusConnectorFactory(string serviceConnectingAddress, string clientConnectingAddress, ISerializer serializer, IMessagingSystemFactory messageBusMessaging)
             {
                 using (EneterTrace.Entering())
                 {
                     myClientConnectingAddress = clientConnectingAddress;
                     myServiceConnectingAddress = serviceConnectingAddress;
-                    myprotocolFormatter = protocolFormatter;
+                    mySerializer = serializer;
                     myMessageBusMessaging = messageBusMessaging;
                 }
             }
@@ -168,7 +169,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     // myClientConnectingAddress is address where message bus listens to connecting clients.
                     // outputConnectorAddress is responseReceiverId of connecting client.
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, outputConnectorAddress);
-                    return new MessageBusOutputConnector(inputConnectorAddress, myprotocolFormatter, aMessageBusOutputChannel);
+                    return new MessageBusOutputConnector(inputConnectorAddress, mySerializer, aMessageBusOutputChannel, OpenConnectionTimeout);
                 }
             }
 
@@ -179,13 +180,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     // myServiceConnectingAddress is address where message bus listen to connecting services.
                     // inputConnectorAddress is channelId of connecting service.
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myServiceConnectingAddress, inputConnectorAddress);
-                    return new MessageBusInputConnector(myprotocolFormatter, aMessageBusOutputChannel);
+                    return new MessageBusInputConnector(mySerializer, aMessageBusOutputChannel);
                 }
             }
 
+            public TimeSpan OpenConnectionTimeout { get; set; }
+
             private string myClientConnectingAddress;
             private string myServiceConnectingAddress;
-            IProtocolFormatter myprotocolFormatter;
+            private ISerializer mySerializer;
             private IMessagingSystemFactory myMessageBusMessaging;
         }
 
@@ -196,7 +199,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <param name="clientConnectingAddress">message bus address for clients that want to connect a registered service.</param>
         /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
-            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new EneterProtocolFormatter())
+            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new XmlStringSerializer())
         {
         }
 
@@ -207,11 +210,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <param name="clientConnectingAddress">message bus address for clients that want to connect a registered service.</param>
         /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         /// <param name="protocolFormatter">protocol formatter used for the communication between channels.</param>
-        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, IProtocolFormatter protocolFormatter)
+        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
-                myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, protocolFormatter, underlyingMessaging);
+                myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, serializer, underlyingMessaging);
+                myConnectorFactory.OpenConnectionTimeout = TimeSpan.FromMilliseconds(30000);
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
                 OutputChannelThreading = new NoDispatching();
@@ -294,6 +298,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Default setting is that received response messages are routed one by one via a working thread.
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
+
+        public TimeSpan OpenConnectionTimeout
+        {
+            get { return myConnectorFactory.OpenConnectionTimeout; }
+            set { myConnectorFactory.OpenConnectionTimeout = value; }
+        }
 
 
         private MessageBusConnectorFactory myConnectorFactory;
