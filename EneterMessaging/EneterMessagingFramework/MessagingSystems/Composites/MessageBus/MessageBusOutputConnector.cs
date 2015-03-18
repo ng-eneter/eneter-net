@@ -107,7 +107,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendMessage, myClientId, message);
+                // Note: do not send the client id. It will be automatically assign in the message bus before forwarding the message to the service.
+                //       It is done like this due to security reasons. So that some client cannot pretend other client just by sending a different id.
+                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendRequestMessage, null, message);
                 object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
                 myMessageBusOutputChannel.SendMessage(aSerializedMessage);
             }
@@ -135,7 +137,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                     EneterTrace.Debug("CONNECTION CONFIRMED");
                 }
-                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendResponseMessage)
                 {
                     Action<MessageContext> aResponseHandler = myResponseMessageHandler;
 

@@ -106,6 +106,7 @@
     <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\Composites\MessageBus\CustomMessageBusSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs">
       <SubType>Code</SubType>
     </Compile>

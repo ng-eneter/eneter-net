@@ -88,7 +88,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendMessage, clientId, message);
+                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendResponseMessage, clientId, message);
                 object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
 
                 myMessageBusOutputChannel.SendMessage(aSerializedMessage);
@@ -137,7 +137,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
                     NotifyMessageContext(aMessageContext);
                 }
-                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendRequestMessage)
                 {
                     ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, aMessageBusMessage.Id, aMessageBusMessage.MessageData);
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);

@@ -193,9 +193,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     EneterTrace.Debug("CLIENT OPENS CONNECTION TO '" + aMessageBusMessage.Id + "'.");
                     RegisterClient(e.ResponseReceiverId, aMessageBusMessage.Id);
                 }
-                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendRequestMessage)
                 {
-                    ForwardMessageToService(e.ResponseReceiverId, e.Message);
+                    ForwardMessageToService(e.ResponseReceiverId, aMessageBusMessage);
                 }
             }
         }
@@ -307,7 +307,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        private void ForwardMessageToService(string clientresponseReceiverId, object serializedMessage)
+        private void ForwardMessageToService(string clientresponseReceiverId, MessageBusMessage messageFromClient)
         {
             using (EneterTrace.Entering())
             {
@@ -325,7 +325,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     {
                         try
                         {
-                            anInputChannel.SendResponseMessage(aCientContext.ServiceResponseReceiverId, serializedMessage);
+                            // Add the client id into the message.
+                            // Note: Because of security reasons we do not expect Ids from the client but using Ids associated with the connection session.
+                            //       Otherwise it would be possible that some client could use id of another client to pretend a different client.
+                            messageFromClient.Id = clientresponseReceiverId;
+                            object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(messageFromClient);
+
+                            anInputChannel.SendResponseMessage(aCientContext.ServiceResponseReceiverId, aSerializedMessage);
                         }
                         catch (Exception err)
                         {
@@ -375,7 +381,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     EneterTrace.Debug("REGISTER SERVICE: " + aMessageBusMessage.Id);
                     RegisterService(aMessageBusMessage.Id, e.ResponseReceiverId);
                 }
-                else if (aMessageBusMessage.Request == EMessageBusRequest.SendMessage)
+                else if (aMessageBusMessage.Request == EMessageBusRequest.SendResponseMessage)
                 {
                     // Note: forward the same message - it does not have to be serialized again.
                     ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message);
@@ -535,7 +541,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 if (aClientContext == null)
                 {
                     // The associated client does not exist and the message canno be sent.
-                    EneterTrace.Warning(TracedObject + "failed to forwrd the message to client because the client was not found.");
+                    EneterTrace.Warning(TracedObject + "failed to forward the message to client because the client was not found.");
                     return;
                 }
 
