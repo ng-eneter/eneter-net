@@ -129,6 +129,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
+                if (string.IsNullOrEmpty(responseReceiverId))
+                {
+                    string aMessage = TracedObject + "detected the input parameter responseReceiverId is null or empty string.";
+                    EneterTrace.Error(aMessage);
+                    throw new ArgumentException(aMessage);
+                }
+
                 if (!IsListening)
                 {
                     string aMessage = TracedObject + ErrorHandler.SendResponseNotListeningFailure;
@@ -136,7 +143,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     throw new InvalidOperationException(aMessage);
                 }
 
-                if (string.IsNullOrEmpty(responseReceiverId))
+                // If broadcast to all connected response receivers.
+                if (responseReceiverId == "*")
                 {
                     lock (myConnectedClients)
                     {

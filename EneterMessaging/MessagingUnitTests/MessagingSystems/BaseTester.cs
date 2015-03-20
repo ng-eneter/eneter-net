@@ -623,7 +623,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
                 for (int i = 0; i < numberOfMessages; ++i)
                 {
-                    aService.InputChannel.SendResponseMessage(null, broadcastMessage);
+                    aService.InputChannel.SendResponseMessage("*", broadcastMessage);
                 }
                 aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
 
