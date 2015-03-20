@@ -32,7 +32,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
             myMessageBus = new MessageBusFactory().CreateMessageBus();
             myMessageBus.AttachDuplexInputChannels(aMessageBusServiceInputChannel, aMessageBusClientInputChannel);
 
-            MessagingSystemFactory = new MessageBusMessagingFactory("MyServicesAddress", "MyClientsAddress", anUnderlyingMessaging);
+            MessagingSystemFactory = new MessageBusMessagingFactory("MyServicesAddress", "MyClientsAddress", anUnderlyingMessaging)
+            {
+                ConnectTimeout = TimeSpan.FromMilliseconds(3000)
+            };
 
             // Address of the service in the message bus.
             ChannelId = "Service1_Address";

@@ -13,14 +13,14 @@ using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.Nodes.Broker
 {
-    public class CustomBrokerSerializer : ISerializer
+    internal class BrokerCustomSerializer : ISerializer
     {
-        public CustomBrokerSerializer()
+        public BrokerCustomSerializer()
             : this(true)
         {
         }
 
-        public CustomBrokerSerializer(bool isLittleEndian)
+        public BrokerCustomSerializer(bool isLittleEndian)
         {
             using (EneterTrace.Entering())
             {

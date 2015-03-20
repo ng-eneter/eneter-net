@@ -29,7 +29,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
 
             MessagingSystemFactory = new MessageBusMessagingFactory("MyServicesAddress", "MyClientsAddress", anUnderlyingMessaging)
             {
-                OpenConnectionTimeout = TimeSpan.FromMilliseconds(3000)
+                ConnectTimeout = TimeSpan.FromMilliseconds(3000)
             };
 
             // Address of the service in the message bus.

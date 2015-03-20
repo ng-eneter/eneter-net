@@ -199,7 +199,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <param name="clientConnectingAddress">message bus address for clients that want to connect a registered service.</param>
         /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
-            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new XmlStringSerializer())
+            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new MessageBusCustomSerializer())
         {
         }
 
@@ -299,7 +299,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
-        public TimeSpan OpenConnectionTimeout
+        public TimeSpan ConnectTimeout
         {
             get { return myConnectorFactory.OpenConnectionTimeout; }
             set { myConnectorFactory.OpenConnectionTimeout = value; }

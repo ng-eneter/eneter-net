@@ -26,7 +26,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 myClientId = messageBusOutputChannel.ResponseReceiverId;
                 mySerializer = serializer;
                 myMessageBusOutputChannel = messageBusOutputChannel;
-                myOpenConnectionTimeout = openConnectionTimeout;
+                myOpenConnectionTimeout = (openConnectionTimeout == TimeSpan.Zero) ? TimeSpan.FromMilliseconds(-1) : openConnectionTimeout;
             }
         }
 
@@ -58,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                         if (!myOpenConnectionConfirmed.WaitOne(myOpenConnectionTimeout))
                         {
-                            throw new TimeoutException(TracedObject + "failed to open the connection within the timeout.");
+                            throw new TimeoutException(TracedObject + "failed to open the connection within the timeout: " + myOpenConnectionTimeout);
                         }
 
                         if (!myMessageBusOutputChannel.IsConnected)
@@ -109,7 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 // Note: do not send the client id. It will be automatically assign in the message bus before forwarding the message to the service.
                 //       It is done like this due to security reasons. So that some client cannot pretend other client just by sending a different id.
-                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendRequestMessage, null, message);
+                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendRequestMessage, "", message);
                 object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
                 myMessageBusOutputChannel.SendMessage(aSerializedMessage);
             }

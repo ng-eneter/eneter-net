@@ -25,7 +25,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Default EneterProtocolFormatter is used.
         /// </remarks>
         public MessageBusFactory()
-            : this(new XmlStringSerializer())
+            : this(new MessageBusCustomSerializer())
         {
         }
 

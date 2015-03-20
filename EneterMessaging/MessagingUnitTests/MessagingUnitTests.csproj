@@ -145,7 +145,6 @@
     <Compile Include="EventWaitHandleExt.cs" />
     <Compile Include="MessagingSystems\ClientMockFarm.cs" />
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp_Interop.cs" />
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp_Interop_CustomSer.cs" />
     <Compile Include="MessagingSystems\ServiceMock.cs" />
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
       <SubType>Code</SubType>
@@ -205,9 +204,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Sync.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Ws.cs">

@@ -2,7 +2,7 @@
  * Project: Eneter.Messaging.Framework
  * Author:  Ondrej Uzovic
  * 
- * Copyright © Ondrej Uzovic 2014
+ * Copyright © Ondrej Uzovic 2015
 */
 
 using System;
@@ -13,14 +13,14 @@ using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
-    public class CustomMessageBusSerializer : ISerializer
+    internal class MessageBusCustomSerializer : ISerializer
     {
-        public CustomMessageBusSerializer()
+        public MessageBusCustomSerializer()
             : this(true)
         {
         }
 
-        public CustomMessageBusSerializer(bool isLittleEndian)
+        public MessageBusCustomSerializer(bool isLittleEndian)
         {
             using (EneterTrace.Entering())
             {
@@ -48,21 +48,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     byte aRequestType = (byte)aMessage.Request;
                     aWriter.Write((byte)aRequestType);
 
-                    // Write message data.
-                    if (aMessage.Request == EMessageBusRequest.SendRequestMessage)
-                    {
-                        myEncoderDecoder.Write(aWriter, aMessage.MessageData, myIsLittleEndian);
-                    }
-                    else
-                    {
-                        // Write Id.
-                        myEncoderDecoder.WritePlainString(aWriter, aMessage.Id, Encoding.UTF8, myIsLittleEndian);
+                    // Write Id.
+                    myEncoderDecoder.WritePlainString(aWriter, aMessage.Id, Encoding.UTF8, myIsLittleEndian);
 
-                        if (aMessage.Request == EMessageBusRequest.SendResponseMessage)
+                    // Write message data.
+                    if (aMessage.Request == EMessageBusRequest.SendRequestMessage ||
+                        aMessage.Request == EMessageBusRequest.SendResponseMessage)
+                    {
+                        if (aMessage.MessageData == null)
                         {
-                            // Write response message data.
-                            myEncoderDecoder.Write(aWriter, aMessage.MessageData, myIsLittleEndian);
+                            throw new InvalidOperationException("Message data is null.");
                         }
+
+                        myEncoderDecoder.Write(aWriter, aMessage.MessageData, myIsLittleEndian);
                     }
 
                     return aStream.ToArray();
@@ -96,25 +94,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     int aRequest = aReader.ReadByte();
                     EMessageBusRequest aMessageBusRequest = (EMessageBusRequest)aRequest;
 
-                    object aMessageData = null;
-                    string anId = null;
+                    // Read Id
+                    string anId = myEncoderDecoder.ReadPlainString(aReader, Encoding.UTF8, myIsLittleEndian);
 
-                    if (aMessageBusRequest == EMessageBusRequest.SendRequestMessage)
+                    // Read message data.
+                    object aMessageData = null;
+                    if (aMessageBusRequest == EMessageBusRequest.SendRequestMessage ||
+                        aMessageBusRequest == EMessageBusRequest.SendResponseMessage)
                     {
-                        // Read message data.
                         aMessageData = myEncoderDecoder.Read(aReader, myIsLittleEndian);
                     }
-                    else
-                    {
-                        // Read id.
-                        anId = myEncoderDecoder.ReadPlainString(aReader, Encoding.UTF8, myIsLittleEndian);
 
-                        if (aMessageBusRequest == EMessageBusRequest.SendResponseMessage)
-                        {
-                            // Read response message data.
-                            aMessageData = myEncoderDecoder.Read(aReader, myIsLittleEndian);
-                        }
-                    }
 
                     aResult = new MessageBusMessage(aMessageBusRequest, anId, aMessageData);
                     return (_T)(object)aResult;

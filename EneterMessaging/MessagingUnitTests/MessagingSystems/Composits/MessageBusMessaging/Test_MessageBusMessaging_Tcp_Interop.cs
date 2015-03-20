@@ -7,6 +7,9 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.MessagingSystems.Composites.MessageBus;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessaging
 {
@@ -30,7 +33,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
             myMessageBus = new MessageBusFactory().CreateMessageBus();
             myMessageBus.AttachDuplexInputChannels(aMessageBusServiceInputChannel, aMessageBusClientInputChannel);
 
-            MessagingSystemFactory = new MessageBusMessagingFactory("tcp://[::1]:" + aPort1 + "/", "tcp://[::1]:" + aPort2 + "/", anUnderlyingMessaging);
+            MessagingSystemFactory = new MessageBusMessagingFactory("tcp://[::1]:" + aPort1 + "/", "tcp://[::1]:" + aPort2 + "/", anUnderlyingMessaging)
+            {
+                ConnectTimeout = TimeSpan.FromMilliseconds(3000)
+            };
 
             // Address of the service in the message bus.
             ChannelId = "Service1_Address";

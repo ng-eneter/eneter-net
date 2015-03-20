@@ -305,7 +305,7 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             IMessagingSystemFactory aMessagingSystem = new TcpMessagingSystemFactory(aProtocolFormatter);
             string aBrokerAddress = "tcp://127.0.0.1:" + aPort + "/";
 
-            ISerializer aSerializer = new CustomBrokerSerializer();
+            ISerializer aSerializer = new BrokerCustomSerializer();
 
             Notify(50000, aSerializer, aMessagingSystem, aBrokerAddress);
         }

@@ -35,7 +35,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_03_Send1_10MB()
         {
-            SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 1, 1000, 1000);
+            SendMessageReceiveResponse(ChannelId, myMessage_10MB, myMessage_10MB, 1, 1, 1000, 5000);
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_05_Send50_10Prallel()
         {
-            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 10, 50, 1000, 2000);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 10, 50, 1000, 10000);
         }
 
         [Test]
@@ -531,7 +531,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                                                 int openConnectionTimeout,
                                                 int allMessagesReceivedTimeout)
         {
-            ThreadPool.SetMinThreads(50, 2);
+            ThreadPool.SetMinThreads(100, 2);
 
             ClientMockFarm aClientFarm = new ClientMockFarm(MessagingSystemFactory, channelId, numberOfClients);
 
@@ -565,6 +565,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
                 aStopWatch.Stop();
                 Console.WriteLine("Send messages to '" + ChannelId + "' completed. Elapsed time = " + aStopWatch.Elapsed);
+
+                // Wait little bit more for case there is an error that more messages are sent.
+                Thread.Sleep(500);
 
                 Assert.AreEqual(numberOfMessages * numberOfClients, aService.ReceivedMessages.Count());
                 Assert.AreEqual(numberOfMessages * numberOfClients, aClientFarm.ReceivedResponses.Count());

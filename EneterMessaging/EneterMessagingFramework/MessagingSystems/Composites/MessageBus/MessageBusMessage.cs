@@ -49,7 +49,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Used by client when sending a message to the service.
         /// </summary>
         /// <remarks>
-        /// MessageBusMessage Id is not used. (The association to the service is resolved in the message bus.)
+        /// MessageBusMessage Id parameter is client id which sent the message to the service.
         /// </remarks>
         SendRequestMessage = 50,
 
