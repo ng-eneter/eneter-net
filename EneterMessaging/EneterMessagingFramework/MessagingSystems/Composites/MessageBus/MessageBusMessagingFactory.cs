@@ -195,9 +195,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Constructs the factory.
         /// </summary>
-        /// <param name="serviceConnctingAddress">message bus address for registered services.</param>
-        /// <param name="clientConnectingAddress">message bus address for clients that want to connect a registered service.</param>
-        /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
+        /// <remarks>
+        /// Message bus instantiated using this constructor will use MessageBusCustom serializer which is optimized to serialize/deserialize
+        /// only MessageBusMessage used for the communication with the message bus.
+        /// </remarks>
+        /// <param name="serviceConnctingAddress">address used by services</param>
+        /// <param name="clientConnectingAddress">address used by clients</param>
+        /// <param name="underlyingMessaging">messaging system used for the communication with the message bus</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
             : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new MessageBusCustomSerializer())
         {
@@ -206,10 +210,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Constructs the factory.
         /// </summary>
-        /// <param name="serviceConnctingAddress">message bus address for registered services.</param>
-        /// <param name="clientConnectingAddress">message bus address for clients that want to connect a registered service.</param>
-        /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
-        /// <param name="protocolFormatter">protocol formatter used for the communication between channels.</param>
+        /// <param name="serviceConnctingAddress">address used by services</param>
+        /// <param name="clientConnectingAddress">address used by clients</param>
+        /// <param name="underlyingMessaging">messaging system used for the communication with the message bus</param>
+        /// <param name="serializer">serializer which will serialize/deserialize MessageBusMessage which is used for the communication
+        /// with the message bus.</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
         {
             using (EneterTrace.Entering())
@@ -299,6 +304,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
+        /// <summary>
+        /// Maximum time for opening connection with the service via the message bus. Default value is 30 seconds.
+        /// </summary>
+        /// <remarks>
+        /// When the client opens the connection with a service via message bus it requests message bus to open connection
+        /// with a desired service. The message checks if the requested service exists and if yes it forwards the open connection request.
+        /// Then when the service receives the open connection request it sends back the confirmation message that the client is connected.
+        /// This timeout specifies the maximum time which is allowed for sending the open connection request and receiving the confirmation from the service.
+        /// </remarks>
         public TimeSpan ConnectTimeout
         {
             get { return myConnectorFactory.OpenConnectionTimeout; }

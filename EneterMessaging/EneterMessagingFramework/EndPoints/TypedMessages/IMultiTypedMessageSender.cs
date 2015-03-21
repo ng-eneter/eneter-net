@@ -13,7 +13,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Sender capable to send messages of multiple types.
+    /// Sender which sends messages of multiple types.
     /// </summary>
     /// <remarks>
     /// This is a client component which can send request messages and receive response messages.

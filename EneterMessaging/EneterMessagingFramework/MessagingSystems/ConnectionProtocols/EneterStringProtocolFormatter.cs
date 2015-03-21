@@ -6,6 +6,7 @@
 */
 
 using System;
+using System.IO;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 
@@ -18,14 +19,14 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     /// Encoding to the string can be used if the messaging system does not allow tu use byte[].
     /// E.g. the messaging between Silverlight applications sends only string messages.
     /// </remarks>
-    public class EneterStringProtocolFormatter : ProtocolFormatterBase, IProtocolFormatter
+    public class EneterStringProtocolFormatter : IProtocolFormatter
     {
         /// <summary>
         /// Encodes open connection request.
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <returns></returns>
-        public override object EncodeOpenConnectionMessage(string responseReceiverId)
+        public object EncodeOpenConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -34,12 +35,17 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        public void EncodeOpenConnectionMessage(string responseReceiverId, Stream outputSream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support encoding to stream.");
+        }
+
         /// <summary>
         /// Encodes close connection request.
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <returns></returns>
-        public override object EncodeCloseConnectionMessage(string responseReceiverId)
+        public object EncodeCloseConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -48,13 +54,18 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        public void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support encoding to stream.");
+        }
+
         /// <summary>
         /// Encodes a message or a response message.
         /// </summary>
         /// <param name="responseReceiverId">client id</param>
         /// <param name="message">the serialized content of the message</param>
         /// <returns></returns>
-        public override object EncodeMessage(string responseReceiverId, object message)
+        public object EncodeMessage(string responseReceiverId, object message)
         {
             using (EneterTrace.Entering())
             {
@@ -63,12 +74,17 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        public void EncodeMessage(string responseReceiverId, object message, Stream outputSream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support decoding from stream.");
+        }
+
         /// <summary>
         /// Decodes a message or a response message from the byte[].
         /// </summary>
         /// <param name="encodedMessage">source of the low-level message</param>
         /// <returns></returns>
-        public override ProtocolMessage DecodeMessage(object encodedMessage)
+        public ProtocolMessage DecodeMessage(object encodedMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -83,6 +99,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     return null;
                 }
             }
+        }
+
+        public ProtocolMessage DecodeMessage(Stream readStream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support decoding from stream.");
         }
 
 

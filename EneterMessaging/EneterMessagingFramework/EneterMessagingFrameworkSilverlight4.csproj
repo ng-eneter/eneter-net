@@ -318,9 +318,6 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\LocalProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolMessage.cs">
       <SubType>Code</SubType>
     </Compile>

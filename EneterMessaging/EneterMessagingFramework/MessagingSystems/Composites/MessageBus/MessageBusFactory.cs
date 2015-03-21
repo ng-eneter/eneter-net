@@ -22,7 +22,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Constructs the factory with default parameters.
         /// </summary>
         /// <remarks>
-        /// Default EneterProtocolFormatter is used.
+        /// It uses internal MessageBusCustomSerializer which is optimazed to serialize/deserialze only the MessageBusMessage.
         /// </remarks>
         public MessageBusFactory()
             : this(new MessageBusCustomSerializer())
@@ -32,8 +32,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Construct the factory.
         /// </summary>
-        /// <param name="protocolFormatter">This protocol formatter must be exactly same as is used by both channels that will be attached to the message bus.
-        /// </param>
+        /// <param name="serializer">Serializer which will be used to serialize/deserialize MessageBusMessage.</param>
         public MessageBusFactory(ISerializer serializer)
         {
             using (EneterTrace.Entering())

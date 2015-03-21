@@ -159,9 +159,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\InteroperableProtocolFormatter.cs" />
-    <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter_CompactFramework.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListenerFactory_CompactFramework.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListener_CompactFramework.cs" />

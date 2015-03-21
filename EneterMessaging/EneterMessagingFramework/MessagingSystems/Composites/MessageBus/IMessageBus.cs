@@ -36,19 +36,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
         /// <summary>
-        /// Attaches duplex input channels that are used by clients and services to connect the message bus.
+        /// Attaches duplex input channels and starts listening.
         /// </summary>
         /// <remarks>
-        /// Once input channels are attached the message bus is listening and can be contacted by services and
+        /// Once input channels are attached the message bus is listening and can be used by services and
         /// clients. <br/>
         /// <br/>
         /// To connect the message bus services must use 'Message Bus Duplex Input Channel' and clients must use
         /// 'Message Bus Duplex Output Channel'.<br/>
-        /// <br/>
-        /// IMPORTANT: Both duplex input channels must use the same protocol formatter!
         /// </remarks>
-        /// <param name="serviceInputChannel">input channel used by services to register in the message bus.</param>
-        /// <param name="clientInputChannel">input channel used by clients to connect a service via the message bus.</param>
+        /// <param name="serviceInputChannel">channel used by services for registering their services in the message bus</param>
+        /// <param name="clientInputChannel">channel used by clients for connecting services via the message bus.</param>
         void AttachDuplexInputChannels(IDuplexInputChannel serviceInputChannel, IDuplexInputChannel clientInputChannel);
 
         /// <summary>

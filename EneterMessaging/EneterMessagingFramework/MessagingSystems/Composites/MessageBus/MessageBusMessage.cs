@@ -11,6 +11,9 @@ using System.Runtime.Serialization;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
+    /// <summary>
+    /// Internal commands for interaction with the message bus.
+    /// </summary>
     public enum EMessageBusRequest
     {
         /// <summary>
@@ -62,16 +65,31 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         SendResponseMessage = 60
     }
 
+
+    /// <summary>
+    /// Internal message for interaction with the message bus.
+    /// </summary>
 #if !SILVERLIGHT
     [Serializable]
 #endif
     [DataContract]
     public class MessageBusMessage
     {
+        /// <summary>
+        /// Default constructor available for deserialization.
+        /// </summary>
         public MessageBusMessage()
         {
         }
 
+        /// <summary>
+        /// Constructs the message.
+        /// </summary>
+        /// <param name="request">Requested from the message bus.</param>
+        /// <param name="id">Depending on the request it is client id or service id.</param>
+        /// <param name="messageData">If the request is SendRequestMessage or SendResponseMessage it is the serialized message data.
+        /// Otherwise it is null.
+        /// </param>
         public MessageBusMessage(EMessageBusRequest request, string id, object messageData)
         {
             Request = request;
@@ -79,12 +97,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             MessageData = messageData;
         }
 
+        /// <summary>
+        /// Request for the message bus.
+        /// </summary>
         [DataMember]
         public EMessageBusRequest Request { get; set; }
 
+        /// <summary>
+        /// Depending on the request it is client id or service id.
+        /// </summary>
         [DataMember]
         public string Id { get; set; }
 
+        /// <summary>
+        /// If the request is SendRequestMessage or SendResponseMessage it is the serialized message data.
+        /// Otherwise it is null.
+        /// </summary>
         [DataMember]
         public object MessageData { get; set; }
     }

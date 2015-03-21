@@ -254,8 +254,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         /// Creates the connection if does not exist.
         /// Returns false if the opening the connection was not approved - user rejected the connection via the connection token.
         /// </summary>
-        /// <param name="messageContext"></param>
         /// <param name="responseReceiverId"></param>
+        /// <param name="senderAddress"></param>
         /// <returns></returns>
         private void OpenConnection(string responseReceiverId, string senderAddress)
         {

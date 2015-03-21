@@ -20,7 +20,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     /// </summary>
     /// <remarks>
     /// The policy server is required by Silverlight for the communication via HTTP or TCP.
-    /// (See also <see cref="HttpPolicyServer"/>.)
     /// <br/><br/>
     /// The TCP policy server is a special service listening on the port 943 (by default for all Ip adresses).
     /// When it receives &lt;policy-file-request/&gt; request, it returns the content of the policy file.

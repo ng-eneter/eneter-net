@@ -6,13 +6,14 @@
 */
 
 using System;
+using System.IO;
 using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
-    internal class LocalProtocolFormatter : ProtocolFormatterBase, IProtocolFormatter
+    internal class LocalProtocolFormatter : IProtocolFormatter
     {
-        public override object EncodeOpenConnectionMessage(string responseReceiverId)
+        public object EncodeOpenConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -21,7 +22,12 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
-        public override object EncodeCloseConnectionMessage(string responseReceiverId)
+        public void EncodeOpenConnectionMessage(string responseReceiverId, Stream outputSream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support encoding to stream.");
+        }
+
+        public object EncodeCloseConnectionMessage(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -30,7 +36,12 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
-        public override object EncodeMessage(string responseReceiverId, object message)
+        public void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support encoding to stream.");
+        }
+
+        public object EncodeMessage(string responseReceiverId, object message)
         {
             using (EneterTrace.Entering())
             {
@@ -39,12 +50,22 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
-        public override ProtocolMessage DecodeMessage(object readMessage)
+        public void EncodeMessage(string responseReceiverId, object message, Stream outputSream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support decoding from stream.");
+        }
+
+        public ProtocolMessage DecodeMessage(object readMessage)
         {
             using (EneterTrace.Entering())
             {
                 return (ProtocolMessage)readMessage;
             }
+        }
+
+        public ProtocolMessage DecodeMessage(Stream readStream)
+        {
+            throw new NotSupportedException("This protocol formatter does not support decoding from stream.");
         }
     }
 }

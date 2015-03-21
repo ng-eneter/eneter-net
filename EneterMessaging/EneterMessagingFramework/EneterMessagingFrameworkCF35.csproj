@@ -181,7 +181,6 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\InteroperableProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\IProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\LocalProtocolFormatter.cs" />
-    <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolFormatterBase.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolMessage.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter_CompactFramework.cs" />
