@@ -31,8 +31,6 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-        public event EventHandler<TypedResponseReceivedEventArgs<object>> FailedToReceiveResponseMessage;
-
         public MultiTypedMessageSender(ISerializer serializer)
         {
             using (EneterTrace.Entering())
@@ -183,15 +181,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                if (e.ReceivingError != null)
-                {
-                    if (FailedToReceiveResponseMessage != null)
-                    {
-                        TypedResponseReceivedEventArgs<object> anEvent = new TypedResponseReceivedEventArgs<object>(e.ReceivingError);
-                        FailedToReceiveResponseMessage(this, anEvent);
-                    }
-                }
-                else
+                if (e.ReceivingError == null)
                 {
                     TMessageHandler aMessageHandler;
 
@@ -220,12 +210,16 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                         {
                             aMessageHandler.Invoke(null, err);
                         }
-                        
+
                     }
                     else
                     {
                         EneterTrace.Warning(TracedObject + ErrorHandler.NobodySubscribedForMessage + " Message type = " + e.ResponseMessage.TypeName);
                     }
+                }
+                else
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageFailure, e.ReceivingError);
                 }
             }
         }

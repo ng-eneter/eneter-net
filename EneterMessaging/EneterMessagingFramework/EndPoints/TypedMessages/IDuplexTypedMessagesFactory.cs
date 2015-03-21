@@ -14,7 +14,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     public interface IDuplexTypedMessagesFactory
     {
         /// <summary>
-        /// Creates duplex typed message sender that can send request messages and receive response messages of specified type.
+        /// Creates typed message sender which can send request messages and receive response messages of specified type.
         /// </summary>
         /// <typeparam name="TResponse">Type of response messages.</typeparam>
         /// <typeparam name="TRequest">Type of request messages.</typeparam>
@@ -22,11 +22,10 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         IDuplexTypedMessageSender<TResponse, TRequest> CreateDuplexTypedMessageSender<TResponse, TRequest>();
 
         /// <summary>
-        /// Creates synchronous duplex typed message sender that sends a request message and then
-        /// waits until the response message is received.
+        /// Creates typed message sender which sends the request message and then waits until the response is received.
         /// </summary>
-        /// <typeparam name="TResponse">Response message type.</typeparam>
-        /// <typeparam name="TRequest">Request message type.</typeparam>
+        /// <typeparam name="TResponse">Type of response messages.</typeparam>
+        /// <typeparam name="TRequest">Type of receiving messages.</typeparam>
         /// <returns>synchronous duplex typed message sender</returns>
         ISyncDuplexTypedMessageSender<TResponse, TRequest> CreateSyncDuplexTypedMessageSender<TResponse, TRequest>();
         

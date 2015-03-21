@@ -31,8 +31,6 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
 
-        public event EventHandler<TypedRequestReceivedEventArgs<object>> FailedToReceiveRequestMessage;
-
 
         public MultiTypedMessageReceiver(ISerializer serializer)
         {
@@ -186,11 +184,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             {
                 if (e.ReceivingError != null)
                 {
-                    if (FailedToReceiveRequestMessage != null)
-                    {
-                        TypedRequestReceivedEventArgs<object> anEvent = new TypedRequestReceivedEventArgs<object>(e.ResponseReceiverId, e.SenderAddress, e.ReceivingError);
-                        FailedToReceiveRequestMessage(this, anEvent);
-                    }
+                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageFailure, e.ReceivingError);
                 }
                 else
                 {

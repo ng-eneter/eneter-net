@@ -12,7 +12,7 @@ using System.Runtime.Serialization;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Internal message used by Eneter framework for reliable communication.
+    /// Internal message used by ReliebleMessageSender and ReliableMessage Receiver.
     /// </summary>
 #if !SILVERLIGHT
     [Serializable]

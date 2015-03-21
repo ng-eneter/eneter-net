@@ -12,32 +12,42 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Receiver of typed messages.
+    /// Receiver of specified message type.
     /// </summary>
-    /// <typeparam name="_ResponseType">sends response messages of this type.</typeparam>
-    /// <typeparam name="_RequestType">receives messages of this type.</typeparam>
-    public interface IDuplexTypedMessageReceiver<_ResponseType, _RequestType> : IAttachableDuplexInputChannel
+    /// <remarks>
+    /// This is a service component which can receive request messages and send back response messages.
+    /// DuplexTypedMessageReceiver can receive messages only from DuplexTypedMessageSender or from SyncDuplexTypedMessageSender.
+    /// </remarks>
+    /// <typeparam name="TResponse">Type of response message which can be sent by the receiver.</typeparam>
+    /// <typeparam name="TRequest">Type of request message which can be received by the receiver.</typeparam>
+    public interface IDuplexTypedMessageReceiver<TResponse, TRequest> : IAttachableDuplexInputChannel
     {
         /// <summary>
-        /// The event is invoked when the message from a duplex typed message sender was received.
+        /// The event is invoked when the request message is received.
         /// </summary>
-        event EventHandler<TypedRequestReceivedEventArgs<_RequestType>> MessageReceived;
+        event EventHandler<TypedRequestReceivedEventArgs<TRequest>> MessageReceived;
 
         /// <summary>
-        /// The event is invoked when a duplex typed message sender opened the connection via its duplex output channel.
+        /// The event is invoked when a new duplex typed message sender (client) opened the connection.
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
 
         /// <summary>
-        /// The event is invoked when a duplex typed message sender closed the connection via its duplex output channel.
+        /// The event is invoked when a duplex typed message sender (client) closed the connection.
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
 
         /// <summary>
-        /// Sends the response message back to the duplex typed message sender via the attached duplex input channel.
+        /// Sends the response message.
         /// </summary>
-        /// <param name="responseReceiverId">identifies the duplex typed message sender that will receive the response</param>
+        /// <remarks>
+        /// The message will be serialized and sent via duplex output channel to the specified response receiver.
+        /// The response receiver deserializes the message and in case of DuplexTypedMessageSender raises the event ResponseReceived.
+        /// In case of SyncDuplexTypedMessageSender it returns from the method SendRequestMessage.
+        /// </remarks>
+        /// <param name="responseReceiverId">Identifies response receiver which will receive the message.
+        /// If the value is * then the broadcast to all connected response receivers will be sent.</param>
         /// <param name="responseMessage">response message</param>
-        void SendResponseMessage(string responseReceiverId, _ResponseType responseMessage);
+        void SendResponseMessage(string responseReceiverId, TResponse responseMessage);
     }
 }

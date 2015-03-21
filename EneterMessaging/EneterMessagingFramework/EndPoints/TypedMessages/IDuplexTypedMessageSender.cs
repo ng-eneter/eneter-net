@@ -12,11 +12,15 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Sender of typed messages.
+    /// Sender of specified message type.
     /// </summary>
-    /// <typeparam name="_ResponseType">receives response messages of this type.</typeparam>
-    /// <typeparam name="_RequestType">sends messages of this type.</typeparam>
-    public interface IDuplexTypedMessageSender<_ResponseType, _RequestType> : IAttachableDuplexOutputChannel
+    /// <remarks>
+    /// This is a client component which can send request messages and receive response messages.
+    /// DuplexTypedMessageSender can send messages only to DuplexTypedMessageReceiver.
+    /// </remarks>
+    /// <typeparam name="TResponse">receives response messages of this type.</typeparam>
+    /// <typeparam name="TRequest">sends messages of this type.</typeparam>
+    public interface IDuplexTypedMessageSender<TResponse, TRequest> : IAttachableDuplexOutputChannel
     {
         /// <summary>
         /// The event is raised when the connection with the receiver is open.
@@ -29,14 +33,18 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
-        /// The event is invoked when a response message was received.
+        /// The event is raised when a response message is received.
         /// </summary>
-        event EventHandler<TypedResponseReceivedEventArgs<_ResponseType>> ResponseReceived;
+        event EventHandler<TypedResponseReceivedEventArgs<TResponse>> ResponseReceived;
 
         /// <summary>
-        /// Sends message of specified type.
+        /// Sends message.
         /// </summary>
-        /// <param name="message"></param>
-        void SendRequestMessage(_RequestType message);
+        /// <remarks>
+        /// The given message is serialized and then sent via duplex output channel to the connected DuplexTypedMessageReceiver.
+        /// DuplexTypedMessageReceiver deserilizes the message and raises the MessageReceived event to notify that a message is received.
+        /// </remarks>
+        /// <param name="message">request message</param>
+        void SendRequestMessage(TRequest message);
     }
 }
