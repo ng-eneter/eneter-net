@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Eneter.MessagingUnitTests
 {
-    public static class SyncEvent
+    internal static class SyncEvent
     {
         public static bool WaitFor(Func<bool> condition, TimeSpan maxWaitingTime)
         {

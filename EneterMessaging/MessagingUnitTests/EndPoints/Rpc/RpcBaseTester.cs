@@ -928,6 +928,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         }
 #endif
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void PerClientInstanceService()
         {
@@ -984,7 +985,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-
+#endif
 
         protected IMessagingSystemFactory myMessaging;
         protected string myChannelId;

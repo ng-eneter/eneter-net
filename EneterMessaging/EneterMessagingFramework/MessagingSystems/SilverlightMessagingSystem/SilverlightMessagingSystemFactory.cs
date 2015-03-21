@@ -140,15 +140,22 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
     {
         private class ConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
-            public IOutputConnector CreateOutputConnector(string serviceConnectorAddress, string clientConnectorAddress)
+            public ConnectorFactory(IProtocolFormatter protocolFormatter)
             {
-                return new SilverlightOutputConnector(serviceConnectorAddress, clientConnectorAddress);
+                myProtocolFormatter = protocolFormatter;
             }
 
-            public IInputConnector CreateInputConnector(string serviceConnecterAddress)
+            public IOutputConnector CreateOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
             {
-                return new SilverlightInputConnector(serviceConnecterAddress);
+                return new SilverlightOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter);
             }
+
+            public IInputConnector CreateInputConnector(string inputConnecterAddress)
+            {
+                return new SilverlightInputConnector(inputConnecterAddress, myProtocolFormatter);
+            }
+
+            private IProtocolFormatter myProtocolFormatter;
         }
 
 
@@ -159,8 +166,8 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                myConnectorFactory = new ConnectorFactory();
-                myProtocolFormatter = new EneterStringProtocolFormatter();
+                IProtocolFormatter aProtocolFormatter = new EneterStringProtocolFormatter();
+                myConnectorFactory = new ConnectorFactory(aProtocolFormatter);
                 myDispatcher = new NoDispatching().GetDispatcher();
                 myDispatcherAfterMessageDecoded = myDispatcher;
             }
@@ -184,7 +191,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, null, myDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory);
             }
         }
 
@@ -208,7 +215,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory, myProtocolFormatter, false);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, myDispatcher, myDispatcherAfterMessageDecoded, myConnectorFactory);
             }
         }
 
@@ -228,14 +235,13 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             using (EneterTrace.Entering())
             {
                 IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
-                return new DefaultDuplexInputChannel(channelId, myDispatcher, myDispatcherAfterMessageDecoded, anInputConnector, myProtocolFormatter);
+                return new DefaultDuplexInputChannel(channelId, myDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
             }
         }
 
         private IThreadDispatcher myDispatcher;
         private IThreadDispatcher myDispatcherAfterMessageDecoded;
         private ConnectorFactory myConnectorFactory;
-        private IProtocolFormatter<string> myProtocolFormatter;
     }
 }
 

@@ -96,10 +96,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
         private class WebSocketOutputConnectorFactory : IOutputConnectorFactory
         {
-            public WebSocketOutputConnectorFactory(int connectionTimeout, int sendTimeout, int receiveTimeout)
+            public WebSocketOutputConnectorFactory(IProtocolFormatter protocolFormatter, int connectionTimeout, int sendTimeout, int receiveTimeout)
             {
                 using (EneterTrace.Entering())
                 {
+                    myProtocolFormatter = protocolFormatter;
                     myConnectionTimeout = connectionTimeout;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
@@ -110,10 +111,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketOutputConnector(inputConnectorAddress, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
+                    return new WebSocketOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private int myConnectionTimeout;
             private int mySendTimeout;
             private int myReceiveTimeout;
@@ -173,7 +175,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #else
-                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
+                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
@@ -206,7 +208,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #else
-                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(
+                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);

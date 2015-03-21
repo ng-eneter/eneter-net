@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.DataProcessing.Serializing;
-using Eneter.Messaging.EndPoints.TypedMessages;
-using NUnit.Framework;
 using System.Threading;
-using Eneter.Messaging.Threading.Dispatching;
+
+#if !COMPACT_FRAMEWORK
 using System.Windows.Threading;
+#endif
+
+using Eneter.Messaging.EndPoints.TypedMessages;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Threading.Dispatching;
+using NUnit.Framework;
 
 namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
 {
@@ -141,6 +141,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
             }
         }
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void ThreadDispatching()
         {
@@ -196,7 +197,8 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
                 }
             }
         }
-
+#endif
+        
         protected IDuplexInputChannel InputChannel { get; set; }
         protected IDuplexOutputChannel OutputChannel { get; set; }
         protected IDuplexTypedMessagesFactory DuplexTypedMessagesFactory { get; set; }

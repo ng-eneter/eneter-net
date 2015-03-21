@@ -18,7 +18,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     internal class MessageBusOutputConnector : IOutputConnector
     {
         public MessageBusOutputConnector(string inputConnectorAddress, ISerializer serializer, IDuplexOutputChannel messageBusOutputChannel,
-            TimeSpan openConnectionTimeout)
+            int openConnectionTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -26,7 +26,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 myClientId = messageBusOutputChannel.ResponseReceiverId;
                 mySerializer = serializer;
                 myMessageBusOutputChannel = messageBusOutputChannel;
-                myOpenConnectionTimeout = (openConnectionTimeout == TimeSpan.Zero) ? TimeSpan.FromMilliseconds(-1) : openConnectionTimeout;
+                myOpenConnectionTimeout = (openConnectionTimeout == 0) ? -1 : openConnectionTimeout;
             }
         }
 
@@ -184,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         }
 
         private string myClientId;
-        private TimeSpan myOpenConnectionTimeout;
+        private int myOpenConnectionTimeout;
         private ISerializer mySerializer;
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private string myServiceId;

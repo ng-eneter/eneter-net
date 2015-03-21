@@ -10,6 +10,7 @@
 using System;
 using System.IO;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 #if SILVERLIGHT
@@ -18,7 +19,6 @@ using System.Windows;
 
 #if !SILVERLIGHT
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 #endif
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
@@ -31,7 +31,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             int sendTimeout,
             int receiveTimeout)
 #else
-        public WebSocketOutputConnector(string inputConnectorAddress,
+        public WebSocketOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter,
             int connectTimeout,
             int sendTimeout,
             int receiveTimeout)

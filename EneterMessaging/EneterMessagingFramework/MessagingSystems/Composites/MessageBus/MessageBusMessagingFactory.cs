@@ -169,7 +169,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     // myClientConnectingAddress is address where message bus listens to connecting clients.
                     // outputConnectorAddress is responseReceiverId of connecting client.
                     IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, outputConnectorAddress);
-                    return new MessageBusOutputConnector(inputConnectorAddress, mySerializer, aMessageBusOutputChannel, OpenConnectionTimeout);
+                    return new MessageBusOutputConnector(inputConnectorAddress, mySerializer, aMessageBusOutputChannel, (int)OpenConnectionTimeout.TotalMilliseconds);
                 }
             }
 

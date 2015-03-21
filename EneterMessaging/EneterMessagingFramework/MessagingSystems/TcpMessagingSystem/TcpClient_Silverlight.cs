@@ -192,7 +192,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     {
                         if (!mySocketReceiverThread.Join(1000))
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + mySocketReceiverThread.ManagedThreadId);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + mySocketReceiverThread.ManagedThreadId);
 
                             try
                             {
@@ -200,7 +200,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                             }
 
                         }
@@ -254,7 +254,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 {
                     if (!Connected)
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                        string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                         EneterTrace.Error(aMessage);
                         throw new InvalidOperationException(aMessage);
                     }
@@ -267,7 +267,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
                         throw;
                     }
 
@@ -324,7 +324,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
                             throw;
                         }
 
@@ -367,7 +367,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
                             throw;
                         }
                     }

@@ -196,7 +196,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// <param name="pollingFrequency">how often the duplex output channel polls for the pending response messages</param>
         /// <param name="receiveInSilverlightThread">true if the response messages shall be received in the main silverlight thread</param>
         /// <param name="protocolFormatter">formatter for low-level messages between duplex output channel and duplex input channel</param>
-        public HttpMessagingSystemFactory(int pollingFrequency, bool receiveInSilverlightThread, IProtocolFormatter<byte[]> protocolFormatter)
+        public HttpMessagingSystemFactory(int pollingFrequency, bool receiveInSilverlightThread, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {

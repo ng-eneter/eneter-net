@@ -9,19 +9,25 @@
 
 using System;
 using System.IO;
+
+#if COMPACT_FRAMEWORK
+using System.Net;
+#endif
+
 using System.Net.Sockets;
 using System.Threading;
+
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 
-
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     internal class TcpOutputConnector : IOutputConnector
     {
-        public TcpOutputConnector(string ipAddressAndPort, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory, int connectTimeout, int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer)
+        public TcpOutputConnector(string ipAddressAndPort, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
+            int connectTimeout, int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer)
         {
             using (EneterTrace.Entering())
             {
@@ -175,9 +181,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                 }
                             }
                         }
-                        myResponseReceiverThread = null;
                     }
 
+                    myResponseReceiverThread = null;
                     myResponseMessageHandler = null;
                 }
             }
@@ -187,9 +193,13 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (EneterTrace.Entering())
                 {
-                    return myIsListeningToResponses;
+
+                    lock (myConnectionManipulatorLock)
+                    {
+                        return myIsListeningToResponses;
+                    }
                 }
             }
         }

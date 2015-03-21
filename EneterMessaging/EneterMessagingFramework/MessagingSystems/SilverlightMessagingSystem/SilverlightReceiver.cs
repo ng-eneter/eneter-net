@@ -10,12 +10,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Messaging;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.Sequencing;
-using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 
 namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
 {
@@ -38,15 +38,10 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             }
         }
 
-        public void StartListening(Func<MessageContext, bool> messageHandler)
+        public void StartListening(Action<string> messageHandler)
         {
             using (EneterTrace.Entering())
             {
-                if (IsListening)
-                {
-                    throw new InvalidOperationException(TracedObject + ErrorHandler.IsAlreadyListening);
-                }
-
                 try
                 {
                     myMessageHandler = messageHandler;
@@ -122,22 +117,22 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                     if (aFragments != null && aFragments.Any())
                     {
                         // Go via all fragments and get the serialized string of the originaly split message.
-                        string aSerializedOriginalMsg = "";
+                        StringBuilder aSerializedOriginalMsg = new StringBuilder();
                         foreach (Fragment aFragment in aFragments)
                         {
                             SilverlightFragmentMessage aSilverlightFragment = aFragment as SilverlightFragmentMessage;
                             if (aSilverlightFragment != null)
                             {
-                                aSerializedOriginalMsg += aSilverlightFragment.Message;
+                                aSerializedOriginalMsg.Append(aSilverlightFragment.Message);
                             }
                         }
 
                         try
                         {
-                            MessageContext aContext = new MessageContext(aSerializedOriginalMsg, "", null);
                             if (myMessageHandler != null)
                             {
-                                myMessageHandler(aContext);
+                                string aMessage = aSerializedOriginalMsg.ToString();
+                                myMessageHandler(aMessage);
                             }
                         }
                         catch (Exception err)
@@ -148,7 +143,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.ReceiveMessageFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToReceiveMessage, err);
                 }
             }
         }
@@ -167,7 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         }
 
 
-        private Func<MessageContext, bool> myMessageHandler;
+        private Action<string> myMessageHandler;
         private string myReceiverAddress;
         private LocalMessageReceiver myReceiver;
         private ISerializer mySerializer = new XmlStringSerializer();

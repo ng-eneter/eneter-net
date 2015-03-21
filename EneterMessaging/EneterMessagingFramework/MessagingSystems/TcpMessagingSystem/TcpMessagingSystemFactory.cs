@@ -104,24 +104,26 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 #else
         private class TcpOutputConnectorFactory : IOutputConnectorFactory
         {
-            public TcpOutputConnectorFactory(int connectionTimeout, int sendTimeout, int receiveTimeout)
+            public TcpOutputConnectorFactory(IProtocolFormatter protocolFormatter, int connectionTimeout, int sendTimeout, int receiveTimeout)
             {
                 using (EneterTrace.Entering())
                 {
+                    myProtocolFormatter = protocolFormatter;
                     myConnectionTimeout = connectionTimeout;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
                 }
             }
 
-            public IOutputConnector CreateOutputConnector(string serviceConnectorAddress, string clientConnectorAddress)
+            public IOutputConnector CreateOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
             {
                 using (EneterTrace.Entering())
                 {
-                    return new TcpOutputConnector(serviceConnectorAddress, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
+                    return new TcpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
                 }
             }
 
+            private IProtocolFormatter myProtocolFormatter;
             private int myConnectionTimeout;
             private int mySendTimeout;
             private int myReceiveTimeout;
@@ -155,7 +157,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </summary>
         /// <param name="receiveInSilverlightThread">true - if the response messages shall be received in the main Silverlight thread.</param>
         /// <param name="protocolFormatter">formatter used for low-level messages between duplex output and duplex input channels.</param>
-        public TcpMessagingSystemFactory(bool receiveInSilverlightThread, IProtocolFormatter<byte[]> protocolFormatter)
+        public TcpMessagingSystemFactory(bool receiveInSilverlightThread, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
@@ -251,6 +253,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     SendBufferSize, ReceiveBufferSize);
 #else
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
+                    myProtocolFormatter,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
@@ -292,6 +295,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     SendBufferSize, ReceiveBufferSize);
 #else
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
+                    myProtocolFormatter,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
 #endif
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);

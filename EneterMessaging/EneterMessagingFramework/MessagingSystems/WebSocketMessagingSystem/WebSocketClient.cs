@@ -900,7 +900,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                         }
 #endif
 

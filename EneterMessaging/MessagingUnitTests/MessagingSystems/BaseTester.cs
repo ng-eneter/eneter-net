@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using NUnit.Framework;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
-using System.Diagnostics;
-using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+
+#if !COMPACT_FRAMEWORK
 using Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem;
 using Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem;
+#endif
+
+using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
+using NUnit.Framework;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems
 {
@@ -219,10 +221,12 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 {
                     anIsConnected = aClient.OutputChannel.IsConnected;
 
+#if !COMPACT_FRAMEWORK
                     if (MessagingSystemFactory is SharedMemoryMessagingSystemFactory)
                     {
                         Thread.Sleep(300);
                     }
+#endif
 
                     aClient.OutputChannel.OpenConnection();
                 });
@@ -442,10 +446,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
             aClient.DoOnConnectionOpen((x, y) =>
                 {
+
+#if !COMPACT_FRAMEWORK
                     if (MessagingSystemFactory is NamedPipeMessagingSystemFactory)
                     {
                         Thread.Sleep(500);
                     }
+#endif
 
                     aClient.OutputChannel.CloseConnection();
                 });
@@ -492,10 +499,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
             aService.DoOnResponseReceiverConnected((x, y) =>
                 {
+
+#if !COMPACT_FRAMEWORK
                     if (MessagingSystemFactory is NamedPipeMessagingSystemFactory)
                     {
                         Thread.Sleep(500);
                     }
+#endif
 
                     aService.InputChannel.DisconnectResponseReceiver(y.ResponseReceiverId);
                 });

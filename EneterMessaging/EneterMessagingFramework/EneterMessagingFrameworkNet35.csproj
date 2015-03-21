@@ -123,6 +123,7 @@
     <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\IReliableTypedMessagesFactory.cs" />
     <Compile Include="EndPoints\TypedMessages\ISyncDuplexTypedMessageSender.cs" />
+    <Compile Include="EndPoints\TypedMessages\ISyncMultitypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessage.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageReceiver.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageSender.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="EndPoints\TypedMessages\ReliableMessageIdEventArgs.cs" />
     <Compile Include="EndPoints\TypedMessages\ReliableMessageTimeTracker.cs" />
     <Compile Include="EndPoints\TypedMessages\ReliableTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\SyncMultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\SyncTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\VoidMessage.cs" />
     <Compile Include="Infrastructure\Attachable\AttachableMultipleDuplexInputChannelsBase.cs">
@@ -217,8 +219,10 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusCustomSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessage.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
@@ -250,6 +254,7 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterStringProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\ConnectionProtocols\InteroperableProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\IProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -371,13 +376,7 @@
     </Compile>
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IOutputConnector.cs" />
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\IOutputConnectorFactory.cs" />
-    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\ISender.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\SimpleMessagingSystemBase\MessageContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\SimpleMessagingSystemBase\SenderUtil.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\SynchronousMessagingSystem\SynchronousMessagingProvider.cs">
@@ -464,9 +463,6 @@
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -514,6 +510,7 @@
     <Compile Include="Nodes\BackupRouter\IBackupConnectionRouterFactory.cs" />
     <Compile Include="Nodes\BackupRouter\RedirectEventArgs.cs" />
     <Compile Include="Nodes\BackupRouter\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\Broker\BrokerCustomSerializer.cs" />
     <Compile Include="Nodes\Broker\BrokerMessage.cs" />
     <Compile Include="Nodes\Broker\BrokerMessageReceivedEventArgs.cs">
       <SubType>Code</SubType>

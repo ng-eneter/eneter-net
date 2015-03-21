@@ -11,41 +11,43 @@
 using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
 {
     internal class SilverlightOutputConnector : IOutputConnector
     {
-        public SilverlightOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
+        public SilverlightOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
                 myInputConnectorAddress = inputConnectorAddress;
                 myOutputConnectorAddress = outputConnectorAddress;
+                myProtocolFormatter = protocolFormatter;
             }
         }
 
-        public void OpenConnection(Func<MessageContext, bool> responseMessageHandler)
+        public void OpenConnection(Action<MessageContext> responseMessageHandler)
         {
             using (EneterTrace.Entering())
             {
+                if (responseMessageHandler == null)
+                {
+                    throw new ArgumentNullException("responseMessageHandler is null.");
+                }
+
                 lock (myConnectionManipulatorLock)
                 {
-                    if (IsConnected)
-                    {
-                        throw new InvalidOperationException(TracedObject + ErrorHandler.IsAlreadyConnected);
-                    }
-
                     try
                     {
+                        myResponseMessageHandler = responseMessageHandler;
+                        myResponseReceiver = new SilverlightReceiver(myOutputConnectorAddress);
+                        myResponseReceiver.StartListening(HandleResponseMessage);
+
                         mySender = new SilverlightSender(myInputConnectorAddress);
 
-                        // If it shall receive response messages.
-                        if (responseMessageHandler != null)
-                        {
-                            myResponseReceiver = new SilverlightReceiver(myOutputConnectorAddress);
-                            myResponseReceiver.StartListening(responseMessageHandler);
-                        }
+                        string anEncodedMessage = (string)myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                        mySender.SendMessage(anEncodedMessage);
                     }
                     catch
                     {
@@ -60,16 +62,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
-                {
-                    if (myResponseReceiver != null)
-                    {
-                        myResponseReceiver.StopListening();
-                        myResponseReceiver = null;
-                    }
-
-                    mySender = null;
-                }
+                CleanConnection(true);
             }
         }
 
@@ -79,41 +72,89 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    // If one-way communication.
-                    if (myResponseReceiver == null)
-                    {
-                        return mySender != null;
-                    }
-
-                    return myResponseReceiver.IsListening;
+                    return myResponseReceiver != null && myResponseReceiver.IsListening;
                 }
             }
         }
 
-        public bool IsStreamWritter { get { return false; } }
-
-
-        public void SendMessage(object message)
+        public void SendRequestMessage(object message)
         {
             using (EneterTrace.Entering())
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    mySender.SendMessage(message);
+                    string anEncodedMessage = (string)myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                    mySender.SendMessage(anEncodedMessage);
                 }
             }
         }
 
-        public void SendMessage(Action<System.IO.Stream> toStreamWritter)
+
+        private void HandleResponseMessage(string message)
         {
-            throw new NotSupportedException(TracedObject + "does not suport toStreamWritter.");
+            using (EneterTrace.Entering())
+            {
+                Action<MessageContext> aResponseHandler = myResponseMessageHandler;
+
+                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(message);
+                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                {
+                    CleanConnection(false);
+                }
+
+                try
+                {
+                    aResponseHandler(aMessageContext);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
+            }
+        }
+
+        private void CleanConnection(bool sendMessageFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionManipulatorLock)
+                {
+                    if (mySender != null)
+                    {
+                        if (sendMessageFlag)
+                        {
+                            try
+                            {
+                                string anEncodedMessage = (string)myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
+                                mySender.SendMessage(anEncodedMessage);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + "failed to send close connection message.", err);
+                            }
+                        }
+
+                        mySender = null;
+                    }
+
+                    if (myResponseReceiver != null)
+                    {
+                        myResponseReceiver.StopListening();
+                        myResponseReceiver = null;
+                    }
+                }
+            }
         }
 
 
+        private Action<MessageContext> myResponseMessageHandler;
+        private IProtocolFormatter myProtocolFormatter;
         private object myConnectionManipulatorLock = new object();
         private string myInputConnectorAddress;
         private string myOutputConnectorAddress;
-        private ISender mySender;
+        private SilverlightSender mySender;
         private SilverlightReceiver myResponseReceiver;
 
 

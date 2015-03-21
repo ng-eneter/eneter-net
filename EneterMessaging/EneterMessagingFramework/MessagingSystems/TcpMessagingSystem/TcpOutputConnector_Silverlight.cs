@@ -12,12 +12,13 @@ using System.IO;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     internal class TcpOutputConnector : IOutputConnector
     {
-        public TcpOutputConnector(string ipAddressAndPort,
+        public TcpOutputConnector(string ipAddressAndPort, string outputConnectorAddress, IProtocolFormatter protocolFormatter,
             int connectTimeout,
             int sendTimeout,
             int receiveTimeout)
@@ -41,39 +42,25 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     throw;
                 }
 
+                myOutputConnectorAddress = outputConnectorAddress;
+                myProtocolFormatter = protocolFormatter;
                 myConnectionTimeout = connectTimeout;
                 mySendTimeout = sendTimeout;
                 myReceiveTimeout = receiveTimeout;
             }
         }
 
-        public void OpenConnection(Func<MessageContext, bool> responseMessageHandler)
+        public void OpenConnection(Action<MessageContext> responseMessageHandler)
         {
             using (EneterTrace.Entering())
             {
+                if (responseMessageHandler == null)
+                {
+                    throw new ArgumentNullException("responseMessageHandler is null.");
+                }
+
                 lock (myConnectionManipulatorLock)
                 {
-                    if (IsConnected)
-                    {
-                        string aMessage = TracedObject + ErrorHandler.IsAlreadyConnected;
-                        EneterTrace.Error(aMessage);
-                        throw new InvalidOperationException(aMessage);
-                    }
-
-
-                    // If it is needed clear after previous connection
-                    if (myTcpClient != null)
-                    {
-                        try
-                        {
-                            CloseConnection();
-                        }
-                        catch
-                        {
-                            // We tried to clean after the previous connection. The exception can be ignored.
-                        }
-                    }
-
                     try
                     {
                         // 4502 and 4532 ???
@@ -96,20 +83,16 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                         // Try to wait until the thread listening to responses started.
                         myListeningToResponsesStartedEvent.WaitOne(1000);
+
+                        byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
+                        if (anEncodedMessage != null)
+                        {
+                            myTcpClient.Send(anEncodedMessage);
+                        }
                     }
-                    catch (Exception err)
+                    catch
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
-
-                        try
-                        {
-                            CloseConnection();
-                        }
-                        catch
-                        {
-                            // We tried to clean after failure. The exception can be ignored.
-                        }
-
+                        CloseConnection();
                         throw;
                     }
                 }
@@ -134,7 +117,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     {
                         if (!myResponseReceiverThread.Join(3000))
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myResponseReceiverThread.ManagedThreadId);
 
                             try
                             {
@@ -142,12 +125,12 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                             }
                         }
                     }
-                    myResponseReceiverThread = null;
 
+                    myResponseReceiverThread = null;
                     myResponseMessageHandler = null;
                 }
             }
@@ -167,26 +150,18 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-        public bool IsStreamWritter { get { return false; } }
-        
 
-        public void SendMessage(object message)
+        public void SendRequestMessage(object message)
         {
             using (EneterTrace.Entering())
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    byte[] aMessage = (byte[])message;
-                    myTcpClient.Send(aMessage);
+                    byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
+                    myTcpClient.Send(anEncodedMessage);
                 }
             }
         }
-
-        public void SendMessage(Action<System.IO.Stream> toStreamWritter)
-        {
-            throw new NotSupportedException("toStreamWritter is not supported.");
-        }
-
 
         private void DoResponseListening()
         {
@@ -198,15 +173,25 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 try
                 {
                     Stream anInputStream = myTcpClient.GetInputStream();
-                    MessageContext aContext = new MessageContext(anInputStream, "", null);
 
                     while (!myStopReceivingRequestedFlag)
                     {
-                        if (!myResponseMessageHandler(aContext))
+                        ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)anInputStream);
+                        if (aProtocolMessage == null)
                         {
-                            // Handler requests stop receiving.
-                            myStopReceivingRequestedFlag = true;
+                            // The client is disconneced by the service.
                             break;
+                        }
+
+                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                        try
+                        {
+                            myResponseMessageHandler(aMessageContext);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                         }
                     }
                 }
@@ -215,7 +200,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     // If it is not an exception caused by closing the socket.
                     if (!myStopReceivingRequestedFlag)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                     }
                 }
 
@@ -225,27 +210,36 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 // If this closing is not caused by CloseConnection method.
                 if (!myStopReceivingRequestedFlag)
                 {
-                    // Try to clean the connection.
-                    ThreadPool.QueueUserWorkItem(x => CloseConnection());
+                    Action<MessageContext> aResponseHandler = myResponseMessageHandler;
+                    CloseConnection();
+
+                    try
+                    {
+                        aResponseHandler(null);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
+                    }
                 }
             }
         }
 
 
-
-        private object myConnectionManipulatorLock = new object();
-        private TcpClient myTcpClient;
         private UriBuilder myUriBuilder;
+        private string myOutputConnectorAddress;
+        private TcpClient myTcpClient;
+        private IProtocolFormatter myProtocolFormatter;
         private int myConnectionTimeout;
         private int mySendTimeout;
         private int myReceiveTimeout;
+        private object myConnectionManipulatorLock = new object();
+
+        private Action<MessageContext> myResponseMessageHandler;
+        private Thread myResponseReceiverThread;
         private volatile bool myStopReceivingRequestedFlag;
         private volatile bool myIsListeningToResponses;
-        private Thread myResponseReceiverThread;
         private ManualResetEvent myListeningToResponsesStartedEvent = new ManualResetEvent(false);
-        private Func<MessageContext, bool> myResponseMessageHandler;
-
-
 
         private string TracedObject { get { return GetType().Name + " "; } }
     }
