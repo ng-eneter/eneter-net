@@ -24,7 +24,7 @@ namespace Eneter.Messaging.EndPoints.StringMessages
             {
                 if (AttachedDuplexOutputChannel == null)
                 {
-                    string anError = TracedObject + ErrorHandler.ChannelNotAttached;
+                    string anError = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotAttached;
                     EneterTrace.Error(anError);
                     throw new InvalidOperationException(anError);
                 }
@@ -35,7 +35,7 @@ namespace Eneter.Messaging.EndPoints.StringMessages
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
                     throw;
                 }
             }

@@ -7,21 +7,35 @@
 
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
+using System;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     public class MultiTypedMessagesFactory : IMultiTypedMessagesFactory
     {
         public MultiTypedMessagesFactory()
-            : this(new XmlStringSerializer())
+            : this(TimeSpan.FromMilliseconds(-1), new XmlStringSerializer())
         {
         }
 
         public MultiTypedMessagesFactory(ISerializer serializer)
+            : this(TimeSpan.FromMilliseconds(-1), serializer)
+        {
+        }
+
+        public MultiTypedMessagesFactory(TimeSpan responseReceiveTimeout)
+            : this(responseReceiveTimeout, new XmlStringSerializer())
+        {
+        }
+
+        public MultiTypedMessagesFactory(TimeSpan responseReceiveTimeout, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
+                myResponseReceiveTimeout = responseReceiveTimeout;
                 mySerializer = serializer;
+                SyncDuplexTypedSenderThreadMode = new SyncDispatching();
             }
         }
 
@@ -33,6 +47,14 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
+        public ISyncMultitypedMessageSender CreateSyncMultiTypedMessageSender()
+        {
+            using (EneterTrace.Entering())
+            {
+                return new SyncMultiTypedMessageSender(myResponseReceiveTimeout, mySerializer, SyncDuplexTypedSenderThreadMode);
+            }
+        }
+
         public IMultiTypedMessageReceiver CreateMultiTypedMessageReceiver()
         {
             using (EneterTrace.Entering())
@@ -41,6 +63,10 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
+
+        public IThreadDispatcherProvider SyncDuplexTypedSenderThreadMode { get; set; }
+        
         private ISerializer mySerializer;
+        private TimeSpan myResponseReceiveTimeout;
     }
 }

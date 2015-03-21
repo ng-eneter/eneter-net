@@ -64,7 +64,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
                     throw;
                 }
             }
@@ -84,7 +84,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.StartListeningFailure, err);
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStartListening, err);
                 }
             }
         }

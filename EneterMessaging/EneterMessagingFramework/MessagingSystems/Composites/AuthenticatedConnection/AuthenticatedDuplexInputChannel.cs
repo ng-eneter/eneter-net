@@ -72,7 +72,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             {
                 if (!IsListening)
                 {
-                    string aMessage = TracedObject + ErrorHandler.SendResponseNotListeningFailure;
+                    string aMessage = TracedObject + ErrorHandler.FailedToSendResponseBecauseNotListening;
                     EneterTrace.Error(aMessage);
                     throw new InvalidOperationException(aMessage);
                 }
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                                EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
 
                                 // Note: Exception is not rethrown because if sending to one client fails it should not
                                 //       affect sending to other clients.
@@ -105,7 +105,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     {
                         if (!myAuthenticatedConnections.Contains(responseReceiverId))
                         {
-                            string aMessage = TracedObject + ErrorHandler.SendResponseNotConnectedFailure;
+                            string aMessage = TracedObject + ErrorHandler.FailedToSendResponseBecauaeClientNotConnected;
                             EneterTrace.Error(aMessage);
                             throw new InvalidOperationException(aMessage);
                         }

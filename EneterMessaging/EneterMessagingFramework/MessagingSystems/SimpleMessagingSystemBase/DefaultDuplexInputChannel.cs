@@ -70,7 +70,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
 
                         // The listening did not start correctly.
                         // So try to clean.
@@ -104,7 +104,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.IncorrectlyStoppedListening, err);
                     }
                 }
             }
@@ -138,7 +138,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                 if (!IsListening)
                 {
-                    string aMessage = TracedObject + ErrorHandler.SendResponseNotListeningFailure;
+                    string aMessage = TracedObject + ErrorHandler.FailedToSendResponseBecauseNotListening;
                     EneterTrace.Error(aMessage);
                     throw new InvalidOperationException(aMessage);
                 }
@@ -158,7 +158,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                                EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                                 CloseConnection(aConnectedClient.Key, true);
 
                                 // Note: Exception is not rethrown because if sending to one client fails it should not
@@ -176,7 +176,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                         CloseConnection(responseReceiverId, true);
                         throw;
                     }
@@ -245,7 +245,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
                 else
                 {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToReceiveMessageBecauseIncorrectFormat);
                 }
             }
         }
@@ -306,7 +306,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                         }
                     }
                 }

@@ -97,7 +97,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
                     throw;
                 }
             }

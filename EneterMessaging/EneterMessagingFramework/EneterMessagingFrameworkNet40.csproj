@@ -60,10 +60,12 @@
     <Compile Include="EndPoints\TypedMessages\IMultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\IMultiTypedMessageReceiver.cs" />
     <Compile Include="EndPoints\TypedMessages\IMultiTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\ISyncMultitypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessage.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageReceiver.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessagesFactory.cs" />
+    <Compile Include="EndPoints\TypedMessages\SyncMultiTypedMessageSender.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbCableMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>

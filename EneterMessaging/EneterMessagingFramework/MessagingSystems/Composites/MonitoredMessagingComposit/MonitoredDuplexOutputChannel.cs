@@ -65,7 +65,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         myUnderlyingOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
                         myUnderlyingOutputChannel.ConnectionOpened -= OnConnectionOpened;
 
-                        EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
 
                         throw;
                     }
@@ -106,7 +106,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     {
                         if (!myPingingThread.Join(3000))
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myPingingThread.ManagedThreadId);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myPingingThread.ManagedThreadId);
 
                             try
                             {
@@ -114,7 +114,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                             }
                         }
                     }
@@ -145,7 +145,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 {
                     if (!IsConnected)
                     {
-                        string anError = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                        string anError = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                         EneterTrace.Error(anError);
                         throw new InvalidOperationException(anError);
                     }
@@ -161,7 +161,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                     catch (Exception err)
                     {
-                        string anErrorMessage = TracedObject + ErrorHandler.SendMessageFailure;
+                        string anErrorMessage = TracedObject + ErrorHandler.FailedToSendMessage;
                         EneterTrace.Error(anErrorMessage, err);
                         throw;
                     }
@@ -191,7 +191,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.ReceiveMessageFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToReceiveMessage, err);
                 }
             }
         }
@@ -248,7 +248,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                     }
 
                     myUnderlyingOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;

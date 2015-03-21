@@ -184,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                 }
 
                 myIsListeningToResponses = false;
@@ -241,7 +241,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         {
                             if (!myResponseReceiverThread.Join(3000))
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myResponseReceiverThread.ManagedThreadId);
 
                                 try
                                 {
@@ -249,7 +249,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                                 }
                                 catch (Exception err)
                                 {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                                 }
                             }
                         }

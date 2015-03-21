@@ -134,7 +134,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
 
                         try
                         {
@@ -180,7 +180,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                         {
                             if (!myListeningThread.Join(3000))
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myListeningThread.ManagedThreadId.ToString());
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myListeningThread.ManagedThreadId.ToString());
 
                                 try
                                 {
@@ -188,7 +188,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                                 }
                                 catch (Exception err)
                                 {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                                 }
                             }
                         }
@@ -274,7 +274,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
 
                     // The error means the connection was closed from outside.
                     anErrorFlag = true;

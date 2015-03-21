@@ -38,7 +38,7 @@ namespace Eneter.Messaging.EndPoints.StringMessages
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                     throw;
                 }
             }

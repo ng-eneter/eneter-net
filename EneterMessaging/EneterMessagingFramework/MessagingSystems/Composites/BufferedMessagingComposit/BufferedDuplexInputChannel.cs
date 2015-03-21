@@ -58,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         myUnderlyingInputChannel.ResponseReceiverDisconnected -= OnResponseReceiverDisconnected;
                         myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
 
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
                         throw;
                     }
 
@@ -94,7 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.IncorrectlyStoppedListening, err);
                     }
 
                     myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;

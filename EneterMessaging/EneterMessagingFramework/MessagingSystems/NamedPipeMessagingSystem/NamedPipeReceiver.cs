@@ -73,7 +73,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
 
                         try
                         {

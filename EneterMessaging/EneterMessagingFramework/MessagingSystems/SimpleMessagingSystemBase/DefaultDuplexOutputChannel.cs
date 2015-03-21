@@ -85,7 +85,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     {
                         myConnectionIsCorrectlyOpen = false;
 
-                        EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
 
                         try
                         {
@@ -132,7 +132,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     if (!IsConnected)
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                        string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                         EneterTrace.Error(aMessage);
                         throw new InvalidOperationException(aMessage);
                     }
@@ -144,7 +144,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
                         throw;
                     }
                 }
@@ -171,7 +171,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 }
                 else
                 {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageIncorrectFormatFailure);
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToReceiveMessageBecauseIncorrectFormat);
                 }
             }
         }
@@ -192,7 +192,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                         }
                     }
 

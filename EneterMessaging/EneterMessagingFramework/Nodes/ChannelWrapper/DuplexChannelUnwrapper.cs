@@ -165,7 +165,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                         }
 
                     }
@@ -237,7 +237,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                 }
             }
         }

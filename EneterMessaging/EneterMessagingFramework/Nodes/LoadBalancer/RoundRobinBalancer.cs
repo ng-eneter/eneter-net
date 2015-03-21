@@ -178,7 +178,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.OpenConnectionFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToOpenConnection, err);
 
                                 anOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
                                 anOutputChannel.ConnectionClosed -= OnRequestReceiverClosedConnection;
@@ -205,7 +205,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.SendMessageFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToSendMessage, err);
 
                             try
                             {
@@ -214,7 +214,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                             }
                             catch (Exception err2)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err2);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err2);
                             }
 
                             aConnection.DuplexOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
@@ -283,7 +283,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
 
                             try
                             {
@@ -292,7 +292,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                             }
                             catch (Exception err2)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.DisconnectResponseReceiverFailure + aConnection.ResponseReceiverId, err2);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToDisconnectResponseReceiver + aConnection.ResponseReceiverId, err2);
                             }
 
                             myOpenConnections.RemoveWhere(x =>
@@ -305,7 +305,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                                         }
                                         catch (Exception err2)
                                         {
-                                            EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err2);
+                                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err2);
                                         }
 
                                         x.DuplexOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
@@ -354,7 +354,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                                 }
                                 catch (Exception err)
                                 {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                                 }
 
                                 x.DuplexOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;

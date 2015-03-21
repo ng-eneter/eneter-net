@@ -36,7 +36,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
                             // Ignore exception in exception.
                         }
 
-                        string aMessage = TracedObject + ErrorHandler.OpenConnectionFailure;
+                        string aMessage = TracedObject + ErrorHandler.FailedToOpenConnection;
                         EneterTrace.Error(aMessage, err);
                         throw;
                     }

@@ -58,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     // Wait until the thread is stopped.
                     if (!mySendingThreadStoppedEvent.WaitOne(5000))
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId);
                     }
 
                     // Remove all messages.

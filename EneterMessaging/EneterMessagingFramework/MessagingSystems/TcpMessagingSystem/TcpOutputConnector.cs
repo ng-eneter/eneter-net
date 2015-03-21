@@ -163,7 +163,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         {
                             if (!myResponseReceiverThread.Join(3000))
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myResponseReceiverThread.ManagedThreadId);
 
                                 try
                                 {
@@ -171,7 +171,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                 }
                                 catch (Exception err)
                                 {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                                 }
                             }
                         }
@@ -241,7 +241,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     // If it is not an exception caused by closing the socket.
                     if (!myStopReceivingRequestedFlag)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                     }
                 }
 
@@ -260,7 +260,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                     }
                 }
             }

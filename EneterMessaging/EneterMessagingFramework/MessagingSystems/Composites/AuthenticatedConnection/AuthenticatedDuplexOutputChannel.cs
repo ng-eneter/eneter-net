@@ -103,7 +103,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                         if (!IsConnected)
                         {
-                            String anErrorMessage = TracedObject + ErrorHandler.OpenConnectionFailure;
+                            String anErrorMessage = TracedObject + ErrorHandler.FailedToOpenConnection;
                             EneterTrace.Error(anErrorMessage);
                             throw new InvalidOperationException(anErrorMessage);
                         }
@@ -149,7 +149,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 {
                     if (!IsConnected)
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                        string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                         EneterTrace.Error(aMessage);
                         throw new InvalidOperationException(aMessage);
                     }

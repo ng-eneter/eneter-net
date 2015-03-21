@@ -125,7 +125,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 if (!IsConnected)
                 {
-                    string aMessage = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                    string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                     EneterTrace.Error(aMessage);
                     throw new InvalidOperationException(aMessage);
                 }

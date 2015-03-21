@@ -109,7 +109,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                     // Remove the message from the tracking.
                     myTimeTracker.RemoveTracking(aMessageId);
 
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                     throw;
                 }
             }

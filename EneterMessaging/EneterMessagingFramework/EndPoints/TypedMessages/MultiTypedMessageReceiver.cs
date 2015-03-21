@@ -184,7 +184,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             {
                 if (e.ReceivingError != null)
                 {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageFailure, e.ReceivingError);
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToReceiveMessage, e.ReceivingError);
                 }
                 else
                 {

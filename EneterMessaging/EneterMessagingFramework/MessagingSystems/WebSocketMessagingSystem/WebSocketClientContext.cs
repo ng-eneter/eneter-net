@@ -108,7 +108,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                             }
 
                             myClientStream.Close();
@@ -247,7 +247,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 {
                     if (!IsConnected)
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                        string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                         EneterTrace.Error(aMessage);
                         throw new InvalidOperationException(aMessage);
                     }
@@ -264,7 +264,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
                         throw;
                     }
                 }
@@ -385,7 +385,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                 }
 
                 // If the connection is being closed due to a protocol error.

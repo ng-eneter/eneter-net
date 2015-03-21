@@ -433,7 +433,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         {
                         }
 
-                        EneterTrace.Error(TracedObject + ErrorHandler.OpenConnectionFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
                         throw;
                     }
                 }
@@ -605,7 +605,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 if (!responseRegEx.Success)
                 {
-                    string anErrorMessage = TracedObject + ErrorHandler.OpenConnectionFailure + " The http response was not recognized.";
+                    string anErrorMessage = TracedObject + ErrorHandler.FailedToOpenConnection + " The http response was not recognized.";
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
@@ -621,7 +621,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     !aHeaderFields.ContainsKey("Connection") ||
                     string.IsNullOrEmpty(aSecurityAccept))
                 {
-                    string anErrorMessage = TracedObject + ErrorHandler.OpenConnectionFailure + " A required header field was missing.";
+                    string anErrorMessage = TracedObject + ErrorHandler.FailedToOpenConnection + " A required header field was missing.";
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
@@ -631,7 +631,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 string aCalculatedAcceptance = WebSocketFormatter.EncryptWebSocketKey(aWebSocketKeyBase64);
                 if (aCalculatedAcceptance != aSecurityAccept)
                 {
-                    string anErrorMessage = TracedObject + ErrorHandler.OpenConnectionFailure + " Sec-WebSocket-Accept has incorrect value.";
+                    string anErrorMessage = TracedObject + ErrorHandler.FailedToOpenConnection + " Sec-WebSocket-Accept has incorrect value.";
                     EneterTrace.Error(anErrorMessage);
                     throw new InvalidOperationException(anErrorMessage);
                 }
@@ -646,7 +646,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 {
                     if (!IsConnected)
                     {
-                        string aMessage = TracedObject + ErrorHandler.SendMessageNotConnectedFailure;
+                        string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
                         EneterTrace.Error(aMessage);
                         throw new InvalidOperationException(aMessage);
                     }
@@ -666,7 +666,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
                         throw;
                     }
                 }
@@ -816,7 +816,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                 }
 
                 // If the connection is being closed due to a protocol error.
@@ -885,7 +885,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.CloseConnectionFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                             }
 
                             myClientStream.Close();
@@ -924,7 +924,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     {
                         if (!myResponseReceiverThread.Join(3000))
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myResponseReceiverThread.ManagedThreadId);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myResponseReceiverThread.ManagedThreadId);
 
                             try
                             {
@@ -932,7 +932,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                             }
                         }
                     }
@@ -944,7 +944,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.UnregisterMessageHandlerThreadFailure, err);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.FailedToUnregisterMessageHandler, err);
                     }
 
                     // Reset the responsibility for starting of threads looping for response messages.

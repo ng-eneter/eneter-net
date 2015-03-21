@@ -82,12 +82,14 @@
     <Compile Include="EndPoints\MultiTypedMessages\MultiTypedMessagesBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EndPoints\MultiTypedMessages\SyncMultiTypedMessageBaseTester.cs" />
     <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncBin.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EndPoints\MultiTypedMessages\Test_MultiTypedMessagesSyncXml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EndPoints\MultiTypedMessages\Test_SyncMultitypedMessages_Sync_Xml.cs" />
     <Compile Include="EndPoints\Rpc\RpcBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>

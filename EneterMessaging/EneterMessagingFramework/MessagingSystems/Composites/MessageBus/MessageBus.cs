@@ -293,7 +293,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         }
                         catch (Exception err)
                         {
-                            string anErrorMessage = TracedObject + ErrorHandler.CloseConnectionFailure;
+                            string anErrorMessage = TracedObject + ErrorHandler.FailedToCloseConnection;
                             EneterTrace.Warning(anErrorMessage, err);
                         }
                     }

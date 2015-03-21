@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                 {
                     if (!myListeningThread.Join(300))
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myListeningThread.ManagedThreadId);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myListeningThread.ManagedThreadId);
 
                         try
                         {
@@ -99,7 +99,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                         }
                     }
                 }
@@ -236,7 +236,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     // if the error is not caused by closed communication.
                     if (!myStopListeningRequestFlag)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                     }
                 }
             }

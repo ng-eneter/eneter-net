@@ -21,6 +21,12 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         IMultiTypedMessageSender CreateMultiTypedMessageSender();
 
         /// <summary>
+        /// Creates multi typed message sender which sends the request message and then waits until the response is received.
+        /// </summary>
+        /// <returns>synchronous multi typed message sender</returns>
+        ISyncMultitypedMessageSender CreateSyncMultiTypedMessageSender();
+
+        /// <summary>
         /// Creates multi typed message receiver which can receive messages of various types and send response messages of various types.
         /// </summary>
         /// <returns>multi typed message receiver</returns>

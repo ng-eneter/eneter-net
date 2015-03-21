@@ -82,7 +82,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Error(TracedObject + ErrorHandler.SendMessageFailure, err);
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
                         }
                     }
                 }
@@ -99,7 +99,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                 }
             }
         }

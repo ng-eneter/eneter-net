@@ -87,7 +87,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
                         myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
 
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
                     }
                 }
             }
@@ -105,7 +105,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.IncorrectlyStoppedListening, err);
                     }
 
                     myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
@@ -143,7 +143,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                     throw;
                 }
             }
@@ -159,7 +159,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.DisconnectResponseReceiverFailure + responseReceiverId, err);
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToDisconnectResponseReceiver + responseReceiverId, err);
                 }
             }
         }
@@ -229,7 +229,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.ReceiveMessageFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToReceiveMessage, err);
                 }
             }
         }

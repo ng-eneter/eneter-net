@@ -146,11 +146,20 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                MultiTypedMessage aMessage = new MultiTypedMessage();
-                aMessage.TypeName = typeof(TRequestMessage).Name;
-                aMessage.MessageData = mySerializer.Serialize<TRequestMessage>(message);
+                try
+                {
+                    MultiTypedMessage aMessage = new MultiTypedMessage();
+                    aMessage.TypeName = typeof(TRequestMessage).Name;
+                    aMessage.MessageData = mySerializer.Serialize<TRequestMessage>(message);
 
-                mySender.SendRequestMessage(aMessage);
+                    mySender.SendRequestMessage(aMessage);
+                }
+                catch (Exception err)
+                {
+                    string anErrorMessage = TracedObject + ErrorHandler.FailedToSendMessage;
+                    EneterTrace.Error(anErrorMessage, err);
+                    throw;
+                }
             }
         }
 
@@ -219,7 +228,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                 }
                 else
                 {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.ReceiveMessageFailure, e.ReceivingError);
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToReceiveMessage, e.ReceivingError);
                 }
             }
         }

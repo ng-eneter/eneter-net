@@ -361,7 +361,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.SendResponseFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
                 }
             }
         }

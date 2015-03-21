@@ -67,7 +67,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
 
                         try
                         {
@@ -101,7 +101,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         }
                         catch (Exception err)
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopListeningFailure, err);
+                            EneterTrace.Warning(TracedObject + ErrorHandler.IncorrectlyStoppedListening, err);
                         }
                         myListener = null;
                     }
@@ -114,7 +114,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     {
                         if (!myListeningThread.Join(1000))
                         {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.StopThreadFailure + myListeningThread.ManagedThreadId.ToString());
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myListeningThread.ManagedThreadId.ToString());
 
                             try
                             {
@@ -122,7 +122,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             }
                             catch (Exception err)
                             {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.AbortThreadFailure, err);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
                             }
                         }
                     }
@@ -195,7 +195,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.DoListeningFailure, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
                 }
             }
         }

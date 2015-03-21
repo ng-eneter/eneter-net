@@ -305,6 +305,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// The factory will create senders and receivers using the default XmlStringSerializer
         /// and the factory will create ISyncDuplexTypedMessageSender with specified timeout
         /// indicating how long it can wait for a response message from the service.
+        /// The timeout value TimeSpan.FromMilliseconds(-1) means infinite time.
         /// </remarks>
         /// <param name="syncResponseReceiveTimeout">maximum waiting time when synchronous message sender is used.</param>
         public DuplexTypedMessagesFactory(TimeSpan syncResponseReceiveTimeout)
@@ -331,14 +332,14 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// Creates duplex typed message sender that can send request messages and receive response
         /// messages of specified type.
         /// </summary>
-        /// <typeparam name="_ResponseType">Type of response messages.</typeparam>
-        /// <typeparam name="_RequestType">Type of request messages.</typeparam>
+        /// <typeparam name="TResponse">Type of response messages.</typeparam>
+        /// <typeparam name="TRequest">Type of request messages.</typeparam>
         /// <returns>duplex typed message sender</returns>
-        public IDuplexTypedMessageSender<_ResponseType, _RequestType> CreateDuplexTypedMessageSender<_ResponseType, _RequestType>()
+        public IDuplexTypedMessageSender<TResponse, TRequest> CreateDuplexTypedMessageSender<TResponse, TRequest>()
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexTypedMessageSender<_ResponseType, _RequestType>(mySerializer);
+                return new DuplexTypedMessageSender<TResponse, TRequest>(mySerializer);
             }
         }
 
@@ -346,15 +347,15 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// Creates synchronous duplex typed message sender that sends a request message and then
         /// waits until the response message is received.
         /// </summary>
-        /// <typeparam name="_ResponseType">Response message type.</typeparam>
-        /// <typeparam name="_RequestType">Request message type.</typeparam>
+        /// <typeparam name="TResponse">Response message type.</typeparam>
+        /// <typeparam name="TRequest">Request message type.</typeparam>
         /// <returns></returns>
-        public ISyncDuplexTypedMessageSender<_ResponseType, _RequestType> CreateSyncDuplexTypedMessageSender<_ResponseType, _RequestType>()
+        public ISyncDuplexTypedMessageSender<TResponse, TRequest> CreateSyncDuplexTypedMessageSender<TResponse, TRequest>()
         {
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aThreadDispatcher = SyncDuplexTypedSenderThreadMode.GetDispatcher();
-                SyncTypedMessageSender<_ResponseType, _RequestType> aSender = new SyncTypedMessageSender<_ResponseType, _RequestType>(mySyncResponseReceiveTimeout, mySerializer, aThreadDispatcher);
+                SyncTypedMessageSender<TResponse, TRequest> aSender = new SyncTypedMessageSender<TResponse, TRequest>(mySyncResponseReceiveTimeout, mySerializer, aThreadDispatcher);
                 return aSender;
             }
         }
@@ -363,14 +364,14 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// Creates duplex typed message receiver that can receive request messages and
         /// send back response messages of specified type.
         /// </summary>
-        /// <typeparam name="_ResponseType">Type of response messages.</typeparam>
-        /// <typeparam name="_RequestType">Type of receiving messages.</typeparam>
+        /// <typeparam name="TResponse">Type of response messages.</typeparam>
+        /// <typeparam name="TRequest">Type of receiving messages.</typeparam>
         /// <returns>duplex typed message receiver</returns>
-        public IDuplexTypedMessageReceiver<_ResponseType, _RequestType> CreateDuplexTypedMessageReceiver<_ResponseType, _RequestType>()
+        public IDuplexTypedMessageReceiver<TResponse, TRequest> CreateDuplexTypedMessageReceiver<TResponse, TRequest>()
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexTypedMessageReceiver<_ResponseType, _RequestType>(mySerializer);
+                return new DuplexTypedMessageReceiver<TResponse, TRequest>(mySerializer);
             }
         }
 

@@ -36,7 +36,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
                             // Ignore exception in exception.
                         }
 
-                        EneterTrace.Error(TracedObject + ErrorHandler.StartListeningFailure, err);
+                        EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
                         throw;
                     }
                 }

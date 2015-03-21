@@ -199,7 +199,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
 
         protected IDuplexInputChannel InputChannel { get; set; }
         protected IDuplexOutputChannel OutputChannel { get; set; }
-        protected ISerializer Serializer { get; set; }
         protected IDuplexTypedMessagesFactory DuplexTypedMessagesFactory { get; set; }
     }
 }

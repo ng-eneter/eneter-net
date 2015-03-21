@@ -63,7 +63,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                         if (!myMessageBusOutputChannel.IsConnected)
                         {
-                            throw new InvalidOperationException(TracedObject + ErrorHandler.OpenConnectionFailure);
+                            throw new InvalidOperationException(TracedObject + ErrorHandler.FailedToOpenConnection);
                         }
                     }
                     catch
