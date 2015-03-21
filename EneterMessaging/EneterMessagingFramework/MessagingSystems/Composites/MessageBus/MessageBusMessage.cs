@@ -79,8 +79,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             MessageData = messageData;
         }
 
+        [DataMember]
         public EMessageBusRequest Request { get; set; }
+
+        [DataMember]
         public string Id { get; set; }
+
+        [DataMember]
         public object MessageData { get; set; }
     }
 }
