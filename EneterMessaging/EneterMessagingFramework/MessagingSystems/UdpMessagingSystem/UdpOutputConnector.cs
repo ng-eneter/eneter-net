@@ -104,21 +104,32 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 Action<MessageContext> aResponseHandler = myResponseMessageHandler;
 
-                ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
-                MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                ProtocolMessage aProtocolMessage = null;
+                if (datagram != null)
+                {
+                    aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
+                }
+                else
+                {
+                    aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutpuConnectorAddress, null);
+                }
 
                 if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
                     CleanConnection(false);
                 }
 
-                try
+                if (aResponseHandler != null)
                 {
-                    aResponseHandler(aMessageContext);
-                }
-                catch (Exception err)
-                {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    try
+                    {
+                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                        aResponseHandler(aMessageContext);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
                 }
             }
         }

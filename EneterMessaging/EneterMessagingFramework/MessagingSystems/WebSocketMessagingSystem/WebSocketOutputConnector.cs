@@ -152,7 +152,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                 try
                 {
-                    // If the connection closed is not caused that the client callled CloseConnection()
+                    // If the connection closed is not caused that the client called CloseConnection()
                     // but the connection was closed from the service.
                     if (aResponseHandler != null)
                     {

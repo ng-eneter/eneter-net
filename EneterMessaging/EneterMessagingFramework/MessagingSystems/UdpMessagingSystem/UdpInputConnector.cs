@@ -181,6 +181,12 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                if (datagram == null && clientAddress == null)
+                {
+                    // The listening got interrupted so nothing to do.
+                    return;
+                }
+
                 // Get the sender IP address.
                 string aClientIp = (clientAddress != null) ? ((IPEndPoint)clientAddress).Address.ToString() : "";
 

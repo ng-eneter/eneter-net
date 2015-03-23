@@ -22,11 +22,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        public IOutputConnector CreateOutputConnector(string serviceConnectorAddress, string clientConnectorAddress)
+        public IOutputConnector CreateOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
         {
             using (EneterTrace.Entering())
             {
-                return new DefaultOutputConnector(serviceConnectorAddress, clientConnectorAddress, myMessagingProvider, myProtocolFormatter);
+                return new DefaultOutputConnector(inputConnectorAddress, outputConnectorAddress, myMessagingProvider, myProtocolFormatter);
             }
         }
 

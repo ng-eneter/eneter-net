@@ -208,7 +208,14 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         string aResponseReceiverId = aConnection.Key;
                         string aSenderAddress = aConnection.Value;
 
-                        myInputConnector.CloseConnection(aResponseReceiverId);
+                        try
+                        {
+                            myInputConnector.CloseConnection(aResponseReceiverId);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
 
                         Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, aResponseReceiverId, aSenderAddress));
                     }
