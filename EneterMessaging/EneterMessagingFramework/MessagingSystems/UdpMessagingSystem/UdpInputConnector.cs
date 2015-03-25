@@ -34,8 +34,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    IsClosedFromService = true;
-
                     // Note: we do not close the udp socket because it is used globaly for all connected clients.
                 }
             }
@@ -48,7 +46,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myUdpSocket.SendTo(aMessageData, myClientAddress);
                 }
             }
-            public bool IsClosedFromService { get; private set; }
 
             private Socket myUdpSocket;
             private EndPoint myClientAddress;

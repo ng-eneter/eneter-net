@@ -270,7 +270,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     }
                     catch (Exception err)
                     {
-                        EneterTrace.Error(TracedObject + ErrorHandler.FailedInListeningLoop, err);
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                     }
                 }
             }
