@@ -319,7 +319,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                 if (aCientContext != null)
                 {
-                    // Forward the incomming message to the service.
+                    // Forward the incoming message to the service.
                     IDuplexInputChannel anInputChannel = myServiceConnector.AttachedDuplexInputChannel;
                     if (anInputChannel != null)
                     {
@@ -445,7 +445,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         UnregisterService(serviceResponseReceiverId);
                     }
                     else if (aServiceContext.ServiceId == serviceId &&
-                             aServiceContext.ServiceResponseReceiverId == serviceResponseReceiverId)
+                             aServiceContext.ServiceResponseReceiverId != serviceResponseReceiverId)
                     {
                         EneterTrace.Warning("Service '" + serviceId + "' is already registered. Connection will be disconnected.");
                         UnregisterService(serviceResponseReceiverId);
