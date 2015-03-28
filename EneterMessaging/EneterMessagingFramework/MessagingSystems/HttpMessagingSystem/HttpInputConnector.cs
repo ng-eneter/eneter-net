@@ -309,6 +309,8 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                                     // The client with the same id exists but was closed and disposed.
                                     // It is just that the timer did not remove it. So delete it now.
                                     myConnectedClients.Remove(aClientContext);
+
+                                    // Indicate the new client context shall be created.
                                     aClientContext = null;
                                 }
 
