@@ -26,7 +26,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-        public AndroidUsbDuplexOutputChannel(int port, string responseReceiverId, int adbHostPort, IProtocolFormatter protocolFormatter,
+        public AndroidUsbDuplexOutputChannel(int port, string responseReceiverId, int adbHostPort,
             IMessagingSystemFactory underlyingTcpMessaging)
         {
             using (EneterTrace.Entering())

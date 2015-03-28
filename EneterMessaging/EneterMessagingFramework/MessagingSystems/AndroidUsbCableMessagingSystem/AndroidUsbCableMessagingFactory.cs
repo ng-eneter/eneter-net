@@ -211,7 +211,6 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
             {
                 myAdbHostPort = adbHostPort;
                 myUnderlyingTcpMessaging = new TcpMessagingSystemFactory(protocolFormatter);
-                myProtocolFormatter = protocolFormatter;
             }
         }
 
@@ -281,7 +280,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), null, myAdbHostPort, myProtocolFormatter, myUnderlyingTcpMessaging);
+                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), null, myAdbHostPort, myUnderlyingTcpMessaging);
             }
         }
 
@@ -295,7 +294,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), responseReceiverId, myAdbHostPort, myProtocolFormatter, myUnderlyingTcpMessaging);
+                return new AndroidUsbDuplexOutputChannel(int.Parse(channelId), responseReceiverId, myAdbHostPort, myUnderlyingTcpMessaging);
             }
         }
 
@@ -407,7 +406,6 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 
         private int myAdbHostPort;
         private TcpMessagingSystemFactory myUnderlyingTcpMessaging;
-        private IProtocolFormatter myProtocolFormatter;
     }
 }
 
