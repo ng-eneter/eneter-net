@@ -159,6 +159,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     myServiceConnectingAddress = serviceConnectingAddress;
                     mySerializer = serializer;
                     myMessageBusMessaging = messageBusMessaging;
+                    OpenConnectionTimeout = TimeSpan.FromMilliseconds(30000);
                 }
             }
 
@@ -220,7 +221,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, serializer, underlyingMessaging);
-                myConnectorFactory.OpenConnectionTimeout = TimeSpan.FromMilliseconds(30000);
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
                 OutputChannelThreading = new NoDispatching();
