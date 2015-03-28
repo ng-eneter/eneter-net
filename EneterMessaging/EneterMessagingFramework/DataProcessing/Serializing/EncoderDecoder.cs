@@ -173,6 +173,10 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 {
                     anEncoding = Encoding.BigEndianUnicode;
                 }
+                else
+                {
+                    throw new InvalidOperationException("Unknnown data encoding " + aDataType);
+                }
 
                 aResult = ReadPlainString(reader, anEncoding, isLittleEndian);
             }
