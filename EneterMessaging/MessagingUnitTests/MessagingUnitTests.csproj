@@ -120,15 +120,6 @@
     <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Tcp_Xml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Sync_Xml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Tcp_Xml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedReliableMessages\TypedReliableMessagesBaseTester.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_NamedPipe_Bin.cs">
       <SubType>Code</SubType>
     </Compile>

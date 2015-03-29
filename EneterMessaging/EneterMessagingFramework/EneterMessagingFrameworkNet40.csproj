@@ -493,30 +493,7 @@
     <Compile Include="EndPoints\TypedMessages\IDuplexTypedMessagesFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageReceiver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessagesFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="EndPoints\TypedMessages\ISyncDuplexTypedMessageSender.cs" />
-    <Compile Include="EndPoints\TypedMessages\ReliableMessageIdEventArgs.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableDuplexTypedMessageReceiver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableDuplexTypedMessageSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableMessage.cs" />
-    <Compile Include="EndPoints\TypedMessages\ReliableMessageTimeTracker.cs" />
-    <Compile Include="EndPoints\TypedMessages\ReliableTypedMessagesFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="EndPoints\TypedMessages\SyncTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\TypedRequestReceivedEventArgs.cs">
       <SubType>Code</SubType>

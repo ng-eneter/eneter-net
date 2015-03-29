@@ -126,39 +126,12 @@
     <Compile Include="EndPoints\TypedMessages\IMultiTypedMessageReceiver.cs" />
     <Compile Include="EndPoints\TypedMessages\IMultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\IMultiTypedMessagesFactory.cs" />
-    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageReceiver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessageSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\IReliableTypedMessagesFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="EndPoints\TypedMessages\ISyncDuplexTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\ISyncMultitypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessage.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageReceiver.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessagesFactory.cs" />
-    <Compile Include="EndPoints\TypedMessages\ReliableDuplexTypedMessageReceiver.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableDuplexTypedMessageSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableMessage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableMessageIdEventArgs.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableMessageTimeTracker.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EndPoints\TypedMessages\ReliableTypedMessagesFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="EndPoints\TypedMessages\SyncMultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\SyncTypedMessageSender.cs">
       <SubType>Code</SubType>
