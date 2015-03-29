@@ -107,9 +107,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 }
                 else
                 {
-                    String anErrorMessage = "Decoding of serialized data failed because of incorrect data fromat.";
-                    EneterTrace.Error(anErrorMessage);
-                    throw new InvalidOperationException(anErrorMessage);
+                    throw new InvalidOperationException("Unknown encoding type value: " + aDataType);
                 }
 
                 return aDecodedData;

@@ -215,14 +215,10 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
                     // End of the stream.
                     return null;
                 }
-                catch (InvalidOperationException err)
+                catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + "failed to decode the message.", err);
 
-                    // Invalid message.
-                    // Note: Just because somebody sends and invalid string the loop reading messages should
-                    //       not be disturbed/interrupted by an exception.
-                    //       The reading must continue with the next message.
                     return null;
                 }
             }

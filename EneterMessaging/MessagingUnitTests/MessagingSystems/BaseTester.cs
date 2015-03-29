@@ -463,7 +463,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             {
                 aService.InputChannel.StartListening();
 
-                // The ecent will try to close connection.
                 aClient.OutputChannel.OpenConnection();
 
                 aClient.WaitUntilConnectionOpenIsNotified(1000);

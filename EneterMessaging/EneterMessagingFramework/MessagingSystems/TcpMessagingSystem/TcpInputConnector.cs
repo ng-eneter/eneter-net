@@ -233,55 +233,59 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     {
                         ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage((Stream)anInputOutputStream);
 
-                        // Note: Due to security reasons ignore close connection message in TCP.
-                        //       So that it is not possible that somebody will just send a close message which will have id of somebody else.
-                        //       The TCP connection will be closed when the client closes the socket.
-                        if (aProtocolMessage != null && aProtocolMessage.MessageType != EProtocolMessageType.CloseConnectionRequest)
+                        // If the stream was not closed.
+                        if (aProtocolMessage != null)
                         {
-                            MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
-
-                            // If open connection message is received and the current protocol formatter uses open connection message
-                            // then create the connection now.
-                            if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest &&
-                                myProtocolUsesOpenConnectionMessage)
+                            // Note: Due to security reasons ignore close connection message in TCP.
+                            //       So that it is not possible that somebody will just send a close message which will have id of somebody else.
+                            //       The TCP connection will be closed when the client closes the socket.
+                            if (aProtocolMessage.MessageType != EProtocolMessageType.CloseConnectionRequest)
                             {
-                                // Note: if client id is already set then it means this client has already open connection.
-                                if (string.IsNullOrEmpty(aClientId))
-                                {
-                                    aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
+                                MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
 
-                                    lock (myConnectedClients)
+                                // If open connection message is received and the current protocol formatter uses open connection message
+                                // then create the connection now.
+                                if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest &&
+                                    myProtocolUsesOpenConnectionMessage)
+                                {
+                                    // Note: if client id is already set then it means this client has already open connection.
+                                    if (string.IsNullOrEmpty(aClientId))
                                     {
-                                        if (!myConnectedClients.ContainsKey(aClientId))
+                                        aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
+
+                                        lock (myConnectedClients)
                                         {
-                                            myConnectedClients[aClientId] = aClientContext;
-                                        }
-                                        else
-                                        {
-                                            // Note: if the client id already exists then the connection cannot be open
-                                            //       and the connection with this  client will be closed.
-                                            EneterTrace.Warning(TracedObject + "could not open connection for client '" + aClientId + "' because the client with same id is already connected.");
-                                            break;
+                                            if (!myConnectedClients.ContainsKey(aClientId))
+                                            {
+                                                myConnectedClients[aClientId] = aClientContext;
+                                            }
+                                            else
+                                            {
+                                                // Note: if the client id already exists then the connection cannot be open
+                                                //       and the connection with this  client will be closed.
+                                                EneterTrace.Warning(TracedObject + "could not open connection for client '" + aClientId + "' because the client with same id is already connected.");
+                                                break;
+                                            }
                                         }
                                     }
+                                    else
+                                    {
+                                        EneterTrace.Warning(TracedObject + "the client '" + aClientId + "' has already open connection.");
+                                    }
                                 }
-                                else
+
+                                try
                                 {
-                                    EneterTrace.Warning(TracedObject + "the client '" + aClientId + "' has already open connection.");
+                                    // Ensure that nobody will try to use id of somebody else.
+                                    aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
+
+                                    // Notify message.
+                                    myMessageHandler(aMessageContext);
                                 }
-                            }
-
-                            try
-                            {
-                                // Ensure that nobody will try to use id of somebody else.
-                                aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
-
-                                // Notify message.
-                                myMessageHandler(aMessageContext);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                }
                             }
                         }
                         else

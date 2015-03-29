@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
@@ -111,7 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <param name="outputSream">not used</param>
         public void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream)
         {
-            // // An explicit close connection message is not supported therefore write nothing into the stream.
+            // An explicit close connection message is not supported therefore write nothing into the stream.
         }
 
         /// <summary>
@@ -203,7 +204,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
             catch (ObjectDisposedException)
             {
-                // End of the stream.
+                return null;
+            }
+            catch (Exception err)
+            {
+                EneterTrace.Warning("Failed to decode the message.", err);
                 return null;
             }
         }
