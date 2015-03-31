@@ -193,7 +193,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 try
                 {
-#if !COMPACT_FRAMWORK
+#if !COMPACT_FRAMEWORK
                     tcpClient.SendTimeout = mySendTimeout;
                     tcpClient.ReceiveTimeout = myReceiveTimeout;
                     tcpClient.SendBufferSize = mySendBuffer;
