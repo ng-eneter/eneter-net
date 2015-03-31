@@ -213,7 +213,14 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                         }
                         catch (Exception err)
                         {
-                            aMessageHandler.Invoke(e.ResponseReceiverId, e.SenderAddress, null, err);
+                            try
+                            {
+                                aMessageHandler.Invoke(e.ResponseReceiverId, e.SenderAddress, null, err);
+                            }
+                            catch (Exception err2)
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err2);
+                            }
                         }
                     }
                     else

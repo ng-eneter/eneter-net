@@ -217,9 +217,15 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                         }
                         catch (Exception err)
                         {
-                            aMessageHandler.Invoke(null, err);
+                            try
+                            {
+                                aMessageHandler.Invoke(null, err);
+                            }
+                            catch (Exception err2)
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err2);
+                            }
                         }
-
                     }
                     else
                     {
