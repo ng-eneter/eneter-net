@@ -104,6 +104,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
             Assert.IsNotNull(aReceivedMessage2);
             Assert.AreEqual("House", aReceivedMessage2.Name);
             Assert.AreEqual(1000, aReceivedMessage2.Count);
+
+            Assert.IsNotNull(aReceivedResponse2);
+            Assert.AreEqual("Car", aReceivedResponse2.Name);
+            Assert.AreEqual(100, aReceivedResponse2.Count);
         }
 
         [Test]
@@ -151,88 +155,44 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
 
             // Check received values
             Assert.IsNull(aReceivedMessage2);
+            Assert.IsNull(aReceivedResponse2);
         }
 
         [Test]
         public void RegisterUnregister()
         {
-            // The test can be performed from more threads therefore we must synchronize.
-            AutoResetEvent aMessageReceivedEvent = new AutoResetEvent(false);
+            // Registering / unregistering in service.
+            Responser.RegisterRequestMessageReceiver<int>((x, y) => { });
+            Responser.RegisterRequestMessageReceiver<CustomClass>((x, y) => { });
+            Responser.RegisterRequestMessageReceiver<string>((x, y) => { });
 
-            int aReceivedMessage1 = 0;
-            Responser.RegisterRequestMessageReceiver<int>((x, y) =>
-            {
-                aReceivedMessage1 = y.RequestMessage;
+            Assert.AreEqual(3, Responser.RegisteredRequestMessageTypes.Count());
+            Assert.IsTrue(Responser.RegisteredRequestMessageTypes.Any(x => x == typeof(int)));
+            Assert.IsTrue(Responser.RegisteredRequestMessageTypes.Any(x => x == typeof(CustomClass)));
+            Assert.IsTrue(Responser.RegisteredRequestMessageTypes.Any(x => x == typeof(string)));
 
-                // Send the response
-                Responser.SendResponseMessage<string>(y.ResponseReceiverId, "hello");
-            });
+            Responser.UnregisterRequestMessageReceiver<CustomClass>();
 
-            CustomClass aReceivedMessage2 = null;
-            Responser.RegisterRequestMessageReceiver<CustomClass>((x, y) =>
-            {
-                aReceivedMessage2 = y.RequestMessage;
-
-                // Send the response
-                CustomClass aResponse = new CustomClass();
-                aResponse.Name = "Car";
-                aResponse.Count = 100;
-
-                Responser.SendResponseMessage<CustomClass>(y.ResponseReceiverId, aResponse);
-            });
+            Assert.AreEqual(2, Responser.RegisteredRequestMessageTypes.Count());
+            Assert.IsTrue(Responser.RegisteredRequestMessageTypes.Any(x => x == typeof(int)));
+            Assert.IsTrue(Responser.RegisteredRequestMessageTypes.Any(x => x == typeof(string)));
 
 
-            Responser.AttachDuplexInputChannel(DuplexInputChannel);
+            // Registering / unregistering in client.
+            Requester.RegisterResponseMessageReceiver<int>((x, y) => { });
+            Requester.RegisterResponseMessageReceiver<CustomClass>((x, y) => { });
+            Requester.RegisterResponseMessageReceiver<string>((x, y) => { });
 
-            string aReceivedResponse1 = "";
-            EventHandler<TypedResponseReceivedEventArgs<string>> aResponseHandler = (x, y) =>
-            {
-                aReceivedResponse1 = y.ResponseMessage;
-            };
+            Assert.AreEqual(3, Requester.RegisteredResponseMessageTypes.Count());
+            Assert.IsTrue(Requester.RegisteredResponseMessageTypes.Any(x => x == typeof(int)));
+            Assert.IsTrue(Requester.RegisteredResponseMessageTypes.Any(x => x == typeof(CustomClass)));
+            Assert.IsTrue(Requester.RegisteredResponseMessageTypes.Any(x => x == typeof(string)));
 
-            // Register
-            Requester.RegisterResponseMessageReceiver<string>(aResponseHandler);
+            Requester.UnregisterResponseMessageReceiver<int>();
 
-            // Unregister the string.
-            Requester.UnregisterResponseMessageReceiver<string>();
-
-
-            CustomClass aReceivedResponse2 = null;
-            Requester.RegisterResponseMessageReceiver<CustomClass>((x, y) =>
-            {
-                aReceivedResponse2 = y.ResponseMessage;
-
-                // Signal that the response message was received -> the loop is closed.
-                aMessageReceivedEvent.Set();
-            });
-            Requester.AttachDuplexOutputChannel(DuplexOutputChannel);
-
-            try
-            {
-                Requester.SendRequestMessage<int>(1000);
-
-                CustomClass aCustomRequest = new CustomClass();
-                aCustomRequest.Name = "House";
-                aCustomRequest.Count = 1000;
-                Requester.SendRequestMessage<CustomClass>(aCustomRequest);
-
-                // Wait for the signal that the message is received.
-                aMessageReceivedEvent.WaitOne();
-                //Assert.IsTrue(aMessageReceivedEvent.WaitOne(2000));
-            }
-            finally
-            {
-                Requester.DetachDuplexOutputChannel();
-                Responser.DetachDuplexInputChannel();
-            }
-
-            // Check received values
-            Assert.AreEqual(1000, aReceivedMessage1);
-            Assert.AreEqual("", aReceivedResponse1);
-
-            Assert.IsNotNull(aReceivedMessage2);
-            Assert.AreEqual("House", aReceivedMessage2.Name);
-            Assert.AreEqual(1000, aReceivedMessage2.Count);
+            Assert.AreEqual(2, Requester.RegisteredResponseMessageTypes.Count());
+            Assert.IsTrue(Requester.RegisteredResponseMessageTypes.Any(x => x == typeof(CustomClass)));
+            Assert.IsTrue(Requester.RegisteredResponseMessageTypes.Any(x => x == typeof(string)));
         }
 
         protected IMessagingSystemFactory MessagingSystemFactory { get; set; }
