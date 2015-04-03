@@ -167,7 +167,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                UnregisterClient(e.ResponseReceiverId, true);
+                UnregisterClient(e.ResponseReceiverId, true, false);
             }
         }
 
@@ -184,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 catch (Exception err)
                 {
                     EneterTrace.Error(TracedObject + "failed to deserialize message from service. The service will be disconnected.", err);
-                    UnregisterClient(e.ResponseReceiverId, true);
+                    UnregisterClient(e.ResponseReceiverId, true, true);
                     return;
                 }
 
@@ -245,21 +245,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                         // Note: The service should not be disconnected from the message bus when not available.
                         //       Because it can be "just" overloaded. So only this new client will be disconnected from the message bus.
-                        UnregisterClient(clientResponseReceiverId, false);
+                        UnregisterClient(clientResponseReceiverId, false, true);
                     }
                 }
                 else
                 {
                     EneterTrace.Warning(TracedObject + "failed to connect the client already exists. The connection will be closed.");
-                    UnregisterClient(clientResponseReceiverId, true);
+                    UnregisterClient(clientResponseReceiverId, true, true);
                 }
             }
         }
 
-        private void UnregisterClient(string clientResponseReceiverId, bool sendCloseConnectionToServiceFlag)
+        private void UnregisterClient(string clientResponseReceiverId, bool sendCloseConnectionToServiceFlag, bool disconnectClientFlag)
         {
             using (EneterTrace.Entering())
             {
+                // Unregistering client. 
                 TClientContext aClientContext = null;
                 lock (myConnectionLock)
                 {
@@ -298,10 +299,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         }
                     }
 
-                    IDuplexInputChannel anInputChannel1 = myClientConnector.AttachedDuplexInputChannel;
-                    if (anInputChannel1 != null)
+                    // Disconnecting the client.
+                    if (disconnectClientFlag)
                     {
-                        anInputChannel1.DisconnectResponseReceiver(aClientContext.ClientResponseReceiverId);
+                        IDuplexInputChannel anInputChannel1 = myClientConnector.AttachedDuplexInputChannel;
+                        if (anInputChannel1 != null)
+                        {
+                            anInputChannel1.DisconnectResponseReceiver(aClientContext.ClientResponseReceiverId);
+                        }
                     }
                 }
             }
@@ -389,7 +394,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 else if (aMessageBusMessage.Request == EMessageBusRequest.DisconnectClient)
                 {
                     EneterTrace.Debug("SERVICE DISCONNECTs CLIENT");
-                    UnregisterClient(aMessageBusMessage.Id, false);
+                    UnregisterClient(aMessageBusMessage.Id, false, true);
                 }
                 else if (aMessageBusMessage.Request == EMessageBusRequest.ConfirmClient)
                 {
@@ -557,7 +562,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         string anErrorMessage = TracedObject + "failed to send message to the client.";
                         EneterTrace.Error(anErrorMessage, err);
 
-                        UnregisterClient(aClientContext.ClientResponseReceiverId, true);
+                        UnregisterClient(aClientContext.ClientResponseReceiverId, true, true);
                     }
                 }
             }
