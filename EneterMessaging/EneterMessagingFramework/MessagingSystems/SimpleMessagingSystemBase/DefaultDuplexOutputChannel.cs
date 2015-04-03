@@ -89,7 +89,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
                         try
                         {
-                            CleanAfterConnection(false);
+                            CloseConnection();
                         }
                         catch
                         {
@@ -109,7 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                CleanAfterConnection(true);
+                CleanAfterConnection(true, false);
             }
         }
 
@@ -162,7 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
                     EneterTrace.Debug("CLIENT DISCONNECTED RECEIVED");
-                    myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false));
+                    myDispatchingAfterResponseReading.Invoke(() => CleanAfterConnection(false, true));
                 }
                 else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
@@ -176,11 +176,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        private void CleanAfterConnection(bool sendCloseMessageFlag)
+        private void CleanAfterConnection(bool sendCloseMessageFlag, bool notifyConnectionClosedFlag)
         {
             using (EneterTrace.Entering())
             {
-                bool aNotifyFlag = false;
+                bool aConnectionWasCorrectlyOpen = false;
 
                 lock (myConnectionManipulatorLock)
                 {
@@ -197,13 +197,13 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     }
 
                     // Note: the notification must run outside the lock because of potententional deadlock.
-                    aNotifyFlag = myConnectionIsCorrectlyOpen;
+                    aConnectionWasCorrectlyOpen = myConnectionIsCorrectlyOpen;
                     myConnectionIsCorrectlyOpen = false;
                 }
 
                 // Notify the connection closed only if it was successfuly open before.
                 // E.g. It will be not notified if the CloseConnection() is called for already closed connection.
-                if (aNotifyFlag)
+                if (aConnectionWasCorrectlyOpen && notifyConnectionClosedFlag)
                 {
                     Dispatcher.Invoke(() => Notify(ConnectionClosed));
                 }

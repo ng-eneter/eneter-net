@@ -146,6 +146,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 // If broadcast to all connected response receivers.
                 if (responseReceiverId == "*")
                 {
+                    List<string> aDisconnectedClients = new List<string>();
+
                     lock (myConnectedClients)
                     {
                         // Send the response message to all connected clients.
@@ -159,12 +161,18 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                             catch (Exception err)
                             {
                                 EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
-                                CloseConnection(aConnectedClient.Key, true);
+                                aDisconnectedClients.Add(aConnectedClient.Key);
 
                                 // Note: Exception is not rethrown because if sending to one client fails it should not
                                 //       affect sending to other clients.
                             }
                         }
+                    }
+
+                    // Disconnect failed clients.
+                    foreach (String aResponseReceiverId in aDisconnectedClients)
+                    {
+                        CloseConnection(aResponseReceiverId, true, true);
                     }
                 }
                 else
@@ -177,7 +185,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     catch (Exception err)
                     {
                         EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
-                        CloseConnection(responseReceiverId, true);
+                        CloseConnection(responseReceiverId, true, true);
                         throw;
                     }
                 }
@@ -188,7 +196,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                CloseConnection(responseReceiverId, true);
+                CloseConnection(responseReceiverId, true, false);
             }
         }
 
@@ -216,8 +224,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         {
                             EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
                         }
-
-                        Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, aResponseReceiverId, aSenderAddress));
                     }
                     myConnectedClients.Clear();
                 }
@@ -248,7 +254,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                 {
                     EneterTrace.Debug("CLIENT DISCONNECTION RECEIVED");
-                    myDispatchingAfterMessageReading.Invoke(() => CloseConnection(messageContext.ProtocolMessage.ResponseReceiverId, false));
+                    myDispatchingAfterMessageReading.Invoke(() => CloseConnection(messageContext.ProtocolMessage.ResponseReceiverId, false, true));
                 }
                 else
                 {
@@ -290,7 +296,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             }
         }
 
-        private void CloseConnection(string responseReceiverId, bool sendCloseMessageFlag)
+        private void CloseConnection(string responseReceiverId, bool sendCloseMessageFlag, bool notifyDisconnectFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -322,8 +328,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     EneterTrace.Warning(TracedObject + "failed to close connection with response receiver.", err);
                 }
 
-                // If a connection was closed.
-                if (aConnecionExisted)
+                // If a connection was closed and notification event is required.
+                if (aConnecionExisted && notifyDisconnectFlag)
                 {
                     // Notify the connection was closed.
                     Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, responseReceiverId, aSenderAddress));

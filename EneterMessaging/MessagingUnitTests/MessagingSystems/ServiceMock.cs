@@ -24,6 +24,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             myAllResponseReceiversDisconnectedEvent.Reset();
             myRequestMessagesReceivedEvent.Reset();
 
+            myConnectedResponseReceivers.Clear();
             myDisconnectedResponseReceivers.Clear();
             myReceivedMessages.Clear();
         }
