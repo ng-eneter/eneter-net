@@ -27,17 +27,17 @@ namespace Eneter.Messaging.Nodes.Broker
         /// <summary>
         /// Request to unsubscribe from exactly specified message.
         /// </summary>
-        Unsubscribe = 30,
+        Unsubscribe = 20,
 
         /// <summary>
         /// Request to unsubscribe all messages and regular expressions.
         /// </summary>
-        UnsubscribeAll = 50,
+        UnsubscribeAll = 30,
 
         /// <summary>
         /// Request to publish a message.
         /// </summary>
-        Publish = 60
+        Publish = 40
     }
 
 
