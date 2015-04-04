@@ -6,7 +6,6 @@
 */
 
 using System;
-using System.Text.RegularExpressions;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
@@ -81,46 +80,6 @@ namespace Eneter.Messaging.Nodes.Broker
             }
         }
 
-        public void SubscribeRegExp(string regularExpression)
-        {
-            using (EneterTrace.Entering())
-            {
-                string[] aRegularExpression = { regularExpression };
-                SubscribeRegExp(aRegularExpression);
-            }
-        }
-
-        public void SubscribeRegExp(string[] regularExpressions)
-        {
-            using (EneterTrace.Entering())
-            {
-                if (regularExpressions == null)
-                {
-                    string anErrorMessage = TracedObject + "cannot subscribe to null.";
-                    EneterTrace.Error(anErrorMessage);
-                    throw new ArgumentNullException(anErrorMessage);
-                }
-
-                // Check if the client has a correct regular expression.
-                // If not, then the exception will be thrown here on the client side and not in the broker during the evaluation.
-                foreach (string aRegExpression in regularExpressions)
-                {
-                    try
-                    {
-                        Regex.IsMatch("", aRegExpression);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Error(TracedObject + "failed to subscribe the regular expression because the regular expression '"
-                            + aRegExpression + "' is incorrect.", err);
-                        throw;
-                    }
-                }
-
-                Send(EBrokerRequest.SubscribeRegExp, regularExpressions);
-            }
-        }
-
         public void Unsubscribe(string eventId)
         {
             using (EneterTrace.Entering())
@@ -135,23 +94,6 @@ namespace Eneter.Messaging.Nodes.Broker
             using (EneterTrace.Entering())
             {
                 Send(EBrokerRequest.Unsubscribe, eventIds);
-            }
-        }
-
-        public void UnsubscribeRegExp(string regularExpression)
-        {
-            using (EneterTrace.Entering())
-            {
-                string[] aRegularExpression = { regularExpression };
-                UnsubscribeRegExp(aRegularExpression);
-            }
-        }
-
-        public void UnsubscribeRegExp(string[] regularExpressions)
-        {
-            using (EneterTrace.Entering())
-            {
-                Send(EBrokerRequest.UnsubscribeRegExp, regularExpressions);
             }
         }
 

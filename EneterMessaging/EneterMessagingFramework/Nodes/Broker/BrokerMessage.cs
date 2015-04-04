@@ -25,21 +25,9 @@ namespace Eneter.Messaging.Nodes.Broker
         Subscribe = 10,
 
         /// <summary>
-        /// Request to subscribe for message type ids that match with the regular expression.
-        /// I.e. regular expression is used to identify what message types shall be notified
-        /// to the client.
-        /// </summary>
-        SubscribeRegExp = 20,
-
-        /// <summary>
         /// Request to unsubscribe from exactly specified message.
         /// </summary>
         Unsubscribe = 30,
-
-        /// <summary>
-        /// Request to unsubscribe the regular expression.
-        /// </summary>
-        UnsubscribeRegExp = 40,
 
         /// <summary>
         /// Request to unsubscribe all messages and regular expressions.

@@ -30,7 +30,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             IDuplexOutputChannel aSubscriber1ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
             IDuplexOutputChannel aSubscriber2ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
             IDuplexOutputChannel aSubscriber3ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
-            IDuplexOutputChannel aSubscriber4ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
 
             IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory();
 
@@ -66,13 +65,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             };
             aBrokerClient3.AttachDuplexOutputChannel(aSubscriber3ClientOutputChannel);
 
-            IDuplexBrokerClient aBrokerClient4 = aBrokerFactory.CreateBrokerClient();
-            BrokerMessageReceivedEventArgs aClient4ReceivedMessage = null;
-            aBrokerClient4.BrokerMessageReceived += (x, y) =>
-            {
-                aClient4ReceivedMessage = y;
-            };
-            aBrokerClient4.AttachDuplexOutputChannel(aSubscriber4ClientOutputChannel);
 
             string[] aSubscription1 = {"TypeA", "TypeB"};
             aBrokerClient1.Subscribe(aSubscription1);
@@ -83,10 +75,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             string[] aSubscription3 = { "MTypeC" };
             aBrokerClient3.Subscribe(aSubscription3);
 
-            // Subscription using the regular expression.
-            // Note: Subscribe for all message types starting with the character 'T'. 
-            string[] aSubscription4 = { "^T" };
-            aBrokerClient4.SubscribeRegExp(aSubscription4);
 
             aBroker.Subscribe("TypeA");
 
@@ -101,10 +89,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
 
             Assert.AreEqual(null, aClient3ReceivedMessage);
 
-            Assert.AreEqual("TypeA", aClient4ReceivedMessage.MessageTypeId);
-            Assert.AreEqual("Message A", (string)aClient4ReceivedMessage.Message);
-            Assert.AreEqual(null, aClient4ReceivedMessage.ReceivingError);
-
             Assert.AreEqual("TypeA", aBrokerReceivedMessage.MessageTypeId);
             Assert.AreEqual("Message A", (string)aBrokerReceivedMessage.Message);
             Assert.AreEqual(null, aBrokerReceivedMessage.ReceivingError);
@@ -113,7 +97,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             aClient1ReceivedMessage = null;
             aClient2ReceivedMessage = null;
             aClient3ReceivedMessage = null;
-            aClient4ReceivedMessage = null;
             aBrokerReceivedMessage = null;
 
             aBrokerClient2.Unsubscribe();
@@ -128,15 +111,12 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             Assert.AreEqual("Message MTC", (string)aClient3ReceivedMessage.Message);
             Assert.AreEqual(null, aClient3ReceivedMessage.ReceivingError);
 
-            Assert.AreEqual(null, aClient4ReceivedMessage);
-
             Assert.AreEqual(null, aBrokerReceivedMessage);
 
             
             aClient1ReceivedMessage = null;
             aClient2ReceivedMessage = null;
             aClient3ReceivedMessage = null;
-            aClient4ReceivedMessage = null;
             aBrokerReceivedMessage = null;
 
             aBroker.SendMessage("TypeA", "Message A");
@@ -148,9 +128,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
 
             Assert.AreEqual(null, aClient3ReceivedMessage);
 
-            Assert.AreEqual("TypeA", aClient4ReceivedMessage.MessageTypeId);
-            Assert.AreEqual("Message A", (string)aClient4ReceivedMessage.Message);
-            Assert.AreEqual(null, aClient4ReceivedMessage.ReceivingError);
 
             Assert.AreEqual("TypeA", aBrokerReceivedMessage.MessageTypeId);
             Assert.AreEqual("Message A", (string)aBrokerReceivedMessage.Message);
@@ -160,7 +137,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             aClient1ReceivedMessage = null;
             aClient2ReceivedMessage = null;
             aClient3ReceivedMessage = null;
-            aClient4ReceivedMessage = null;
             aBrokerReceivedMessage = null;
 
 

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
@@ -18,9 +17,9 @@ namespace Eneter.Messaging.Nodes.Broker
 {
     internal class DuplexBroker : AttachableDuplexInputChannelBase, IDuplexBroker
     {
-        private class TSubscriptionItem
+        private class TSubscription
         {
-            public TSubscriptionItem(string messageTypeId, string receiverId)
+            public TSubscription(string messageTypeId, string receiverId)
             {
                 MessageTypeId = messageTypeId;
                 ReceiverId = receiverId;
@@ -57,7 +56,7 @@ namespace Eneter.Messaging.Nodes.Broker
             using (EneterTrace.Entering())
             {
                 string[] aEventsToSubscribe = { eventId };
-                Subscribe(myLocalReceiverId, aEventsToSubscribe, myMessageSubscribtions);
+                Subscribe(myLocalReceiverId, aEventsToSubscribe);
             }
         }
 
@@ -65,7 +64,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                Subscribe(myLocalReceiverId, eventIds, myMessageSubscribtions);
+                Subscribe(myLocalReceiverId, eventIds);
             }
         }
 
@@ -74,7 +73,7 @@ namespace Eneter.Messaging.Nodes.Broker
             using (EneterTrace.Entering())
             {
                 string[] aEventsToUnsubscribe = { eventId };
-                Unsubscribe(myLocalReceiverId, aEventsToUnsubscribe, myMessageSubscribtions);
+                Unsubscribe(myLocalReceiverId, aEventsToUnsubscribe);
             }
         }
 
@@ -82,42 +81,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                Unsubscribe(myLocalReceiverId, eventIds, myMessageSubscribtions);
-            }
-        }
-
-        public void SubscribeRegExp(string regularExpression)
-        {
-            using (EneterTrace.Entering())
-            {
-                string[] aSubscribingExpressions = { regularExpression };
-                Subscribe(myLocalReceiverId, aSubscribingExpressions, myRegExpSubscribtions);
-            }
-        }
-
-        public void SubscribeRegExp(string[] regularExpressions)
-        {
-            using (EneterTrace.Entering())
-            {
-                Subscribe(myLocalReceiverId, regularExpressions, myRegExpSubscribtions);
-            }
-        }
-
-
-        public void UnsubscribeRegExp(string regularExpression)
-        {
-            using (EneterTrace.Entering())
-            {
-                string[] aUnsubscribingExpressions = { regularExpression };
-                Unsubscribe(myLocalReceiverId, aUnsubscribingExpressions, myRegExpSubscribtions);
-            }
-        }
-
-        public void UnsubscribeRegExp(string[] regularExpressions)
-        {
-            using (EneterTrace.Entering())
-            {
-                Unsubscribe(myLocalReceiverId, regularExpressions, myRegExpSubscribtions);
+                Unsubscribe(myLocalReceiverId, eventIds);
             }
         }
 
@@ -125,11 +89,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                lock (mySubscribtionManipulatorLock)
-                {
-                    Unsubscribe(myLocalReceiverId, null, myMessageSubscribtions);
-                    Unsubscribe(myLocalReceiverId, null, myRegExpSubscribtions);
-                }
+                Unsubscribe(myLocalReceiverId, null);
             }
         }
 
@@ -156,27 +116,15 @@ namespace Eneter.Messaging.Nodes.Broker
                 }
                 else if (aBrokerMessage.Request == EBrokerRequest.Subscribe)
                 {
-                    Subscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes, myMessageSubscribtions);
-                }
-                else if (aBrokerMessage.Request == EBrokerRequest.SubscribeRegExp)
-                {
-                    Subscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes, myRegExpSubscribtions);
+                    Subscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes);
                 }
                 else if (aBrokerMessage.Request == EBrokerRequest.Unsubscribe)
                 {
-                    Unsubscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes, myMessageSubscribtions);
-                }
-                else if (aBrokerMessage.Request == EBrokerRequest.UnsubscribeRegExp)
-                {
-                    Unsubscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes, myRegExpSubscribtions);
+                    Unsubscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes);
                 }
                 else if (aBrokerMessage.Request == EBrokerRequest.UnsubscribeAll)
                 {
-                    lock (mySubscribtionManipulatorLock)
-                    {
-                        Unsubscribe(e.ResponseReceiverId, null, myMessageSubscribtions);
-                        Unsubscribe(e.ResponseReceiverId, null, myRegExpSubscribtions);
-                    }
+                    Unsubscribe(e.ResponseReceiverId, null);
                 }
             }
         }
@@ -190,12 +138,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                // Remove all subscriptions for the disconnected subscriber.
-                lock (mySubscribtionManipulatorLock)
-                {
-                    Unsubscribe(e.ResponseReceiverId, null, myMessageSubscribtions);
-                    Unsubscribe(e.ResponseReceiverId, null, myRegExpSubscribtions);
-                }
+                Unsubscribe(e.ResponseReceiverId, null);
             }
         }
 
@@ -203,66 +146,40 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                lock (mySubscribtionManipulatorLock)
+                List<TSubscription> anIdetifiedSubscriptions = new List<TSubscription>();
+
+                lock (mySubscribtions)
                 {
-                    List<TSubscriptionItem> anIncorrectRegExpCollector = new List<TSubscriptionItem>();
-
-                    IEnumerable<TSubscriptionItem> aMessageSubscribers = myMessageSubscribtions.Where(x => 
-                        (myIsPublisherSelfnotified || x.ReceiverId != publisherResponseReceiverId) && x.MessageTypeId == message.MessageTypes[0]);
-                    IEnumerable<TSubscriptionItem> aRegExpSubscribers = myRegExpSubscribtions.Where(x =>
-                        {
-                            if (myIsPublisherSelfnotified || x.ReceiverId != publisherResponseReceiverId)
-                            {
-                                try
-                                {
-                                    return Regex.IsMatch(message.MessageTypes[0], x.MessageTypeId);
-                                }
-                                catch (Exception err)
-                                {
-                                    // The regular expression provided by a client can be incorrect and can cause an exception.
-                                    // Other clients should not be affected by this. Therefore, we catch the exception and remove the invalid expression.
-                                    EneterTrace.Error(TracedObject + "detected an incorrect regular expression: " + x.MessageTypeId, err);
-
-                                    // Store the subscribtion with the wrong expression.
-                                    anIncorrectRegExpCollector.Add(x);
-
-                                    return false;
-                                }
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        });
-
-                    // Remove subscriptions with regular expresions causing exceptions.
-                    anIncorrectRegExpCollector.ForEach(x => myRegExpSubscribtions.Remove(x));
-
-                    IEnumerable<TSubscriptionItem> aSubscribers = aMessageSubscribers.Concat(aRegExpSubscribers);
-                    if (aSubscribers != null)
+                    foreach (TSubscription aMessageSubscription in mySubscribtions)
                     {
-                        foreach (TSubscriptionItem aSubscriber in aSubscribers)
+                        if ((myIsPublisherSelfnotified || aMessageSubscription.ReceiverId != publisherResponseReceiverId) &&
+                            aMessageSubscription.MessageTypeId == message.MessageTypes[0])
                         {
-                            if (aSubscriber.ReceiverId == myLocalReceiverId)
+                            anIdetifiedSubscriptions.Add(aMessageSubscription);
+                        }
+                    }
+                }
+
+                foreach (TSubscription aSubscription in anIdetifiedSubscriptions)
+                {
+                    if (aSubscription.ReceiverId == myLocalReceiverId)
+                    {
+                        if (BrokerMessageReceived != null)
+                        {
+                            try
                             {
-                                if (BrokerMessageReceived != null)
-                                {
-                                    try
-                                    {
-                                        BrokerMessageReceivedEventArgs anEvent = new BrokerMessageReceivedEventArgs(message.MessageTypes[0], message.Message);
-                                        BrokerMessageReceived(this, anEvent);
-                                    }
-                                    catch (Exception err)
-                                    {
-                                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                                    }
-                                }
+                                BrokerMessageReceivedEventArgs anEvent = new BrokerMessageReceivedEventArgs(message.MessageTypes[0], message.Message);
+                                BrokerMessageReceived(this, anEvent);
                             }
-                            else
+                            catch (Exception err)
                             {
-                                Send(aSubscriber.ReceiverId, originalSerializedMessage);
+                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                             }
                         }
+                    }
+                    else
+                    {
+                        Send(aSubscription.ReceiverId, originalSerializedMessage);
                     }
                 }
             }
@@ -297,26 +214,23 @@ namespace Eneter.Messaging.Nodes.Broker
                     }
 
                     // Unsubscribe the failed client.
-                    lock (myDuplexInputChannelManipulatorLock)
-                    {
-                        Unsubscribe(responseReceiverId, null, myMessageSubscribtions);
-                        Unsubscribe(responseReceiverId, null, myRegExpSubscribtions);
-                    }
+                    Unsubscribe(responseReceiverId, null);
                 }
             }
         }
 
-        private void Subscribe(string responseReceiverId, string[] messageTypes, HashSet<TSubscriptionItem> subscribtions)
+        private void Subscribe(string responseReceiverId, string[] messageTypes)
         {
             using (EneterTrace.Entering())
             {
-                lock (mySubscribtionManipulatorLock)
+                lock (mySubscribtions)
                 {
                     // Subscribe only messages that are not subscribed yet.
                     List<string> aMessagesToSubscribe = new List<string>(messageTypes);
-                    foreach (TSubscriptionItem aSubscription in subscribtions)
+                    foreach (TSubscription aSubscription in mySubscribtions)
                     {
-                        if (aSubscription.ReceiverId == responseReceiverId)
+                        if (aSubscription.ReceiverId == responseReceiverId &&
+                            aMessagesToSubscribe.Contains(aSubscription.MessageTypeId))
                         {
                             aMessagesToSubscribe.Remove(aSubscription.MessageTypeId);
                         }
@@ -325,47 +239,39 @@ namespace Eneter.Messaging.Nodes.Broker
                     // Subscribe
                     foreach (string aMessageType in aMessagesToSubscribe)
                     {
-                        subscribtions.Add(new TSubscriptionItem(aMessageType, responseReceiverId));
+                        mySubscribtions.Add(new TSubscription(aMessageType, responseReceiverId));
                     }
                 }
             }
         }
 
-        private void Unsubscribe(string responseReceiverId, string[] messageTypes, HashSet<TSubscriptionItem> subscribtions)
+        private void Unsubscribe(string responseReceiverId, string[] messageTypes)
         {
             using (EneterTrace.Entering())
             {
-                lock (mySubscribtionManipulatorLock)
+                lock (mySubscribtions)
                 {
                     // If unsubscribe from all messages
                     if (messageTypes == null || messageTypes.Length == 0)
                     {
-                        subscribtions.RemoveWhere(x => x.ReceiverId == responseReceiverId);
+                        mySubscribtions.RemoveWhere(x => x.ReceiverId == responseReceiverId);
                     }
                     // If unsubscribe from specified messages
                     else
                     {
-                        subscribtions.RemoveWhere(x => x.ReceiverId == responseReceiverId && messageTypes.Any(y => x.MessageTypeId == y));
+                        mySubscribtions.RemoveWhere(x => x.ReceiverId == responseReceiverId && messageTypes.Any(y => x.MessageTypeId == y));
                     }
                 }
             }
         }
 
-        private object mySubscribtionManipulatorLock = new object();
-        private HashSet<TSubscriptionItem> myMessageSubscribtions = new HashSet<TSubscriptionItem>();
-        private HashSet<TSubscriptionItem> myRegExpSubscribtions = new HashSet<TSubscriptionItem>();
+        private HashSet<TSubscription> mySubscribtions = new HashSet<TSubscription>();
         private bool myIsPublisherSelfnotified;
         private ISerializer mySerializer;
 
         private readonly string myLocalReceiverId = "Eneter.Broker.LocalReceiver";
-        
-        protected override string TracedObject
-        {
-            get
-            {
-                return GetType().Name + " ";
-            }
-        }
+
+        protected override string TracedObject { get { return GetType().Name + " "; } }
 
     }
 }
