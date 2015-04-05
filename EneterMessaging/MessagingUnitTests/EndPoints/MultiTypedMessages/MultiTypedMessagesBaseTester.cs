@@ -26,7 +26,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
             DuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(channelId);
             DuplexInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(channelId);
 
-            IMultiTypedMessagesFactory aMessageFactory = new MultiTypedMessagesFactory(serializer);
+            IMultiTypedMessagesFactory aMessageFactory = new MultiTypedMessagesFactory()
+            {
+                Serializer = serializer
+            };
             Requester = aMessageFactory.CreateMultiTypedMessageSender();
             Responser = aMessageFactory.CreateMultiTypedMessageReceiver();
         }

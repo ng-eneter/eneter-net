@@ -322,8 +322,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                mySyncResponseReceiveTimeout = syncResponseReceiveTimeout;
-                mySerializer = serializer;
+                SyncResponseReceiveTimeout = syncResponseReceiveTimeout;
+                Serializer = serializer;
                 SyncDuplexTypedSenderThreadMode = new SyncDispatching();
             }
         }
@@ -339,7 +339,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexTypedMessageSender<TResponse, TRequest>(mySerializer);
+                return new DuplexTypedMessageSender<TResponse, TRequest>(Serializer);
             }
         }
 
@@ -355,7 +355,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aThreadDispatcher = SyncDuplexTypedSenderThreadMode.GetDispatcher();
-                SyncTypedMessageSender<TResponse, TRequest> aSender = new SyncTypedMessageSender<TResponse, TRequest>(mySyncResponseReceiveTimeout, mySerializer, aThreadDispatcher);
+                SyncTypedMessageSender<TResponse, TRequest> aSender = new SyncTypedMessageSender<TResponse, TRequest>(SyncResponseReceiveTimeout, Serializer, aThreadDispatcher);
                 return aSender;
             }
         }
@@ -371,7 +371,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexTypedMessageReceiver<TResponse, TRequest>(mySerializer);
+                return new DuplexTypedMessageReceiver<TResponse, TRequest>(Serializer);
             }
         }
 
@@ -395,7 +395,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// </remarks>
         public IThreadDispatcherProvider SyncDuplexTypedSenderThreadMode { get; set; }
 
-        private ISerializer mySerializer;
-        private TimeSpan mySyncResponseReceiveTimeout;
+        public ISerializer Serializer { get; set; }
+
+        public TimeSpan SyncResponseReceiveTimeout { get; set; }
     }
 }

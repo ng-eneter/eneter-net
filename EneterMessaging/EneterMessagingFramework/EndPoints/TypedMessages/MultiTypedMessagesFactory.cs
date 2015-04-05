@@ -25,7 +25,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// default XmlStringSerializer and with infinite timeout for SyncMultiTypedMessageSender.
         /// </remarks>
         public MultiTypedMessagesFactory()
-            : this(TimeSpan.FromMilliseconds(-1), new XmlStringSerializer())
+            : this(new XmlStringSerializer())
         {
         }
 
@@ -37,36 +37,10 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// </remarks>
         /// <param name="serializer">serializer which will be used to serializer/deserialize messages</param>
         public MultiTypedMessagesFactory(ISerializer serializer)
-            : this(TimeSpan.FromMilliseconds(-1), serializer)
         {
-        }
-
-        /// <summary>
-        /// Constructs the factory.
-        /// </summary>
-        /// <remarks>
-        /// It instantiates the factory which will create multi typed senders and receivers which will use
-        /// default XmlStringSerializer.
-        /// </remarks>
-        /// <param name="responseReceiveTimeout">maximum time SyncMultiTypedMessageSender can wait for the response message</param>
-        public MultiTypedMessagesFactory(TimeSpan responseReceiveTimeout)
-            : this(responseReceiveTimeout, new XmlStringSerializer())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the factory.
-        /// </summary>
-        /// <param name="responseReceiveTimeout">maximum time SyncMultiTypedMessageSender can wait for the response message</param>
-        /// <param name="serializer">serializer which will be used to serializer/deserialize messages</param>
-        public MultiTypedMessagesFactory(TimeSpan responseReceiveTimeout, ISerializer serializer)
-        {
-            using (EneterTrace.Entering())
-            {
-                myResponseReceiveTimeout = responseReceiveTimeout;
-                mySerializer = serializer;
-                SyncDuplexTypedSenderThreadMode = new SyncDispatching();
-            }
+            SyncResponseReceiveTimeout = TimeSpan.FromMilliseconds(-1);
+            Serializer = serializer;
+            SyncDuplexTypedSenderThreadMode = new SyncDispatching();
         }
 
         /// <summary>
@@ -80,7 +54,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                return new MultiTypedMessageSender(mySerializer);
+                return new MultiTypedMessageSender(Serializer);
             }
         }
 
@@ -92,7 +66,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                return new SyncMultiTypedMessageSender(myResponseReceiveTimeout, mySerializer, SyncDuplexTypedSenderThreadMode);
+                return new SyncMultiTypedMessageSender(SyncResponseReceiveTimeout, Serializer, SyncDuplexTypedSenderThreadMode);
             }
         }
 
@@ -108,7 +82,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                return new MultiTypedMessageReceiver(mySerializer);
+                return new MultiTypedMessageReceiver(Serializer);
             }
         }
 
@@ -131,8 +105,9 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// SyncDuplexTypedSenderThreadMode property when you create SyncDuplexTypedMessageSender.
         /// </remarks>
         public IThreadDispatcherProvider SyncDuplexTypedSenderThreadMode { get; set; }
-        
-        private ISerializer mySerializer;
-        private TimeSpan myResponseReceiveTimeout;
+
+        public ISerializer Serializer { get; set; }
+
+        public TimeSpan SyncResponseReceiveTimeout { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                mySerializer = serializer;
+                Serializer = serializer;
             }
         }
 
@@ -44,7 +44,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexChannelWrapper(mySerializer);
+                return new DuplexChannelWrapper(Serializer);
             }
         }
 
@@ -56,10 +56,10 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexChannelUnwrapper(outputMessagingSystem, mySerializer);
+                return new DuplexChannelUnwrapper(outputMessagingSystem, Serializer);
             }
         }
 
-        private ISerializer mySerializer;
+        public ISerializer Serializer { get; set; }
     }
 }

@@ -80,7 +80,7 @@ namespace Eneter.Messaging.Nodes.Broker
         /// Constructs the broker factory with XmlStringSerializer.
         /// </summary>
         public DuplexBrokerFactory()
-            : this(true, new XmlStringSerializer())
+            : this(new XmlStringSerializer())
         {
         }
 
@@ -89,46 +89,11 @@ namespace Eneter.Messaging.Nodes.Broker
         /// </summary>
         /// <param name="serializer">serializer used by the broker</param>
         public DuplexBrokerFactory(ISerializer serializer)
-            : this(true, serializer)
-        {
-        }
-
-        /// <summary>
-        /// Constructs the broker factory.
-        /// </summary>
-        /// <remarks>
-        /// It allows to specify if the broker client gets notification from the broker for its own published events.
-        /// E.g. if the broker client is subscribed to the event 'StatusChanged' and if this broker client also publishes the
-        /// event 'StatusChanged' then if the parmater publisherCanBeNotified is false the broker client will not get notification events
-        /// from its own published events.
-        /// </remarks>
-        /// <param name="publisherCanBeNotified">false - broker does not send notifications to the broker client
-        /// which published the event.
-        /// </param>
-        public DuplexBrokerFactory(bool publisherCanBeNotified)
-            : this(publisherCanBeNotified, new XmlStringSerializer())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the broker factory.
-        /// </summary>
-        /// <remarks>
-        /// It allows to specify if the broker client gets notification from the broker for its own published events.
-        /// E.g. if the broker client is subscribed to the event 'StatusChanged' and if this broker client also publishes the
-        /// event 'StatusChanged' then if the parmater publisherCanBeNotified is false the broker client will not get notification events
-        /// from its own published events.
-        /// </remarks>
-        /// <param name="publisherCanBeNotified">false - broker does not send notifications to the broker client
-        /// which published the event.
-        /// </param>
-        /// <param name="serializer">serializer used by the broker</param>
-        public DuplexBrokerFactory(bool publisherCanBeNotified, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
-                myIsPublisherNotified = publisherCanBeNotified;
-                mySerializer = serializer;
+                IsPublisherNotified = true;
+                Serializer = serializer;
             }
         }
 
@@ -143,7 +108,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexBrokerClient(mySerializer);
+                return new DuplexBrokerClient(Serializer);
             }
         }
 
@@ -157,11 +122,21 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexBroker(myIsPublisherNotified, mySerializer);
+                return new DuplexBroker(IsPublisherNotified, Serializer);
             }
         }
 
-        private ISerializer mySerializer;
-        private bool myIsPublisherNotified;
+        public ISerializer Serializer { get; set; }
+
+        /// <summary>
+        /// Indicates whether the BrokerClient shall be notified about own events.
+        /// </summary>
+        /// <remarks>
+        /// It allows to specify if the broker client gets notification from the broker for its own published events.
+        /// E.g. if the broker client is subscribed to the event 'StatusChanged' and if this broker client also publishes the
+        /// event 'StatusChanged' then if the parmater publisherCanBeNotified is false the broker client will not get notification events
+        /// from its own published events.
+        /// </remarks>
+        public bool IsPublisherNotified { get; set; }
     }
 }

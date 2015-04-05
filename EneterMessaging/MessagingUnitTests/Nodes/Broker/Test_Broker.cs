@@ -211,7 +211,10 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             IDuplexOutputChannel aClient2OutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
 
             // Specify in the factory that the publisher shall not be notified from its own published events.
-            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(false);
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory()
+            {
+                IsPublisherNotified = false
+            };
 
             IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
             aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
@@ -294,7 +297,10 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             IDuplexOutputChannel aClient2OutputChannel = messaging.CreateDuplexOutputChannel(aBrokerAddress);
 
             // Specify in the factory that the publisher shall not be notified from its own published events.
-            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(false, serializer);
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(serializer)
+            {
+                IsPublisherNotified = false
+            };
 
             IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
             aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
