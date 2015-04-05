@@ -20,6 +20,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         public event EventHandler<DuplexChannelMessageEventArgs> ResponseMessageReceived;
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
+        public event EventHandler<DuplexChannelEventArgs> Offline;
+        public event EventHandler<DuplexChannelEventArgs> ConnectionRecovered;
+
         public BufferedDuplexOutputChannel(IDuplexOutputChannel underlyingDuplexOutputChannel, TimeSpan maxOfflineTime)
         {
             using (EneterTrace.Entering())
@@ -45,7 +48,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 {
                     lock (myConnectionManipulatorLock)
                     {
-                        return myIsOpenConnectionCalledFlag;
+                        return myConnectionIsOpenFlag;
                     }
                 }
             }
@@ -64,22 +67,24 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         throw new InvalidOperationException(aMessage);
                     }
 
-                    myUnderlyingOutputChannel.ConnectionOpened += OnConnectionOpened;
                     myUnderlyingOutputChannel.ConnectionClosed += OnConnectionClosed;
                     myUnderlyingOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
 
-                    myIsSendingThreadRequestedToStop = false;
+                    myMessageQueueRequestedToStopFlag = false;
 
-                    myIsConnectionOpeningRequestedToStop = false;
-                    myConnectionOpeningThreadIsStoppedEvent.Reset();
+                    myConnectionOpeningRequestedToStopFlag = false;
+                    myConnectionOpeningEndedEvent.Reset();
 
                     // Try open connection in a different thread.
-                    myIsConnectionOpeningActive = true;
-                    ThreadPool.QueueUserWorkItem(x => DoOpenConnection());
+                    myConnectionOpeningActiveFlag = true;
+                    ThreadPool.QueueUserWorkItem(DoOpenConnection);
 
                     // Indicate the connection is open.
-                    myIsOpenConnectionCalledFlag = true;
+                    myConnectionIsOpenFlag = true;
                 }
+
+                DuplexChannelEventArgs anEvent = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, "");
+                Dispatcher.Invoke(() => Notify(ConnectionOpened, anEvent, false));
             }
         }
 
@@ -89,31 +94,28 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    myIsSendingThreadRequestedToStop = true;
-                    if (!mySendingThreadIsStoppedEvent.WaitOne(5000))
+                    myMessageQueueRequestedToStopFlag = true;
+                    if (!myMessageQueueEndedEvent.WaitOne(5000))
                     {
                         EneterTrace.Warning(TracedObject + "failed to stop the message sending thread within 5 seconds.");
                     }
 
-                    myIsConnectionOpeningRequestedToStop = true;
-                    if (!myConnectionOpeningThreadIsStoppedEvent.WaitOne(5000))
+                    myConnectionOpeningActiveFlag = true;
+                    if (!myConnectionOpeningEndedEvent.WaitOne(5000))
                     {
                         EneterTrace.Warning(TracedObject + "failed to stop the connection openning thread within 5 seconds.");
                     }
 
                     myUnderlyingOutputChannel.CloseConnection();
-                    myUnderlyingOutputChannel.ConnectionOpened -= OnConnectionOpened;
                     myUnderlyingOutputChannel.ConnectionClosed -= OnConnectionClosed;
                     myUnderlyingOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
 
-                    // Emty the queue with messages.
-                    lock (myMessagesToSend)
+                    lock (myMessageQueue)
                     {
-                        myMessagesToSend.Clear();
+                        myMessageQueue.Clear();
                     }
 
-
-                    myIsOpenConnectionCalledFlag = false;
+                    myConnectionIsOpenFlag = false;
                 }
             }
         }
@@ -123,34 +125,28 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                if (!IsConnected)
+                lock (myConnectionManipulatorLock)
                 {
-                    string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
-                    EneterTrace.Error(aMessage);
-                    throw new InvalidOperationException(aMessage);
-                }
-
-                lock (myMessagesToSend)
-                {
-                    myMessagesToSend.Add(message);
-
-                    if (!mySendingThreadActiveFlag)
+                    if (!IsConnected)
                     {
-                        mySendingThreadActiveFlag = true;
-                        mySendingThreadIsStoppedEvent.Reset();
+                        string aMessage = TracedObject + ErrorHandler.FailedToSendMessageBecauseNotConnected;
+                        EneterTrace.Error(aMessage);
+                        throw new InvalidOperationException(aMessage);
+                    }
 
-                        // Start thread responsible for sending messages.
-                        ThreadPool.QueueUserWorkItem(x => DoMessageSending());
+                    lock (myMessageQueue)
+                    {
+                        if (!myMessageQueueActiveFlag)
+                        {
+                            myMessageQueueActiveFlag = true;
+
+                            // Start thread responsible for sending messages.
+                            ThreadPool.QueueUserWorkItem(DoMessageSending);
+                        }
+
+                        myMessageQueue.Enqueue(message);
                     }
                 }
-            }
-        }
-
-        private void OnConnectionOpened(object sender, DuplexChannelEventArgs e)
-        {
-            using (EneterTrace.Entering())
-            {
-                Notify<DuplexChannelEventArgs>(ConnectionOpened, e, false);
             }
         }
 
@@ -158,20 +154,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                // If the opening of the connection is not desired, then just return.
-                if (myIsConnectionOpeningRequestedToStop)
-                {
-                    Notify<DuplexChannelEventArgs>(ConnectionClosed, e, false);
-                    return;
-                }
-
                 // Try to reopen the connection in a different thread.
-                if (!myIsConnectionOpeningActive)
+                if (!myConnectionOpeningActiveFlag)
                 {
-                    myIsConnectionOpeningActive = true;
+                    myConnectionOpeningActiveFlag = true;
 
                     // Start openning in another thread.
-                    ThreadPool.QueueUserWorkItem(x => DoOpenConnection());
+                    ThreadPool.QueueUserWorkItem(DoOpenConnection);
                 }
             }
         }
@@ -184,29 +173,30 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        private void DoOpenConnection()
+        private void DoOpenConnection(object x)
         {
             using (EneterTrace.Entering())
             {
+                DuplexChannelEventArgs anEvent = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, "");
+                myUnderlyingOutputChannel.Dispatcher.Invoke(() => Notify(Offline, anEvent, false));
+
+                bool aConnectionOpenFlag = false;
                 DateTime aStartConnectionTime = DateTime.Now;
 
                 // Loop until the connection is open, or the connection openning is requested to stop,
                 // or the max offline time expired.
-                while (!myIsConnectionOpeningRequestedToStop)
+                while (!myConnectionOpeningRequestedToStopFlag)
                 {
                     try
                     {
                         myUnderlyingOutputChannel.OpenConnection();
+                        aConnectionOpenFlag = true;
+                        break;
                     }
                     catch
                     {
                         // The connection failed, so try again.
                         // Or the connection was already open (by some other thread).
-                    }
-
-                    if (myUnderlyingOutputChannel.IsConnected)
-                    {
-                        break;
                     }
 
                     // If the max offline time is exceeded, then notify disconnection.
@@ -216,7 +206,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     }
 
                     // Do not wait for the next attempt, if the connection opening shall stop.
-                    if (!myIsConnectionOpeningRequestedToStop)
+                    if (!myConnectionOpeningRequestedToStopFlag)
                     {
                         Thread.Sleep(300);
                     }
@@ -224,41 +214,50 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
 
                 // Indicate this connection opening is not active.
-                // The CloseConnection() is going to be called.
-                // There is the WaitOne(), waiting until the
-                myIsConnectionOpeningActive = false;
-                myConnectionOpeningThreadIsStoppedEvent.Set();
+                myConnectionOpeningActiveFlag = false;
+                myConnectionOpeningEndedEvent.Set();
+
+                // If openning failed and the connection was meanwhile not explicitelly closed.
+                if (!myConnectionOpeningRequestedToStopFlag)
+                {
+                    if (!aConnectionOpenFlag)
+                    {
+                        myUnderlyingOutputChannel.Dispatcher.Invoke(() => Notify(ConnectionClosed, anEvent, false));
+                    }
+                    else
+                    {
+                        myUnderlyingOutputChannel.Dispatcher.Invoke(() => Notify(ConnectionRecovered, anEvent, false));
+                    }
+                }
             }
         }
 
-        private void DoMessageSending()
+        private void DoMessageSending(object x)
         {
             using (EneterTrace.Entering())
             {
+                myMessageQueueEndedEvent.Reset();
+
                 try
                 {
                     // Loop taking messages from the queue, until the queue is empty or there is a request to stop sending.
-                    while (!myIsSendingThreadRequestedToStop)
+                    while (!myMessageQueueRequestedToStopFlag)
                     {
                         object aMessage;
 
-                        lock (myMessagesToSend)
+                        lock (myMessageQueue)
                         {
-                            // If there is a message in the queue, read it.
-                            if (myMessagesToSend.Count > 0)
+                            if (myMessageQueue.Count == 0)
                             {
-                                aMessage = myMessagesToSend[0];
-                            }
-                            else
-                            {
-                                // There are no messages in the queue, therefore the thread can end.
                                 return;
                             }
+
+                            aMessage = myMessageQueue.Peek();
                         }
 
 
                         // Loop until the message is sent or until there is no request to stop sending.
-                        while (!myIsSendingThreadRequestedToStop)
+                        while (!myMessageQueueRequestedToStopFlag)
                         {
                             try
                             {
@@ -267,9 +266,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                                     myUnderlyingOutputChannel.SendMessage(aMessage);
 
                                     // The message was successfuly sent, therefore remove it from the queue.
-                                    lock (myMessagesToSend)
+                                    lock (myMessageQueue)
                                     {
-                                        myMessagesToSend.RemoveAt(0);
+                                        myMessageQueue.Dequeue();
                                     }
 
                                     break;
@@ -281,7 +280,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                             }
 
                             // Do not wait if there is a request to stop the sending.
-                            if (!myIsSendingThreadRequestedToStop)
+                            if (!myMessageQueueRequestedToStopFlag)
                             {
                                 Thread.Sleep(300);
                             }
@@ -290,8 +289,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 }
                 finally
                 {
-                    mySendingThreadActiveFlag = false;
-                    mySendingThreadIsStoppedEvent.Set();
+                    myMessageQueueActiveFlag = false;
+                    myMessageQueueEndedEvent.Set();
                 }
             }
         }
@@ -322,26 +321,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         private TimeSpan myMaxOfflineTime;
         private IDuplexOutputChannel myUnderlyingOutputChannel;
 
-        private bool myIsOpenConnectionCalledFlag;
-        
-        private bool mySendingThreadActiveFlag;
-        private bool myIsSendingThreadRequestedToStop;
-        private ManualResetEvent mySendingThreadIsStoppedEvent = new ManualResetEvent(true);
-
-        private bool myIsConnectionOpeningActive;
-        private bool myIsConnectionOpeningRequestedToStop;
-        private ManualResetEvent myConnectionOpeningThreadIsStoppedEvent = new ManualResetEvent(true);
-
         private object myConnectionManipulatorLock = new object();
-        private List<object> myMessagesToSend = new List<object>();
+        private bool myConnectionIsOpenFlag;
+        private bool myConnectionOpeningActiveFlag;
+        private bool myConnectionOpeningRequestedToStopFlag;
+        private ManualResetEvent myConnectionOpeningEndedEvent = new ManualResetEvent(true);
 
+        private bool myMessageQueueActiveFlag;
+        private bool myMessageQueueRequestedToStopFlag;
+        private ManualResetEvent myMessageQueueEndedEvent = new ManualResetEvent(true);
+        private Queue<object> myMessageQueue = new Queue<object>();
 
-        private string TracedObject
-        {
-            get
-            {
-                return GetType().Name + " '" + ChannelId + "' ";
-            }
-        }
+        private string TracedObject { get { return GetType().Name + " '" + ChannelId + "' "; } }
     }
 }
