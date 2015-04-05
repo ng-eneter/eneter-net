@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
@@ -29,12 +30,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         public WebSocketOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
             int connectTimeout,
             int sendTimeout,
-            int receiveTimeout)
+            int receiveTimeout,
+            int pingFrequency)
 #else
         public WebSocketOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter,
             int connectTimeout,
             int sendTimeout,
-            int receiveTimeout)
+            int receiveTimeout,
+            int pingFrequency)
 #endif
         {
             using (EneterTrace.Entering())
@@ -61,6 +64,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 myClient.ConnectTimeout = connectTimeout;
                 myClient.SendTimeout = sendTimeout;
                 myClient.ReceiveTimeout = receiveTimeout;
+
+                myPingFrequency = pingFrequency;
+                myTimer = new Timer(OnPing, null, -1, -1);
             }
         }
 
@@ -94,6 +100,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         {
                             myClient.SendMessage(anEncodedMessage);
                         }
+
+                        myTimer.Change(myPingFrequency, -1);
                     }
                     catch
                     {
@@ -184,6 +192,27 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
+        private void OnPing(Object o)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    myClient.SendPing();
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + "failed to send the ping.", err);
+                }
+
+                // If the connection is open then schedule the next ping.
+                if (IsConnected)
+                {
+                    myTimer.Change(myPingFrequency, -1);
+                }
+            }
+        }
+
 
         private string myOutputConnectorAddress;
         private IProtocolFormatter myProtocolFormatter;
@@ -191,6 +220,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private Action<MessageContext> myResponseMessageHandler;
         private string myIpAddress;
         private object myConnectionManipulatorLock = new object();
+        private Timer myTimer;
+        private int myPingFrequency;
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

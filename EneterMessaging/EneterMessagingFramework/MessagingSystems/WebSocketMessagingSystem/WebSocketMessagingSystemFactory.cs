@@ -65,7 +65,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
         private class WebSocketOutputConnectorFactory : IOutputConnectorFactory
         {
-            public WebSocketOutputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory, int connectionTimeout, int sendTimeout, int receiveTimeout)
+            public WebSocketOutputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
+                int connectionTimeout, int sendTimeout, int receiveTimeout,
+                int pingFrequency)
             {
                 using (EneterTrace.Entering())
                 {
@@ -74,6 +76,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     myConnectionTimeout = connectionTimeout;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
+                    myPingFrequency = pingFrequency;
                 }
             }
 
@@ -81,7 +84,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myClientSecurityFactory, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
+                    return new WebSocketOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myClientSecurityFactory,
+                        myConnectionTimeout, mySendTimeout, myReceiveTimeout,
+                        myPingFrequency);
                 }
             }
 
@@ -90,13 +95,16 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             private int myConnectionTimeout;
             private int mySendTimeout;
             private int myReceiveTimeout;
+            private int myPingFrequency;
         }
 
 #else
 
         private class WebSocketOutputConnectorFactory : IOutputConnectorFactory
         {
-            public WebSocketOutputConnectorFactory(IProtocolFormatter protocolFormatter, int connectionTimeout, int sendTimeout, int receiveTimeout)
+            public WebSocketOutputConnectorFactory(IProtocolFormatter protocolFormatter,
+                int connectionTimeout, int sendTimeout, int receiveTimeout,
+                int pingFrequency)
             {
                 using (EneterTrace.Entering())
                 {
@@ -104,6 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     myConnectionTimeout = connectionTimeout;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
+                    myPingFrequency = pingFrequency;
                 }
             }
 
@@ -111,7 +120,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
+                    return new WebSocketOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter,
+                        myConnectionTimeout, mySendTimeout, myReceiveTimeout,
+                        myPingFrequency);
                 }
             }
 
@@ -119,8 +130,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             private int myConnectionTimeout;
             private int mySendTimeout;
             private int myReceiveTimeout;
+            private int myPingFrequency;
         }
-#endif        
+#endif
 
         /// <summary>
         /// Constructs the WebSocket messaging factory.
@@ -148,6 +160,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
+
+                PingFrequency = TimeSpan.FromMilliseconds(300000);
             }
         }
 
@@ -173,10 +187,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
 #if !SILVERLIGHT
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
+                    (int)PingFrequency.TotalMilliseconds);
 #else
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
+                    (int)PingFrequency.TotalMilliseconds);
 #endif
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
             }
@@ -206,10 +222,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
 #if !SILVERLIGHT
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
+                    (int)PingFrequency.TotalMilliseconds);
 #else
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
+                    (int)PingFrequency.TotalMilliseconds);
 #endif
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
             }
@@ -319,6 +337,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// Default setting is that received response messages are routed via one working thread.
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
+
+        public TimeSpan PingFrequency { get; set; }
+
 
 #if !SILVERLIGHT
         private ISecurityFactory myServerSecurityStreamFactory = new NonSecurityFactory();
