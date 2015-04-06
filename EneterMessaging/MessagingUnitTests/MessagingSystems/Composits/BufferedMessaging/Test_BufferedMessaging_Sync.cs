@@ -7,6 +7,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
 using Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit;
 using System.IO;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
 {
@@ -20,9 +21,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             ChannelId = "Channel_1";
-            UnderlyingMessaging = new SynchronousMessagingSystemFactory();
+            IMessagingSystemFactory anUnderlyingMessaging = new SynchronousMessagingSystemFactory();
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
-            MessagingSystem = new BufferedMessagingFactory(UnderlyingMessaging, aMaxOfflineTime);
+            MessagingSystem = new BufferedMessagingFactory(anUnderlyingMessaging, aMaxOfflineTime);
             ConnectionInterruptionFrequency = 5;
         }
 

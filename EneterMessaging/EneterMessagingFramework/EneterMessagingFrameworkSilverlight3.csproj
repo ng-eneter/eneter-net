@@ -271,12 +271,6 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseMessageSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseReceiverContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -624,6 +618,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\HashSet.cs" />
     <Compile Include="System\LinqBridge.cs" />
+    <Compile Include="System\ListExt.cs" />
     <Compile Include="System\ReadOnlyDictionary.cs" />
     <Compile Include="System\SystemAttributes.cs" />
     <Compile Include="System\WaitHandleExt.cs" />

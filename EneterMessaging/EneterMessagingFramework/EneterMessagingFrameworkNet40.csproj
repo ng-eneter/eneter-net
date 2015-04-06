@@ -96,12 +96,6 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseMessageSender.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseReceiverContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -357,6 +351,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Nodes\Broker\BrokerCustomSerializer.cs" />
+    <Compile Include="System\ListExt.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />

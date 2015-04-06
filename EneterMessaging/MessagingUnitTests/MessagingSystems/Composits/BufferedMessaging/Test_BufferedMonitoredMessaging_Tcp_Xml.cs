@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.MessagingSystems.Composites;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
 {
@@ -19,10 +20,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
         {
             ChannelId = "tcp://127.0.0.1:6070/";
 
-            UnderlyingMessaging = new TcpMessagingSystemFactory();
+            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
             ISerializer aSerializer = new XmlStringSerializer();
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
-            MessagingSystem = new BufferedMonitoredMessagingFactory(UnderlyingMessaging, aSerializer, aMaxOfflineTime, TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100));
+            MessagingSystem = new BufferedMonitoredMessagingFactory(anUnderlyingMessaging, aSerializer, aMaxOfflineTime, TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100));
             ConnectionInterruptionFrequency = 100;
         }
     }

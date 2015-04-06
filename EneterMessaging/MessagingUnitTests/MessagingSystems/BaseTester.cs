@@ -566,14 +566,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     }
                 }
 
-                Stopwatch aStopWatch = new Stopwatch();
+                PerformanceTimer aStopWatch = new PerformanceTimer();
                 aStopWatch.Start();
 
                 aClientFarm.SendMessageAsync(message, numberOfMessages);
                 aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
 
                 aStopWatch.Stop();
-                Console.WriteLine("Send messages to '" + ChannelId + "' completed. Elapsed time = " + aStopWatch.Elapsed);
 
                 // Wait little bit more for case there is an error that more messages are sent.
                 Thread.Sleep(500);
@@ -627,7 +626,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                     }
                 }
 
-                Stopwatch aStopWatch = new Stopwatch();
+                PerformanceTimer aStopWatch = new PerformanceTimer();
                 aStopWatch.Start();
 
                 for (int i = 0; i < numberOfMessages; ++i)
@@ -637,7 +636,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
 
                 aStopWatch.Stop();
-                Console.WriteLine("Send messages to '" + ChannelId + "' completed. Elapsed time = " + aStopWatch.Elapsed);
 
                 foreach (DuplexChannelMessageEventArgs aResponseMessage in aClientFarm.ReceivedResponses)
                 {

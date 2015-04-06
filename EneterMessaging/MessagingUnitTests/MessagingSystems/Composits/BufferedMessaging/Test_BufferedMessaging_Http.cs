@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.HttpMessagingSystem;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
 {
@@ -18,9 +19,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
         public void Setup()
         {
             ChannelId = "http://127.0.0.1:8056/bbb/";
-            UnderlyingMessaging = new HttpMessagingSystemFactory(200, 600000);
+            IMessagingSystemFactory anUnderlyingMessaging = new HttpMessagingSystemFactory(200, 600000);
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
-            MessagingSystem = new BufferedMessagingFactory(UnderlyingMessaging, aMaxOfflineTime);
+            MessagingSystem = new BufferedMessagingFactory(anUnderlyingMessaging, aMaxOfflineTime);
             ConnectionInterruptionFrequency = 500;
         }
     }

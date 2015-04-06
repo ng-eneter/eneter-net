@@ -23,10 +23,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             ChannelId = "Channel_1";
-            UnderlyingMessaging = new SynchronousMessagingSystemFactory();
+            IMessagingSystemFactory anUnderlyingMessaging = new SynchronousMessagingSystemFactory();
             ISerializer aSerializer = new XmlStringSerializer();
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
-            MessagingSystem = new BufferedMonitoredMessagingFactory(UnderlyingMessaging, aSerializer, aMaxOfflineTime, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(50));
+            MessagingSystem = new BufferedMonitoredMessagingFactory(anUnderlyingMessaging, aSerializer, aMaxOfflineTime, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(50));
             ConnectionInterruptionFrequency = 5;
         }
     }

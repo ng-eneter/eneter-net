@@ -9,6 +9,7 @@ using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
 {
@@ -22,9 +23,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             ChannelId = "tcp://127.0.0.1:6070/";
-            UnderlyingMessaging = new TcpMessagingSystemFactory();
+            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
-            MessagingSystem = new BufferedMessagingFactory(UnderlyingMessaging, aMaxOfflineTime);
+            MessagingSystem = new BufferedMessagingFactory(anUnderlyingMessaging, aMaxOfflineTime);
             ConnectionInterruptionFrequency = 80;
         }
     }

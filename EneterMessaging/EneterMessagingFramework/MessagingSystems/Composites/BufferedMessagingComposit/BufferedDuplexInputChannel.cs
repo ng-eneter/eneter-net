@@ -40,19 +40,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
                 set
                 {
-                    if (value != myIsOnline)
-                    {
-                        myIsOnline = value;
+                    myIsOnline = value;
 
-                        if (!myIsOnline)
-                        {
-                            OfflineStartedAt = DateTime.Now;
-                        }
+                    if (!myIsOnline)
+                    {
+                        OfflineStartedAt = DateTime.Now;
                     }
                 }
             }
 
-            public bool ResponseReceiverConnectedEventPending { get; set; }
+            public bool PendingResponseReceiverConnectedEvent { get; set; }
 
             public void SendResponseMessage(object message)
             {
@@ -96,9 +93,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             public string ResponseReceiverId { get; private set; }
             public string ClientAddress { get; set; }
 
-            public object ManipulatorLock { get { return myManipulatorLock; } }
-
-            private object myManipulatorLock = new object();
             private IDuplexInputChannel myDuplexInputChannel;
             private Queue<object> myMessageQueue = new Queue<object>();
             private volatile bool myIsOnline;
@@ -119,15 +113,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
-        public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverRecovered;
-        public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverInterrupted;
+        public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverOnline;
+        public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverOffline;
 
 
         public BufferedDuplexInputChannel(IDuplexInputChannel underlyingDuplexInputChannel, TimeSpan maxOfflineTime)
         {
             using (EneterTrace.Entering())
             {
-                myUnderlyingInputChannel = underlyingDuplexInputChannel;
+                myInputChannel = underlyingDuplexInputChannel;
                 myMaxOfflineTime = maxOfflineTime;
 
                 myMaxOfflineChecker = new Timer(OnMaxOfflineTimeCheckTick, null, -1, -1);
@@ -135,9 +129,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         }
 
 
-        public string ChannelId { get { return myUnderlyingInputChannel.ChannelId; } }
+        public string ChannelId { get { return myInputChannel.ChannelId; } }
 
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get { return myInputChannel.Dispatcher; } }
 
         public void StartListening()
         {
@@ -145,13 +139,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 lock (myListeningManipulatorLock)
                 {
-                    myUnderlyingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
-                    myUnderlyingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
-                    myUnderlyingInputChannel.MessageReceived += OnMessageReceived;
+                    myInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
+                    myInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
+                    myInputChannel.MessageReceived += OnMessageReceived;
 
                     try
                     {
-                        myUnderlyingInputChannel.StartListening();
+                        myInputChannel.StartListening();
                     }
                     catch (Exception err)
                     {
@@ -175,23 +169,24 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     // shall stop.
                     myMaxOfflineCheckerRequestedToStop = true;
 
-                    lock (myResponseReceivers)
-                    {
-                        myResponseReceivers.Clear();
-                    }
-
                     try
                     {
-                        myUnderlyingInputChannel.StopListening();
+                        myInputChannel.StopListening();
                     }
                     catch (Exception err)
                     {
                         EneterTrace.Warning(TracedObject + ErrorHandler.IncorrectlyStoppedListening, err);
                     }
 
-                    myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
-                    myUnderlyingInputChannel.ResponseReceiverDisconnected -= OnResponseReceiverDisconnected;
-                    myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
+                    lock (myResponseReceivers)
+                    {
+                        myBroadcasts.Clear();
+                        myResponseReceivers.Clear();
+                    }
+
+                    myInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
+                    myInputChannel.ResponseReceiverDisconnected -= OnResponseReceiverDisconnected;
+                    myInputChannel.MessageReceived -= OnMessageReceived;
                 }
             }
         }
@@ -204,7 +199,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 {
                     lock (myListeningManipulatorLock)
                     {
-                        return myUnderlyingInputChannel.IsListening;
+                        return myInputChannel.IsListening;
                     }
                 }
             }
@@ -219,34 +214,36 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 {
                     lock (myResponseReceivers)
                     {
+                        TBroadcast aBroadcastMessage = new TBroadcast(message);
+                        myBroadcasts.Add(aBroadcastMessage);
+
                         foreach (TBufferedResponseReceiver aResponseReceiver in myResponseReceivers)
                         {
-                            lock (aResponseReceiver.ManipulatorLock)
-                            {
-                                aResponseReceiver.SendResponseMessage(message);
-                            }
+                            // Note: it does not throw exception.
+                            aResponseReceiver.SendResponseMessage(message);
                         }
                     }
                 }
                 else
                 {
-                    TBufferedResponseReceiver aResponseReciever;
+                    bool aNotifyOffline = false;
                     lock (myResponseReceivers)
                     {
-                        aResponseReciever = GetResponseReceiver(responseReceiverId);
+                        TBufferedResponseReceiver aResponseReciever = GetResponseReceiver(responseReceiverId);
                         if (aResponseReciever == null)
                         {
                             aResponseReciever = CreateResponseReceiver(responseReceiverId, "", true);
+                            aNotifyOffline = true;
+                        }
+
+                        aResponseReciever.SendResponseMessage(message);
+
+                        if (aNotifyOffline)
+                        {
+                            ResponseReceiverEventArgs anEvent = new ResponseReceiverEventArgs(responseReceiverId, "");
+                            Dispatcher.Invoke(() => Notify(ResponseReceiverOffline, anEvent, false));
                         }
                     }
-
-                    lock (aResponseReciever.ManipulatorLock)
-                    {
-                        aResponseReciever.SendResponseMessage(message);
-                    }
-
-                    ResponseReceiverEventArgs anEvent = new ResponseReceiverEventArgs(responseReceiverId, "");
-                    Dispatcher.Invoke(() => Notify(ResponseReceiverInterrupted, anEvent, false));
                 }
             }
         }
@@ -260,7 +257,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     myResponseReceivers.RemoveWhere(x => x.ResponseReceiverId == responseReceiverId);
                 }
 
-                myUnderlyingInputChannel.DisconnectResponseReceiver(responseReceiverId);
+                myInputChannel.DisconnectResponseReceiver(responseReceiverId);
             }
         }
 
@@ -268,7 +265,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                bool aNewResponseReceiver = false;
+                bool aPendingResponseReceicerConnectedEvent = false;
+                bool aNewResponseReceiverFlag = false;
                 TBufferedResponseReceiver aResponseReciever;
                 lock (myResponseReceivers)
                 {
@@ -276,47 +274,36 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     if (aResponseReciever == null)
                     {
                         aResponseReciever = CreateResponseReceiver(e.ResponseReceiverId, e.SenderAddress, false);
-                        aNewResponseReceiver = true;
+                        aNewResponseReceiverFlag = true;
                     }
-                }
-
-                bool aResponseReceicerConnectedEventFlag = false;
-                lock (aResponseReciever.ManipulatorLock)
-                {
+                    
                     aResponseReciever.IsOnline = true;
 
-                    if (aResponseReciever.ResponseReceiverConnectedEventPending)
+                    if (aResponseReciever.PendingResponseReceiverConnectedEvent)
                     {
                         aResponseReciever.ClientAddress = e.SenderAddress;
-                        aResponseReceicerConnectedEventFlag = aResponseReciever.ResponseReceiverConnectedEventPending;
-                        aResponseReciever.ResponseReceiverConnectedEventPending = false;
+                        aPendingResponseReceicerConnectedEvent = aResponseReciever.PendingResponseReceiverConnectedEvent;
+                        aResponseReciever.PendingResponseReceiverConnectedEvent = false;
                     }
 
-                    if (aNewResponseReceiver)
+                    if (aNewResponseReceiverFlag)
                     {
                         // This is a fresh new response receiver. Therefore broadcast messages were not sent to it yet.
-                        lock (myBroadcasts)
+                        foreach (TBroadcast aBroadcastMessage in myBroadcasts)
                         {
-                            foreach (TBroadcast aBroadcastMessage in myBroadcasts)
-                            {
-                                aResponseReciever.SendResponseMessage(aBroadcastMessage);
-                            }
+                            aResponseReciever.SendResponseMessage(aBroadcastMessage.Message);
                         }
                     }
-                    else
-                    {
-                        // This is a reconnected response receiver. Therefore all meessages including broadcasts are already in the queue.
-                        aResponseReciever.SendMessagesFromQueue();
-                    }
+
+                    // Send all buffered messages.
+                    aResponseReciever.SendMessagesFromQueue();
                 }
 
-                if (aNewResponseReceiver || aResponseReceicerConnectedEventFlag)
+
+                Notify(ResponseReceiverOnline, e, false);
+                if (aNewResponseReceiverFlag || aPendingResponseReceicerConnectedEvent)
                 {
-                    Dispatcher.Invoke(() => Notify(ResponseReceiverConnected, e, false));
-                }
-                else
-                {
-                    Dispatcher.Invoke(() => Notify(ResponseReceiverRecovered, e, false));
+                    Notify(ResponseReceiverConnected, e, false);
                 }
             }
         }
@@ -325,20 +312,20 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                TBufferedResponseReceiver aResponseReciever;
+                bool aNotify = false;
                 lock (myResponseReceivers)
                 {
-                    aResponseReciever = GetResponseReceiver(e.ResponseReceiverId);
-                }
-
-                if (aResponseReciever != null)
-                {
-                    lock (aResponseReciever.ManipulatorLock)
+                    TBufferedResponseReceiver aResponseReciever = GetResponseReceiver(e.ResponseReceiverId);
+                    if (aResponseReciever != null)
                     {
                         aResponseReciever.IsOnline = false;
+                        aNotify = true;
                     }
+                }
 
-                    Dispatcher.Invoke(() => Notify(ResponseReceiverInterrupted, e, false));
+                if (aNotify)
+                {
+                    Notify(ResponseReceiverOffline, e, false);
                 }
             }
         }
@@ -365,10 +352,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                TBufferedResponseReceiver aResponseReceiver = new TBufferedResponseReceiver(responseReceiverId, myUnderlyingInputChannel);
+                TBufferedResponseReceiver aResponseReceiver = new TBufferedResponseReceiver(responseReceiverId, myInputChannel);
                 
                 // Note: if it is created as offline then when the client connects raise ResponseReceiverConnected event.
-                aResponseReceiver.ResponseReceiverConnectedEventPending = notifyWhenConnectedFlag;
+                aResponseReceiver.PendingResponseReceiverConnectedEvent = notifyWhenConnectedFlag;
 
                 myResponseReceivers.Add(aResponseReceiver);
 
@@ -398,32 +385,26 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 DateTime aCurrentCheckTime = DateTime.Now;
                 bool aTimerShallContinueFlag;
 
-                lock (myBroadcasts)
+                lock (myResponseReceivers)
                 {
                     // Remove all expired broadcasts.
                     myBroadcasts.RemoveAll(x => aCurrentCheckTime - x.SentAt > myMaxOfflineTime);
-                }
 
-                lock (myResponseReceivers)
-                {
                     // Remove all not connected response receivers which exceeded the max offline timeout.
                     myResponseReceivers.RemoveWhere(x =>
                         {
-                            lock (x.ManipulatorLock)
+                            // If disconnected and max offline time is exceeded. 
+                            if (!x.IsOnline &&
+                                aCurrentCheckTime - x.OfflineStartedAt > myMaxOfflineTime)
                             {
-                                // If disconnected and max offline time is exceeded. 
-                                if (!x.IsOnline &&
-                                    aCurrentCheckTime - x.OfflineStartedAt > myMaxOfflineTime)
-                                {
-                                    aTimeoutedResponseReceivers.Add(x);
+                                aTimeoutedResponseReceivers.Add(x);
 
-                                    // Indicate, the response receiver can be removed.
-                                    return true;
-                                }
-
-                                // Response receiver will not be removed.
-                                return false;
+                                // Indicate, the response receiver can be removed.
+                                return true;
                             }
+
+                            // Response receiver will not be removed.
+                            return false;
                         });
 
                     aTimerShallContinueFlag = myResponseReceivers.Count > 0;
@@ -439,7 +420,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     }
 
                     // Invoke the event in the correct thread.
-                    Dispatcher.Invoke(() => Notify<ResponseReceiverEventArgs>(ResponseReceiverDisconnected, new ResponseReceiverEventArgs(aResponseReceiver.ResponseReceiverId, aResponseReceiver.ClientAddress), false));
+                    Dispatcher.Invoke(() => Notify(ResponseReceiverDisconnected, new ResponseReceiverEventArgs(aResponseReceiver.ResponseReceiverId, aResponseReceiver.ClientAddress), false));
                 }
 
                 // If the timer checking the timeout for response receivers shall continue
@@ -479,7 +460,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         private TimeSpan myMaxOfflineTime;
         private Timer myMaxOfflineChecker;
         private bool myMaxOfflineCheckerRequestedToStop;
-        private IDuplexInputChannel myUnderlyingInputChannel;
+        private IDuplexInputChannel myInputChannel;
 
         private HashSet<TBufferedResponseReceiver> myResponseReceivers = new HashSet<TBufferedResponseReceiver>();
         private List<TBroadcast> myBroadcasts = new List<TBroadcast>();

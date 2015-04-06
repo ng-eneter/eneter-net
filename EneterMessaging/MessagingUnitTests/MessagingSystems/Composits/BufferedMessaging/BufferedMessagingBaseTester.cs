@@ -74,266 +74,283 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
         }
 
         [Test]
-        public void A10_SendResponsesOffline10_10Parallel()
+        public void A11_SendResponsesOffline10_10Parallel()
         {
             SendOfflineResponse(ChannelId, myResponseMessage, 10, 10, 1000, 1000);
         }
 
-//        [Test]
-//        public void A06_TimeoutedResponseReceiver()
-//        {
-//            // Duplex output channel without queue - it will not try to reconnect.
-//            IDuplexOutputChannel aDuplexOutputChannel = UnderlyingMessaging.CreateDuplexOutputChannel(ChannelId);
-//            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
+        [Test]
+        public virtual void A12_SendBroadcastResponse_50_10Clients()
+        {
+            SendBroadcastResponseMessage(ChannelId, myResponseMessage, 10, 50, 1000, 2000);
+        }
 
-//            AutoResetEvent aConnectionClosedEvent = new AutoResetEvent(false);
-//            aDuplexOutputChannel.ConnectionClosed += (x, y) =>
-//                {
-//                    aConnectionClosedEvent.Set();
-//                };
-
-//            string aDisconnectedResponseReceiverId = "";
-//            AutoResetEvent aResponseReceiverDisconnectedEvent = new AutoResetEvent(false);
-//            aDuplexInputChannel.ResponseReceiverDisconnected += (x, y) =>
-//                {
-//                    aDisconnectedResponseReceiverId = y.ResponseReceiverId;
-//                    aResponseReceiverDisconnectedEvent.Set();
-//                };
-
-//            try
-//            {
-//                aDuplexInputChannel.StartListening();
-//                aDuplexOutputChannel.OpenConnection();
-
-//                // Disconnect the output channel.
-//                // The input channel should disconnect the client after max offline time.
-//                aDuplexOutputChannel.CloseConnection();
-
-//                aConnectionClosedEvent.WaitOne();
-//                aResponseReceiverDisconnectedEvent.WaitOne();
-//            }
-//            finally
-//            {
-//                aDuplexOutputChannel.CloseConnection();
-//                aDuplexInputChannel.StopListening();
-//            }
-
-//        }
-
-//        [Test]
-//        public void A07_ResponseReceiverReconnects_AfterDisconnect()
-//        {
-//            // Duplex output channel without queue - it will not try to reconnect.
-//            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystem.CreateDuplexOutputChannel(ChannelId);
-//            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
-
-//            AutoResetEvent aConnectionsCompletedEvent = new AutoResetEvent(false);
-//            List<string> anOpenConnections = new List<string>();
-//            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
-//                {
-//                    lock (anOpenConnections)
-//                    {
-//                        anOpenConnections.Add(y.ResponseReceiverId);
-
-//                        aConnectionsCompletedEvent.Set();
-//                    }
-//                };
-
-//            try
-//            {
-//                aDuplexInputChannel.StartListening();
-//                aDuplexOutputChannel.OpenConnection();
-
-//                // Wait until the connection is open.
-//                aConnectionsCompletedEvent.WaitOne();
-
-//                // Disconnect the response receiver.
-//                aDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
-
-//                // The duplex output channel will try to connect again, therefore wait until connected.
-//                aConnectionsCompletedEvent.WaitOne();
-//            }
-//            finally
-//            {
-//                aDuplexOutputChannel.CloseConnection();
-//                aDuplexInputChannel.StopListening();
-//            }
+        [Test]
+        public virtual void A12_SendOfflineBroadcastResponse_50_10Clients()
+        {
+            SendOfflineBroadcastResponseMessage(ChannelId, myResponseMessage, 1, 1, 1000, 2000);
+        }
 
 
-//            Assert.AreEqual(2, anOpenConnections.Count);
+        [Test]
+        public void A13_TimeoutedResponseReceiver()
+        {
+            ClientMock aClient = new ClientMock(MessagingSystem, ChannelId);
+            ServiceMock aService = new ServiceMock(MessagingSystem, ChannelId);
 
-//            // Both connections should be same.
-//            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[0]);
-//            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[1]);
-//        }
+            try
+            {
+                aService.InputChannel.StartListening();
 
-//        // Note: This test is not applicable for synchronous messaging.
-//        [Test]
-//        public virtual void A08_ResponseReceiverReconnects_AfterStopListening()
-//        {
-//            // Duplex output channel without queue - it will not try to reconnect.
-//            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystem.CreateDuplexOutputChannel(ChannelId);
-//            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
+                // Open the connection.
+                aClient.OutputChannel.OpenConnection();
+                Assert.IsTrue(aClient.OutputChannel.IsConnected);
 
-//            AutoResetEvent aConnectionsCompletedEvent = new AutoResetEvent(false);
-//            List<string> anOpenConnections = new List<string>();
-//            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
-//                {
-//                    lock (anOpenConnections)
-//                    {
-//                        anOpenConnections.Add(y.ResponseReceiverId);
-//                        aConnectionsCompletedEvent.Set();
-//                    }
-//                };
+                // handling open connection on the client side.
+                EneterTrace.Info("1");
+                aClient.WaitUntilConnectionOpenIsNotified(2000);
+                Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedOpenConnection.ChannelId);
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.NotifiedOpenConnection.ResponseReceiverId);
 
-//            try
-//            {
-//                aDuplexInputChannel.StartListening();
-//                aDuplexOutputChannel.OpenConnection();
+                // handling open connection on the service side.
+                EneterTrace.Info("2");
+                aService.WaitUntilResponseReceiversConnectNotified(1, 1000);
+                Assert.AreEqual(1, aService.ConnectedResponseReceivers.Count());
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.ConnectedResponseReceivers[0].ResponseReceiverId);
 
-//                // Wait until the client is connected.
-//                aConnectionsCompletedEvent.WaitOne();
+                aClient.OutputChannel.CloseConnection();
+                Assert.IsFalse(aClient.OutputChannel.IsConnected);
 
-//                // Stop listenig.
-//                aDuplexInputChannel.StopListening();
+                // Service will disconnect the response receiver when the offline timout is exceeded.
+                EneterTrace.Info("3");
+                aService.WaitUntilAllResponseReceiversDisconnectNotified(2000);
+                Assert.AreEqual(1, aService.DisconnectedResponseReceivers.Count());
+                Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aService.DisconnectedResponseReceivers.First().ResponseReceiverId);
+             }
+            finally
+            {
+                EneterTrace.Debug("CLEANING AFTER TEST");
 
-//                // Give some time to stop.
-//                Thread.Sleep(300);
+                aClient.OutputChannel.CloseConnection();
+                aService.InputChannel.StopListening();
 
-//                // Start listening again.
-//                aDuplexInputChannel.StartListening();
+                // Wait for traces.
+                Thread.Sleep(100);
+            }
+        }
 
-//                // The duplex output channel will try to connect again, therefore wait until connected.
-//                aConnectionsCompletedEvent.WaitOne();
+        [Test]
+        public void A14_ResponseReceiverReconnects_AfterDisconnect()
+        {
+            // Duplex output channel without queue - it will not try to reconnect.
+            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystem.CreateDuplexOutputChannel(ChannelId);
+            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
 
-//                Assert.IsTrue(aDuplexOutputChannel.IsConnected);
-//            }
-//            finally
-//            {
-//                aDuplexOutputChannel.CloseConnection();
-//                aDuplexInputChannel.StopListening();
-//            }
+            AutoResetEvent aConnectionsCompletedEvent = new AutoResetEvent(false);
+            List<string> anOpenConnections = new List<string>();
+            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
+                {
+                    lock (anOpenConnections)
+                    {
+                        anOpenConnections.Add(y.ResponseReceiverId);
 
+                        aConnectionsCompletedEvent.Set();
+                    }
+                };
 
-//            Assert.AreEqual(2, anOpenConnections.Count);
+            try
+            {
+                aDuplexInputChannel.StartListening();
+                aDuplexOutputChannel.OpenConnection();
 
-//            // Both connections should be same.
-//            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[0]);
-//            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[1]);
-//        }
+                // Wait until the connection is open.
+                aConnectionsCompletedEvent.WaitOne();
 
-//#if !COMPACT_FRAMEWORK
-//        [Test]
-//        public void A09_RequestResponse_100_ConstantlyInterrupted()
-//        {
-//            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystem.CreateDuplexOutputChannel(ChannelId);
-//            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
-//            IDuplexInputChannel anUnderlyingDuplexInputChannel = aDuplexInputChannel.GetField<IDuplexInputChannel>("myUnderlyingInputChannel");
-//            Assert.NotNull(anUnderlyingDuplexInputChannel);
+                // Disconnect the response receiver.
+                aDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
 
-//            AutoResetEvent anAllMessagesProcessedEvent = new AutoResetEvent(false);
-
-//            // Received messages.
-//            List<int> aReceivedMessages = new List<int>();
-//            aDuplexInputChannel.MessageReceived += (x, y) =>
-//                {
-//                    lock (aReceivedMessages)
-//                    {
-//                        string aReceivedMessage = y.Message as string;
-
-//                        EneterTrace.Info("Received message: " + aReceivedMessage);
-
-//                        int k = int.Parse(aReceivedMessage);
-//                        aReceivedMessages.Add(k);
-//                        k += 1000;
-
-//                        EneterTrace.Info("Sent response message: " + k.ToString());
-//                        aDuplexInputChannel.SendResponseMessage(y.ResponseReceiverId, k.ToString());
-//                    }
-//                };
-
-//            aDuplexOutputChannel.ConnectionClosed += (x, y) =>
-//                {
-//                    EneterTrace.Info("ConnectionClosed invoked in duplex output channel");
-
-//                    // The buffered duplex output channel exceeded the max offline time.
-//                    anAllMessagesProcessedEvent.Set();
-//                };
-
-//            // Received response messages.
-//            List<int> aReceivedResponseMessages = new List<int>();
-//            aDuplexOutputChannel.ResponseMessageReceived += (x, y) =>
-//                {
-//                    lock (aReceivedResponseMessages)
-//                    {
-//                        string aReceivedMessage = y.Message as string;
-
-//                        EneterTrace.Info("Received response message: " + aReceivedMessage);
-
-//                        int k = int.Parse(aReceivedMessage);
-//                        aReceivedResponseMessages.Add(k);
-
-//                        if (aReceivedResponseMessages.Count == 100)
-//                        {
-//                            anAllMessagesProcessedEvent.Set();
-//                        }
-//                    }
-//                };
+                // The duplex output channel will try to connect again, therefore wait until connected.
+                aConnectionsCompletedEvent.WaitOne();
+            }
+            finally
+            {
+                aDuplexOutputChannel.CloseConnection();
+                aDuplexInputChannel.StopListening();
+            }
 
 
-//            try
-//            {
-//                bool aTestFinishedFlag = false;
+            Assert.AreEqual(2, anOpenConnections.Count);
 
-//                aDuplexInputChannel.StartListening();
-//                aDuplexOutputChannel.OpenConnection();
+            // Both connections should be same.
+            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[0]);
+            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[1]);
+        }
+
+        [Test]
+        public virtual void A15_ResponseReceiverReconnects_AfterStopListening()
+        {
+            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystem.CreateDuplexOutputChannel(ChannelId);
+            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
+
+            AutoResetEvent aConnectionsCompletedEvent = new AutoResetEvent(false);
+            List<string> anOpenConnections = new List<string>();
+            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
+                {
+                    lock (anOpenConnections)
+                    {
+                        anOpenConnections.Add(y.ResponseReceiverId);
+                        aConnectionsCompletedEvent.Set();
+                    }
+                };
+
+            try
+            {
+                aDuplexInputChannel.StartListening();
+                aDuplexOutputChannel.OpenConnection();
+
+                // Wait until the client is connected.
+                aConnectionsCompletedEvent.WaitOne();
+
+                // Stop listenig.
+                aDuplexInputChannel.StopListening();
+
+                // Give some time to stop.
+                Thread.Sleep(700);
+
+                // Start listening again.
+                aDuplexInputChannel.StartListening();
+
+                // The duplex output channel will try to connect again, therefore wait until connected.
+                aConnectionsCompletedEvent.WaitOne();
+
+                Assert.IsTrue(aDuplexOutputChannel.IsConnected);
+            }
+            finally
+            {
+                aDuplexOutputChannel.CloseConnection();
+                aDuplexInputChannel.StopListening();
+            }
 
 
-//                Thread anInteruptingThread = new Thread(() =>
-//                    {
-//                        for (int i = 0; i < 100 && !aTestFinishedFlag; ++i)
-//                        {
-//                            anUnderlyingDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
-//                            Thread.Sleep(ConnectionInterruptionFrequency);
-//                        }
-//                    });
+            Assert.AreEqual(2, anOpenConnections.Count);
 
-//                // Start constant disconnecting.
-//                anInteruptingThread.Start();
+            // Both connections should be same.
+            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[0]);
+            Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[1]);
+        }
 
-//                for (int i = 0; i < 100; ++i)
-//                {
-//                    aDuplexOutputChannel.SendMessage(i.ToString());
-//                }
+#if !COMPACT_FRAMEWORK
+        [Test]
+        public void A16_RequestResponse_100_ConstantlyInterrupted()
+        {
+            IDuplexOutputChannel aDuplexOutputChannel = MessagingSystem.CreateDuplexOutputChannel(ChannelId);
+            IDuplexInputChannel aDuplexInputChannel = MessagingSystem.CreateDuplexInputChannel(ChannelId);
+            IDuplexInputChannel anUnderlyingDuplexInputChannel = aDuplexInputChannel.GetField<IDuplexInputChannel>("myInputChannel");
+            Assert.NotNull(anUnderlyingDuplexInputChannel);
 
-//                // Wait until all messages are processed.
-//                //anAllMessagesProcessedEvent.WaitOne();
-//                Assert.IsTrue(anAllMessagesProcessedEvent.WaitOne(20000), "The timeout occured.");
+            AutoResetEvent anAllMessagesProcessedEvent = new AutoResetEvent(false);
 
-//                aTestFinishedFlag = true;
-//                anInteruptingThread.Join();
-//            }
-//            finally
-//            {
-//                aDuplexOutputChannel.CloseConnection();
-//                aDuplexInputChannel.StopListening();
-//            }
+            // Received messages.
+            List<int> aReceivedMessages = new List<int>();
+            aDuplexInputChannel.MessageReceived += (x, y) =>
+                {
+                    lock (aReceivedMessages)
+                    {
+                        string aReceivedMessage = y.Message as string;
 
-//            aReceivedMessages.Sort();
-//            Assert.AreEqual(100, aReceivedMessages.Count);
-//            for (int i = 0; i < 100; ++i)
-//            {
-//                Assert.AreEqual(i, aReceivedMessages[i]);
-//            }
+                        EneterTrace.Info("Received message: " + aReceivedMessage);
 
-//            aReceivedResponseMessages.Sort();
-//            Assert.AreEqual(100, aReceivedResponseMessages.Count);
-//            for (int i = 0; i < 100; ++i)
-//            {
-//                Assert.AreEqual(i + 1000, aReceivedResponseMessages[i]);
-//            }
-//        }
-//#endif
+                        int k = int.Parse(aReceivedMessage);
+                        aReceivedMessages.Add(k);
+                        k += 1000;
+
+                        EneterTrace.Info("Sent response message: " + k.ToString());
+                        aDuplexInputChannel.SendResponseMessage(y.ResponseReceiverId, k.ToString());
+                    }
+                };
+
+            aDuplexOutputChannel.ConnectionClosed += (x, y) =>
+                {
+                    EneterTrace.Info("ConnectionClosed invoked in duplex output channel");
+
+                    // The buffered duplex output channel exceeded the max offline time.
+                    anAllMessagesProcessedEvent.Set();
+                };
+
+            // Received response messages.
+            List<int> aReceivedResponseMessages = new List<int>();
+            aDuplexOutputChannel.ResponseMessageReceived += (x, y) =>
+                {
+                    lock (aReceivedResponseMessages)
+                    {
+                        string aReceivedMessage = y.Message as string;
+
+                        EneterTrace.Info("Received response message: " + aReceivedMessage);
+
+                        int k = int.Parse(aReceivedMessage);
+                        aReceivedResponseMessages.Add(k);
+
+                        if (aReceivedResponseMessages.Count == 100)
+                        {
+                            anAllMessagesProcessedEvent.Set();
+                        }
+                    }
+                };
+
+
+            try
+            {
+                bool aTestFinishedFlag = false;
+
+                aDuplexInputChannel.StartListening();
+                aDuplexOutputChannel.OpenConnection();
+
+
+                Thread anInteruptingThread = new Thread(() =>
+                    {
+                        for (int i = 0; i < 100 && !aTestFinishedFlag; ++i)
+                        {
+                            anUnderlyingDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
+                            Thread.Sleep(ConnectionInterruptionFrequency);
+                        }
+                    });
+
+                // Start constant disconnecting.
+                anInteruptingThread.Start();
+
+                for (int i = 0; i < 100; ++i)
+                {
+                    aDuplexOutputChannel.SendMessage(i.ToString());
+                }
+
+                // Wait until all messages are processed.
+                //anAllMessagesProcessedEvent.WaitOne();
+                Assert.IsTrue(anAllMessagesProcessedEvent.WaitOne(20000), "The timeout occured.");
+
+                aTestFinishedFlag = true;
+                anInteruptingThread.Join();
+            }
+            finally
+            {
+                aDuplexOutputChannel.CloseConnection();
+                aDuplexInputChannel.StopListening();
+            }
+
+            aReceivedMessages.Sort();
+            Assert.AreEqual(100, aReceivedMessages.Count);
+            for (int i = 0; i < 100; ++i)
+            {
+                Assert.AreEqual(i, aReceivedMessages[i]);
+            }
+
+            aReceivedResponseMessages.Sort();
+            Assert.AreEqual(100, aReceivedResponseMessages.Count);
+            for (int i = 0; i < 100; ++i)
+            {
+                Assert.AreEqual(i + 1000, aReceivedResponseMessages[i]);
+            }
+        }
+#endif
 
 
         private void SendMessageReceiveResponse(string channelId, object message, object responseMessage,
@@ -415,11 +432,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 //EneterTrace.StartProfiler();
 
                 aClientFarm.OpenConnectionsAsync();
-                aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
 
                 Thread.Sleep(500);
 
                 aService.InputChannel.StartListening();
+                aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
                 aService.WaitUntilResponseReceiversConnectNotified(numberOfClients, openConnectionTimeout);
                 Assert.AreEqual(aClientFarm.Clients.Count(), aService.ConnectedResponseReceivers.Count());
 
@@ -483,19 +500,19 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 PerformanceTimer aStopWatch = new PerformanceTimer();
                 aStopWatch.Start();
 
-                foreach (ResponseReceiverEventArgs aResponseReceiver in aService.ConnectedResponseReceivers)
+                foreach (ClientMock aClientMock in aClientFarm.Clients)
                 {
                     for (int i = 0; i < numberOfMessages; ++i)
                     {
-                        aService.InputChannel.SendResponseMessage(aResponseReceiver.ResponseReceiverId, responseMessage);
+                        aService.InputChannel.SendResponseMessage(aClientMock.OutputChannel.ResponseReceiverId, responseMessage);
                     }
                 }
 
                 Thread.Sleep(500);
 
                 aClientFarm.OpenConnectionsAsync();
-
                 aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
+
                 aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
 
                 aStopWatch.Stop();
@@ -526,10 +543,116 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             }
         }
 
+        private void SendBroadcastResponseMessage(string channelId, object broadcastMessage,
+                                                int numberOfClients, int numberOfMessages,
+                                                int openConnectionTimeout,
+                                                int allMessagesReceivedTimeout)
+        {
+            ThreadPool.SetMinThreads(50, 2);
+
+            ClientMockFarm aClientFarm = new ClientMockFarm(MessagingSystem, channelId, numberOfClients);
+            ServiceMock aService = new ServiceMock(MessagingSystem, channelId);
+
+            try
+            {
+                aService.InputChannel.StartListening();
+                aClientFarm.OpenConnectionsAsync();
+
+                aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
+                aService.WaitUntilResponseReceiversConnectNotified(numberOfClients, openConnectionTimeout);
+                Assert.AreEqual(aClientFarm.Clients.Count(), aService.ConnectedResponseReceivers.Count());
+                foreach (ClientMock aClient in aClientFarm.Clients)
+                {
+                    Assert.IsTrue(aService.ConnectedResponseReceivers.Any(x => x.ResponseReceiverId == aClient.OutputChannel.ResponseReceiverId));
+                }
+
+                PerformanceTimer aStopWatch = new PerformanceTimer();
+                aStopWatch.Start();
+
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    aService.InputChannel.SendResponseMessage("*", broadcastMessage);
+                }
+                aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
+
+                aStopWatch.Stop();
+
+                foreach (DuplexChannelMessageEventArgs aResponseMessage in aClientFarm.ReceivedResponses)
+                {
+                    Assert.AreEqual(broadcastMessage, aResponseMessage.Message);
+                }
+            }
+            finally
+            {
+                EneterTrace.Debug("CLEANING AFTER TEST");
+
+                aClientFarm.CloseAllConnections();
+                aService.InputChannel.StopListening();
+
+                //EneterTrace.StopProfiler();
+                Thread.Sleep(500);
+            }
+        }
+
+        private void SendOfflineBroadcastResponseMessage(string channelId, object broadcastMessage,
+                                                int numberOfClients, int numberOfMessages,
+                                                int openConnectionTimeout,
+                                                int allMessagesReceivedTimeout)
+        {
+            ThreadPool.SetMinThreads(50, 2);
+
+            ClientMockFarm aClientFarm = new ClientMockFarm(MessagingSystem, channelId, numberOfClients);
+            ServiceMock aService = new ServiceMock(MessagingSystem, channelId);
+
+            try
+            {
+                aService.InputChannel.StartListening();
+
+                // Send broadcasts.
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    aService.InputChannel.SendResponseMessage("*", broadcastMessage);
+                }
+
+                Thread.Sleep(500);
+
+                aClientFarm.OpenConnectionsAsync();
+
+                aClientFarm.WaitUntilAllConnectionsAreOpen(openConnectionTimeout);
+                aService.WaitUntilResponseReceiversConnectNotified(numberOfClients, openConnectionTimeout);
+                Assert.AreEqual(aClientFarm.Clients.Count(), aService.ConnectedResponseReceivers.Count());
+                foreach (ClientMock aClient in aClientFarm.Clients)
+                {
+                    Assert.IsTrue(aService.ConnectedResponseReceivers.Any(x => x.ResponseReceiverId == aClient.OutputChannel.ResponseReceiverId));
+                }
+
+                PerformanceTimer aStopWatch = new PerformanceTimer();
+                aStopWatch.Start();
+
+                aClientFarm.WaitUntilAllResponsesAreReceived(numberOfMessages, allMessagesReceivedTimeout);
+
+                aStopWatch.Stop();
+
+                foreach (DuplexChannelMessageEventArgs aResponseMessage in aClientFarm.ReceivedResponses)
+                {
+                    Assert.AreEqual(broadcastMessage, aResponseMessage.Message);
+                }
+            }
+            finally
+            {
+                EneterTrace.Debug("CLEANING AFTER TEST");
+
+                aClientFarm.CloseAllConnections();
+                aService.InputChannel.StopListening();
+
+                //EneterTrace.StopProfiler();
+                Thread.Sleep(500);
+            }
+        }
+
 
         protected string ChannelId { get; set; }
-        protected IMessagingSystemFactory UnderlyingMessaging { get; set; }
-        protected BufferedMessagingFactory MessagingSystem { get; set; }
+        protected IMessagingSystemFactory MessagingSystem { get; set; }
         protected int ConnectionInterruptionFrequency { get; set; }
 
         protected object myRequestMessage = "Message";

@@ -137,6 +137,12 @@
     </Compile>
     <Compile Include="EventWaitHandleExt.cs" />
     <Compile Include="MessagingSystems\ClientMockFarm.cs" />
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Sync_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp_Interop.cs" />
     <Compile Include="MessagingSystems\ServiceMock.cs" />
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
@@ -158,12 +164,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Sync_Xml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs">
