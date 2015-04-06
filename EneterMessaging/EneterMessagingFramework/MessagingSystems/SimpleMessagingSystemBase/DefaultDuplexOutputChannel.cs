@@ -151,6 +151,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     catch (Exception err)
                     {
                         EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
+                        CleanAfterConnection(true, true);
                         throw;
                     }
                 }
