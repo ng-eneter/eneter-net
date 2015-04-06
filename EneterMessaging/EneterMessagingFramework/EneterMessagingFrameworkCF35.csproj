@@ -145,8 +145,6 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseMessageSender.cs" />
-    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\ResponseReceiverContext.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
@@ -327,6 +325,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\HashSet.cs" />
     <Compile Include="System\LinqBridge.cs" />
+    <Compile Include="System\ListExt.cs" />
     <Compile Include="System\ReadOnlyDictionary.cs" />
     <Compile Include="System\SystemAttributes.cs" />
     <Compile Include="System\WaitHandleExt.cs" />
