@@ -41,6 +41,12 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     aResponseReceiverId += "_" + Guid.NewGuid().ToString() + "/";
                     ResponseReceiverId = aResponseReceiverId;
                 }
+                else if (responseReceiverId == "*")
+                {
+                    string anErrorMessage = "responseReceiverId cannot be '*'. It is reserved for broadcast response messages.";
+                    EneterTrace.Error(anErrorMessage);
+                    throw new ArgumentException(anErrorMessage);
+                }
                 else
                 {
                     ResponseReceiverId = responseReceiverId;
