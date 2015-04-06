@@ -197,7 +197,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         {
                             myOutputChannel.SendMessage(aMessage);
 
-                            // Message was successfuly sent therefore it can be removed from the queue.
+                            // Message was successfully sent therefore it can be removed from the queue.
                             myMessageQueue.Dequeue();
                         }
                         catch
@@ -216,7 +216,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 bool aConnectionOpenFlag = false;
                 DateTime aStartConnectionTime = DateTime.Now;
 
-                // Loop until the connection is open, or the connection openning is requested to stop,
+                // Loop until the connection is open, or the connection opening is requested to stop,
                 // or the max offline time expired.
                 while (!myConnectionOpeningRequestedToStopFlag)
                 {
@@ -249,7 +249,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 myConnectionOpeningActiveFlag = false;
                 myConnectionOpeningEndedEvent.Set();
 
-                // If openning failed and the connection was meanwhile not explicitelly closed.
+                // If opening failed and the connection was meanwhile not explicitly closed.
                 if (!myConnectionOpeningRequestedToStopFlag)
                 {
                     DuplexChannelEventArgs anEvent = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, "");

@@ -88,7 +88,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
         [Test]
         public virtual void A12_SendOfflineBroadcastResponse_50_10Clients()
         {
-            SendOfflineBroadcastResponseMessage(ChannelId, myResponseMessage, 1, 1, 1000, 2000);
+            SendOfflineBroadcastResponseMessage(ChannelId, myResponseMessage, 10, 50, 1000, 2000);
         }
 
 

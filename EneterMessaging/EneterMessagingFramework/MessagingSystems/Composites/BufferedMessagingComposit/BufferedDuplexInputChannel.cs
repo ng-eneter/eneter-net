@@ -23,7 +23,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 ResponseReceiverId = responseReceiverId;
 
-                // Note: at the time of instantiation the client address does not have to be knonwn.
+                // Note: at the time of instantiation the client address does not have to be known.
                 //       E.g. if sending response to a not yet connected response receiver.
                 //       Therefore it will be set explicitly.
                 ClientAddress = "";
@@ -74,7 +74,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                             {
                                 myDuplexInputChannel.SendResponseMessage(ResponseReceiverId, aMessage);
 
-                                // Message was successfuly sent therefore it can be removed from the queue.
+                                // Message was successfully sent therefore it can be removed from the queue.
                                 myMessageQueue.Dequeue();
                             }
                             catch
@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
             private IDuplexInputChannel myDuplexInputChannel;
             private Queue<object> myMessageQueue = new Queue<object>();
-            private volatile bool myIsOnline;
+            private bool myIsOnline;
         }
 
         private class TBroadcast

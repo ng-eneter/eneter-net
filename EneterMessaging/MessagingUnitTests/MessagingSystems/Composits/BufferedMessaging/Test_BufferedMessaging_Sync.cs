@@ -26,13 +26,5 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             MessagingSystem = new BufferedMessagingFactory(anUnderlyingMessaging, aMaxOfflineTime);
             ConnectionInterruptionFrequency = 5;
         }
-
-
-        //public override void A08_ResponseReceiverReconnects_AfterStopListening()
-        //{
-        //    // Not applicable
-        //    // The problem is that for synchronous local messaging it is not possible to detect the input channel stoppped to listen.
-        //    // E.g. it is possible to detect when using TCP.
-        //}
     }
 }
