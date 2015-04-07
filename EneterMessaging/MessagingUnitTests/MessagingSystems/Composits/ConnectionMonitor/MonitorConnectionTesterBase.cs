@@ -110,7 +110,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
         {
             // Create mock for the monitor duplex input channel.
             IDuplexInputChannel anUnderlyingDuplexInputChannel = UnderlyingMessaging.CreateDuplexInputChannel(ChannelId);
-            Mock_MonitorDuplexInputChannel aDuplexInputChannel = new Mock_MonitorDuplexInputChannel(anUnderlyingDuplexInputChannel, Serializer);
+            Mock_MonitorDuplexInputChannel aDuplexInputChannel = new Mock_MonitorDuplexInputChannel(anUnderlyingDuplexInputChannel);
             
             IDuplexOutputChannel aDuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
 
@@ -191,7 +191,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
             }
         }
 
-        protected ISerializer Serializer { get; set; }
         protected IMessagingSystemFactory UnderlyingMessaging { get; set; }
     }
 }

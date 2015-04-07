@@ -40,6 +40,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>MessagingUnitTests.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
       <HintPath>..\..\Program Files\NUnit-2.6.2\bin\nunit.framework.dll</HintPath>
@@ -143,32 +149,6 @@
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp_Interop.cs" />
-    <Compile Include="MessagingSystems\ServiceMock.cs" />
-    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticatedConnection_Tcp.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticationConnection_Sync.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -194,6 +174,32 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_Reconnecter_ThreadPool.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp_Interop.cs" />
+    <Compile Include="MessagingSystems\ServiceMock.cs" />
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticatedConnection_Tcp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\Test_AuthenticationConnection_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Tcp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Sync.cs">
@@ -290,6 +296,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="MessagingUnitTests.snk" />
     <None Include="Resources\EneterSigner.pfx" />
     <None Include="Resources\MyClientCertificate.cer" />
     <None Include="Resources\MyLocalCertificate.cer" />

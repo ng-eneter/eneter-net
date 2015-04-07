@@ -18,9 +18,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
         public void Setup()
         {
             ChannelId = "ChannelId";
-            Serializer = new BinarySerializer();
             UnderlyingMessaging = new SynchronousMessagingSystemFactory();
-            MessagingSystemFactory = new MonitoredMessagingFactory(UnderlyingMessaging, Serializer, TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(200));
+            MessagingSystemFactory = new MonitoredMessagingFactory(UnderlyingMessaging, TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(200));
         }
     }
 }

@@ -9,7 +9,6 @@ using System;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
@@ -49,7 +48,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// </remarks>
         /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
         public MonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging)
-            : this(underlyingMessaging, new XmlStringSerializer(), TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(2000))
+            : this(underlyingMessaging, TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(2000))
         {
         }
 
@@ -57,7 +56,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// Constructs the factory from specified parameters.
         /// </summary>
         /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
-        /// <param name="serializer">serializer used to serialize 'ping' messages</param>
         /// <param name="pingFrequency">how often the duplex output channel pings the connection</param>
         /// <param name="pingResponseTimeout">
         /// For the duplex output channel: the maximum time, the response for the ping must be received
@@ -66,14 +64,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// must be received.
         /// </param>
         public MonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging,
-                                        ISerializer serializer,
                                         TimeSpan pingFrequency,
                                         TimeSpan pingResponseTimeout)
         {
             using (EneterTrace.Entering())
             {
                 myUnderlyingMessaging = underlyingMessaging;
-                mySerializer = serializer;
+                mySerializer = new MonitoredMessagingCustomSerializer();
                 myPingFrequency = pingFrequency;
                 myPingResponseTimeout = pingResponseTimeout;
                 myResponseReceiverTimeout = pingFrequency + pingResponseTimeout;

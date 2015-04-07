@@ -23,10 +23,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
 
             ChannelId = "Channel_1";
             UnderlyingMessaging = new SynchronousMessagingSystemFactory();
-            ISerializer aSerializer = new XmlStringSerializer();
             TimeSpan aPingFrequency = TimeSpan.FromMilliseconds(50);
             TimeSpan aPingResponseTimeout = TimeSpan.FromMilliseconds(500);
-            MessagingSystem = new MonitoredMessagingFactory(UnderlyingMessaging, aSerializer, aPingFrequency, aPingResponseTimeout);
+            MessagingSystem = new MonitoredMessagingFactory(UnderlyingMessaging, aPingFrequency, aPingResponseTimeout);
         }
 
 

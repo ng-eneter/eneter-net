@@ -12,7 +12,6 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit;
 using Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 
 namespace Eneter.Messaging.MessagingSystems.Composites
 {
@@ -39,26 +38,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// </remarks>
         /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
         public BufferedMonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging)
-            : this(underlyingMessaging, new XmlStringSerializer(),
-                   TimeSpan.FromMilliseconds(10000), // max offline time
-                   TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(2000))
-        {
-        }
-
-        /// <summary>
-        /// Constructs the factory with the specified parameters.
-        /// </summary>
-        /// <remarks>
-        /// The maximum offline time is set to 10 seconds.
-        /// The duplex output channel will check the connection with the 'ping' once per second and the response must be received within 2 seconds.
-        /// Otherwise the connection is closed.<br/>
-        /// The duplex input channel expects the 'ping' request at least once per 2 seconds. Otherwise the duplex output
-        /// channel is disconnected.
-        /// </remarks>
-        /// <param name="underlyingMessaging">underlying messaging system</param>
-        /// <param name="serializer">serializer used to serialize the 'ping' requests</param>
-        public BufferedMonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
-            : this(underlyingMessaging, serializer,
+            : this(underlyingMessaging,
                    TimeSpan.FromMilliseconds(10000), // max offline time
                    TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(2000))
         {
@@ -68,7 +48,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// Constructs the factory with the specified parameters.
         /// </summary>
         /// <param name="underlyingMessaging">underlying messaging system</param>
-        /// <param name="serializer">serializer used to serialize the 'ping' requests</param>
         /// <param name="maxOfflineTime">the maximum time, the messaging can work offline. When the messaging works offline,
         /// the sent messages are buffered and the connection is being reopened. If the connection is
         /// not reopen within maxOfflineTime, the connection is closed.
@@ -76,7 +55,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// <param name="pingFrequency">how often the connection is checked with the 'ping' requests.</param>
         /// <param name="pingResponseTimeout">the maximum time, the response for the 'ping' is expected.</param>
         public BufferedMonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging,
-                                                  ISerializer serializer,
 
                                                   // Buffered Messaging
                                                   TimeSpan maxOfflineTime,
@@ -87,7 +65,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         {
             using (EneterTrace.Entering())
             {
-                IMessagingSystemFactory aMonitoredMessaging = new MonitoredMessagingFactory(underlyingMessaging, serializer, pingFrequency, pingResponseTimeout);
+                IMessagingSystemFactory aMonitoredMessaging = new MonitoredMessagingFactory(underlyingMessaging, pingFrequency, pingResponseTimeout);
                 myBufferedMessaging = new BufferedMessagingFactory(aMonitoredMessaging, maxOfflineTime);
             }
         }

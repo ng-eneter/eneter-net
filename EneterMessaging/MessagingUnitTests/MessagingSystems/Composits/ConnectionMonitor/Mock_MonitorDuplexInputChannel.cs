@@ -17,14 +17,14 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
 
-        public Mock_MonitorDuplexInputChannel(IDuplexInputChannel underlyingInputChannel, ISerializer serializer)
+        public Mock_MonitorDuplexInputChannel(IDuplexInputChannel underlyingInputChannel)
         {
             myUnderlyingInputChannel = underlyingInputChannel;
             myUnderlyingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
             myUnderlyingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
             myUnderlyingInputChannel.MessageReceived += OnMessageReceived;
 
-            mySerializer = serializer;
+            mySerializer = new MonitoredMessagingCustomSerializer();
 
             ResponsePingFlag = true;
         }

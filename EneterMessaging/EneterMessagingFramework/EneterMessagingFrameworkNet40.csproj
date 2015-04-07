@@ -140,6 +140,7 @@
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexOutputChannel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredMessagingCustomSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>

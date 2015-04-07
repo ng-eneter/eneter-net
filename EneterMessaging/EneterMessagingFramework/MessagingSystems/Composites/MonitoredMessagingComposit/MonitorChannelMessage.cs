@@ -13,27 +13,27 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     /// <summary>
     /// Type of the message (if it is ping or a data message).
     /// </summary>
-    public enum MonitorChannelMessageType
+    internal enum MonitorChannelMessageType
     {
         /// <summary>
         /// Indicates, it is the ping message or ping response.
         /// </summary>
-        Ping,
+        Ping = 10,
 
         /// <summary>
         /// Indicates, it is a message or a response message containing data. 
         /// </summary>
-        Message
+        Message = 20
     }
 
     /// <summary>
     /// The message internally used to monitor the connection and also to transfer message data.
     /// </summary>
-#if !SILVERLIGHT
-    [Serializable]
-#endif
-    [DataContract]
-    public class MonitorChannelMessage
+    /// <remarks>
+    /// The message is supposed to be serialized/deserialized by a custom serializer.
+    /// Therefore it does not have to be public and does not have to be labeled by attributes.
+    /// </remarks>
+    internal class MonitorChannelMessage
     {
         /// <summary>
         /// Constructs the message. This constructor is used by the Xml serializer for the deserialization.
@@ -56,13 +56,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// <summary>
         /// Type of the message. Ping or regular message.
         /// </summary>
-        [DataMember]
         public MonitorChannelMessageType MessageType { get; set; }
 
         /// <summary>
         /// Message. In case of the 'ping', this property is null.
         /// </summary>
-        [DataMember]
         public object MessageContent { get; set; }
     }
 }

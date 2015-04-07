@@ -7,47 +7,42 @@
 
 using System;
 using System.IO;
-using System.Text;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 
-namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
+namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
-    internal class MessageBusCustomSerializer : ISerializer
+    internal class MonitoredMessagingCustomSerializer : ISerializer
     {
         public object Serialize<T>(T dataToSerialize)
         {
             using (EneterTrace.Entering())
             {
-                if (typeof(T) != typeof(MessageBusMessage))
+                if (typeof(T) != typeof(MonitorChannelMessage))
                 {
-                    throw new InvalidOperationException("Only " + typeof(MessageBusMessage).Name + " can be serialized.");
+                    throw new InvalidOperationException("Only " + typeof(MonitorChannelMessage).Name + " can be serialized.");
                 }
 
                 object aTemp = dataToSerialize;
-                MessageBusMessage aMessage = (MessageBusMessage)aTemp;
+                MonitorChannelMessage aMessage = (MonitorChannelMessage)aTemp;
 
                 using (MemoryStream aStream = new MemoryStream())
                 {
                     BinaryWriter aWriter = new BinaryWriter(aStream);
 
-                    // Write messagebus request.
-                    byte aRequestType = (byte)aMessage.Request;
-                    aWriter.Write((byte)aRequestType);
-
-                    // Write Id.
-                    myEncoderDecoder.WritePlainString(aWriter, aMessage.Id, Encoding.UTF8, myIsLittleEndian);
+                    // Write message type.
+                    byte aMessageType = (byte)aMessage.MessageType;
+                    aWriter.Write((byte)aMessageType);
 
                     // Write message data.
-                    if (aMessage.Request == EMessageBusRequest.SendRequestMessage ||
-                        aMessage.Request == EMessageBusRequest.SendResponseMessage)
+                    if (aMessage.MessageType == MonitorChannelMessageType.Message)
                     {
-                        if (aMessage.MessageData == null)
+                        if (aMessage.MessageContent == null)
                         {
                             throw new InvalidOperationException("Message data is null.");
                         }
 
-                        myEncoderDecoder.Write(aWriter, aMessage.MessageData, myIsLittleEndian);
+                        myEncoderDecoder.Write(aWriter, aMessage.MessageContent, myIsLittleEndian);
                     }
 
                     return aStream.ToArray();
@@ -64,12 +59,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     throw new ArgumentException("Input parameter 'serializedData' is not byte[].");
                 }
 
-                if (typeof(T) != typeof(MessageBusMessage))
+                if (typeof(T) != typeof(MonitorChannelMessage))
                 {
-                    throw new InvalidOperationException("Data can be deserialized only into" + typeof(MessageBusMessage).Name);
+                    throw new InvalidOperationException("Data can be deserialized only into" + typeof(MonitorChannelMessage).Name);
                 }
 
-                MessageBusMessage aResult;
+                MonitorChannelMessage aResult;
 
                 byte[] aData = (byte[])serializedData;
 
@@ -77,28 +72,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     BinaryReader aReader = new BinaryReader(aStream);
 
-                    // Read message bus request.
+                    // Read type of the message.
                     int aRequest = aReader.ReadByte();
-                    EMessageBusRequest aMessageBusRequest = (EMessageBusRequest)aRequest;
+                    MonitorChannelMessageType aMessageType = (MonitorChannelMessageType)aRequest;
 
-                    // Read Id
-                    string anId = myEncoderDecoder.ReadPlainString(aReader, Encoding.UTF8, myIsLittleEndian);
-
-                    // Read message data.
+                    // If it is the message then read data.
                     object aMessageData = null;
-                    if (aMessageBusRequest == EMessageBusRequest.SendRequestMessage ||
-                        aMessageBusRequest == EMessageBusRequest.SendResponseMessage)
+                    if (aMessageType == MonitorChannelMessageType.Message)
                     {
                         aMessageData = myEncoderDecoder.Read(aReader, myIsLittleEndian);
                     }
 
-
-                    aResult = new MessageBusMessage(aMessageBusRequest, anId, aMessageData);
+                    aResult = new MonitorChannelMessage(aMessageType, aMessageData);
                     return (T)(object)aResult;
                 }
             }
         }
-
 
         private bool myIsLittleEndian = true;
         private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
