@@ -20,11 +20,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     {
         private class TResponseReceiverContext
         {
-            public TResponseReceiverContext(string responseReceiverId, string clientAddress, DateTime lastUpdateTime)
+            public TResponseReceiverContext(string responseReceiverId, string clientAddress)
             {
                 ResponseReceiverId = responseReceiverId;
                 ClientAddress = clientAddress;
-                LastUpdateTime = lastUpdateTime;
+                LastUpdateTime = DateTime.Now;
             }
 
             public string ResponseReceiverId { get; private set; }
@@ -155,6 +155,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 try
                 {
+                    lock (myResponseReceiverContexts)
+                    {
+                        myResponseReceiverContexts.RemoveWhere(x => x.ResponseReceiverId == responseReceiverId);
+                    }
+
                     myUnderlyingInputChannel.DisconnectResponseReceiver(responseReceiverId);
                 }
                 catch (Exception err)
@@ -168,8 +173,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                // Update the activity time for the response receiver
-                UpdateResponseReceiver(e.ResponseReceiverId, e.SenderAddress);
+                lock (myResponseReceiverContexts)
+                {
+                    TResponseReceiverContext aResponseReceiver = GetResponseReceiver(e.ResponseReceiverId);
+                    if (aResponseReceiver != null)
+                    {
+                        EneterTrace.Warning(TracedObject + "received open connection from already connected response receiver.");
+                        return;
+                    }
+                    else
+                    {
+                        CreateResponseReceiver(e.ResponseReceiverId, e.SenderAddress);
+                    }
+                }
 
                 if (ResponseReceiverConnected != null)
                 {
@@ -191,8 +207,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 try
                 {
-                    // Update the activity time for the response receiver
-                    UpdateResponseReceiver(e.ResponseReceiverId, e.SenderAddress);
+                    lock (myResponseReceiverContexts)
+                    {
+                        TResponseReceiverContext aResponseReceiver = GetResponseReceiver(e.ResponseReceiverId);
+                        if (aResponseReceiver == null)
+                        {
+                            EneterTrace.Warning(TracedObject + "received message from not connected response receiver.");
+                            return;
+                        }
+
+                        aResponseReceiver.LastUpdateTime = DateTime.Now;
+                    }
 
                     // Deserialize the incoming message.
                     MonitorChannelMessage aMessage = mySerializer.Deserialize<MonitorChannelMessage>(e.Message);
@@ -291,32 +316,28 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        private void UpdateResponseReceiver(string responseReceiverId, string clientAddress)
+        private TResponseReceiverContext GetResponseReceiver(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
-                lock (myResponseReceiverContexts)
+                TResponseReceiverContext aResponseReceiverContext = myResponseReceiverContexts.FirstOrDefault(x => x.ResponseReceiverId == responseReceiverId);
+                return aResponseReceiverContext;
+            }
+        }
+
+        private TResponseReceiverContext CreateResponseReceiver(string responseReceiverId, string clientAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                TResponseReceiverContext aResponseReceiver = new TResponseReceiverContext(responseReceiverId, clientAddress);
+                myResponseReceiverContexts.Add(aResponseReceiver);
+
+                if (myResponseReceiverContexts.Count == 1)
                 {
-                    bool aStartTimerFlag = myResponseReceiverContexts.Count == 0;
-
-                    DateTime aCurrentTime = DateTime.Now;
-
-                    TResponseReceiverContext aResponseReceiverContext = myResponseReceiverContexts.FirstOrDefault(x => x.ResponseReceiverId == responseReceiverId);
-                    if (aResponseReceiverContext == null)
-                    {
-                        aResponseReceiverContext = new TResponseReceiverContext(responseReceiverId, clientAddress, aCurrentTime);
-                        myResponseReceiverContexts.Add(aResponseReceiverContext);
-                    }
-                    else
-                    {
-                        aResponseReceiverContext.LastUpdateTime = aCurrentTime;
-                    }
-
-                    if (aStartTimerFlag)
-                    {
-                        myPingTimeoutChecker.Change(500, -1);
-                    }
+                    myPingTimeoutChecker.Change(300, -1);
                 }
+
+                return aResponseReceiver;
             }
         }
 

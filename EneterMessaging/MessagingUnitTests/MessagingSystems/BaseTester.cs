@@ -149,7 +149,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 //Assert.AreEqual(aClient.OutputChannel.ChannelId, aClient.NotifiedCloseConnection.ChannelId);
                 //Assert.AreEqual(aClient.OutputChannel.ResponseReceiverId, aClient.NotifiedCloseConnection.ResponseReceiverId);
 
-                aService.WaitUntilAllResponseReceiversDisconnectNotified(1000);
+                aService.WaitUntilAllResponseReceiversDisconnectNotified(3000);
                 Assert.AreEqual(1, aService.DisconnectedResponseReceivers.Count());
                 if (CompareResponseReceiverId)
                 {
@@ -253,7 +253,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 aService.InputChannel.DisconnectResponseReceiver(aConnectedResponseReceiverId);
 
                 //aService.WaitUntilResponseRecieverIdDisconnectNotified(aConnectedResponseReceiverId, 1000);
-                aClient.WaitUntilConnectionClosedIsNotified(1000);
+                aClient.WaitUntilConnectionClosedIsNotified(3000);
                 //Assert.AreEqual(aConnectedResponseReceiverId, aService.DisconnectedResponseReceivers[0].ResponseReceiverId);
 
                 // Client should open the connection again.
