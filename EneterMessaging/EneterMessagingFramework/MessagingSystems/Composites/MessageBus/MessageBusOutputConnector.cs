@@ -23,7 +23,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 myServiceId = inputConnectorAddress;
-                myClientId = messageBusOutputChannel.ResponseReceiverId;
                 mySerializer = serializer;
                 myMessageBusOutputChannel = messageBusOutputChannel;
                 myOpenConnectionTimeout = (openConnectionTimeout == 0) ? -1 : openConnectionTimeout;
@@ -183,7 +182,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        private string myClientId;
         private int myOpenConnectionTimeout;
         private ISerializer mySerializer;
         private IDuplexOutputChannel myMessageBusOutputChannel;

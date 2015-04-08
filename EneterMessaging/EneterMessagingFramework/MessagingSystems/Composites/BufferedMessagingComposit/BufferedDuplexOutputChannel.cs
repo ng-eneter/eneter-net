@@ -147,7 +147,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
                 lock (myConnectionManipulatorLock)
                 {
-                    myIsOnline = true;
                     SendMessagesFromQueue();
                 }
             }
@@ -159,8 +158,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 lock (myConnectionManipulatorLock)
                 {
-                    myIsOnline = false;
-
                     // Try to reopen the connection in a different thread.
                     if (!myConnectionOpeningActiveFlag)
                     {
@@ -289,7 +286,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         private IDuplexOutputChannel myOutputChannel;
 
         private object myConnectionManipulatorLock = new object();
-        private bool myIsOnline;
         private bool myIsConnectionOpenEventPendingFlag;
         private bool myConnectionIsOpenFlag;
         private bool myConnectionOpeningActiveFlag;
