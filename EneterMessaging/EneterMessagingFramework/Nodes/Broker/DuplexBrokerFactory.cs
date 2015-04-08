@@ -80,7 +80,7 @@ namespace Eneter.Messaging.Nodes.Broker
         /// Constructs the broker factory with XmlStringSerializer.
         /// </summary>
         public DuplexBrokerFactory()
-            : this(new XmlStringSerializer())
+            : this(new BrokerCustomSerializer())
         {
         }
 

@@ -13,7 +13,7 @@ using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.Nodes.Broker
 {
-    public class BrokerCustomSerializer : ISerializer
+    internal class BrokerCustomSerializer : ISerializer
     {
         public BrokerCustomSerializer()
             : this(true)
