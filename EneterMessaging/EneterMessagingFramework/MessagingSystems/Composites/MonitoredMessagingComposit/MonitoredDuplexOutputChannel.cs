@@ -21,7 +21,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         public event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
 
-        public MonitoredDuplexOutputChannel(IDuplexOutputChannel underlyingOutputChannel, ISerializer serializer, TimeSpan pingFrequency, TimeSpan pingResponseTimeout)
+        public MonitoredDuplexOutputChannel(IDuplexOutputChannel underlyingOutputChannel, ISerializer serializer,
+            int pingFrequency,
+            int receiveTimeout)
         {
             using (EneterTrace.Entering())
             {
@@ -29,10 +31,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 mySerializer = serializer;
                 myPingFrequency = pingFrequency;
-                myPingResponseTimeout = pingResponseTimeout;
+                myReceiveTimeout = receiveTimeout;
 
                 MonitorChannelMessage aPingMessage = new MonitorChannelMessage(MonitorChannelMessageType.Ping, null);
                 myPreserializedPingMessage = mySerializer.Serialize<MonitorChannelMessage>(aPingMessage);
+
+                myPingingTimer = new Timer(OnPingingTimerTick, null, -1, -1);
+                myReceiveTimer = new Timer(OnResponseTimerTick, null, -1, -1);
+
+                myUnderlyingOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
+                myUnderlyingOutputChannel.ConnectionOpened += OnConnectionOpened;
+                myUnderlyingOutputChannel.ConnectionClosed += OnConnectionClosed;
             }
         }
 
@@ -55,32 +64,21 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         throw new InvalidOperationException(aMessage);
                     }
 
-                    myUnderlyingOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
-                    myUnderlyingOutputChannel.ConnectionOpened += OnConnectionOpened;
-
                     try
                     {
+                        // Start timers.
+                        myPingingTimer.Change(myPingFrequency, -1);
+                        myReceiveTimer.Change(myReceiveTimeout, -1);
+
                         // Open connection in the underlying channel.
                         myUnderlyingOutputChannel.OpenConnection();
                     }
                     catch (Exception err)
                     {
-                        myUnderlyingOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
-                        myUnderlyingOutputChannel.ConnectionOpened -= OnConnectionOpened;
-
                         EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
-
+                        CloseConnection();
                         throw;
                     }
-
-                    // Indicate, the pinging shall run.
-                    myPingingRequestedToStopFlag = false;
-                    myPingFrequencyWaiting.Reset();
-                    myResponseReceivedEvent.Reset();
-
-                    myPingingThread = new Thread(DoPinging);
-                    myPingingThread.Start();
-                    myPingingThreadStartedEvent.WaitOne(1000);
                 }
             }
         }
@@ -89,41 +87,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
-                {
-                    // Indicate, the pinging thread shall stop.
-                    // Note: when pinging thread stops, it also closes the underlying duplex output channel.
-                    myPingingRequestedToStopFlag = true;
-
-                    // Interrupt waiting for the frequency time.
-                    myPingFrequencyWaiting.Set();
-
-                    // Interrupt waiting for the response of the ping.
-                    myResponseReceivedEvent.Set();
-
-                    // Wait until the pinging thread is stopped.
-#if COMPACT_FRAMEWORK
-                    if (myPingingThread != null)
-#else
-                    if (myPingingThread != null && myPingingThread.ThreadState != ThreadState.Unstarted)
-#endif
-                    {
-                        if (!myPingingThread.Join(3000))
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToStopThreadId + myPingingThread.ManagedThreadId);
-
-                            try
-                            {
-                                myPingingThread.Abort();
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.FailedToAbortThread, err);
-                            }
-                        }
-                    }
-                    myPingingThread = null;
-                }
+                CleanAfterConnection(true, false);
             }
         }
 
@@ -162,11 +126,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                         // Send the message by using the underlying messaging system.
                         myUnderlyingOutputChannel.SendMessage(aSerializedMessage);
+
+                        // Reschedule the ping.
+                        myPingingTimer.Change(myPingFrequency, -1);
                     }
                     catch (Exception err)
                     {
                         string anErrorMessage = TracedObject + ErrorHandler.FailedToSendMessage;
                         EneterTrace.Error(anErrorMessage, err);
+
+                        CleanAfterConnection(true, true);
+
                         throw;
                     }
                 }
@@ -182,13 +152,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     // Deserialize the message.
                     MonitorChannelMessage aMessage = mySerializer.Deserialize<MonitorChannelMessage>(e.Message);
 
-                    // If it is the response for the ping.
-                    if (aMessage.MessageType == MonitorChannelMessageType.Ping)
+                    // Note: timer setting is after deserialization.
+                    //       reason: if deserialization fails the timer is not updated and the client will be disconnected.
+                    lock (myConnectionManipulatorLock)
                     {
-                        // Release the pinging thread waiting for the response.
-                        myResponseReceivedEvent.Set();
+                        // Cancel the current response timeout and set the new one.
+                        myReceiveTimer.Change(myReceiveTimeout, -1);
                     }
-                    else
+
+                    // If it is a message.
+                    if (aMessage.MessageType == MonitorChannelMessageType.Message)
                     {
                         Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress), true);
                     }
@@ -208,69 +181,70 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        private void DoPinging()
+        private void OnConnectionClosed(object sender, DuplexChannelEventArgs e)
         {
             using (EneterTrace.Entering())
             {
-                myPingingThreadStartedEvent.Set();
+                CleanAfterConnection(false, true);
+            }
+        }
+        
 
-                // While the flag indicates, the pinging shall run.
-                while (!myPingingRequestedToStopFlag)
+        // The method is called if the inactivity (not sending messages) exceeded the pinging frequency time.
+        private void OnPingingTimerTick(object x)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
                 {
-                    try
+                    lock (myConnectionManipulatorLock)
                     {
-                        // Wait, before the next ping.
-                        myPingFrequencyWaiting.WaitOne((int)myPingFrequency.TotalMilliseconds);
+                        // Send the ping message.
+                        myUnderlyingOutputChannel.SendMessage(myPreserializedPingMessage);
 
-                        if (!myPingingRequestedToStopFlag)
-                        {
-                            // Send the ping message.
-                            myUnderlyingOutputChannel.SendMessage(myPreserializedPingMessage);
-                        }
-                    }
-                    catch
-                    {
-                        // The sending of the ping message failed.
-                        // Therefore the connection is broken and the pinging will be stopped.
-                        break;
-                    }
-
-                    // If the response does not come in defined time, then it consider that as broken connection.
-                    if (!myResponseReceivedEvent.WaitOne((int)myPingResponseTimeout.TotalMilliseconds))
-                    {
-                        break;
+                        // Schedule the next ping.
+                        myPingingTimer.Change(myPingFrequency, -1);
                     }
                 }
-
-                myPingingThreadStartedEvent.Reset();
-
-                // Close the underlying channel.
-                if (myUnderlyingOutputChannel != null)
+                catch
                 {
-                    try
-                    {
-                        // Close connection in the underlying channel.
-                        myUnderlyingOutputChannel.CloseConnection();
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
-                    }
-
-                    myUnderlyingOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
-                    myUnderlyingOutputChannel.ConnectionOpened -= OnConnectionOpened;
-                }
-
-                // If it is not requested disconnection.
-                if (!myPingingRequestedToStopFlag)
-                {
-                    ThreadPool.QueueUserWorkItem(x =>
-                        Dispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionClosed, new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, ""), false))
-                        );
+                    // The sending of the ping message failed - the connection is broken.
+                    CleanAfterConnection(true, true);
                 }
             }
         }
 
+        // The method is called if there is no message from the input channel within response timeout.
+        private void OnResponseTimerTick(object x)
+        {
+            using (EneterTrace.Entering())
+            {
+                CleanAfterConnection(true, true);
+            }
+        }
+
+        private void CleanAfterConnection(bool sendCloseMessageFlag, bool notifyConnectionClosedFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionManipulatorLock)
+                {
+                    // Stop timers.
+                    myPingingTimer.Change(-1, -1);
+                    myReceiveTimer.Change(-1, -1);
+
+                    if (sendCloseMessageFlag)
+                    {
+                        myUnderlyingOutputChannel.CloseConnection();
+                    }
+                }
+
+                if (notifyConnectionClosedFlag)
+                {
+                    Dispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionClosed, new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, ""), false));
+                }
+            }
+        }
 
         private void Notify<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
             where T : EventArgs
@@ -297,24 +271,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
         private IDuplexOutputChannel myUnderlyingOutputChannel;
         private object myConnectionManipulatorLock = new object();
-        private TimeSpan myPingFrequency;
-        private AutoResetEvent myPingFrequencyWaiting = new AutoResetEvent(false);
-        private TimeSpan myPingResponseTimeout;
-        private volatile bool myPingingRequestedToStopFlag;
-        private AutoResetEvent myResponseReceivedEvent = new AutoResetEvent(false);
-        private ManualResetEvent myPingingThreadStartedEvent = new ManualResetEvent(false);
-        private Thread myPingingThread;
+        
+        private Timer myPingingTimer;
+        private int myPingFrequency;
+
+        private Timer myReceiveTimer;
+        private int myReceiveTimeout;
 
         private ISerializer mySerializer;
         private object myPreserializedPingMessage;
 
-
-        private string TracedObject
-        {
-            get
-            {
-                return GetType().Name + " '" + ChannelId + "' ";
-            }
-        }
+        private string TracedObject { get { return GetType().Name + " '" + ChannelId + "' "; } }
     }
 }

@@ -149,9 +149,6 @@
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\MonitorConnectionTesterBase.cs">
       <SubType>Code</SubType>
     </Compile>

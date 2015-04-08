@@ -108,10 +108,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
         [Test]
         public void B03_Pinging_NoResponseForPing()
         {
-            // Create mock for the monitor duplex input channel.
-            IDuplexInputChannel anUnderlyingDuplexInputChannel = UnderlyingMessaging.CreateDuplexInputChannel(ChannelId);
-            Mock_MonitorDuplexInputChannel aDuplexInputChannel = new Mock_MonitorDuplexInputChannel(anUnderlyingDuplexInputChannel);
-            
+            // Create duplex input channel which will not send ping messages.
+            IDuplexInputChannel aDuplexInputChannel = UnderlyingMessaging.CreateDuplexInputChannel(ChannelId);
+
             IDuplexOutputChannel aDuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
 
             AutoResetEvent aDisconnectedEvent = new AutoResetEvent(false);
@@ -130,13 +129,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.ConnectionMonitor
 
                 // Allow some time for pinging.
                 aDuplexOutputChannel.OpenConnection();
-                Thread.Sleep(5000);
+                Assert.IsTrue(aDuplexOutputChannel.IsConnected);
 
-                EneterTrace.Info("B03_Pinging_NoResponseForPing() turned off responding for Ping.");
-                Assert.IsFalse(aDisconnectedFlag);
-
-                // Turn off the responding on pings.
-                aDuplexInputChannel.ResponsePingFlag = false;
+                Thread.Sleep(2000);
 
                 aDisconnectedEvent.WaitOne();
 

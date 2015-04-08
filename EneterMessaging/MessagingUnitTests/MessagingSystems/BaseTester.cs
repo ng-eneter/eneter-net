@@ -414,7 +414,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
                 Assert.IsFalse(aClients.Clients[0].OutputChannel.IsConnected);
 
                 //aClients.Clients[0].WaitUntilConnectionClosedIsNotified(1000);
-                aService.WaitUntilResponseRecieverIdDisconnectNotified(aResponseReceiverId1, 1000);
+                aService.WaitUntilResponseRecieverIdDisconnectNotified(aResponseReceiverId1, 2000);
                 if (CompareResponseReceiverId)
                 {
                     Assert.AreEqual(aClients.Clients[0].OutputChannel.ResponseReceiverId, aService.DisconnectedResponseReceivers[0].ResponseReceiverId);

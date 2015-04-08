@@ -57,7 +57,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// </summary>
         /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
         /// <param name="pingFrequency">how often the duplex output channel pings the connection</param>
-        /// <param name="pingResponseTimeout">
+        /// <param name="pingReceiveTimeout">
         /// For the duplex output channel: the maximum time, the response for the ping must be received
         /// <br/>
         /// For the duplex input channel: pingFrequency + pingResponseTimeout = the maximum time within the ping for the connected duplex output channel
@@ -65,15 +65,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// </param>
         public MonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging,
                                         TimeSpan pingFrequency,
-                                        TimeSpan pingResponseTimeout)
+                                        TimeSpan pingReceiveTimeout)
         {
             using (EneterTrace.Entering())
             {
                 myUnderlyingMessaging = underlyingMessaging;
                 mySerializer = new MonitoredMessagingCustomSerializer();
                 myPingFrequency = pingFrequency;
-                myPingResponseTimeout = pingResponseTimeout;
-                myResponseReceiverTimeout = pingFrequency + pingResponseTimeout;
+                myReceiveTimeout = pingReceiveTimeout;
             }
         }
 
@@ -92,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexOutputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId);
-                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, mySerializer, myPingFrequency, myPingResponseTimeout);
+                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, mySerializer, (int)myPingFrequency.TotalMilliseconds, (int)myReceiveTimeout.TotalMilliseconds);
             }
         }
 
@@ -112,7 +111,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexOutputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId, responseReceiverId);
-                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, mySerializer, myPingFrequency, myPingResponseTimeout);
+                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, mySerializer, (int)myPingFrequency.TotalMilliseconds, (int)myReceiveTimeout.TotalMilliseconds);
             }
         }
 
@@ -132,15 +131,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexInputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexInputChannel(channelId);
-                return new MonitoredDuplexInputChannel(anUnderlyingChannel, mySerializer, myResponseReceiverTimeout);
+                return new MonitoredDuplexInputChannel(anUnderlyingChannel, mySerializer, (int)myPingFrequency.TotalMilliseconds, (int)myReceiveTimeout.TotalMilliseconds);
             }
         }
 
 
         private IMessagingSystemFactory myUnderlyingMessaging;
         private TimeSpan myPingFrequency;
-        private TimeSpan myPingResponseTimeout;
-        private TimeSpan myResponseReceiverTimeout;
+        private TimeSpan myReceiveTimeout;
         private ISerializer mySerializer;
     }
 }

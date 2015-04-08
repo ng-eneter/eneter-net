@@ -24,12 +24,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 ResponseReceiverId = responseReceiverId;
                 ClientAddress = clientAddress;
-                LastUpdateTime = DateTime.Now;
+                LastReceiveTime = DateTime.Now;
+                LastPingSentTime = DateTime.Now;
             }
 
             public string ResponseReceiverId { get; private set; }
             public string ClientAddress { get; private set; }
-            public DateTime LastUpdateTime { get; set; }
+            public DateTime LastReceiveTime { get; set; }
+            public DateTime LastPingSentTime { get; set; }
         }
 
 
@@ -39,15 +41,21 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         public event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
 
-        public MonitoredDuplexInputChannel(IDuplexInputChannel underlyingInputChannel, ISerializer serializer, TimeSpan pingTimeout)
+        public MonitoredDuplexInputChannel(IDuplexInputChannel underlyingInputChannel, ISerializer serializer,
+            int pingFrequency,
+            int receiveTimeout)
         {
             using (EneterTrace.Entering())
             {
                 myUnderlyingInputChannel = underlyingInputChannel;
                 mySerializer = serializer;
-                myPingTimeout = pingTimeout;
 
-                myPingTimeoutChecker = new Timer(OnPingTimeoutCheckerTick, null, -1, -1);
+                myPingFrequency = pingFrequency;
+                myReceiveTimeout = receiveTimeout;
+                myCheckTimer = new Timer(OnCheckerTick, null, -1, -1);
+
+                MonitorChannelMessage aPingMessage = new MonitorChannelMessage(MonitorChannelMessageType.Ping, null);
+                myPreserializedPingMessage = mySerializer.Serialize<MonitorChannelMessage>(aPingMessage);
             }
         }
 
@@ -76,6 +84,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
 
                     myUnderlyingInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
+                    myUnderlyingInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
                     myUnderlyingInputChannel.MessageReceived += OnMessageReceived;
 
                     try
@@ -84,10 +93,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                     catch (Exception err)
                     {
-                        myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
-                        myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
-
                         EneterTrace.Error(TracedObject + ErrorHandler.FailedToStartListening, err);
+                        StopListening();
                     }
                 }
             }
@@ -109,6 +116,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
 
                     myUnderlyingInputChannel.ResponseReceiverConnected -= OnResponseReceiverConnected;
+                    myUnderlyingInputChannel.ResponseReceiverDisconnected -= OnResponseReceiverDisconnected;
                     myUnderlyingInputChannel.MessageReceived -= OnMessageReceived;
                 }
             }
@@ -201,6 +209,23 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
+        private void OnResponseReceiverDisconnected(object sender, ResponseReceiverEventArgs e)
+        {
+            using (EneterTrace.Entering())
+            {
+                int aNumberOfRemoved;
+                lock (myResponseReceiverContexts)
+                {
+                    aNumberOfRemoved = myResponseReceiverContexts.RemoveWhere(x => x.ResponseReceiverId == e.ResponseReceiverId);
+                }
+
+                if (aNumberOfRemoved > 0)
+                {
+                    NotifyResponseReceiverDisconnected(e);
+                }
+            }
+        }
+
         private void OnMessageReceived(object sender, DuplexChannelMessageEventArgs e)
         {
             using (EneterTrace.Entering())
@@ -212,29 +237,18 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         TResponseReceiverContext aResponseReceiver = GetResponseReceiver(e.ResponseReceiverId);
                         if (aResponseReceiver == null)
                         {
-                            EneterTrace.Warning(TracedObject + "received message from not connected response receiver.");
+                            // Note: the response receiver was just disconnected.
                             return;
                         }
 
-                        aResponseReceiver.LastUpdateTime = DateTime.Now;
+                        aResponseReceiver.LastReceiveTime = DateTime.Now;
                     }
 
                     // Deserialize the incoming message.
                     MonitorChannelMessage aMessage = mySerializer.Deserialize<MonitorChannelMessage>(e.Message);
 
                     // if the message is ping, then response.
-                    if (aMessage.MessageType == MonitorChannelMessageType.Ping)
-                    {
-                        try
-                        {
-                            myUnderlyingInputChannel.SendResponseMessage(e.ResponseReceiverId, e.Message);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + "failed to response the ping message.", err);
-                        }
-                    }
-                    else
+                    if (aMessage.MessageType == MonitorChannelMessageType.Message)
                     {
                         // Notify the incoming message.
                         if (MessageReceived != null)
@@ -259,12 +273,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        private void OnPingTimeoutCheckerTick(object o)
+        private void OnCheckerTick(object o)
         {
             using (EneterTrace.Entering())
             {
+                List<TResponseReceiverContext> aPingNeededReceivers = new List<TResponseReceiverContext>();
                 List<TResponseReceiverContext> aTimeoutedResponseReceivers = new List<TResponseReceiverContext>();
-
                 bool aContinueTimerFlag = false;
 
                 lock (myResponseReceiverContexts)
@@ -273,13 +287,18 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                     myResponseReceiverContexts.RemoveWhere(x =>
                         {
-                            if (aCurrentTime - x.LastUpdateTime > myPingTimeout)
+                            if (aCurrentTime - x.LastReceiveTime > TimeSpan.FromMilliseconds(myReceiveTimeout))
                             {
                                 // Store the timeouted response receiver.
                                 aTimeoutedResponseReceivers.Add(x);
 
                                 // Indicate, that the response receiver can be removed.
                                 return true;
+                            }
+
+                            if (aCurrentTime - x.LastPingSentTime >= TimeSpan.FromMilliseconds(myPingFrequency))
+                            {
+                                aPingNeededReceivers.Add(x);
                             }
 
                             // Indicate, that the response receiver cannot be removed.
@@ -289,13 +308,27 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     aContinueTimerFlag = myResponseReceiverContexts.Count > 0;
                 }
 
-                // Close connection for all timeouted response receivers.
+                // Send pings to all receivers which need it.
+                foreach (TResponseReceiverContext aResponseReceiver in aPingNeededReceivers)
+                {
+                    try
+                    {
+                        myUnderlyingInputChannel.SendResponseMessage(aResponseReceiver.ResponseReceiverId, myPreserializedPingMessage);
+                        aResponseReceiver.LastPingSentTime = DateTime.Now;
+                    }
+                    catch
+                    {
+                        // The sending of ping failed. It means the response receiver will be notified as disconnected.
+                    }
+                }
+
+                // Close all removed response receivers.
                 foreach (TResponseReceiverContext aResponseReceiver in aTimeoutedResponseReceivers)
                 {
                     // Try to disconnect the response receiver.
                     try
                     {
-                        DisconnectResponseReceiver(aResponseReceiver.ResponseReceiverId);
+                        myUnderlyingInputChannel.DisconnectResponseReceiver(aResponseReceiver.ResponseReceiverId);
                     }
                     catch
                     {
@@ -311,7 +344,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 // If the timer chall continue.
                 if (aContinueTimerFlag)
                 {
-                    myPingTimeoutChecker.Change(500, -1);
+                    myCheckTimer.Change(myPingFrequency, -1);
                 }
             }
         }
@@ -334,7 +367,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 if (myResponseReceiverContexts.Count == 1)
                 {
-                    myPingTimeoutChecker.Change(300, -1);
+                    myCheckTimer.Change(myPingFrequency, -1);
                 }
 
                 return aResponseReceiver;
@@ -365,9 +398,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         private IDuplexInputChannel myUnderlyingInputChannel;
         private ISerializer mySerializer;
 
-        private TimeSpan myPingTimeout;
-        private Timer myPingTimeoutChecker;
+        private int myPingFrequency;
+        private int myReceiveTimeout;
+        private Timer myCheckTimer;
         private HashSet<TResponseReceiverContext> myResponseReceiverContexts = new HashSet<TResponseReceiverContext>();
+
+        private object myPreserializedPingMessage;
 
         private string TracedObject
         {
