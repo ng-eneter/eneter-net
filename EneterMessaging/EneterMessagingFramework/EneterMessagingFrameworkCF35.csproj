@@ -161,6 +161,7 @@
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitorChannelMessage.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredDuplexOutputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredMessagingCustomSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\MonitoredMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\Reconnecter.cs" />
     <Compile Include="MessagingSystems\Composites\MonitoredMessagingComposit\_NamespaceDoc.cs" />
