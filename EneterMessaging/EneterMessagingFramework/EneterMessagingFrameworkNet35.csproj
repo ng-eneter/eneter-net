@@ -234,13 +234,13 @@
     <Compile Include="MessagingSystems\Composites\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\ConnectionProtocols\EasyProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterStringProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\ConnectionProtocols\InteroperableProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\IProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -280,7 +280,7 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             Random aRnd = new Random();
             int aPort = aRnd.Next(8000, 9000);
 
-            IProtocolFormatter aProtocolFormatter = new InteroperableProtocolFormatter();
+            IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
             IMessagingSystemFactory aMessagingSystem = new TcpMessagingSystemFactory(aProtocolFormatter);
             string aBrokerAddress = "tcp://127.0.0.1:" + aPort + "/";
 

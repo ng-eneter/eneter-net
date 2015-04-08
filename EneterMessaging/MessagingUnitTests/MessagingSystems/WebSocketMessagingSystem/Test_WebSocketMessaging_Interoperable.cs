@@ -21,7 +21,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
             // Generate random number for the port.
             string aPort = RandomPortGenerator.Generate();
 
-            MessagingSystemFactory = new WebSocketMessagingSystemFactory(new InteroperableProtocolFormatter());
+            MessagingSystemFactory = new WebSocketMessagingSystemFactory(new EasyProtocolFormatter());
             ChannelId = "ws://127.0.0.1:" + aPort + "/";
 
             this.CompareResponseReceiverId = false;

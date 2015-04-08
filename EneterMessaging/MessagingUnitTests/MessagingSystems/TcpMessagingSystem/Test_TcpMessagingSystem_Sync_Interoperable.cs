@@ -23,7 +23,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
             // Generate random number for the port.
             string aPort = RandomPortGenerator.Generate();
 
-            MessagingSystemFactory = new TcpMessagingSystemFactory(new InteroperableProtocolFormatter());
+            MessagingSystemFactory = new TcpMessagingSystemFactory(new EasyProtocolFormatter());
             //ChannelId = "tcp://127.0.0.1:" + aPort + "/";
             ChannelId = "tcp://[::1]:" + aPort + "/";
 

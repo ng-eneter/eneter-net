@@ -26,7 +26,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.MessageBusMessagi
             int aPort1 = RandomPortGenerator.GenerateInt();
             int aPort2 = aPort1 + 10;
 
-            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory(new InteroperableProtocolFormatter());
+            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory(new EasyProtocolFormatter());
 
             IDuplexInputChannel aMessageBusServiceInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("tcp://[::1]:" + aPort1 + "/");
             IDuplexInputChannel aMessageBusClientInputChannel = anUnderlyingMessaging.CreateDuplexInputChannel("tcp://[::1]:" + aPort2 + "/");
