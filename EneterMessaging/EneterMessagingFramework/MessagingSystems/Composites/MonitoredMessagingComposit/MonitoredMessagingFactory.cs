@@ -70,9 +70,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 myUnderlyingMessaging = underlyingMessaging;
-                mySerializer = new MonitoredMessagingCustomSerializer();
-                myPingFrequency = pingFrequency;
-                myReceiveTimeout = pingReceiveTimeout;
+                PingFrequency = pingFrequency;
+                ReceiveTimeout = pingReceiveTimeout;
+                Serializer = new MonitoredMessagingCustomSerializer();
             }
         }
 
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexOutputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId);
-                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, mySerializer, (int)myPingFrequency.TotalMilliseconds, (int)myReceiveTimeout.TotalMilliseconds);
+                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
             }
         }
 
@@ -111,7 +111,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexOutputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId, responseReceiverId);
-                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, mySerializer, (int)myPingFrequency.TotalMilliseconds, (int)myReceiveTimeout.TotalMilliseconds);
+                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
             }
         }
 
@@ -131,14 +131,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexInputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexInputChannel(channelId);
-                return new MonitoredDuplexInputChannel(anUnderlyingChannel, mySerializer, (int)myPingFrequency.TotalMilliseconds, (int)myReceiveTimeout.TotalMilliseconds);
+                return new MonitoredDuplexInputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
             }
         }
 
+        public TimeSpan PingFrequency { get; set; }
+        public TimeSpan ReceiveTimeout { get; set; }
+
+        public ISerializer Serializer { get; set; }
 
         private IMessagingSystemFactory myUnderlyingMessaging;
-        private TimeSpan myPingFrequency;
-        private TimeSpan myReceiveTimeout;
-        private ISerializer mySerializer;
     }
 }
