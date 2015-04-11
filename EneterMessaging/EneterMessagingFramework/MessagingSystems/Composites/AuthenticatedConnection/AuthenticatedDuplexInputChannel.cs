@@ -77,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     throw new InvalidOperationException(aMessage);
                 }
 
-                if (string.IsNullOrEmpty(responseReceiverId))
+                if (responseReceiverId == "*")
                 {
                     lock (myAuthenticatedConnections)
                     {
@@ -120,6 +120,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
+                lock (myAuthenticatedConnections)
+                {
+                    myAuthenticatedConnections.Remove(responseReceiverId);
+                }
+
+                lock (myNotYetAuthenticatedConnections)
+                {
+                    myNotYetAuthenticatedConnections.Remove(responseReceiverId);
+                }
+
                 myUnderlayingInputChannel.DisconnectResponseReceiver(responseReceiverId);
             }
         }
@@ -159,7 +169,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 if (anIsAuthenticated)
                 {
                     Notify<DuplexChannelMessageEventArgs>(MessageReceived, e, true);
-
                     return;
                 }
 
