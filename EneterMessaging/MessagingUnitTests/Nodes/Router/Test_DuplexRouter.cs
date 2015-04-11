@@ -196,31 +196,6 @@ namespace Eneter.MessagingUnitTests.Nodes.Router
             Assert.AreEqual("", aReceivedResponse12);
             Assert.AreEqual("", aReceivedResponse13);
             Assert.AreEqual("", aReceivedResponse22);
-
-
-
-            aReceivedMessage1 = "";
-            aReceivedMessage2 = "";
-            aReceivedMessage3 = "";
-            aReceivedResponse11 = "";
-            aReceivedResponse12 = "";
-            aReceivedResponse13 = "";
-            aReceivedResponse22 = "";
-            myDuplexRouter.DetachDuplexInputChannel("ChannelA_2");
-            aConnectionProvider.Attach(myDuplexRouter, "ChannelA_2");
-
-            myDuplexRouter.AddConnection("ChannelA_2", "ChannelB_2");
-
-            myStringMessageSender12.SendMessage("Message2");
-
-            Assert.AreEqual("", aReceivedMessage1);
-            Assert.AreEqual("Message2", aReceivedMessage2);
-            Assert.AreEqual("", aReceivedMessage3);
-
-            Assert.AreEqual("", aReceivedResponse11);
-            Assert.AreEqual("Response2", aReceivedResponse12);
-            Assert.AreEqual("", aReceivedResponse13);
-            Assert.AreEqual("", aReceivedResponse22);
         }
 
 

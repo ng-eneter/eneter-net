@@ -211,34 +211,9 @@ namespace Eneter.MessagingUnitTests.Nodes.Dispatcher
             Assert.AreEqual("", aReceivedResponse12);
             Assert.AreEqual("", aReceivedResponse13);
             Assert.AreEqual("", aReceivedResponse22);
-
-
-
-            aReceivedMessage1 = "";
-            aReceivedMessage2 = "";
-            aReceivedMessage3 = "";
-            aReceivedResponse11 = "";
-            aReceivedResponse12 = "";
-            aReceivedResponse13 = "";
-            aReceivedResponse22 = "";
-            myDuplexDispatcher.DetachDuplexInputChannel("ChannelA_2");
-            aConnectionProvider.Attach(myDuplexDispatcher, "ChannelA_2");
-            
-            myDuplexDispatcher.AddDuplexOutputChannel("ChannelB_2");
-
-            myStringMessageSender12.SendMessage("Message2");
-
-            Assert.AreEqual("", aReceivedMessage1);
-            Assert.AreEqual("Message2", aReceivedMessage2);
-            Assert.AreEqual("", aReceivedMessage3);
-
-            Assert.AreEqual("", aReceivedResponse11);
-            Assert.AreEqual("Response2", aReceivedResponse12);
-            Assert.AreEqual("", aReceivedResponse13);
-            Assert.AreEqual("", aReceivedResponse22);
         }
 
-        [Test]
+        //[Test]
         public void GetAssociatedResponseReceiverId()
         {
             IConnectionProviderFactory aConnectionProviderFactory = new ConnectionProviderFactory();
