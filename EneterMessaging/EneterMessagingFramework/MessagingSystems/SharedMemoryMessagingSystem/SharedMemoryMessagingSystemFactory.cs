@@ -259,37 +259,24 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// The maximum message size will be 10Mb.
         /// </remarks>
         public SharedMemoryMessagingSystemFactory()
-            : this(10485760, new EneterProtocolFormatter(), null)
-        {
-        }
-
-        /// <summary>
-        /// Constructs the messaging system with possibility to specify the maximum message size.
-        /// </summary>
-        /// <param name="maxMessageSize">maximum message size in bytes</param>
-        public SharedMemoryMessagingSystemFactory(int maxMessageSize)
-            : this(maxMessageSize, new EneterProtocolFormatter(), null)
+            : this(new EneterProtocolFormatter())
         {
         }
 
         /// <summary>
         /// Constructs the messaging system.
         /// </summary>
-        /// <param name="maxMessageSize">maximum message size in bytes</param>
         /// <param name="protocolFormatter">formats low-level communication between channels.
         /// The default formatter is EneterProtocolFormatter.
         /// </param>
-        /// <param name="sharedMemorySecurity">specifies the security that shall be applied for
-        /// the communication via shared memory. Can be null if no security shall be applied.
-        /// </param>
-        public SharedMemoryMessagingSystemFactory(int maxMessageSize, IProtocolFormatter protocolFormatter,
-            MemoryMappedFileSecurity sharedMemorySecurity)
+        public SharedMemoryMessagingSystemFactory(IProtocolFormatter protocolFormatter)
         {
             using (EneterTrace.Entering())
             {
-                myMaxMessageSize = maxMessageSize;
                 myProtocolFormatter = protocolFormatter;
-                mySharedMemorySecurity = sharedMemorySecurity;
+
+                MaxMessageSize = 10485760;
+                SharedMemorySecurity = null;
 
                 ConnectTimeout = TimeSpan.FromMilliseconds(30000);
 
@@ -325,7 +312,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(myProtocolFormatter, ConnectTimeout, SendTimeout, myMaxMessageSize, mySharedMemorySecurity);
+                IOutputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(myProtocolFormatter, ConnectTimeout, SendTimeout, MaxMessageSize, SharedMemorySecurity);
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -356,7 +343,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(myProtocolFormatter, ConnectTimeout, SendTimeout, myMaxMessageSize, mySharedMemorySecurity);
+                IOutputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(myProtocolFormatter, ConnectTimeout, SendTimeout, MaxMessageSize, SharedMemorySecurity);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -379,7 +366,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                IInputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(myProtocolFormatter, ConnectTimeout, SendTimeout, myMaxMessageSize, mySharedMemorySecurity);
+                IInputConnectorFactory aConnectorFactory = new SharedMemoryConnectorFactory(myProtocolFormatter, ConnectTimeout, SendTimeout, MaxMessageSize, SharedMemorySecurity);
                 IThreadDispatcher aThreadDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
@@ -418,10 +405,11 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
-        private int myMaxMessageSize;
-        private IProtocolFormatter myProtocolFormatter;
-        private MemoryMappedFileSecurity mySharedMemorySecurity;
+        public int MaxMessageSize { get; set; }
 
+        public MemoryMappedFileSecurity SharedMemorySecurity { get; set; }
+
+        private IProtocolFormatter myProtocolFormatter;
         private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }
 }
