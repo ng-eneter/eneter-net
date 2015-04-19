@@ -187,8 +187,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         myMessageHandler(aMessageContext);
                     }
 
-                    bool isConnectionOpen = true;
-                    while (isConnectionOpen)
+                    while (true)
                     {
                         // Block until a message is received or the connection is closed.
                         WebSocketMessage aWebSocketMessage = client.ReceiveMessage();
@@ -247,10 +246,15 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                     EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                                 }
                             }
+                            else if (aProtocolMessage == null)
+                            {
+                                // Client disconnected. Or the client shall be disconnected because of incorrect message format.
+                                break;
+                            }
                         }
                         else
                         {
-                            isConnectionOpen = false;
+                            break;
                         }
                     }
                 }
@@ -265,8 +269,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         }
                     }
 
-                    // If the disconnection comes from the client (and not from the service).
-                    if (!aClientContext.IsClosedFromService)
+                    // If the disconnection does not come from the service
+                    // and the client was successfuly connected then notify about the disconnection.
+                    if (!aClientContext.IsClosedFromService && aClientId != null)
                     {
                         ProtocolMessage aCloseProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aClientId, null);
                         MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
