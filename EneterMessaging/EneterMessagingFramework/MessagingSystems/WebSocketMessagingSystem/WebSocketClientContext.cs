@@ -98,7 +98,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         {
                             try
                             {
-                                // If it was not disconnected by the server then try to send the message the connection was closed.
+                                // If it was not disconnected by the client then try to send the message the connection was closed.
                                 if (myIsListeningToResponses)
                                 {
                                     // Generate the masking key.
