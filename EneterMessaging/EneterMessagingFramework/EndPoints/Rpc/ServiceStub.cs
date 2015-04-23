@@ -259,7 +259,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                 string anErrorMessage = "failed to deserialize input parameters for '" + aRequestMessage.OperationName + "'.";
                                 EneterTrace.Error(anErrorMessage, err);
 
-                                aResponseMessage.Error = anErrorMessage + "\n" + err.ToString();
+                                aResponseMessage.Error = err.GetType().Name;
+                                aRequestMessage.ErrorMessage = anErrorMessage;
+                                aRequestMessage.ErrorDetails = err.ToString();
                             }
 
                             if (string.IsNullOrEmpty(aResponseMessage.Error))
@@ -278,7 +280,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                     EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, ex);
 
                                     // The exception will be responded to the client.
-                                    aResponseMessage.Error = ex.ToString();
+                                    aResponseMessage.Error = ex.GetType().Name;
+                                    aRequestMessage.ErrorMessage = ex.Message;
+                                    aRequestMessage.ErrorDetails = err.ToString();
                                 }
 
                                 if (string.IsNullOrEmpty(aResponseMessage.Error))
@@ -297,21 +301,25 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                         string anErrorMessage = TracedObject + "failed to serialize the result.";
                                         EneterTrace.Error(anErrorMessage, err);
 
-                                        aResponseMessage.Error = anErrorMessage + "\r\n" + err.ToString();
+                                        aResponseMessage.Error = err.GetType().Name;
+                                        aRequestMessage.ErrorMessage = anErrorMessage;
+                                        aRequestMessage.ErrorDetails = err.ToString();
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            aRequestMessage.Error = TracedObject + "failed to process '" + aRequestMessage.OperationName + "' because it has incorrect number of input parameters.";
-                            EneterTrace.Error(aRequestMessage.Error);
+                            aRequestMessage.Error = typeof(InvalidOperationException).Name;
+                            aRequestMessage.ErrorMessage = TracedObject + "failed to process '" + aRequestMessage.OperationName + "' because it has incorrect number of input parameters.";
+                            EneterTrace.Error(aRequestMessage.ErrorMessage);
                         }
                     }
                     else
                     {
-                        aResponseMessage.Error = "Method '" + aRequestMessage.OperationName + "' does not exist in the service.";
-                        EneterTrace.Error(TracedObject + "failed to invoke the service method because the method '" + aRequestMessage.OperationName + "' was not found in the service.");
+                        aRequestMessage.Error = typeof(InvalidOperationException).Name;
+                        aResponseMessage.ErrorMessage = "Method '" + aRequestMessage.OperationName + "' does not exist in the service.";
+                        EneterTrace.Error(aResponseMessage.ErrorMessage);
                     }
                 }
                 // If it is a request to subscribe/unsubcribe an event.
@@ -342,14 +350,16 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                     if (anEventContext == null)
                     {
-                        aResponseMessage.Error = TracedObject + "Event '" + aRequestMessage.OperationName + "' does not exist in the service.";
-                        EneterTrace.Error(aResponseMessage.Error);
+                        aRequestMessage.Error = typeof(InvalidOperationException).Name;
+                        aResponseMessage.ErrorMessage = TracedObject + "Event '" + aRequestMessage.OperationName + "' does not exist in the service.";
+                        EneterTrace.Error(aResponseMessage.ErrorMessage);
                     }
                 }
                 else
                 {
-                    aResponseMessage.Error = TracedObject + "could not recognize the incoming request. If it is RPC, Subscribing or Unsubscribfing.";
-                    EneterTrace.Error(aResponseMessage.Error);
+                    aRequestMessage.Error = typeof(InvalidOperationException).Name;
+                    aResponseMessage.ErrorMessage = TracedObject + "could not recognize the incoming request. If it is RPC, Subscribing or Unsubscribfing.";
+                    EneterTrace.Error(aResponseMessage.ErrorMessage);
                 }
 
 

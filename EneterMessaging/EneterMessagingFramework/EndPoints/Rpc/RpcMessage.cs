@@ -57,5 +57,11 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// </summary>
         [DataMember]
         public string Error { get; set; }
+
+        [DataMember]
+        public string ErrorMessage { get; set; }
+
+        [DataMember]
+        public string ErrorDetails { get; set; }
     }
 }

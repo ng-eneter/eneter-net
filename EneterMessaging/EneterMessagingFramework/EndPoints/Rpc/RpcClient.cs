@@ -222,7 +222,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         }
                         else
                         {
-                            InvalidOperationException anException = new InvalidOperationException("Detected exception from the service:\n" + aMessage.Error);
+                            RpcException anException = new RpcException(aMessage.ErrorMessage, aMessage.Error, aMessage.ErrorDetails);
                             anRpcContext.Error = anException;
                         }
 

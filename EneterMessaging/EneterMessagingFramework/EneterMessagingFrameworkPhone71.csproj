@@ -93,6 +93,7 @@
     <Compile Include="EndPoints\Rpc\IRpcService.cs" />
     <Compile Include="EndPoints\Rpc\ProxyProvider.cs" />
     <Compile Include="EndPoints\Rpc\RpcClient.cs" />
+    <Compile Include="EndPoints\Rpc\RpcException.cs" />
     <Compile Include="EndPoints\Rpc\RpcFactory.cs" />
     <Compile Include="EndPoints\Rpc\RpcFlags.cs" />
     <Compile Include="EndPoints\Rpc\RpcMessage.cs" />
