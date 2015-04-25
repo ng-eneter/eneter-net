@@ -56,7 +56,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// If an error occurred in the service.
         /// </summary>
         [DataMember]
-        public string Error { get; set; }
+        public string ErrorType { get; set; }
 
         [DataMember]
         public string ErrorMessage { get; set; }

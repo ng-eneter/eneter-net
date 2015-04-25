@@ -9,13 +9,13 @@ using System;
 
 namespace Eneter.Messaging.EndPoints.Rpc
 {
-    public class RpcException : InvalidOperationException
+    public class RpcException : Exception
     {
-        public RpcException(string message, string serviceExceptionType, string details)
+        internal RpcException(string message, string serviceExceptionType, string serviceExceptionDetails)
             :base(message)
         {
             ServiceExceptionType = serviceExceptionType;
-            ServiceExceptionDetails = details;
+            ServiceExceptionDetails = serviceExceptionDetails;
         }
 
         public string ServiceExceptionType { get; private set; }

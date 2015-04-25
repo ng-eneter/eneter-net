@@ -209,7 +209,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                     if (anRpcContext != null)
                     {
-                        if (string.IsNullOrEmpty(aMessage.Error))
+                        if (string.IsNullOrEmpty(aMessage.ErrorType))
                         {
                             if (aMessage.SerializedData != null && aMessage.SerializedData.Length > 0)
                             {
@@ -222,7 +222,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         }
                         else
                         {
-                            RpcException anException = new RpcException(aMessage.ErrorMessage, aMessage.Error, aMessage.ErrorDetails);
+                            RpcException anException = new RpcException(aMessage.ErrorMessage, aMessage.ErrorType, aMessage.ErrorDetails);
                             anRpcContext.Error = anException;
                         }
 
