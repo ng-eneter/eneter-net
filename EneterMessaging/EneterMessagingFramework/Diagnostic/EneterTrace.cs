@@ -117,7 +117,7 @@ namespace Eneter.Messaging.Diagnostic
             {
                 aTraceObject = new EneterTrace();
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK20
+#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
                 aTraceObject.myStopWatch.Start();
 #else
                 aTraceObject.myEnteringTime = DateTime.Now;
@@ -134,7 +134,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             try
             {
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK20
+#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
                 if (myStopWatch.IsRunning)
                 {
                     myStopWatch.Stop();
@@ -720,7 +720,7 @@ namespace Eneter.Messaging.Diagnostic
         {
         }
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK20
+#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
         private Stopwatch myStopWatch = new Stopwatch();
 #else
         private DateTime myEnteringTime = DateTime.MinValue;

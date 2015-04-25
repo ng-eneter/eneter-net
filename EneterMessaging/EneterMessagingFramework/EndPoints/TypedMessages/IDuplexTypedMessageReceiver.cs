@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Receiver of specified message type.
+    /// Receiver of one specified message type.
     /// </summary>
     /// <remarks>
     /// This is a service component which can receive request messages and send back response messages.
@@ -23,17 +23,17 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     public interface IDuplexTypedMessageReceiver<TResponse, TRequest> : IAttachableDuplexInputChannel
     {
         /// <summary>
-        /// The event is invoked when the request message is received.
+        /// Raised when the request message is received.
         /// </summary>
         event EventHandler<TypedRequestReceivedEventArgs<TRequest>> MessageReceived;
 
         /// <summary>
-        /// The event is invoked when a new duplex typed message sender (client) opened the connection.
+        /// Raised when the connection was successfully opened
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverConnected;
 
         /// <summary>
-        /// The event is invoked when a duplex typed message sender (client) closed the connection.
+        /// Raised when a duplex typed message sender (client) closed the connection.
         /// </summary>
         event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
 
@@ -41,12 +41,12 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// Sends the response message.
         /// </summary>
         /// <remarks>
-        /// The message will be serialized and sent via duplex output channel to the specified response receiver.
-        /// The response receiver deserializes the message and in case of DuplexTypedMessageSender raises the event ResponseReceived.
+        /// The message will be serialized and sent via duplex output channel to the response receiver (DuplexTypedMessageSender or SyncDuplexTypedMessageSender).
+        /// DuplexTypedMessageSender deserializes the message and raises the event ResponseReceived.
         /// In case of SyncDuplexTypedMessageSender it returns from the method SendRequestMessage.
         /// </remarks>
         /// <param name="responseReceiverId">Identifies response receiver which will receive the message.
-        /// If the value is * then the broadcast to all connected response receivers will be sent.</param>
+        /// If responseReceiverId is * the broadcast to all connected response receivers will be sent.</param>
         /// <param name="responseMessage">response message</param>
         void SendResponseMessage(string responseReceiverId, TResponse responseMessage);
     }

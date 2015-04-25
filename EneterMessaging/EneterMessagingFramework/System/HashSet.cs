@@ -1,10 +1,10 @@
 ﻿
 
-// Silverlight3 and Compact Framework do not support HashSet<_T>
+// Silverlight3, Windows Phonw 7.0, 7.1 and Compact Framework do not support HashSet<_T>
 // So I have found this implementation on the silverlight forum:
 // http://forums.silverlight.net/forums/t/124538.aspx
 
-#if SILVERLIGHT3 || WINDOWS_PHONE || COMPACT_FRAMEWORK
+#if SILVERLIGHT3 || WINDOWS_PHONE70 || WINDOWS_PHONE71 || COMPACT_FRAMEWORK
 
 namespace System.Collections.Generic
 {

@@ -33,10 +33,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     /// object aSerializedData = aSerializer.Serialize&lt;MyData&gt;(aData);
     /// </code>
     /// </example>
-    /// <br/><br/>
-    /// Notice, since AesSerializer serializes into array of bytes, it is not possible to use this serializer
-    /// for the communication between two Silverlight applications. The communication between two silverlight applications
-    /// requires, that data is serialized into the string.
     /// </remarks>
     public class AesSerializer : ISerializer
     {

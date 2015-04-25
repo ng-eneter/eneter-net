@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.Nodes.Dispatcher;
 
 namespace Eneter.Messaging.Infrastructure.Attachable
 {

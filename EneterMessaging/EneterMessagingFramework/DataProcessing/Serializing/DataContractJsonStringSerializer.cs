@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !MONO && !NET35 && !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !MONO && !NET35 && !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK
 
 using System;
 using System.IO;
@@ -57,7 +57,12 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         /// The factory method can be called from more threads at the same time, so be sure, your factory method
         /// is thread safe.
         /// </param>
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
         public DataContractJsonStringSerializer(XmlDictionaryReaderQuotas quotas, Func<Type, XmlObjectSerializer> dataContractFactoryMethod)
+#else
+        public DataContractJsonStringSerializer(XmlDictionaryReaderQuotas quotas, Func<Type, DataContractJsonSerializer> dataContractFactoryMethod)
+#endif
+
         {
             using (EneterTrace.Entering())
             {
@@ -80,6 +85,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
                 try
                 {
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                     using (MemoryStream aBuffer = new MemoryStream())
                     {
                         using (XmlWriter aJsonWriter = JsonReaderWriterFactory.CreateJsonWriter(aBuffer))
@@ -91,6 +97,14 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                             aSerializedObjectStr = Encoding.UTF8.GetString(aBuffer.GetBuffer(), 0, (int)aBuffer.Length);
                         }
                     }
+#else
+                    using (MemoryStream aBuffer = new MemoryStream())
+                    {
+                        DataContractJsonSerializer aSerializer = myDataContractFactoryMethod(typeof(_T));
+                        aSerializer.WriteObject(aBuffer, dataToSerialize);
+                        aSerializedObjectStr = Encoding.UTF8.GetString(aBuffer.GetBuffer(), 0, (int)aBuffer.Length);
+                    }
+#endif
                 }
                 catch (Exception err)
                 {
@@ -116,12 +130,21 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
                 try
                 {
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                     byte[] aBuffer = Encoding.UTF8.GetBytes(aSerializedJson);
                     using (XmlReader anXmlReader = JsonReaderWriterFactory.CreateJsonReader(aBuffer, myDictionaryQuotas))
                     {
                         XmlObjectSerializer aSerializer = myDataContractFactoryMethod(typeof(_T));
                         return (_T)aSerializer.ReadObject(anXmlReader);
                     }
+#else
+                    byte[] aBuffer = Encoding.UTF8.GetBytes(aSerializedJson);
+                    using (MemoryStream aStream = new MemoryStream(aBuffer))
+                    {
+                        DataContractJsonSerializer aSerializer = myDataContractFactoryMethod(typeof(_T));
+                        return (_T)aSerializer.ReadObject(aStream);
+                    }
+#endif
                 }
                 catch (Exception err)
                 {
@@ -131,8 +154,11 @@ namespace Eneter.Messaging.DataProcessing.Serializing
             }
         }
 
-
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
         private Func<Type, XmlObjectSerializer> myDataContractFactoryMethod;
+#else
+        private Func<Type, DataContractJsonSerializer> myDataContractFactoryMethod;
+#endif
         private XmlDictionaryReaderQuotas myDictionaryQuotas;
     }
 }

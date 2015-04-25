@@ -128,21 +128,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Connects one-way. To send messages without receiving responses.
-        /// </summary>
-        /// <remarks>
-        /// If you do not need to receive response messages from the server then establising oneway
-        /// connection increases the performance because it does not start threads looping for response messages.
-        /// </remarks>
-        public void ConnectOneWay()
-        {
-            using (EneterTrace.Entering())
-            {
-                Connect(true);
-            }
-        }
-
-        /// <summary>
         /// Opens TCP connection with the server.
         /// </summary>
         /// <remarks>
@@ -155,7 +140,74 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                Connect(false);
+                lock (myConnectionManipulatorLock)
+                {
+                    try
+                    {
+                        try
+                        {
+                            myConnectionCompletedSignal.Reset();
+                            mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                            mySocket.ConnectAsync(myConnectionSocketAsyncEventArgs);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
+                            throw;
+                        }
+
+                        if (!myConnectionCompletedSignal.WaitOne(ConnectTimeout))
+                        {
+                            string aMessage = TracedObject + TracedObject + "failed to open the connection within the configured timeout " + ConnectTimeout.ToString() + " ms.";
+                            EneterTrace.Error(aMessage);
+                            throw new InvalidOperationException(aMessage);
+                        }
+
+                        if (myConnectionSocketAsyncEventArgs.SocketError != SocketError.Success)
+                        {
+                            string aMessage = TracedObject + "failed to open the connection because " + myConnectionSocketAsyncEventArgs.SocketError.ToString();
+                            EneterTrace.Error(aMessage);
+                            throw new InvalidOperationException(aMessage);
+                        }
+
+                        try
+                        {
+                            myStopReceivingRequestedFlag = false;
+
+                            // Open the dynamic stream for writing data from the socket and reading messages.
+                            myDynamicStream = new DynamicStream();
+
+                            myListeningToSocketsStartedEvent.Reset();
+
+                            // Thread responsible for reading RAW data from the socket and writing them to
+                            // the DynamicStream.
+                            // It writes bytes to the stream as they come from the network.
+                            mySocketReceiverThread = new Thread(DoReceiveSocket);
+                            mySocketReceiverThread.Start();
+
+                            // Wait until the thread is running.
+                            myListeningToSocketsStartedEvent.WaitOne(3000);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
+                            throw;
+                        }
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            // Just try to close.
+                            Close();
+                        }
+                        catch
+                        {
+                        }
+
+                        throw;
+                    }
+                }
             }
         }
 
@@ -235,8 +287,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 {
                     lock (myConnectionManipulatorLock)
                     {
-                        return mySocket != null && myIsOneWayConnection == true ||
-                               mySocket != null && myIsOneWayConnection == false && myIsListeningToSockets == true;
+                        return mySocket != null && myIsListeningToSockets == true;
                     }
                 }
             }
@@ -299,93 +350,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                if (myIsOneWayConnection)
-                {
-                    throw new InvalidOperationException(TracedObject + "has one-way connection. Messages can be sent but not read.");
-                }
-
                 return myDynamicStream;
-            }
-        }
-
-        private void Connect(bool isOneWayConnection)
-        {
-            using (EneterTrace.Entering())
-            {
-                lock (myConnectionManipulatorLock)
-                {
-                    try
-                    {
-                        try
-                        {
-                            myConnectionCompletedSignal.Reset();
-                            mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                            mySocket.ConnectAsync(myConnectionSocketAsyncEventArgs);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
-                            throw;
-                        }
-
-                        if (!myConnectionCompletedSignal.WaitOne(ConnectTimeout))
-                        {
-                            string aMessage = TracedObject + TracedObject + "failed to open the connection within the configured timeout " + ConnectTimeout.ToString() + " ms.";
-                            EneterTrace.Error(aMessage);
-                            throw new InvalidOperationException(aMessage);
-                        }
-
-                        if (myConnectionSocketAsyncEventArgs.SocketError != SocketError.Success)
-                        {
-                            string aMessage = TracedObject + "failed to open the connection because " + myConnectionSocketAsyncEventArgs.SocketError.ToString();
-                            EneterTrace.Error(aMessage);
-                            throw new InvalidOperationException(aMessage);
-                        }
-
-                        try
-                        {
-                            myIsOneWayConnection = isOneWayConnection;
-                            myStopReceivingRequestedFlag = false;
-
-                            // Open the dynamic stream for writing data from the socket and reading messages.
-                            myDynamicStream = new DynamicStream();
-
-                            // If we want to receive response messages too.
-                            if (!isOneWayConnection)
-                            {
-                                myListeningToSocketsStartedEvent.Reset();
-
-                                // Thread responsible for reading RAW data from the socket and writing them to
-                                // the DynamicStream.
-                                // It writes bytes to the stream as they come from the network.
-                                mySocketReceiverThread = new Thread(DoReceiveSocket);
-                                mySocketReceiverThread.Start();
-
-                                // Wait until the thread is running.
-                                myListeningToSocketsStartedEvent.WaitOne(3000);
-                            }
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToOpenConnection, err);
-                            throw;
-                        }
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            // Just try to close.
-                            Close();
-                        }
-                        catch
-                        {
-                        }
-
-                        throw;
-                    }
-                }
-
             }
         }
 
@@ -448,7 +413,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
         private Socket mySocket;
         private object myConnectionManipulatorLock = new object();
-        private bool myIsOneWayConnection;
         private bool myIsListeningToSockets;
         private ManualResetEvent myListeningToSocketsStartedEvent = new ManualResetEvent(false);
 

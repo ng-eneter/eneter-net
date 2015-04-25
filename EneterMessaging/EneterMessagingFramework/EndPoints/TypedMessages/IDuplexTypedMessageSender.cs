@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Sender of specified message type.
+    /// Sender of one specified message type.
     /// </summary>
     /// <remarks>
     /// This is a client component which can send request messages and receive response messages.
