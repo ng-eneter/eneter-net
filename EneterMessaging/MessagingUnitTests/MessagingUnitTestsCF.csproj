@@ -70,9 +70,6 @@
     <Compile Include="EndPoints\SyncTypedMessages\SyncTypedMessagesBaseTester.cs" />
     <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Sync_Xml.cs" />
     <Compile Include="EndPoints\SyncTypedMessages\Test_SyncTypedMessages_Tcp_Xml.cs" />
-    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Sync_Xml.cs" />
-    <Compile Include="EndPoints\TypedReliableMessages\Test_TypedReliableMessages_Tcp_Xml.cs" />
-    <Compile Include="EndPoints\TypedReliableMessages\TypedReliableMessagesBaseTester.cs" />
     <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_BinarySerializer.cs" />
     <Compile Include="EndPoints\TypedRequestResponse\Test_TypedRequestResponse_SynchronousMessaging_XmlStringSerializer.cs" />
     <Compile Include="EndPoints\TypedRequestResponse\TypedRequestResponseBaseTester.cs" />
@@ -90,7 +87,6 @@
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Sync_Xml.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMonitoredMessaging_Tcp_Xml.cs" />
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_MonitoredMessaging_Sync.cs" />
-    <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Mock_MonitorDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\MonitorConnectionTesterBase.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\ReconnecterBaseTester.cs" />
     <Compile Include="MessagingSystems\Composits\ConnectionMonitor\Test_MonitorConnection_Tcp_Bin.cs" />
@@ -138,7 +134,6 @@
     <Folder Include="EndPoints\Rpc" />
     <Folder Include="EndPoints\StringRequestResponse" />
     <Folder Include="EndPoints\SyncTypedMessages" />
-    <Folder Include="EndPoints\TypedReliableMessages" />
     <Folder Include="EndPoints\TypedRequestResponse" />
     <Folder Include="MessagingSystems" />
     <Folder Include="MessagingSystems\Composits" />
