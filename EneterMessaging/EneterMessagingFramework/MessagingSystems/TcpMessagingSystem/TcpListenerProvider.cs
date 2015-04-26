@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using System;
 using System.Net;
@@ -56,7 +56,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myConnectionHandler = connectionHandler;
 
                         myListener = new TcpListener(myAddress);
-#if !COMPACT_FRAMEWORK
+#if !COMPACT_FRAMEWORK && !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myListener.Server.LingerState = new LingerOption(true, 0);
 #endif
                         myListener.Start();

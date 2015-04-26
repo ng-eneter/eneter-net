@@ -4,7 +4,7 @@
 // So I have found this implementation on the silverlight forum:
 // http://forums.silverlight.net/forums/t/124538.aspx
 
-#if SILVERLIGHT3 || WINDOWS_PHONE70 || WINDOWS_PHONE71 || COMPACT_FRAMEWORK
+#if SILVERLIGHT3 || WINDOWS_PHONE_70 || WINDOWS_PHONE_71 || COMPACT_FRAMEWORK
 
 namespace System.Collections.Generic
 {

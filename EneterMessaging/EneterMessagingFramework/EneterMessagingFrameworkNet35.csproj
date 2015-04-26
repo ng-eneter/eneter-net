@@ -414,7 +414,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector.cs" />
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector_Silverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpPolicyServer.cs">
       <SubType>Code</SubType>
     </Compile>

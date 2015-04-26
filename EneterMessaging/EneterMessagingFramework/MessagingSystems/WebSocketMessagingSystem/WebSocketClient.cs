@@ -11,21 +11,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Eneter.Messaging.DataProcessing.Streaming;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.DataProcessing.MessageQueueing;
-using System.Runtime.CompilerServices;
-
-#if !SILVERLIGHT
-using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-using System.Net.Sockets;
-#endif
-
-#if SILVERLIGHT
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
-#endif
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
+
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
@@ -159,7 +154,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             remove { myMessageReceivedImpl -= value; }
         }
 
-#if !SILVERLIGHT
 
         /// <summary>
         /// Constructs the websocket client.
@@ -191,31 +185,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 mySecurityFactory = clientSecurityFactory;
 
                 HeaderFields = new Dictionary<string, string>();
+#if !SILVERLIGHT
                 HeaderFields["Host"] = Uri.Authority;
-                HeaderFields["Upgrade"] = "websocket";
-                HeaderFields["Connection"] = "Upgrade";
-                HeaderFields["Sec-WebSocket-Version"] = "13";
-
-                ConnectTimeout = 30000;
-                SendTimeout = 30000;
-            }
-        }
 #else
-        /// <summary>
-        /// Constructs the websocket client.
-        /// </summary>
-        /// <param name="uri">websocket uri address. Provide port number too. e.g. ws://127.0.0.1:8055/myservice/<br/>
-        /// You can also specify the query that can be used to pass some open connection related parameters.
-        /// e.g. ws://127.0.0.1:8055/myservice/?param1=10&amp;param2=20
-        /// </param>
-        public WebSocketClient(Uri uri)
-        {
-            using (EneterTrace.Entering())
-            {
-                Uri = uri;
-
-                HeaderFields = new Dictionary<string, string>();
                 HeaderFields["Host"] = Uri.Host + ":" + Uri.Port;
+#endif
                 HeaderFields["Upgrade"] = "websocket";
                 HeaderFields["Connection"] = "Upgrade";
                 HeaderFields["Sec-WebSocket-Version"] = "13";
@@ -224,7 +198,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 SendTimeout = 30000;
             }
         }
-#endif
 
         /// <summary>
         /// Sets or gets the connection timeout in miliseconds. Default value is 30000 miliseconds.
@@ -340,17 +313,26 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         byte[] anOpenRequest = WebSocketFormatter.EncodeOpenConnectionHttpRequest(Uri.AbsolutePath + Uri.Query, HeaderFields);
 
 #if !SILVERLIGHT
-
                         // Open TCP connection.
                         AddressFamily anAddressFamily = (Uri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+#else
+                        AddressFamily anAddressFamily = AddressFamily.InterNetwork;
+#endif
                         myTcpClient = new TcpClient(anAddressFamily);
                         myTcpClient.NoDelay = true;
+
+#if SILVERLIGHT
+                        // Note: Silverlight has connection timeout too.
+                        myTcpClient.ConnectTimeout = ConnectTimeout;
+#endif
+
 #if !COMPACT_FRAMEWORK
                         // Note: Compact framework does not support these timeouts. - it throws exception.
                         myTcpClient.SendTimeout = SendTimeout;
                         myTcpClient.ReceiveTimeout = ReceiveTimeout;
 #endif
 
+#if !SILVERLIGHT
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
                         //       There it must be workerounded a little bit.
                         Exception anException = null;
@@ -382,6 +364,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         {
                             throw anException;
                         }
+#else // SILVERLIGHT
+                        // This call also resolves the host name.
+                        // Note: Silverlight has also the connection timeout.
+                        myTcpClient.Connect(Uri.Host, Uri.Port);
+#endif
 
                         // If SSL then authentication is performed and security stream is provided.
                         myClientStream = mySecurityFactory.CreateSecurityStreamAndAuthenticate(myTcpClient.GetStream());
@@ -391,17 +378,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                         // Get HTTP response and check if the communication was open.
                         Match anHttpResponseRegEx = WebSocketFormatter.DecodeOpenConnectionHttpResponse(myClientStream);
-#else
-                        // Opening connection in Silverlight.
-                        myTcpClient = new TcpClient(Uri.Host, Uri.Port);
-                        myTcpClient.ConnectTimeout = ConnectTimeout;
-                        myTcpClient.SendTimeout = SendTimeout;
-                        myTcpClient.Connect();
-                        myTcpClient.Send(anOpenRequest);
-
-                        // Get HTTP response and check if the communication was open.
-                        Match anHttpResponseRegEx = WebSocketFormatter.DecodeOpenConnectionHttpResponse(myTcpClient.GetInputStream());
-#endif
 
                         ValidateOpenConnectionResponse(anHttpResponseRegEx, aWebsocketKey);
 
@@ -657,12 +633,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         byte[] aMaskingKey = GetMaskingKey();
                         byte[] aFrame = formatter(aMaskingKey);
 
-#if !SILVERLIGHT
                         // Send the message.
                         myClientStream.Write(aFrame, 0, aFrame.Length);
-#else
-                        myTcpClient.Send(aFrame);
-#endif
                     }
                     catch (Exception err)
                     {
@@ -710,13 +682,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                     while (!myStopReceivingRequestedFlag)
                     {
-#if !SILVERLIGHT
                         // Decode the incoming message.
                         WebSocketFrame aFrame = WebSocketFormatter.DecodeFrame(myClientStream);
-#else
-                        // Decode the incoming message.
-                        WebSocketFrame aFrame = WebSocketFormatter.DecodeFrame(myTcpClient.GetInputStream());
-#endif
                         if (!myStopReceivingRequestedFlag && aFrame != null)
                         {
                             // Frames from server must be unmasked.
@@ -828,11 +795,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         byte[] aMaskingKey = GetMaskingKey();
                         byte[] aCloseMessage = WebSocketFormatter.EncodeCloseFrame(aMaskingKey, aCloseCode);
 
-#if !SILVERLIGHT
                         myClientStream.Write(aCloseMessage, 0, aCloseMessage.Length);
-#else
-                        myTcpClient.Send(aCloseMessage);
-#endif
                     }
                     catch
                     {
@@ -869,7 +832,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                     if (myTcpClient != null)
                     {
-#if !SILVERLIGHT
                         // Try to send the frame closing the communication.
                         if (myClientStream != null)
                         {
@@ -890,19 +852,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                             myClientStream.Close();
                         }
-#else
-                        try
-                        {
-                            // Generate the masking key.
-                            byte[] aMaskingKey = GetMaskingKey();
-                            byte[] aCloseFrame = WebSocketFormatter.EncodeCloseFrame(aMaskingKey, 1000);
-                            myTcpClient.Send(aCloseFrame);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
-                        }
-#endif
 
                         try
                         {
@@ -1020,18 +969,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT
         private ISecurityFactory mySecurityFactory;
         private TcpClient myTcpClient;
-#else
-        private TcpClient myTcpClient;
-#endif
 
         private Random myGenerator = new Random();
 
-#if !SILVERLIGHT
         private Stream myClientStream;
-#endif
 
         private object myConnectionManipulatorLock = new object();
         private EResponseListeningResponsible myResponsibleForActivatingListening = EResponseListeningResponsible.OpenConnection;

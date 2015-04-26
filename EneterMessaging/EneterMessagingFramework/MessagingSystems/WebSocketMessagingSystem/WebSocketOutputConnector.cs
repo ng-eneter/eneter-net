@@ -13,32 +13,22 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 
 #if SILVERLIGHT
 using System.Windows;
 #endif
 
-#if !SILVERLIGHT
-using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-#endif
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     internal class WebSocketOutputConnector : IOutputConnector
     {
-#if !SILVERLIGHT
         public WebSocketOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
             int connectTimeout,
             int sendTimeout,
             int receiveTimeout,
             int pingFrequency)
-#else
-        public WebSocketOutputConnector(string inputConnectorAddress, string outputConnectorAddress, IProtocolFormatter protocolFormatter,
-            int connectTimeout,
-            int sendTimeout,
-            int receiveTimeout,
-            int pingFrequency)
-#endif
         {
             using (EneterTrace.Entering())
             {
@@ -53,11 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     throw;
                 }
 
-#if !SILVERLIGHT
                 myClient = new WebSocketClient(aUri, clientSecurityFactory);
-#else
-                myClient = new WebSocketClient(aUri);
-#endif
 
                 myOutputConnectorAddress = outputConnectorAddress;
                 myProtocolFormatter = protocolFormatter;

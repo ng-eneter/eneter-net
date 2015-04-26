@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !WINDOWS_PHONE_70
 
 using System;
 using System.IO;
@@ -65,7 +65,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 {
                     try
                     {
+#if !SILVERLIGHT
                         AddressFamily anAddressFamily = (myUri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+#else
+                        AddressFamily anAddressFamily = AddressFamily.InterNetwork;
+#endif
                         myTcpClient = new TcpClient(anAddressFamily);
                         myTcpClient.NoDelay = true;
 #if !COMPACT_FRAMEWORK
@@ -107,8 +111,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             throw anException;
                         }
 
+#if !SILVERLIGHT
                         myIpAddress = (myTcpClient.Client.LocalEndPoint != null) ? myTcpClient.Client.LocalEndPoint.ToString() : "";
-
+#else
+                        myIpAddress = "";
+#endif
                         myClientStream = myClientSecurityFactory.CreateSecurityStreamAndAuthenticate(myTcpClient.GetStream());
 
                         // If it shall listen to response messages.
@@ -289,6 +296,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private int mySendBuffer;
         private int myReceiveBuffer;
         private Stream myClientStream;
+
         private string myIpAddress;
         private object myConnectionManipulatorLock = new object();
 

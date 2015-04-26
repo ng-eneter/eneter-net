@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT
 
 using System.IO;
 
@@ -28,5 +27,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
         Stream CreateSecurityStreamAndAuthenticate(Stream source);
     }
 }
-
-#endif

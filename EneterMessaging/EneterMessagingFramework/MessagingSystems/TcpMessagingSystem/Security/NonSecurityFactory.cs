@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT
-
 using System.IO;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
@@ -20,5 +18,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
         }
     }
 }
-
-#endif

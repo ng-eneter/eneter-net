@@ -40,7 +40,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         public static byte[] EncodeOpenConnectionHttpResponse(string webSocketKey)
         {
             using (EneterTrace.Entering())
@@ -184,7 +184,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         public static Match DecodeOpenConnectionHttpRequest(Stream inputStream)
         {
             using (EneterTrace.Entering())
@@ -401,7 +401,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private static readonly Regex myHttpOpenConnectionRequest = new Regex(
                            @"^GET\s(?<path>[^\s\?]+)(?<query>\?[^\s]+)?\sHTTP\/1\.1\r\n" +
                            @"((?<headerKey>[^:\r\n]+):\s(?<headerValue>[^\r\n]+)\r\n)+" +

@@ -11,12 +11,10 @@ using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
-using Eneter.Messaging.Threading.Dispatching;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
-
-#if !SILVERLIGHT
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-#endif
+using Eneter.Messaging.Threading.Dispatching;
+
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -35,7 +33,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     /// </remarks>
     public class TcpMessagingSystemFactory : IMessagingSystemFactory
     {
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private class TcpInputConnectorFactory : IInputConnectorFactory
         {
             public TcpInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory,
@@ -67,6 +65,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private int mySendBuffer;
             private int myReceiveBuffer;
         }
+#endif
 
         private class TcpOutputConnectorFactory : IOutputConnectorFactory
         {
@@ -101,87 +100,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private int mySendBuffer;
             private int myReceiveBuffer;
         }
-#else
-        private class TcpOutputConnectorFactory : IOutputConnectorFactory
-        {
-            public TcpOutputConnectorFactory(IProtocolFormatter protocolFormatter, int connectionTimeout, int sendTimeout, int receiveTimeout)
-            {
-                using (EneterTrace.Entering())
-                {
-                    myProtocolFormatter = protocolFormatter;
-                    myConnectionTimeout = connectionTimeout;
-                    mySendTimeout = sendTimeout;
-                    myReceiveTimeout = receiveTimeout;
-                }
-            }
 
-            public IOutputConnector CreateOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
-            {
-                using (EneterTrace.Entering())
-                {
-                    return new TcpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myConnectionTimeout, mySendTimeout, myReceiveTimeout);
-                }
-            }
-
-            private IProtocolFormatter myProtocolFormatter;
-            private int myConnectionTimeout;
-            private int mySendTimeout;
-            private int myReceiveTimeout;
-        }
-#endif
-
-
-#if SILVERLIGHT
-        /// <summary>
-        /// Constructs the factory that will create output channels and duplex output channels with default settings.
-        /// </summary>
-        /// <remarks>
-        /// The response messages will be received in the main Silverlight thread.
-        /// </remarks>
-        public TcpMessagingSystemFactory()
-            : this(true, new EneterProtocolFormatter())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the factory that will create output channels and duplex output channels.
-        /// </summary>
-        /// <param name="receiveInSilverlightThread">true - if the response messages shall be received in the main Silverlight thread.</param>
-        public TcpMessagingSystemFactory(bool receiveInSilverlightThread)
-            : this(receiveInSilverlightThread, new EneterProtocolFormatter())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the TCP messaging factory.
-        /// </summary>
-        /// <param name="receiveInSilverlightThread">true - if the response messages shall be received in the main Silverlight thread.</param>
-        /// <param name="protocolFormatter">formatter used for low-level messages between duplex output and duplex input channels.</param>
-        public TcpMessagingSystemFactory(bool receiveInSilverlightThread, IProtocolFormatter protocolFormatter)
-        {
-            using (EneterTrace.Entering())
-            {
-                myProtocolFormatter = protocolFormatter;
-                ConnectTimeout = TimeSpan.FromMilliseconds(30000);
-                
-                // Infinite time for sending and receiving.
-                // Note: do not forget to convert this 0 to -1 when using ManualResetEvent.
-                SendTimeout = TimeSpan.FromMilliseconds(0);
-                ReceiveTimeout = TimeSpan.FromMilliseconds(0);
-
-                if (receiveInSilverlightThread)
-                {
-                    OutputChannelThreading = new SilverlightDispatching();
-                }
-                else
-                {
-                    OutputChannelThreading = new SyncDispatching();
-                }
-            }
-        }
-#endif
-
-#if !SILVERLIGHT
 
         /// <summary>
         /// Constructs the TCP messaging factory.
@@ -214,11 +133,21 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 SendBufferSize = 8192;
                 ReceiveBufferSize = 8192;
 
+#if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
+#endif
+
+#if  WINDOWS_PHONE80 || WINDOWS_PHONE81
+                InputChannelThreading = new SilverlightDispatching();
+                OutputChannelThreading = InputChannelThreading;
+#endif
+
+#if SILVERLIGHT3 || SILVERLIGHT4 || SILVERLIGHT5
+                OutputChannelThreading = new SilverlightDispatching();
+#endif
             }
         }
-#endif
 
         /// <summary>
         /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using TCP.
@@ -246,16 +175,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-#if !SILVERLIGHT
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     SendBufferSize, ReceiveBufferSize);
-#else
-                IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
-                    myProtocolFormatter,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
-#endif
+
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
         }
@@ -288,16 +212,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-#if !SILVERLIGHT
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     SendBufferSize, ReceiveBufferSize);
-#else
-                IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
-                    myProtocolFormatter,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
-#endif
+
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
         }
@@ -325,7 +244,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory aFactory = new TcpInputConnectorFactory(
@@ -336,13 +255,12 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
 #else
-                throw new NotSupportedException("The Tcp duplex input channel is not supported in Silverlight.");
+                throw new NotSupportedException("The Tcp duplex input channel is not supported.");
 #endif
             }
         }
 
 
-#if !SILVERLIGHT
         /// <summary>
         /// Sets or gets the security stream factory for the server.
         /// If the factory is set, then the input channel and the duplex input channel use it to establish
@@ -406,7 +324,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private ISecurityFactory myServerSecurityStreamFactory = new NonSecurityFactory();
         private ISecurityFactory myClientSecurityStreamFactory = new NonSecurityFactory();
 
-#endif
 
 #if !COMPACT_FRAMEWORK
         /// <summary>
@@ -441,7 +358,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </summary>
         public TimeSpan ConnectTimeout { get; set; }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
         /// Provides thread dispatcher responsible for routing events from duplex input channel according to
         /// desired threading model.

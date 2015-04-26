@@ -6,7 +6,7 @@
 */
 
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using System;
 using System.Collections.Generic;

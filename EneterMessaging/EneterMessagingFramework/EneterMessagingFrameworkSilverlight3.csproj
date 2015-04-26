@@ -472,11 +472,11 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpInputConnector.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListenerProvider.cs" />
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListener_WindowsPhoneSilverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemFactory.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector.cs" />
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector_Silverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpPolicyServer.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
