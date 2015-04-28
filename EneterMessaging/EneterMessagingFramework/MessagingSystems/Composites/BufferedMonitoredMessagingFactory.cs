@@ -142,6 +142,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites
             }
         }
 
+        public MonitoredMessagingFactory MonitoredMessaging { get { return myMonitoredMessaging; } }
+
         private IMessagingSystemFactory myBufferedMessaging;
+        private MonitoredMessagingFactory myMonitoredMessaging;
     }
 }
