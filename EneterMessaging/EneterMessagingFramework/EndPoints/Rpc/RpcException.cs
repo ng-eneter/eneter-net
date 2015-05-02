@@ -9,6 +9,14 @@ using System;
 
 namespace Eneter.Messaging.EndPoints.Rpc
 {
+    /// <summary>
+    /// Exception thrown if an RPC call fails on the service side.
+    /// </summary>
+    /// <remarks>
+    /// E.g. in case the service method throws an exception it is transfered to the client.
+    /// When the client receives the exception from the service it creates RpcException and stores there all details
+    /// about original service exception. The RpcException is then thrown and can be processed by the client.  
+    /// </remarks>
     public class RpcException : Exception
     {
         internal RpcException(string message, string serviceExceptionType, string serviceExceptionDetails)
@@ -18,7 +26,14 @@ namespace Eneter.Messaging.EndPoints.Rpc
             ServiceExceptionDetails = serviceExceptionDetails;
         }
 
+        /// <summary>
+        /// Gets name of the exception type thrown in the service.
+        /// </summary>
         public string ServiceExceptionType { get; private set; }
+
+        /// <summary>
+        /// Gets service exception details including callstack.
+        /// </summary>
         public string ServiceExceptionDetails { get; private set; }
     }
 }
