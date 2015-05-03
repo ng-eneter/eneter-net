@@ -15,13 +15,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites
     /// Extensions for messaging systems.
     /// </summary>
     /// <remarks>
-    /// E.g. it is possible to extend the communication by connection monitoring, buffering, authentication or communication via the message bus.
-    /// 
-    /// The composite implements IMessagingSystemFactory so it looks like any other messaging but it provides
-    /// some additional behavior which is then applied on the underlying messaging.
-    /// Multiple composite messaging systems can be applied in a "chain". 
-    /// E.g. if you want to have TCP communication with monitored connection and authentication you can
-    /// compose it like in the following example.
+    /// The composites are extensions which can be composed on top of each other in order to add additional features
+    /// into the communication.
+    /// E.g. connection monitoring, connection recovery, authentication or communication via the message bus.<br/>
+    /// <br/>
+    /// The following example shows how to add the connection monitoring and the authentication into the communication via TCP.
     /// <example>
     /// Example shows hot composite messaging systems can be chained to create the desired behavior.
     /// <code>
@@ -29,7 +27,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
     /// IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
     /// 
     /// // Create monitored messaging which takes TCP as underlying messaging.
-    /// IMessagingSystemFactory aMonitoredMessaging = new MonitoredMessagingFactory(aTcpMessaging);
+    /// IMessagingSystemFactory aMonitoredMessaging = new MonitoredMessagingFactory(anUnderlyingMessaging);
     /// 
     /// // Create messaging with authenticated connection.
     /// // It takes monitored messaging as the underlying messaging.

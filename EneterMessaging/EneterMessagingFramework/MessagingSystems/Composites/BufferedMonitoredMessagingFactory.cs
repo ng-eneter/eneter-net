@@ -16,12 +16,34 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.MessagingSystems.Composites
 {
     /// <summary>
-    /// Combines buffered messaging and the connection monitoring.
+    /// This messaging combines buffered and monitored messaging.
     /// </summary>
     /// <remarks>
-    /// Monitored messaging constantly monitors the connection. If the monitoring detects the connection is interrupted
-    /// sent messages are stored in the buffer. Then when the connection is recovered the messages stored in the buffer
-    /// are sent.
+    /// Monitored messaging constantly monitors the connection and if the disconnection is detected the buffered messaging
+    /// is notified. Buffered messaging then tries to reconnect and meanwhile stores all sent messages into a buffer.
+    /// Once the connection is recovered the messages stored in the buffer are sent.<br/>
+    /// <br/>
+    /// The buffered monitored messaging is composed from following messagings:
+    /// <ul>
+    /// <li><i>BufferedMessaging</i> is on the top and is responsible for storing of messages during the disconnection (offline time)
+    /// and automatic reconnect.</li>
+    /// <li><i>MonitoredMessaging</i> is in the middle and is responsible for continuous monitoring of the connection.</li>
+    /// <li><i>UnderlyingMessaging</i> (e.g. TCP) is on the bottom and is responsible for sending and receiving messages.</li>
+    /// </ul>
+    /// The following example shows how to create BufferedMonitoredMessaging:
+    /// <example>
+    /// <code>
+    /// // Create TCP messaging system.
+    /// IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
+    /// 
+    /// // Create buffered monitored messaging which takes TCP as underlying messaging.
+    /// IMessagingSystemFactory aMessaging = new BufferedMonitoredMessagingFactory(anUnderlyingMessaging);
+    /// 
+    /// // Then creating channels which can be then attached to communication components.
+    /// IDuplexInputChannel anInputChannel = aMessaging.createDuplexInputChannel("tcp://127.0.0.1:8095/");
+    /// IDuplexInputChannel anOutputChannel = aMessaging.createDuplexOutputChannel("tcp://127.0.0.1:8095/");
+    /// </code>
+    /// </example>
     /// </remarks>
     public class BufferedMonitoredMessagingFactory : IMessagingSystemFactory
     {
@@ -29,14 +51,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// Constructs the factory with default settings.
         /// </summary>
         /// <remarks>
-        /// The serializer for the 'ping' messages checking the connection is set to <see cref="XmlStringSerializer"/>.
-        /// The maximum offline time is set to 10 seconds.
-        /// The duplex output channel will check the connection with the 'ping' once per second and the response must be received within 2 seconds.
-        /// Otherwise the connection is closed.<br/>
-        /// The duplex input channel expects the 'ping' request at least once per 2 seconds. Otherwise the duplex output
-        /// channel is disconnected.
+        /// The maximum offline time for buffered messaging is set to 10 seconds.
+        /// The ping frequency for monitored messaging is set to 1 second and the receive timeout for monitored messaging
+        /// is set to 2 seconds.
         /// </remarks>
-        /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
+        /// <param name="underlyingMessaging">underlying messaging system e.g. TCP, ...</param>
         public BufferedMonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging)
             : this(underlyingMessaging,
                    TimeSpan.FromMilliseconds(10000), // max offline time
@@ -47,7 +66,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// <summary>
         /// Constructs the factory with the specified parameters.
         /// </summary>
-        /// <param name="underlyingMessaging">underlying messaging system</param>
+        /// <param name="underlyingMessaging">underlying messaging system e.g. TCP</param>
         /// <param name="maxOfflineTime">the maximum time, the messaging can work offline. When the messaging works offline,
         /// the sent messages are buffered and the connection is being reopened. If the connection is
         /// not reopen within maxOfflineTime, the connection is closed.
@@ -72,19 +91,18 @@ namespace Eneter.Messaging.MessagingSystems.Composites
 
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages.
+        /// Creates the output channel which can send and receive messages.
         /// </summary>
         /// <remarks>
         /// This duplex output channel provides the buffered messaging and the connection monitoring.
-        /// The channel regularly checks if the connection is available. It sends 'ping' requests and expects 'ping' responses
-        /// within the specified time. If the 'ping' response does not come, the buffered messaging layer is notified,
-        /// that the connection was interrupted.
-        /// The buffered messaging then tries to reconnect and stores sent messages to the buffer.
-        /// If the connection is open, the buffered messages are sent.
-        /// If the reconnection was not successful, it notifies <see cref="IDuplexOutputChannel.ConnectionClosed"/>
-        /// and deletes messages from the buffer.
+        /// It regularly checks if the connection is available. It sends 'ping' requests and expects 'ping' responses
+        /// within the specified time. If the 'ping' response does not come the disconnection is notified to the buffered messaging.
+        /// The buffered messaging then tries to reconnect and meanwhile stores the sent messages to the buffer.
+        /// Once the connection is recovered the messages stored in the buffer are sent.
+        /// If the connection recovery was not possible the event IDuplexOutputChannel.ConnectionClosed
+        /// is raised the message buffer is deleted.
         /// </remarks>
-        /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
+        /// <param name="channelId">input channel address. The syntax must comply to underlying messaging</param>
         /// <returns>buffered and monitored duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
@@ -95,17 +113,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages.
+        /// Creates the output channel which can send and receive messages.
         /// </summary>
         /// <remarks>
         /// This duplex output channel provides the buffered messaging and the connection monitoring.
-        /// The channel regularly checks if the connection is available. It sends 'ping' requests and expects 'ping' responses
-        /// within the specified time. If the 'ping' response does not come, the buffered messaging layer is notified,
-        /// that the connection was interrupted.
-        /// The buffered messaging then tries to reconnect and stores sent messages to the buffer.
-        /// If the connection is open, the buffered messages are sent.
-        /// If the reconnection was not successful, it notifies <see cref="IDuplexOutputChannel.ConnectionClosed"/>
-        /// and deletes messages from the buffer.
+        /// It regularly checks if the connection is available. It sends 'ping' requests and expects 'ping' responses
+        /// within the specified time. If the 'ping' response does not come the disconnection is notified to the buffered messaging.
+        /// The buffered messaging then tries to reconnect and meanwhile stores the sent messages to the buffer.
+        /// Once the connection is recovered the messages stored in the buffer are sent.
+        /// If the connection recovery was not possible the event IDuplexOutputChannel.ConnectionClosed
+        /// is raised the message buffer is deleted.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">the unique id of this response receiver</param>
@@ -119,18 +136,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         }
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending the response messages.
+        /// Creates the input channel which can receive and send messages.
         /// </summary>
         /// <remarks>
         /// This duplex input channel provides the buffered messaging and the connection monitoring.
-        /// The channel regularly checks if the duplex output channel is still connected. It expect, that every connected duplex output channel
+        /// It regularly checks if the duplex output channel is still connected. It expect, that every connected duplex output channel
         /// sends regularly 'ping' messages. If the 'ping' message from the duplex output channel is not received within the specified
-        /// time, the duplex output channel is disconnected and the buffered messaging (as the layer above) is notified about the
-        /// disconnection.
+        /// time the duplex output channel is disconnected and the buffered messaging is notified about the disconnection.
         /// The buffered messaging then puts all sent response messages to the buffer and waits whether the duplex output channel reconnects.
-        /// If the duplex output channel reopens the connection, the buffered response messages are sent.
-        /// If the duplex output channel does not reconnect, the event
-        /// <see cref="IDuplexInputChannel.ResponseReceiverDisconnected"/> is invoked and rsponse messages are deleted from the buffer.
+        /// If the duplex output channel reopens the connection the messages stored in the buffer are sent.
+        /// If the duplex output channel does not reconnect the event
+        /// IDuplexInputChannel.ResponseReceiverDisconnected is raised and response messages are deleted from the buffer.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <returns>buffered and monitored duplex input channel</returns>
@@ -142,9 +158,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites
             }
         }
 
+        /// <summary>
+        /// Returns underlying buffered messaging.
+        /// </summary>
+        public BufferedMessagingFactory BufferedMessaging { get { return myBufferedMessaging; } }
+
+        /// <summary>
+        /// Returns underlying monitored messaging.
+        /// </summary>
         public MonitoredMessagingFactory MonitoredMessaging { get { return myMonitoredMessaging; } }
 
-        private IMessagingSystemFactory myBufferedMessaging;
+        private BufferedMessagingFactory myBufferedMessaging;
         private MonitoredMessagingFactory myMonitoredMessaging;
     }
 }
