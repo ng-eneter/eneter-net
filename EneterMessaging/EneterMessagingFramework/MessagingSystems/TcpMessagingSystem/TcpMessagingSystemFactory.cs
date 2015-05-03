@@ -24,12 +24,13 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     /// <remarks>
     /// It creates the communication channels using TCP for sending and receiving messages.
     /// The channel id must be a valid URI address. E.g.: tcp://127.0.0.1:6080/. <br/>
-    /// Notice, Silverlight and Windows Phone do not support TCP listeners.
+    /// Notice, Silverlight and Windows Phone 7.1 do not support TCP listeners.
     /// Therefore, only sending of messages (and receiving response messages) is possible on these platforms.<br/>
     /// More details:<br/>
     /// TCP in Silverlight is restricted to ports 4502 - 4532 and requires the TcpPolicyServer running on the service side.<br/>
     /// Windows Phone 7.0 does not suport TCP at all. The TCP is supported from Windows Phone 7.1. TCP in Windows Phone 7.1
-    /// does not require TcpPolicyServer and is not restricted to certain ports as in Silverlight. 
+    /// does not require TcpPolicyServer and is not restricted to certain ports as in Silverlight.<br/>
+    /// Windows Phone 8.0 and 8.1 supports also TCP listening and it does not requires the TCP policy server.
     /// </remarks>
     public class TcpMessagingSystemFactory : IMessagingSystemFactory
     {
