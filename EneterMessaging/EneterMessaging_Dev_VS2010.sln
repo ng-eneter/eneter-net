@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EneterMessagingFrameworkSil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EneterMessagingFrameworkPhone71", "EneterMessagingFramework\EneterMessagingFrameworkPhone71.csproj", "{5C57F0AD-76C4-4B94-B2C8-D834427CB727}"
 EndProject
-Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "EneterDocumentation", "EneterDocumentation\EneterDocumentation.shfbproj", "{5DC8F2B1-478D-40D0-8259-0DFBF0C1FD03}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EneterMessagingFrameworkPhone7", "EneterMessagingFramework\EneterMessagingFrameworkPhone7.csproj", "{CDD483DB-2D8A-422C-A3C5-C2200C778539}"
 EndProject
 Global
@@ -59,8 +57,6 @@ Global
 		{41C96EFD-6A48-4C8F-9CFC-62AB575B2528}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C57F0AD-76C4-4B94-B2C8-D834427CB727}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5C57F0AD-76C4-4B94-B2C8-D834427CB727}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DC8F2B1-478D-40D0-8259-0DFBF0C1FD03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DC8F2B1-478D-40D0-8259-0DFBF0C1FD03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDD483DB-2D8A-422C-A3C5-C2200C778539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CDD483DB-2D8A-422C-A3C5-C2200C778539}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDD483DB-2D8A-422C-A3C5-C2200C778539}.Release|Any CPU.ActiveCfg = Release|Any CPU
