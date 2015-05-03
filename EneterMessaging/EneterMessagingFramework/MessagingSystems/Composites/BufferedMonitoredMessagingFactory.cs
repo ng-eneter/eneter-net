@@ -84,8 +84,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         {
             using (EneterTrace.Entering())
             {
-                IMessagingSystemFactory aMonitoredMessaging = new MonitoredMessagingFactory(underlyingMessaging, pingFrequency, pingResponseTimeout);
-                myBufferedMessaging = new BufferedMessagingFactory(aMonitoredMessaging, maxOfflineTime);
+                myMonitoredMessaging = new MonitoredMessagingFactory(underlyingMessaging, pingFrequency, pingResponseTimeout);
+                myBufferedMessaging = new BufferedMessagingFactory(myMonitoredMessaging, maxOfflineTime);
             }
         }
 
