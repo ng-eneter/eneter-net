@@ -15,10 +15,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     /// Message bus.
     /// </summary>
     /// <remarks>
-    /// The message bus is the component that allows to dynamically expose various services.
-    /// Services that want to be exposed via the message bus connect the message bus and register their service ids.
-    /// Then, if a client wants to use the service it connects the message bus and asks for the particular service id.
-    /// If such service id exists the message bus mediates the communication between the client and the service.<br/>
+    /// The message bus is the component which can expose services.
+    /// The service connects the message bus and registers its service id.
+    /// When a client needs to use the service it connects the message bus and specifies the service id.
+    /// If the service id exists the message bus establishes the connection between the client and the service.<br/>
     /// <br/>
     /// The presence of the message bus is transparent for logic of services and their clients. The whole communication
     /// is realized via <see cref="MessageBusMessagingFactory"/> which ensures the interaction with the message bus.
@@ -36,14 +36,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
         /// <summary>
-        /// Attaches duplex input channels and starts listening.
+        /// Attaches input channels which are used for the communication with the message bus.
         /// </summary>
         /// <remarks>
         /// Once input channels are attached the message bus is listening and can be used by services and
-        /// clients. <br/>
-        /// <br/>
-        /// To connect the message bus services must use 'Message Bus Duplex Input Channel' and clients must use
-        /// 'Message Bus Duplex Output Channel'.<br/>
+        /// clients.
         /// </remarks>
         /// <param name="serviceInputChannel">channel used by services for registering their services in the message bus</param>
         /// <param name="clientInputChannel">channel used by clients for connecting services via the message bus.</param>

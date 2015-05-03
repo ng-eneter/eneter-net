@@ -110,7 +110,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         public string Id { get; set; }
 
         /// <summary>
-        /// If the request is SendRequestMessage or SendResponseMessage it is the serialized message data.
+        /// If the request is SendRequestMessage or SendResponseMessage it contains the serialized message data
+        /// which is sent between client and service. 
         /// Otherwise it is null.
         /// </summary>
         [DataMember]

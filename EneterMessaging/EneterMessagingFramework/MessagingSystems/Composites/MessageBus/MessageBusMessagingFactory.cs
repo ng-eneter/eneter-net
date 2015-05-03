@@ -18,11 +18,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     /// Extension providing the communication via the message bus.
     /// </summary>
     /// <remarks>
-    /// This messaging wraps the communication with the message bus.
+    /// This messaging provides the client-service communication via the message bus.
+    /// It ensures the communication via the message bus is transparent and for communicating parts it looks like a normal
+    /// communication via output and input channel.<br/>
     /// The duplex input channel created by this messaging will automatically connect the message bus and register the service
-    /// when the startListening() is called.<br/>
+    /// when the StartListening() is called.<br/>
     /// The duplex output channel created by this messaging will automatically connect the message bus and ask for the service
-    /// when the openConnection() is called.<br/>
+    /// when the OpenConnection() is called.<br/>
     /// <br/>
     /// The following example shows how to communicate via the message bus.
     /// 
@@ -200,9 +202,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Message bus instantiated using this constructor will use MessageBusCustom serializer which is optimized to serialize/deserialize
         /// only MessageBusMessage used for the communication with the message bus.
         /// </remarks>
-        /// <param name="serviceConnctingAddress">address used by services</param>
-        /// <param name="clientConnectingAddress">address used by clients</param>
-        /// <param name="underlyingMessaging">messaging system used for the communication with the message bus</param>
+        /// <param name="serviceConnctingAddress">message bus address intended for services which want to register in the message bus.
+        /// It can be null if the message bus factory is intended to create only duplex output channels.</param>
+        /// <param name="clientConnectingAddress">clientConnectingAddress message bus address intended for clients which want to connect a registered service.
+        /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
+        /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
             : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new MessageBusCustomSerializer())
         {
@@ -211,11 +215,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Constructs the factory.
         /// </summary>
-        /// <param name="serviceConnctingAddress">address used by services</param>
-        /// <param name="clientConnectingAddress">address used by clients</param>
-        /// <param name="underlyingMessaging">messaging system used for the communication with the message bus</param>
-        /// <param name="serializer">serializer which will serialize/deserialize MessageBusMessage which is used for the communication
-        /// with the message bus.</param>
+        /// <param name="serviceConnctingAddress">message bus address intended for services which want to register in the message bus.
+        /// It can be null if the message bus factory is intended to create only duplex output channels.</param>
+        /// <param name="clientConnectingAddress">clientConnectingAddress message bus address intended for clients which want to connect a registered service.
+        /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
+        /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
+        /// <param name="serializer">serializer which is used to serialize {@link MessageBusMessage} which is internally used for the communication with
+        /// the message bus.</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
         {
             using (EneterTrace.Entering())
