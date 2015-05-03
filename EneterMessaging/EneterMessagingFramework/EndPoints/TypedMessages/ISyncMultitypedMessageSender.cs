@@ -12,22 +12,26 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Sender which sends a message and then waits for a response.
+    /// Synchronized sender for multiple message types (it waits until the response is received).
     /// </summary>
     public interface ISyncMultitypedMessageSender : IAttachableDuplexOutputChannel
     {
         /// <summary>
-        /// The event is raised when the connection with the receiver is open.
+        /// Raised when the connection with the receiver is open.
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
-        /// The event is raised when the connection with the receiver is closed.
+        /// Raised when the service closed the connection with the client.
         /// </summary>
+        /// <remarks>
+        /// The event is raised only if the service closes the connection with the client.
+        /// It is not raised if the client closed the connection by IDuplexOutputChannel.CloseConnection().
+        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
-        /// Sends the message of specified type and then waits for the response of specified type.
+        /// Sends request message and returns the response.
         /// </summary>
         /// <typeparam name="TResponse">Type of request message.</typeparam>
         /// <typeparam name="TRequest">Type of response message.</typeparam>

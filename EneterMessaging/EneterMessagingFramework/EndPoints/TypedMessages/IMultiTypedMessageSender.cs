@@ -13,42 +13,45 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Sender which sends messages of multiple types.
+    /// Sender for multiple message types.
     /// </summary>
     /// <remarks>
-    /// This is a client component which can send request messages and receive response messages.
-    /// MultiTypedMessageSende can send messages only to MultiTypedMessageReceiver.
+    /// This is a client component which can send and receive messages of multiple types.
     /// </remarks>
     public interface IMultiTypedMessageSender : IAttachableDuplexOutputChannel
     {
         /// <summary>
-        /// The event is raised when the connection with the receiver is open.
+        /// Raised when the connection with the receiver is open.
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
-        /// The event is raised when the connection with the receiver is closed.
+        /// Raised when the service closed the connection with the client.
         /// </summary>
+        /// <remarks>
+        /// The event is raised only if the service closes the connection with the client.
+        /// It is not raised if the client closed the connection by IDuplexOutputChannel.CloseConnection().
+        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
-        /// Registeres the handler for specified response message type.
+        /// Registers response message handler for specified message type.
         /// </summary>
         /// <remarks>
-        /// The handler is called if the message of specified type is deserialized from the incoming message data.
+        /// If the response message of the specified type is received the handler will be called to process it.
         /// </remarks>
         /// <typeparam name="T">data type of the response message which will be handled by the handler</typeparam>
         /// <param name="handler">handler which will be called if the response message of specified type is received</param>
         void RegisterResponseMessageReceiver<T>(EventHandler<TypedResponseReceivedEventArgs<T>> handler);
 
         /// <summary>
-        /// Unregisteres the handler for the specified type.
+        /// Unregisters the response message handler for the specified message type.
         /// </summary>
         /// <typeparam name="T">data type of the resposne message for which the handler shall be unregistered</typeparam>
         void UnregisterResponseMessageReceiver<T>();
 
         /// <summary>
-        /// Returns response message types which are registered to be received.
+        /// Returns the list of registered response message types which can be received.
         /// </summary>
         IEnumerable<Type> RegisteredResponseMessageTypes { get; }
 

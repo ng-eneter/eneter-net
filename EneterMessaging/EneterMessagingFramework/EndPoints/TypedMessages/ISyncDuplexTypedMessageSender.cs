@@ -13,11 +13,11 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Sender which sends a message and then waits for a response.
+    /// Synchronized sender for one specified message type (it waits until the response is received).
     /// </summary>
     /// <remarks>
-    /// Declares message sender that sends request messages of specified type and receive response messages of specified type.
-    /// Synchronous means it when the message is sent it waits until the response message is received.
+    /// Message sender which sends request messages of specified type and receive response messages of specified type.
+    /// Synchronous means when the message is sent it waits until the response message is received.
     /// If the waiting for the response message exceeds the specified timeout the TimeoutException is thrown.
     /// </remarks>
     /// <typeparam name="TResponse">Type of response message.</typeparam>
@@ -25,13 +25,17 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     public interface ISyncDuplexTypedMessageSender<TResponse, TRequest> : IAttachableDuplexOutputChannel
     {
         /// <summary>
-        /// The event is raised when the connection with the receiver is open.
+        /// Raised when the connection with the receiver is open.
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
-        /// The event is raised when the connection with the receiver is closed.
+        /// Raised when the service closed the connection with the client.
         /// </summary>
+        /// <remarks>
+        /// The event is raised only if the service closes the connection with the client.
+        /// It is not raised if the client closed the connection by IDuplexOutputChannel.CloseConnection().
+        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>

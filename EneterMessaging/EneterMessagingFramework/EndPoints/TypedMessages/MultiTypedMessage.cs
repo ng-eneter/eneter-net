@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Eneter.Messaging.EndPoints.TypedMessages
 {
     /// <summary>
-    /// Internal message used by MultiTypedMessageSender and MultiTypedMessageReceiver.
+    /// Internal message used for the communication between multi-typed message sender and receiver.
     /// </summary>
 #if !SILVERLIGHT
     [Serializable]
@@ -20,7 +20,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     public class MultiTypedMessage
     {
         /// <summary>
-        /// Name of the type which is serialized in MessageData.
+        /// Name of the message type (without namespace).
         /// </summary>
         /// <remarks>
         /// In order to ensure better portability between .NET and Java the type name does not include the whole namespace
@@ -30,7 +30,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         public string TypeName { get; set; }
 
         /// <summary>
-        /// Serialized data.
+        /// Serialized message.
         /// </summary>
         [DataMember]
         public object MessageData { get; set; }

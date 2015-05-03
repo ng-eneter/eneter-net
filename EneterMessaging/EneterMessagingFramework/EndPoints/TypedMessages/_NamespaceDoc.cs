@@ -17,8 +17,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     /// <example>
     /// For more details see examples:
     /// <ul>
-    ///     <li><see cref="DuplexTypedMessagesFactory"/> - sending and receiving messages of one declared type.</li>
-    ///     <li><see cref="MultiTypedMessagesFactory"/> - sending and receiving messages of multiple declared types.</li>
+    ///     <li><see cref="DuplexTypedMessagesFactory"/> - sending and receiving messages of declared type.</li>
+    ///     <li><see cref="MultiTypedMessagesFactory"/> - sending and receiving multiple types of messages.</li>
     /// </ul>
     /// </example>
     [CompilerGeneratedAttribute()]
