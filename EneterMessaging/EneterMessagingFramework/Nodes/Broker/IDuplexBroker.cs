@@ -11,59 +11,57 @@ using Eneter.Messaging.Infrastructure.Attachable;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// Broker component (for publish-subscribe scenarios).
+    /// Broker component.
     /// </summary>
     /// <remarks>
-    /// The broker receives messages and forwards them to subscribed clients.
+    /// The broker is the communication component intended for publish-subscribe scenario.
+    /// It is the component which allows consumers to subscribe for desired message types
+    /// and allows publishers to send a message to subscribed consumers.<br/>
+    /// <br/>
+    /// When the broker receives a message from a publisher it finds all consumers subscribed to that
+    /// message and forwards them the message.
     /// </remarks>
     public interface IDuplexBroker : IAttachableDuplexInputChannel
     {
         /// <summary>
-        /// The event is invoked when the observed event is received.
+        /// The event is invoked when the observed message is received.
         /// </summary>
         event EventHandler<BrokerMessageReceivedEventArgs> BrokerMessageReceived;
 
         /// <summary>
-        /// Publishes the event.
+        /// Publishes the message.
         /// </summary>
-        /// <param name="eventId">identification of published event.</param>
-        /// <param name="serializedMessage">
-        /// message content. If the message is not a primitive type or string then the input parameter expects the message is already serialized!
-        /// </param>
-        void SendMessage(string eventId, object serializedMessage);
+        /// <param name="messageType">identifies the type of the published message. The broker will forward the message
+        /// to all subscribers subscribed to this message type.</param>
+        /// <param name="serializedMessage">message content.</param>
+        void SendMessage(string messageType, object serializedMessage);
 
         /// <summary>
-        /// Subscribes for the event.
+        /// Subscribes for the message type.
         /// </summary>
-        /// <remarks>
-        /// If you can call this method multiple times to subscribe for multile events.
-        /// </remarks>
-        /// <param name="eventId">identification of event that shall be observed</param>
-        void Subscribe(string eventId);
+        /// <param name="messageType">identifies the type of the message which shall be subscribed.</param>
+        void Subscribe(string messageType);
 
         /// <summary>
-        /// Subscribes for list of events.
+        /// Subscribes for list of message types.
         /// </summary>
-        /// <remarks>
-        /// If you can call this method multiple times to subscribe for multile events.
-        /// </remarks>
-        /// <param name="eventIds">list of events that shall be observed</param>
-        void Subscribe(string[] eventIds);
+        /// <param name="messageTypes">list of message types which shall be subscribed.</param>
+        void Subscribe(string[] messageTypes);
 
         /// <summary>
-        /// Unsubscribes from the specified event.
+        /// Unsubscribes from the specified message type.
         /// </summary>
-        /// <param name="eventId">type of event which shall not be observed anymore</param>
-        void Unsubscribe(string eventId);
+        /// <param name="messageType">message type the client does not want to receive anymore.</param>
+        void Unsubscribe(string messageType);
 
         /// <summary>
         /// Unsubscribes from specified events.
         /// </summary>
-        /// <param name="eventIds">list of events that shall not be observed anymore</param>
-        void Unsubscribe(string[] eventIds);
+        /// <param name="messageTypes">list of message types the client does not want to receive anymore.</param>
+        void Unsubscribe(string[] messageTypes);
 
         /// <summary>
-        /// Unsubscribes from all types of events and regular expressions.
+        /// Unsubscribe all messages.
         /// </summary>
         void Unsubscribe();
     }

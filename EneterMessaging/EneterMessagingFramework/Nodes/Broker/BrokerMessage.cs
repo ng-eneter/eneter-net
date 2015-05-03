@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// Specifies the broker request.
+    /// Specifies the internal broker request inside the <see cref="BrokerMessage"/>.
     /// </summary>
     /// <remarks>
     /// The request for the broker is the message that is intended for the broker and not for the subscribers.

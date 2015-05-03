@@ -15,13 +15,13 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// Implents the factory creating broker and broker client.
+    /// Creates broker and broker client.
     /// </summary>
     /// <remarks>
-    /// The broker is the component that provides functionality for publish-subscribe scenarios.
-    /// IDuplexBrokerClient provides functionality to send notification messages to the broker
-    /// and also to subscribe for desired messages.
-    /// 
+    /// The broker is the component for publish-subscribe scenarios. It maintains the list of subscribers.
+    /// When it receives a notification message it forwards it to subscribed clients. 
+    /// IDuplexBrokerClient can publish messages via the broker
+    /// and also can subscribe for desired messages.
     /// <example>
     /// The example shows how to create and use the broker communicating via TCP.
     /// <code>
@@ -77,7 +77,7 @@ namespace Eneter.Messaging.Nodes.Broker
     public class DuplexBrokerFactory : IDuplexBrokerFactory
     {
         /// <summary>
-        /// Constructs the broker factory with XmlStringSerializer.
+        /// Constructs the broker factory with optimized custom serializer.
         /// </summary>
         public DuplexBrokerFactory()
             : this(new BrokerCustomSerializer())
@@ -126,16 +126,23 @@ namespace Eneter.Messaging.Nodes.Broker
             }
         }
 
+        /// <summary>
+        /// Serializer to serialize/deserialize <see cref="BrokerMessage"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="BrokerMessage"/> is used for the communication with the broker.
+        /// </remarks>
         public ISerializer Serializer { get; set; }
 
         /// <summary>
-        /// Indicates whether the BrokerClient shall be notified about own events.
+        /// Sets the flag whether the publisher which sent a message shall be notified in case it is subscribed to the same message.
         /// </summary>
         /// <remarks>
-        /// It allows to specify if the broker client gets notification from the broker for its own published events.
-        /// E.g. if the broker client is subscribed to the event 'StatusChanged' and if this broker client also publishes the
-        /// event 'StatusChanged' then if the parmater publisherCanBeNotified is false the broker client will not get notification events
-        /// from its own published events.
+        /// When a DuplexBrokerClient sent a message the broker forwards the message to all subscribed DuplexBrokerClients.
+        /// In case the DuplexBrokerClient is subscribed to the same message the broker will notify it if the flag
+        /// IsBublisherNotified is set to true.
+        /// If it is set to false then the broker will not forward the message to the DuplexBrokerClient which
+        /// published the message.
         /// </remarks>
         public bool IsPublisherNotified { get; set; }
     }
