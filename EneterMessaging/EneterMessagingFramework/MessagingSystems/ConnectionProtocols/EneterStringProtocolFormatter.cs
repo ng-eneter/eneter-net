@@ -5,6 +5,8 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
+#if SILVERLIGHT3 || SILVERLIGHT4 || SILVERLIGHT5
+
 using System;
 using System.IO;
 using Eneter.Messaging.DataProcessing.Serializing;
@@ -35,6 +37,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        /// <summary>
+        /// Throws NotSupportedException.
+        /// </summary>
+        /// <param name="responseReceiverId"></param>
+        /// <param name="outputSream"></param>
         public void EncodeOpenConnectionMessage(string responseReceiverId, Stream outputSream)
         {
             throw new NotSupportedException("This protocol formatter does not support encoding to stream.");
@@ -54,6 +61,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        /// <summary>
+        /// Throws NotSupportedException.
+        /// </summary>
+        /// <param name="responseReceiverId"></param>
+        /// <param name="outputSream"></param>
         public void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream)
         {
             throw new NotSupportedException("This protocol formatter does not support encoding to stream.");
@@ -74,6 +86,12 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        /// <summary>
+        /// Throws NotSupportedException.
+        /// </summary>
+        /// <param name="responseReceiverId"></param>
+        /// <param name="message"></param>
+        /// <param name="outputSream"></param>
         public void EncodeMessage(string responseReceiverId, object message, Stream outputSream)
         {
             throw new NotSupportedException("This protocol formatter does not support decoding from stream.");
@@ -101,6 +119,11 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
             }
         }
 
+        /// <summary>
+        /// Throws NotSupportedException.
+        /// </summary>
+        /// <param name="readStream"></param>
+        /// <returns></returns>
         public ProtocolMessage DecodeMessage(Stream readStream)
         {
             throw new NotSupportedException("This protocol formatter does not support decoding from stream.");
@@ -118,3 +141,5 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         }
     }
 }
+
+#endif
