@@ -60,6 +60,9 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             }
         }
 
+        /// <summary>
+        /// Serializer which is used to serialize/deserialize DataWrapper.
+        /// </summary>
         public ISerializer Serializer { get; set; }
     }
 }
