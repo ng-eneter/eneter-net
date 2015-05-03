@@ -15,13 +15,12 @@ using System.Net;
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     /// <summary>
-    /// Represents the client context on the server side.
+    /// Represents the client on the server side.
     /// </summary>
     /// <remarks>
-    /// The client context is obtained when a client opened the connection with the server and
-    /// it provides functionality to receive messages from the client and send back response messages.
-    /// <br/>
-    /// To see the example refer to <see cref="WebSocketListener"/>.
+    /// The client context is obtained when a client opened the connection with the server.
+    /// It provides functionality to receive messages from the client and send back response messages.
+    /// To see the example refer to  <see cref="WebSocketListener"/>.
     /// </remarks>
     public interface IWebSocketClientContext
     {

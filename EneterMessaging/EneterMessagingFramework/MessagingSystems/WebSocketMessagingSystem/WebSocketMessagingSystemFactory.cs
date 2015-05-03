@@ -101,6 +101,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <summary>
         /// Constructs the WebSocket messaging factory.
         /// </summary>
+        /// <remarks>
+        /// The ping frequency is set to default value 5 minutes.
+        /// The pinging is intended to keep the connection alive in
+        /// environments that would drop the connection if not active for some time.
+        /// </remarks>
         public WebSocketMessagingSystemFactory()
             : this(new EneterProtocolFormatter())
         {
@@ -143,15 +148,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <summary>
         /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using WebSocket.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
         /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. ws://127.0.0.1:8090/MyService/ </param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
@@ -170,16 +166,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <summary>
         /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using WebSocket.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method allows to specified a desired response receiver id. Please notice, the response receiver
-        /// id is supposed to be unique.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
         /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. ws://127.0.0.1:8090/ </param>
         /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
         /// <returns>duplex output channel</returns>
@@ -200,12 +186,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages by using WebSocket.
         /// The method is not supported in Silverlight and Windows Phone.
         /// </summary>
-        /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
-        /// </remarks>
         /// <param name="channelId">Identifies this duplex input channel. The channel id must be a valid URI address (e.g. ws://127.0.0.1:8090/MyService/) the input channel will listen to.</param>
         /// <returns>duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
@@ -304,6 +284,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
+        /// <summary>
+        /// Ping frequency.
+        /// </summary>
+        /// <remarks>
+        /// The pinging is intended to keep the connection alive in
+        /// environments that would drop the connection if not active for some time.
+        /// </remarks>
         public TimeSpan PingFrequency { get; set; }
 
 
