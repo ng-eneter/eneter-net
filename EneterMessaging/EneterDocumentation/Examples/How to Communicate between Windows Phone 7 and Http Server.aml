@@ -65,7 +65,6 @@ namespace CalculatorService
             // If the connection occurs within 15 seconds, the response messages are sent to the client.
             IMessagingSystemFactory aBufferedMessaging = new BufferedMonitoredMessagingFactory(
                 anUnderlyingMessaging,
-                new XmlStringSerializer(),
                 TimeSpan.FromMilliseconds(15000),   // maximum time, the client can be offline
                 TimeSpan.FromMilliseconds(500),     // 'ping' frequency - this is not applicable for the receiver
                 TimeSpan.FromMilliseconds(5000)     // maximum time, the 'ping' message does not have to be received
@@ -154,7 +153,6 @@ namespace Phone7Sender
             // to reconnect.
             IMessagingSystemFactory aBufferedMessaging = new BufferedMonitoredMessagingFactory(
                 anUnderlyingMessaging, 
-                new XmlStringSerializer(), 
                 TimeSpan.FromMinutes(1),            // maximum offline time
                 TimeSpan.FromMilliseconds(500),     // how often the 'ping' checking the connection is invoked
                 TimeSpan.FromMilliseconds(1000)     // maximum time, the response for the 'ping' shall be received

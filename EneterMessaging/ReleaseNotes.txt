@@ -1,5 +1,36 @@
 Release Notes
 
+Version 6.5
+
+Release Date: 2015-05-03
+
+Supported Platforms:
+
+    Java 6 and Android 2.1 (or later)
+    .Net 3.5, 4.0, 4.5, Silverlight 3, 4, 5, Windows Phone 7, 7.1, 8.0, 8.1 Mono 2.6.4, Compact Framework 2.0, 3.5
+    HTML 5 (Javascript)
+
+New Features:
+
+    Windows Phone 8.0 and 8.1 (Silverlight) supported.
+    Sending broadcast messages from service to all connected clients.
+    Possibility to communicate with Eneter even if some communicating parts do not have Eneter.
+    Sending/receiving multiple types of messages by one sender/receiver.
+
+
+Changes in behavior:
+
+    Reliable Typed Messages are discontinued - sending of confirmation messages can be better handled from the user code based on particular needs.
+    Connection timeout and sending timeout added to the shared memory messaging.
+    Broker has significantly improved the performance (by using new custom serializer).
+    Message Bus has significantly improved performance (by using new custom serializer).
+    RPC (Remote Procedure Call) error handling improved - new RpcException introduces which contains exception details from the service.
+
+Fixed bugs:
+    0000024 - output channel resolves host names.
+    0000023 - Not possibility to set timeouts for SharedMemory protocol.
+
+
 
 Version 6.0
 
@@ -9,6 +40,7 @@ Supported Platforms:
 
     Java 6 and Android 2.1 (or later)
     .Net 3.5, .Net 4.0, .Net 4.5, Silverlight 3, Silverlight 4, Silverlight 5, Windows Phone 7, Windows Phone 7.1, Mono 2.6.4, Compact Framework 2.0 and Compact Framework 3.5
+    HTML 5 (Javascript)
 
 New Features:
 

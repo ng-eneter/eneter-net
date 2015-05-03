@@ -27,12 +27,13 @@
         </para>
 		    <list class="bullet">
 		      <listItem><para>.NET 3.5, 4.0, 4.5</para></listItem>
-		      <listItem><para>Windows Phone 7.0, 7.1</para></listItem>
+		      <listItem><para>Windows Phone 7.0, 7.1, 8.0, 8.1</para></listItem>
 		      <listItem><para>Silverlight 3, 4, 5</para></listItem>
 		      <listItem><para>Compact Framework 2.0, 3.5</para></listItem>
 		      <listItem><para>Mono 2.6.4</para></listItem>
 		      <listItem><para>Java 6</para></listItem>
 		      <listItem><para>Android 2.1 (or later)</para></listItem>
+          <listItem><para>HTML5 Javascript</para></listItem>
 		    </list>
       </content>
     </section>
@@ -87,7 +88,7 @@
 		    <list class="bullet">
 		      <listItem><para><legacyItalic>String Messages</legacyItalic> - for sending and receiving text messages. <codeEntityReference>N:Eneter.Messaging.EndPoints.StringMessages</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Typed Messages</legacyItalic> - for sending and receiving data structures of specified types (strongly typed messages). <codeEntityReference>N:Eneter.Messaging.EndPoints.TypedMessages</codeEntityReference></para></listItem>
-          <listItem><para><legacyItalic>Remote Procudure Calls</legacyItalic> - for invoking methods in another application. (Works accross platforms!) <codeEntityReference>N:Eneter.Messaging.EndPoints.Rpc</codeEntityReference></para></listItem>
+              <listItem><para><legacyItalic>Remote Procudure Calls</legacyItalic> - for invoking methods in another application. <literal>(works for the communication between .NET and Java).</literal> <codeEntityReference>N:Eneter.Messaging.EndPoints.Rpc</codeEntityReference></para></listItem>
 		    </list>
       </content>
     </section>
@@ -119,7 +120,6 @@
 		    <list class="bullet">
 		      <listItem><para><legacyItalic>Monitoring of connection availability</legacyItalic> - for early detection of a disconnection. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Buffered messaging and automatic reconnect</legacyItalic> - for overcoming short disconnections (e.g. in case of unstable network). <codeEntityReference>N:Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit</codeEntityReference></para></listItem>
-		      <listItem><para><legacyItalic>Acknowledged messaging</legacyItalic> - for getting notification whether a message was delivered or not. <codeEntityReference>T:Eneter.Messaging.EndPoints.TypedMessages.ReliableTypedMessagesFactory</codeEntityReference></para></listItem>
 		    </list>
       </content>
     </section>

@@ -8,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{122ee93a-e4ce-473c-8fc5-3acab605711c}</ProjectGuid>
-    <SHFBSchemaVersion>1.9.5.0</SHFBSchemaVersion>
+    <SHFBSchemaVersion>1.9.9.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>Documentation</AssemblyName>
@@ -61,8 +61,8 @@
       </ComponentConfig>
     </ComponentConfigurations>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\..\EneterMessagingFramework\EneterMessagingFrameworkPhone71.csproj" xmlns="" />
-    </DocumentationSources>
+      <DocumentationSource sourceFile="..\..\EneterMessagingFramework\bin\Phone71\Debug\Eneter.Messaging.Framework.Phone.dll" />
+<DocumentationSource sourceFile="..\..\EneterMessagingFramework\bin\Phone71\Debug\Eneter.Messaging.Framework.Phone.xml" /></DocumentationSources>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <IndentHtml>False</IndentHtml>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>

@@ -59,7 +59,6 @@ namespace CalculatorService
             // Then, when the connection is reopen, the buffered messages will be sent.
             IMessagingSystemFactory aBufferedMessaging = new BufferedMonitoredMessagingFactory(
                 anUnderlyingMessaging,              // underying TCP messaging
-                new XmlStringSerializer(),
                 TimeSpan.FromMilliseconds(60000),   // maximum time, the messaging can work offline
                 TimeSpan.FromMilliseconds(500),     // 'ping' frequency - not applicable for receiver
                 TimeSpan.FromMilliseconds(3000)     // maximum time without ping. If this time is exceeded,
@@ -146,7 +145,6 @@ namespace CalculatorSender
             // Then, when the connection is reopen, the buffered messages will be sent.
             IMessagingSystemFactory aBufferedMessaging = new BufferedMonitoredMessagingFactory(
                 anUnderlyingMessaging,          // underying TCP messaging
-                new XmlStringSerializer(),
                 TimeSpan.FromMinutes(1),        // maximum time, the messaging can work offline
                 TimeSpan.FromMilliseconds(500), // 'ping' frequency
                 TimeSpan.FromMilliseconds(1000) // The maximum time without the ping response.

@@ -17,6 +17,9 @@
         The service is a simple console application exposing the interface to calculate numbers.
         The client uses the exposed interface to call remote methods in the service.
       </para>
+      <markup>
+        <img src="../media/EneterRemote-Procedure-Calls.png" width="100%" />
+      </markup>
     </introduction>
 
     <codeExample>

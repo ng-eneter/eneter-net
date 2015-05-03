@@ -8,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5dc8f2b1-478d-40d0-8259-0dfbf0c1fd03}</ProjectGuid>
-    <SHFBSchemaVersion>1.9.5.0</SHFBSchemaVersion>
+    <SHFBSchemaVersion>1.9.9.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>EneterDocumentation</AssemblyName>
@@ -16,7 +16,7 @@
     <Name>EneterDocumentation</Name>
     <!-- SHFB properties -->
     <OutputPath>.\Help\</OutputPath>
-    <HtmlHelpName>Eneter.Messaging.Framework600.Doc</HtmlHelpName>
+    <HtmlHelpName>Eneter.Messaging.Framework650.Doc</HtmlHelpName>
     <Language>en-US</Language>
     <ApiFilter />
     <ComponentConfigurations>
@@ -53,7 +53,8 @@
       </ComponentConfig>
     </ComponentConfigurations>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\EneterMessagingFramework\EneterMessagingFrameworkNet40.csproj" />
+      <DocumentationSource sourceFile="..\EneterMessagingFramework\bin\Net45\Debug\Eneter.Messaging.Framework.dll" />
+      <DocumentationSource sourceFile="..\EneterMessagingFramework\bin\Net45\Debug\Eneter.Messaging.Framework.xml" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries />
@@ -63,8 +64,11 @@
       </PlugInConfig>
       <PlugInConfig id="Version Builder" enabled="True">
         <configuration>
-          <currentProject label=".NET" version=".NET 4.5, .NET 4.0" ripOldApis="False" />
+          <currentProject label=".NET" version=".NET 4.5" ripOldApis="False" />
           <versions>
+            <version label="Windows Phone" version="Windows Phone 8.1" helpFileProject="OtherPlatforms\Phone81.shfbproj" />
+            <version label="Windows Phone" version="Windows Phone 8.0" helpFileProject="OtherPlatforms\Phone80.shfbproj" />
+            <version label=".NET" version=".NET 4.0" helpFileProject="OtherPlatforms\Net40.shfbproj" />
             <version label=".NET" version=".NET 3.5" helpFileProject="OtherPlatforms\Net35.shfbproj" />
             <version label="Compact Framework" version="Compact Framework 2.0" helpFileProject="OtherPlatforms\CompactFramework20.shfbproj" />
             <version label="Compact Framework" version="Compact Framework 3.5" helpFileProject="OtherPlatforms\CompactFramework35.shfbproj" />
@@ -91,22 +95,23 @@
     <SyntaxFilters>Standard</SyntaxFilters>
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <RootNamespaceContainer>True</RootNamespaceContainer>
-    <PresentationStyle>VS2005</PresentationStyle>
+    <PresentationStyle>VS2013</PresentationStyle>
     <Preliminary>False</Preliminary>
     <NamingMethod>MemberName</NamingMethod>
-    <HelpTitle>Eneter.Messaging.Framework 6.0 for .NET platforms</HelpTitle>
+    <HelpTitle>Eneter.Messaging.Framework 6.5 for .NET platforms</HelpTitle>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
     <IndentHtml>False</IndentHtml>
-    <FrameworkVersion>.NET Framework 4.0</FrameworkVersion>
+    <FrameworkVersion>.NET Framework 4.5</FrameworkVersion>
     <KeepLogFile>False</KeepLogFile>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
     <CppCommentsFixup>False</CppCommentsFixup>
     <CleanIntermediates>True</CleanIntermediates>
-    <FeedbackEMailAddress>eneter%40eneter.net</FeedbackEMailAddress>
-    <CopyrightText>Copyright &amp;#169%3b Ondrej Uzovic 2014, All Rights Reserved</CopyrightText>
-    <HelpFileVersion>6.0.0.0</HelpFileVersion>
+    <FeedbackEMailAddress>
+    </FeedbackEMailAddress>
+    <CopyrightText>Copyright &amp;#169%3b Ondrej Uzovic 2015, All Rights Reserved</CopyrightText>
+    <HelpFileVersion>6.5.0.0</HelpFileVersion>
     <PlugInNamespaces>ms.vsipcc+, ms.vsexpresscc+</PlugInNamespaces>
     <CollectionTocStyle>Hierarchical</CollectionTocStyle>
     <MSHelp2SdkLinkType>Msdn</MSHelp2SdkLinkType>
@@ -117,6 +122,9 @@
     <SccProvider>SubversionScc</SccProvider>
     <SccAuxPath>Svn</SccAuxPath>
     <SccLocalPath>Svn</SccLocalPath>
+    <ComponentPath />
+    <MaximumGroupParts>2</MaximumGroupParts>
+    <NamespaceGrouping>False</NamespaceGrouping>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional
@@ -146,34 +154,14 @@
       <AlternateText>Eneter Remote-Procedure-Calls</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\EneterMessageBus.png">
-      <ImageId>EneterMessageBus</ImageId>
-      <AlternateText>Eneter Message Bus</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
-    <Image Include="Images\BrokerCommunication.gif">
-      <ImageId>BrokerCommunication</ImageId>
-      <AlternateText>Broker Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
     <Image Include="Images\CommunicationBetweenAndroidandNET.png">
       <ImageId>CommunicationBetweenAndroidandNET</ImageId>
       <AlternateText>Communication Between AndroidandNET</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\DispatcherRequestResponseCommunication.gif">
-      <ImageId>DispatcherRequestResponseCommunication</ImageId>
-      <AlternateText>Dispatcher Request Response Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
     <Image Include="Images\EneterComponents.png">
       <ImageId>EneterComponents</ImageId>
       <AlternateText>Eneter Components</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
-    <Image Include="Images\LoadBalancer.gif">
-      <ImageId>LoadBalancer</ImageId>
-      <AlternateText>Load Balancer</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
     <Image Include="Images\MultilisteningService.gif">
@@ -184,11 +172,6 @@
     <Image Include="Images\Publish-SubscribeCommunication.gif">
       <ImageId>Publish-SubscribeCommunication</ImageId>
       <AlternateText>Publish-Subscribe Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
-    <Image Include="Images\RouterRequestResponseCommunication.gif">
-      <ImageId>RouterRequestResponseCommunication</ImageId>
-      <AlternateText>Router Request Response Communication</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
     <Image Include="Images\SilverlightDuplexTcpConnection.gif">
@@ -206,19 +189,13 @@
       <AlternateText>Typed Request Response Communication</AlternateText>
       <CopyToMedia>True</CopyToMedia>
     </Image>
-    <Image Include="Images\WrapperRequestResponseCommunication.gif">
-      <ImageId>WrapperRequestResponseCommunication</ImageId>
-      <AlternateText>Wrapper Request Response Communication</AlternateText>
-      <CopyToMedia>True</CopyToMedia>
-    </Image>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images" />
     <Folder Include="Examples" />
-    <Folder Include="OtherPlatforms" />
+    <Folder Include="OtherPlatforms\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ConceptualDocument.aml" />
     <None Include="Examples\How to Communicate across Unstable Network.aml" />
     <None Include="Examples\How To Communicate between Android and Desktop.aml" />
     <None Include="Examples\How to Communicate between Silverlight and Desktop Application.aml" />
@@ -235,8 +212,11 @@
     <None Include="OtherPlatforms\CompactFramework35.shfbproj" />
     <None Include="OtherPlatforms\Mono264.shfbproj" />
     <None Include="OtherPlatforms\Net35.shfbproj" />
+    <None Include="OtherPlatforms\Net40.shfbproj" />
     <None Include="OtherPlatforms\Phone7.shfbproj" />
     <None Include="OtherPlatforms\Phone71.shfbproj" />
+    <None Include="OtherPlatforms\Phone80.shfbproj" />
+    <None Include="OtherPlatforms\Phone81.shfbproj" />
     <None Include="OtherPlatforms\Silverlight3.shfbproj" />
     <None Include="OtherPlatforms\Silverlight4.shfbproj" />
     <None Include="OtherPlatforms\Silverlight5.shfbproj" />

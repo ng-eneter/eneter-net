@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Topics>
-  <Topic id="94743750-5cea-45a8-bf17-f2a98655e913" visible="True" isDefault="true" title="Introduction" />
-  <Topic id="539fb726-b358-41a2-bcbf-df92ada3b8da" visible="True" title="Technical Overview" />
+  <Topic id="94743750-5cea-45a8-bf17-f2a98655e913" visible="True" isDefault="true" isSelected="true" title="Introduction" />
   <Topic id="61003225-e72d-4ed1-a2b5-196f2380c14f" visible="True" title="Release Notes" />
   <Topic id="c561ace9-bf6e-44d3-aac3-1e25a78387d6" visible="True" title="Software License" />
   <Topic id="d2b83907-3f8e-4272-9eb3-ceed62142432" visible="True" noFile="true" isExpanded="true" title="Examples">
-    <Topic id="74b87637-0a7c-4403-8fc9-75500d6e95b2" visible="True" isSelected="true" title="How to: Use Remote Procedure Calls" />
+    <Topic id="74b87637-0a7c-4403-8fc9-75500d6e95b2" visible="True" title="How to: Use Remote Procedure Calls" />
     <Topic id="4df36e2e-281e-444f-a18b-837bf30bec14" visible="True" title="How to: Send and Receive Text Messages" />
     <Topic id="10a9ac12-1cc8-4980-8649-aff89288a48f" visible="True" title="How to: Send and Receive data type messages" />
     <Topic id="9a961e93-8bb7-4d1e-940d-2fde845a5f55" visible="True" title="How to: Communicate across Unstable Network" />

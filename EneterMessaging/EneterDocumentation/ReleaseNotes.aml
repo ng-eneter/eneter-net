@@ -14,6 +14,92 @@
       <autoOutline />
     </introduction>
 
+    <section address="Eneter65">
+      <title>Eneter 6.5</title>
+      <content>
+        <para>Release Date: 2015-05-03</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.1 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, 4.0, 4.5</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, 4, 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7, 7.1, 8.0, 8.1</para>
+          </listItem>
+          <listItem>
+            <para>Compact Framework 2.0, 3.5</para>
+          </listItem>
+          <listItem>
+            <para>HTML5 Javascript</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Windows Phone 8.0 and 8.1 (Silverlight) supported.</para>
+          </listItem>
+          <listItem>
+            <para>Sending broadcast messages from service to all connected clients.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to communicate with Eneter even if some communicating parts do not have Eneter.</para>
+          </listItem>
+          <listItem>
+            <para>Sending/receiving multiple types of messages by one sender/receiver.</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              Reliable Typed Messages are discontinued - sending of confirmation messages can be better handled from the user code based on particular needs.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Connection timeout and sending timeout added to the shared memory messaging.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Broker has significantly improved the performance (by using new custom serializer).
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Message Bus has significantly improved performance (by using new custom serializer).
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              RPC (Remote Procedure Call) error handling improved - new RpcException introduces which contains exception details from the service.
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>0000024 - output channel resolves host names.</para>
+            <para>0000023 - Not possibility to set timeouts for SharedMemory protocol.</para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
     <section address="Eneter60">
       <title>Eneter 6.0</title>
       <content>
