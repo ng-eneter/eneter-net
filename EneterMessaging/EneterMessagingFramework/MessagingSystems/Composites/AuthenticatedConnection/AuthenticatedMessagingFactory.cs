@@ -77,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
 
     /// <summary>
-    /// Extension performing the authentication during connecting.
+    /// Extension for authentication during connecting.
     /// </summary>
     /// <remarks>
     /// Here is how the authentication procedure works:
