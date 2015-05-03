@@ -13,35 +13,50 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
     /// <summary>
-    /// Trivial and very fast communication protocol which is easy to use from various platforms.
+    /// Simple and very fast encoding/decoding (only for TCP and WebSocket).
     /// </summary>
     /// <remarks>
-    /// This is a very simple and fast communication protocol which is easy to implement and so it can be used for the communication
-    /// with Eneter event in cases Eneter is not available in all devices. <br/>
-    /// E.g. if the deployment consists of a .NET based eneter service and .NET and Java based eneter clients and in addition you would like to 
-    /// add other clients which cannot use Eneter framework (e.g. embedded devices or IoT (Interner of Things) devices which have limitted
-    /// resources. <br/>
-    /// <br/>
-    /// The protocol encodes messages following way:
+    /// This protocol can be used only for TCP or WebSocket communication.
+    /// The simplicity of this formatting provides a high performance and easy portability to various platforms allowing so
+    /// to communicate with Eneter even without Eneter.<br/>
+    /// However this formatting has certain limitations:
     /// <ul>
-    /// <li>Open Connection Message - it is not used by this protocol. Openning the connection via the socket is sufficiant.</li>
-    /// <li>Close Connection Message - it is not used by this protocol. Closing the socket is sufficiant.</li>
-    /// <li>Message:
-    ///     <ul>
-    ///     <li>1 byte : if 10 then following data is UTF8 string. If 40 then following data is byte array.</li>
-    ///     <li>4 bytes: size of following data. The size can be encoded in little endian or big endian (see constructor).</li>
-    ///     <li>n bytes: message data of specified size.</li>
-    ///     </ul>
-    /// </li>
+    /// <li>It can be used only for TCP or WebSocket based communication.</li>
+    /// <li>It cannot be used if the reconnect is needed. It means it cannot be used in buffered messaging.</li>
     /// </ul>
-    /// Note:<br/>
-    /// This protocol can be used only with TCP or WebSocket.<br/>
-    /// It is not possible to use this protocol in buffered messaging with automatic reconnect.
+    /// <b>Encoding of open connection message:</b><br/>
+    /// N.A. - the open connection message is not used. The connection is considered open when the socket is open.<br/>
+    /// <br/>
+    /// <b>Encoding of close connection message:</b><br/>
+    /// N.A. = the close connection message is not used. The connection is considered closed then the socket is closed.<br/>
+    /// <br/>
+    /// <b>Encoding of data message:</b><br/>
+    /// 1 byte - type of data: 10 string in UTF8, 40 bytes<br/>
+    /// 4 bytes - length: 32 bit integer indicating the size (in bytes) of message data.<br/>
+    /// x bytes - message data<br/>
+    /// <br/>
+    /// The 32 bit integer indicating the length of message data is encoded as little endian byte default.
+    /// If big endian is needed it is possible to specify it in the constructor.
+    /// <example>
+    /// The following example shows how to use TCP messaging with EasyProtocolFormatter:<br/>
+    /// <code>
+    /// // Instantiate protocol formatter.
+    /// IProtocolFormatter aFormatter = new EasyProtocolFormatter();
+    /// 
+    /// // Provide the protocol formatter into the messaging constructor.
+    /// // Note: It can be only TCP or WebSocket messaging.
+    /// IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory(aFormatter);
+    /// ...
+    /// // Then use can use the messaging to create channels.
+    /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:8084/");
+    /// ...
+    /// </code>
+    /// </example>
     /// </remarks>
     public class EasyProtocolFormatter : IProtocolFormatter
     {
         /// <summary>
-        /// Constructs the protocol which will use little endian encoding.
+        /// Constructs the protocol formatter with default little endian encoding.
         /// </summary>
         public EasyProtocolFormatter()
             : this(true)
@@ -49,9 +64,9 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         }
 
         /// <summary>
-        /// Constructs the protocol.
+        /// Constructs the protocol formatter with specified endianess.
         /// </summary>
-        /// <param name="isLittleEndian">true - little endian encoding. false - big endian encoding</param>
+        /// <param name="isLittleEndian">true - little endian, false - big endian.</param>
         public EasyProtocolFormatter(bool isLittleEndian)
         {
             myIsLittleEndian = isLittleEndian;
@@ -61,8 +76,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// Returns null.
         /// </summary>
         /// <remarks>
-        /// This protocol does not use explicit open connection message to open the connection.
-        /// Instead of that openning the connection via socket is sufficient.
+        /// The open connection message is not used. Therefore it returns null.
         /// </remarks>
         /// <param name="responseReceiverId">not used</param>
         /// <returns>null</returns>
@@ -76,8 +90,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// Does nothing.
         /// </summary>
         /// <remarks>
-        /// This protocol does not use explicit open connection message to open the connection.
-        /// Instead of that openning the connection via socket is sufficient.
+        /// The open connection message is not used. Therefore it does not write any data to the provided output stream.
         /// </remarks>
         /// <param name="responseReceiverId">not used</param>
         /// <param name="outputSream">not used</param>
@@ -90,8 +103,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// Returns null.
         /// </summary>
         /// <remarks>
-        /// This protocol does not use explicit close connection message to close the connection.
-        /// Instead of that closing the socket is sufficient.
+        /// The close connection message is not used. Therefore it returns null.
         /// </remarks>
         /// <param name="responseReceiverId">not used</param>
         /// <returns>null</returns>
@@ -105,8 +117,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// Does nothing.
         /// </summary>
         /// <remarks>
-        /// This protocol does not use explicit close connection message to close the connection.
-        /// Instead of that closing the socket is sufficient.
+        /// The close connection message is not used. Therefore it does not write any data to the provided output stream.
         /// </remarks>
         /// <param name="responseReceiverId">not used</param>
         /// <param name="outputSream">not used</param>
@@ -118,14 +129,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <summary>
         /// Encodes given message to bytes.
         /// </summary>
-        /// <remarks>
-        /// It encodes the message into the following byte sequence:
-        /// <ul>
-        /// <li>1 byte : if 10 then following data is UTF8 string. If 40 then following data is byte array.</li>
-        /// <li>4 bytes: size of following data. The size can be encoded in little endian or big endian (see constructor).</li>
-        /// <li>n bytes: message data of specified size.</li>
-        /// </ul>
-        /// </remarks>
         /// <param name="responseReceiverId">not used</param>
         /// <param name="message">message serialized in string or byte[]</param>
         /// <returns>message encoded in byte[]</returns>
@@ -144,14 +147,6 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// <summary>
         /// Encodes given message to bytes.
         /// </summary>
-        /// <remarks>
-        /// It encodes the message into the following byte sequence:
-        /// <ul>
-        /// <li>1 byte : if 10 then following data is UTF8 string. If 40 then following data is byte array.</li>
-        /// <li>4 bytes: size of following data. The size can be encoded in little endian or big endian (see constructor).</li>
-        /// <li>n bytes: message data of specified size.</li>
-        /// </ul>
-        /// </remarks>
         /// <param name="responseReceiverId">not used</param>
         /// <param name="message">message serialized in string or byte[]</param>
         /// <param name="outputSream">stream into which the message will be encoded</param>

@@ -13,8 +13,38 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
     /// <summary>
-    /// Implements encoding/decoding of low-level messages into eneter format.
+    /// Default Eneter encoding/decoding.
     /// </summary>
+    /// <remarks>
+    /// It is the default Eneter protocol formatter which can be used in all types of communication.<br/>
+    /// <br/>
+    /// <b>Encoding of open connection message:</b><br/>
+    /// 6 bytes - header: ENETER<br/>
+    /// 1 byte  - endianess: 10 little endian, 20 big endian<br/>
+    /// 1 byte  - string encoding: 10 UTF8, 20 UTF16<br/>
+    /// 1 byte  - message type: 10 for open connection<br/>
+    /// 4 bytes - length: 32 bit integer indicating the size (in bytes) of the following string<br/>
+    /// x bytes - responseReceiverId: client id string<br/>
+    /// <br/>
+    /// <b>Encoding of close connection message:</b><br/>
+    /// 6 bytes - header: ENETER<br/>
+    /// 1 byte  - endianess: 10 little endian, 20 big endian<br/>
+    /// 1 byte  - string encoding: 10 UTF8, 20 UTF16<br/>
+    /// 1 byte  - message type: 20 for close connection<br/>
+    /// 4 bytes - length: 32 bit integer indicating the size (in bytes) of the following string<br/>
+    /// x bytes - responseReceiverId: client id string<br/>
+    /// <br/>
+    /// <b>Encoding of data message:</b><br/>
+    /// 6 bytes - header: ENETER<br/>
+    /// 1 byte  - endianess: 10 little endian, 20 big endian<br/>
+    /// 1 byte  - string encoding: 10 UTF8, 20 UTF16<br/>
+    /// 1 byte  - message type: 40 for data message<br/>
+    /// 4 bytes - length: 32 bit integer indicating the size (in bytes) of the following string<br/>
+    /// x bytes - responseReceiverId: client id string<br/>
+    /// 1 byte  - message data type: 10 bytes, 20 string<br/>
+    /// 4 bytes - length: 32 bit integer indicating the size (in bytes) of the following data.<br/>
+    /// y bytes - message data: message data
+    /// </remarks>
     public class EneterProtocolFormatter : IProtocolFormatter
     {
         /// <summary>

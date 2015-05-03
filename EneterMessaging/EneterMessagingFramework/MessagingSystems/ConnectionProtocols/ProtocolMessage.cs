@@ -9,29 +9,35 @@
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
     /// <summary>
-    /// Indicates the type of the low-level protocol message.
+    /// Type of the message sent between channels.
     /// </summary>
     public enum EProtocolMessageType
     {
         /// <summary>
-        /// Open connection request message.
+        /// Open connection message.
         /// </summary>
         OpenConnectionRequest,
 
         /// <summary>
-        /// Close connection request message.
+        /// Close connection message.
         /// </summary>
         CloseConnectionRequest,
 
         /// <summary>
-        /// Message or reaponse message.
+        /// Request message or response message.
         /// </summary>
         MessageReceived
     }
 
     /// <summary>
-    /// Represents decoded low-level protocol message.
+    /// Message decoded by the protocol formatter.
     /// </summary>
+    /// <remarks>
+    /// The protocol formatter is used for the internal communication between output and input channel.
+    /// When the channel receives a message it uses the protocol formatter to figure out if is is 'Open Connection',
+    /// 'Close Connection' or 'Data Message'.<br/>
+    /// Protocol formatter decodes the message and returns ProtocolMessage.
+    /// </remarks>
     public class ProtocolMessage
     {
         /// <summary>
@@ -65,7 +71,8 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         public string ResponseReceiverId { get; set; }
 
         /// <summary>
-        /// The content of the message or response message.
+        /// If message type is MessageReceived the it contains the serialized message data.
+        /// Otherwise it is null.
         /// </summary>
         public object Message { get; set; }
     }
