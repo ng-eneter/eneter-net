@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
 {
     /// <summary>
-    /// Communication with a working thread.
+    /// Communication routing messages into one working thread.
     /// </summary>
     /// <remarks>
     /// The messaging system transferring messages to a working thread.
