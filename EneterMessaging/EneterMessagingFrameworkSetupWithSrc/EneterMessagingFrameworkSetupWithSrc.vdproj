@@ -63,12 +63,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_14F338FCCC35423F9CA48869CDF44C42"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_174F077EE95D443D8C47E166EE3ECA2D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -76,12 +70,6 @@
         "Entry"
         {
         "MsmKey" = "8:_17512178B5DC48A68556BF8FE5E6C66F"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1B6801252AD941238B777C58775E98C4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -112,6 +100,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2041699B2AC6484B9EED6EA806B1E6EC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2611C63ABA3644DDAE681B1F939A658E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -153,6 +147,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_41C6E93C90E4415B903CB292F3B7285E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_421CDB19C995462991A6A2DBBF1D1BC0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4553F76F1B0346C697C0A44B8EFBDD2B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4599310C0FE74470ADBF4080D68DF7F5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -160,6 +172,12 @@
         "Entry"
         {
         "MsmKey" = "8:_461883B778394C45973FC51460C96DEC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_478AD6CADEDB498FA8D3D6328D399E8D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -178,6 +196,18 @@
         "Entry"
         {
         "MsmKey" = "8:_4D5CBDB238D842579D68AA527A227143"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4D8E99E9A2464EEBA810F1253EB9E101"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_50A742B16FC94F9A8EA8FEAA1E2AD6D1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -231,6 +261,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_684CC015F6EC4A4F8063DD08CC34CA55"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_69C03A563E554D11B34E4EE977D1F37F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -267,6 +303,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_760A48611F8A4EA3875C2386C1BD36BC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_78D1D7FABCAF4B139A0097303F995AFB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -280,6 +322,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7AF93C890110417A9E6CD71B40F32238"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8212AE20311844B89B0B355D37FE5620"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -322,6 +370,12 @@
         "Entry"
         {
         "MsmKey" = "8:_89C3A01BC70F4B93B7F141B4E3E243EB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8FC39CC8BF8C430F80BFF4E238345290"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -417,6 +471,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B7A4E5461D50443885DBD3A147A6C8EA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B8F410567B7241C7815C6AFD86E34756"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -430,6 +490,12 @@
         "Entry"
         {
         "MsmKey" = "8:_BB853FC07A414E02838DBBC9E08DE212"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BF441F30692A44F8A2B0A7C6187AA851"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -471,6 +537,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D5AEF4B222514E3EAC66F69AB395CEE6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E15CCD57E9314AEDA1FC15AC9802B86B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -501,7 +573,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F558419E2AA547039028D30247BE0669"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F6DED188075B44EAB75BD2510D1EE7B1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F95CF5056B4C412DB2166CBEB9612226"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -527,6 +611,24 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_89C3A01BC70F4B93B7F141B4E3E243EB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F558419E2AA547039028D30247BE0669"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_421CDB19C995462991A6A2DBBF1D1BC0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_50A742B16FC94F9A8EA8FEAA1E2AD6D1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -655,6 +757,12 @@
         "OwnerKey" = "8:_05CA4B0AAA6D42A9AA8EEC91DC417AB3"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_478AD6CADEDB498FA8D3D6328D399E8D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -663,7 +771,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\EneterMessagingFramework600Src.msi"
+        "OutputFilename" = "8:Debug\\EneterMessagingFramework650Src.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -695,7 +803,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\EneterMessagingFramework600Src.msi"
+        "OutputFilename" = "8:Release\\EneterMessagingFramework650Src.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -779,7 +887,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_05CA4B0AAA6D42A9AA8EEC91DC417AB3"
@@ -830,7 +938,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_0814662D4BAC4332BDE64266C26F9185"
@@ -861,7 +969,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_0D1BC279D55C41E9AFCAAB3C88ED9BFF"
@@ -948,26 +1056,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_14F338FCCC35423F9CA48869CDF44C42"
-            {
-            "SourcePath" = "8:..\\EneterDocumentation\\Help\\Eneter.Messaging.Framework600.Doc.chm"
-            "TargetName" = "8:Eneter.Messaging.Framework600.Doc.chm"
-            "Tag" = "8:"
-            "Folder" = "8:_FC78DA9CCE0D4219B5EDB33D4752EC9E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_174F077EE95D443D8C47E166EE3ECA2D"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight5\\Release\\Eneter.Messaging.Framework.Silverlight.pdb"
@@ -1008,31 +1096,11 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1B6801252AD941238B777C58775E98C4"
-            {
-            "SourcePath" = "8:..\\EneterMessaging_VS2012.sln"
-            "TargetName" = "8:EneterMessaging_VS2012.sln"
-            "Tag" = "8:"
-            "Folder" = "8:_0C7E3396E01044B4A4BA2E556C4D870F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1CC5892D3A954C83955737C0FCBA8852"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_1CC5892D3A954C83955737C0FCBA8852"
@@ -1139,11 +1207,31 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2611C63ABA3644DDAE681B1F939A658E"
+            {
+            "SourcePath" = "8:..\\EneterMessaging_VS2013.sln"
+            "TargetName" = "8:EneterMessaging_VS2013.sln"
+            "Tag" = "8:"
+            "Folder" = "8:_0C7E3396E01044B4A4BA2E556C4D870F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_28D748943AAF43BDAB73B662DEFA27CC"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_28D748943AAF43BDAB73B662DEFA27CC"
@@ -1214,7 +1302,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_37E05883056E441BAF86A3279A8470B4"
@@ -1265,7 +1353,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_3D8BEA59F0F143469E31BF2F7DB40AF2"
@@ -1278,6 +1366,77 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A78AFB65A826463681FF1CEE30D4C97B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_41C6E93C90E4415B903CB292F3B7285E"
+            {
+            "SourcePath" = "8:..\\EneterDocumentation\\Help\\Eneter.Messaging.Framework650.Doc.chm"
+            "TargetName" = "8:Eneter.Messaging.Framework650.Doc.chm"
+            "Tag" = "8:"
+            "Folder" = "8:_FC78DA9CCE0D4219B5EDB33D4752EC9E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_421CDB19C995462991A6A2DBBF1D1BC0"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.PhoneSilverlight, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_421CDB19C995462991A6A2DBBF1D1BC0"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.PhoneSilverlight.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone81\\Debug\\Eneter.Messaging.Framework.PhoneSilverlight.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_F3CBE19132FA44D783024FC173A70092"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4553F76F1B0346C697C0A44B8EFBDD2B"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone80\\Release\\Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "Tag" = "8:"
+            "Folder" = "8:_12B544036C2D482EA3A1FAD31F5B9628"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1318,6 +1477,37 @@
             "TargetName" = "8:Eneter.Messaging.Framework.Silverlight.pdb"
             "Tag" = "8:"
             "Folder" = "8:_3E4CB77EBE7447DD9E63A7258947A2C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_478AD6CADEDB498FA8D3D6328D399E8D"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.PhoneSilverlight, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_478AD6CADEDB498FA8D3D6328D399E8D"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.PhoneSilverlight.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone80\\Debug\\Eneter.Messaging.Framework.PhoneSilverlight.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_4ABE0DA559854C3C80FA9E6699EAE11D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1376,7 +1566,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_4D5CBDB238D842579D68AA527A227143"
@@ -1389,6 +1579,57 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1DC5B3A66D55437CB34D5EB6C04F4E82"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4D8E99E9A2464EEBA810F1253EB9E101"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\EneterMessagingFrameworkPhone81.csproj"
+            "TargetName" = "8:EneterMessagingFrameworkPhone81.csproj"
+            "Tag" = "8:"
+            "Folder" = "8:_1E291D105A1D406C99DA40B8B7B3C6FF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_50A742B16FC94F9A8EA8FEAA1E2AD6D1"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.PhoneSilverlight, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_50A742B16FC94F9A8EA8FEAA1E2AD6D1"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.PhoneSilverlight.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone80\\Release\\Eneter.Messaging.Framework.PhoneSilverlight.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_12B544036C2D482EA3A1FAD31F5B9628"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1447,7 +1688,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_56AA32D349974D25AED09819E67BE48A"
@@ -1538,7 +1779,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_639D76F11F4748CE8F93F6294A6DF50F"
@@ -1585,11 +1826,31 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_684CC015F6EC4A4F8063DD08CC34CA55"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\EneterMessagingFrameworkPhone80.csproj"
+            "TargetName" = "8:EneterMessagingFrameworkPhone80.csproj"
+            "Tag" = "8:"
+            "Folder" = "8:_1E291D105A1D406C99DA40B8B7B3C6FF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_69C03A563E554D11B34E4EE977D1F37F"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_69C03A563E554D11B34E4EE977D1F37F"
@@ -1640,7 +1901,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_6C0753DB30944C3E9C6E107F8431F18F"
@@ -1711,7 +1972,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Silverlight, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_7243D0DA1C8841C6BF8D5CBE386FBF55"
@@ -1724,6 +1985,26 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_088AE9B612DF4AD3A39B19C487E621A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_760A48611F8A4EA3875C2386C1BD36BC"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone81\\Debug\\Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "Tag" = "8:"
+            "Folder" = "8:_F3CBE19132FA44D783024FC173A70092"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1798,6 +2079,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8212AE20311844B89B0B355D37FE5620"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone80\\Debug\\Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "Tag" = "8:"
+            "Folder" = "8:_4ABE0DA559854C3C80FA9E6699EAE11D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8316A6D5895B45E6AB227B418A3598CF"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Silverlight4\\Debug\\Eneter.Messaging.Framework.Silverlight.XML"
@@ -1822,7 +2123,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_84D13B3BAB4C4030B7C3CC4F5D5765E5"
@@ -1873,7 +2174,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_8693246F133C46ADB6C67764F6503EAA"
@@ -1944,7 +2245,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_89C3A01BC70F4B93B7F141B4E3E243EB"
@@ -1957,6 +2258,26 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_87A59CE3398B4490BCA740377FED1967"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8FC39CC8BF8C430F80BFF4E238345290"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone81\\Release\\Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_6F76FDC1AC2A4F7CA8C4FED8B9BA8402"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1995,7 +2316,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_954CA0D4FC2646659546D20424A74D44"
@@ -2026,7 +2347,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_96D532DA9D004F308F233B52CD2E8D6B"
@@ -2077,7 +2398,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Mono, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_9D8FECDB1D2148A090BBA9A2CE224839"
@@ -2248,7 +2569,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_B49BB87FA5F04988905A19ADAE3EC53D"
@@ -2315,11 +2636,31 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B7A4E5461D50443885DBD3A147A6C8EA"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone80\\Release\\Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_12B544036C2D482EA3A1FAD31F5B9628"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B8F410567B7241C7815C6AFD86E34756"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.Phone, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_B8F410567B7241C7815C6AFD86E34756"
@@ -2372,6 +2713,26 @@
             "TargetName" = "8:Eneter.Messaging.Framework.CF.pdb"
             "Tag" = "8:"
             "Folder" = "8:_B4B050C6F77240BDBD6DBA27685CD2FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BF441F30692A44F8A2B0A7C6187AA851"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone81\\Debug\\Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_F3CBE19132FA44D783024FC173A70092"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2490,7 +2851,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.CF, Version=6.5.0.0, Culture=neutral, PublicKeyToken=b85852a6d7b5cd07, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_D3A184ED570742DAA6BFD81DF87D257E"
@@ -2503,6 +2864,26 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_67DE9E11BA414874A3A12E5D9996F004"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D5AEF4B222514E3EAC66F69AB395CEE6"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone80\\Debug\\Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_4ABE0DA559854C3C80FA9E6699EAE11D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2617,12 +2998,63 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F558419E2AA547039028D30247BE0669"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Eneter.Messaging.Framework.PhoneSilverlight, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_F558419E2AA547039028D30247BE0669"
+                    {
+                    "Name" = "8:Eneter.Messaging.Framework.PhoneSilverlight.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone81\\Release\\Eneter.Messaging.Framework.PhoneSilverlight.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_6F76FDC1AC2A4F7CA8C4FED8B9BA8402"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F6DED188075B44EAB75BD2510D1EE7B1"
             {
             "SourcePath" = "8:..\\EneterMessagingFramework\\EneterMessagingFrameworkNet45.csproj"
             "TargetName" = "8:EneterMessagingFrameworkNet45.csproj"
             "Tag" = "8:"
             "Folder" = "8:_1E291D105A1D406C99DA40B8B7B3C6FF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F95CF5056B4C412DB2166CBEB9612226"
+            {
+            "SourcePath" = "8:..\\EneterMessagingFramework\\bin\\Phone81\\Release\\Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "TargetName" = "8:Eneter.Messaging.Framework.PhoneSilverlight.pdb"
+            "Tag" = "8:"
+            "Folder" = "8:_6F76FDC1AC2A4F7CA8C4FED8B9BA8402"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2727,7 +3159,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_CFF050C845AF4B51A84E3A463E272F0A"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\Eneter.Messaging.Framework\\v6.0.0"
+            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\Eneter.Messaging.Framework\\v6.5.0"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -2933,6 +3365,39 @@
                             }
                         }
                     }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_61DE2E7061A04C329B3DFD41D41E63A9"
+                    {
+                    "Name" = "8:Phone80"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_29567FCC1A3046E782FCC3ABCA5494A0"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_12B544036C2D482EA3A1FAD31F5B9628"
+                            {
+                            "Name" = "8:Release"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_2490FA0B6BF241C89DD53AEAA439C2EF"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_4ABE0DA559854C3C80FA9E6699EAE11D"
+                            {
+                            "Name" = "8:Debug"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_D4B1898E800748B2B317EC0BB01305D8"
+                                "Folders"
+                                {
+                                }
+                            }
+                        }
+                    }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_7FE7CD2ACC1A4A9F8042A775863CECCA"
                     {
                     "Name" = "8:Silverlight5"
@@ -2995,6 +3460,39 @@
                                         {
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_9C8DBE4A8706406F81517746CBE70FDB"
+                    {
+                    "Name" = "8:Phone81"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_20A5FA5D3A8A412AA908D6D784C3A491"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_6F76FDC1AC2A4F7CA8C4FED8B9BA8402"
+                            {
+                            "Name" = "8:Release"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_852DC1DAEA2849D79BE6D8FB6FCFB6A5"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_F3CBE19132FA44D783024FC173A70092"
+                            {
+                            "Name" = "8:Debug"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_F2E136307AAB4772A33DF18EE70B43BA"
+                                "Folders"
+                                {
                                 }
                             }
                         }
@@ -3111,7 +3609,7 @@
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_FF8D8B4E94B84E4A84BCE6367296EA9C"
                     {
-                    "Name" = "8:Phone7"
+                    "Name" = "8:Phone70"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -3159,20 +3657,20 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Eneter.Messaging.Framework 6.0.0"
-        "ProductCode" = "8:{185278ED-9C13-446A-96FC-B934BF27943F}"
-        "PackageCode" = "8:{47F65B4B-EB4E-41BA-9263-7FD0218E6CA6}"
+        "ProductName" = "8:Eneter.Messaging.Framework 6.5.0"
+        "ProductCode" = "8:{8F04FBE8-B0D4-45A3-957D-3F9EEFDA8422}"
+        "PackageCode" = "8:{27F9043A-DC70-46D4-B8E5-BE01458D9F92}"
         "UpgradeCode" = "8:{C14FF852-43A5-451D-88FC-8FFED08823AE}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:6.0.0"
+        "ProductVersion" = "8:6.5.0"
         "Manufacturer" = "8:Eneter"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Eneter Messaging Framework 6.0.0"
+        "Title" = "8:Eneter Messaging Framework 6.5.0"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Ondrej Uzovic"
         "Keywords" = "8:"
