@@ -395,8 +395,18 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// </remarks>
         public IThreadDispatcherProvider SyncDuplexTypedSenderThreadMode { get; set; }
 
+        /// <summary>
+        /// Serializer for messages.
+        /// </summary>
         public ISerializer Serializer { get; set; }
 
+        /// <summary>
+        /// Timeout which is used for SyncDuplexTypedMessageSender.
+        /// </summary>
+        /// <remarks>
+        /// When SyncDuplexTypedMessageSender calls SendRequestMessage(..) then it waits until the response is received.
+        /// This timeout specifies the maximum wating time. The default value is -1 and it means infinite time.
+        /// </remarks>
         public TimeSpan SyncResponseReceiveTimeout { get; set; }
     }
 }
