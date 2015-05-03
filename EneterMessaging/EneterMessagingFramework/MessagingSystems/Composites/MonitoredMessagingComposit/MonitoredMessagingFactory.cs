@@ -16,6 +16,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     /// Extension providing the connection monitoring.
     /// </summary>
     /// <remarks>
+    /// The monitored messaging regularly monitors if the connection is still available.
+    /// It sends ping messages and receives ping messages in a defined frequency. If sending of the ping message fails
+    /// or the ping message is not received within the specified time the connection is considered broken.<br/>
+    /// The advantage of the monitored messaging is that the disconnection can be detected very early.<br/>
+    /// <br/>
     /// When the connection is monitored, the duplex output channel periodically sends 'ping' messages
     /// to the duplex input channel and waits for responses.
     /// If the response comes within the specified timeout, the connection is open.
@@ -24,15 +29,39 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     /// duplex output channel is still alive. If the 'ping' message does not come within the specified timeout,
     /// the particular duplex output channel is disconnected.
     /// <br/><br/>
-    /// Notice, the output channel and the input channel do not maintain an open connection.
-    /// Therefore, the monitored messaging is not applicable for them. The implementation of this factory just uses
-    /// the underlying messaging to create them.
-    /// <br/><br/>
     /// <b>Note</b>
     /// Channels created by monitored messaging factory cannot communicate with channels, that were not created
     /// by monitored factory. E.g. the channel created with the monitored messaging factory with underlying TCP
     /// will not communicate with channels created directly with TCP messaging factory. The reason is, the
     /// communicating channels must understand the 'ping' communication.
+    /// <example>
+    /// The following example shows how to use monitored messaging:
+    /// <code>
+    /// // Create TCP messaging.
+    /// IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
+    /// 
+    /// // Create monitored messaging that internally uses TCP.
+    /// IMessagingSystemFactory aMessaging = new MonitoredMessagingSystemFactory(anUnderlyingMessaging);
+    /// 
+    /// // Create the duplex output channel.
+    /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:8045/");
+    /// 
+    /// // Create message sender to send simple string messages.
+    /// IDuplexStringMessagesFactory aSenderFactory = new DuplexStringMessagesFactory();
+    /// IDuplexStringMessageSender aSender = aSenderFactory.CreateDuplexStringMessageSender();
+    /// 
+    /// // Subscribe to receive responses.
+    /// aSender.ResponseReceived += OnResponseReceived;
+    /// 
+    /// // Attach output channel an be able to send messages and receive responses.
+    /// aSender.AttachDuplexOutputChannel(anOutputChannel);
+    /// 
+    /// ...
+    /// 
+    /// // Send a message.
+    /// aSender.SendMessage("Hello.");
+    /// </code>
+    /// </example>
     /// </remarks>
     public class MonitoredMessagingFactory : IMessagingSystemFactory
     {
@@ -40,11 +69,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// Constructs the factory with default settings.
         /// </summary>
         /// <remarks>
-        /// It uses <see cref="XmlStringSerializer"/>.
-        /// The duplex output channel will check the connection with the 'ping' once per second and the response must be received within 2 seconds.
-        /// Otherwise the connection is closed.<br/>
-        /// The duplex input channel expects the 'ping' request at least once per 3s (1s + 2s). Otherwise the duplex output
-        /// channel is disconnected.
+        /// It uses optimized custom serializer which is optimized to serialize/deserialize MonitorChannelMessage which is
+        /// used for the internal communication between output and input channels.
+        /// The ping message is sent once per second and it is expected the ping message is received at least once per two seconds.
         /// </remarks>
         /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
         public MonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging)
@@ -55,14 +82,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// <summary>
         /// Constructs the factory from specified parameters.
         /// </summary>
-        /// <param name="underlyingMessaging">underlying messaging system e.g. HTTP, TCP, ...</param>
-        /// <param name="pingFrequency">how often the duplex output channel pings the connection</param>
-        /// <param name="pingReceiveTimeout">
-        /// For the duplex output channel: the maximum time, the response for the ping must be received
-        /// <br/>
-        /// For the duplex input channel: pingFrequency + pingResponseTimeout = the maximum time within the ping for the connected duplex output channel
-        /// must be received.
-        /// </param>
+        /// <param name="underlyingMessaging">underlying messaging system e.g. Websocket, TCP, ...</param>
+        /// <param name="pingFrequency">how often the ping message is sent.</param>
+        /// <param name="pingReceiveTimeout">the maximum time within it the ping message must be received.</param>
         public MonitoredMessagingFactory(IMessagingSystemFactory underlyingMessaging,
                                         TimeSpan pingFrequency,
                                         TimeSpan pingReceiveTimeout)
@@ -77,14 +99,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages.
+        /// Creates the output channel which can send messages to the input channel and receive response messages.
         /// </summary>
         /// <remarks>
-        /// The channel also regularly checks if the connection is available. It sends 'ping' messages and expect 'ping' responses
-        /// within the specified timeout. If the 'ping' response does not come within the specified timeout, the event
-        /// <see cref="IDuplexOutputChannel.ConnectionClosed"/> is invoked.
+        /// In addition the output channel monitors the connection availability. It sends ping messages in a specified frequency to the input channel
+        /// and expects receiving ping messages within a specified time.
         /// </remarks>
-        /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
+        /// <param name="channelId">input channel address. It must comply to underlying messaging</param>
         /// <returns>monitoring duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
@@ -96,12 +117,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages.
+        /// Creates the output channel which can send messages to the input channel and receive response messages.
         /// </summary>
         /// <remarks>
-        /// The channel also regularly checks if the connection is available. It sends 'ping' messages and expect 'ping' responses
-        /// within the specified timeout. If the 'ping' response does not come within the specified timeout, the event
-        /// <see cref="IDuplexOutputChannel.ConnectionClosed"/> is invoked.
+        /// In addition the output channel monitors the connection availability. It sends ping messages in a specified frequency to the input channel
+        /// and expects receiving ping messages within a specified time.
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">response receiver id of the channel</param>
@@ -116,15 +136,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         }
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending the response messages.
+        /// Creates the input channel which can receive messages from the output channel and send response messages.
         /// </summary>
         /// <remarks>
-        /// It also checks if the duplex output channel is still connected. It expect, that every connected duplex output channel
-        /// sends regularly 'ping' messages. If the 'ping' message from the duplex output channel is not received within the specified
-        /// timeout, the duplex output channel is disconnected. The event <see cref="IDuplexInputChannel.ResponseReceiverDisconnected"/>
-        /// is invoked.
+        /// In addition it expects receiving ping messages from each connected client within a specified time and sends
+        /// ping messages to each connected client in a specified frequency.
         /// </remarks>
-        /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
+        /// <param name="channelId">input channel address. It must comply to underlying messaging</param>
         /// <returns>monitoring duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
@@ -135,9 +153,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
+        /// <summary>
+        /// How often the ping message shall be sent.
+        /// </summary>
         public TimeSpan PingFrequency { get; set; }
+
+        /// <summary>
+        /// Time within it the ping message must be received.
+        /// </summary>
         public TimeSpan ReceiveTimeout { get; set; }
 
+        /// <summary>
+        /// Serializer which shall be used to serialize MonitorChannelMessage.
+        /// </summary>
         public ISerializer Serializer { get; set; }
 
         private IMessagingSystemFactory myUnderlyingMessaging;

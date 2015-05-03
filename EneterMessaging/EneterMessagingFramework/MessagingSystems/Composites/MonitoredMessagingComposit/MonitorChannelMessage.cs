@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
     /// <summary>
-    /// Type of the message (if it is ping or a data message).
+    /// Type of the message.
     /// </summary>
     public enum MonitorChannelMessageType
     {
@@ -21,18 +21,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         Ping = 10,
 
         /// <summary>
-        /// Indicates, it is a message or a response message containing data. 
+        /// Indicates, it is a regular data message between output and input channel. 
         /// </summary>
         Message = 20
     }
 
     /// <summary>
-    /// The message internally used to monitor the connection and also to transfer message data.
+    /// Internal message used for the communication between output and input channels in monitored messaging.
     /// </summary>
-    /// <remarks>
-    /// The message is supposed to be serialized/deserialized by a custom serializer.
-    /// Therefore it does not have to be public and does not have to be labeled by attributes.
-    /// </remarks>
 #if !SILVERLIGHT
     [Serializable]
 #endif
@@ -40,7 +36,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     public class MonitorChannelMessage
     {
         /// <summary>
-        /// Constructs the message. This constructor is used by the Xml serializer for the deserialization.
+        /// Constructs the message.
         /// </summary>
         public MonitorChannelMessage()
         {
@@ -64,8 +60,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         public MonitorChannelMessageType MessageType { get; set; }
 
         /// <summary>
-        /// Message. In case of the 'ping', this property is null.
+        /// Serialized data message.
         /// </summary>
+        /// <remarks>
+        /// In case of 'ping', this property is null.
+        /// </remarks>
         [DataMember]
         public object MessageContent { get; set; }
     }
