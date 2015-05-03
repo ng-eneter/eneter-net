@@ -410,6 +410,7 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListenerProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListener_WindowsPhoneSilverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemFactory.cs">
       <SubType>Code</SubType>
     </Compile>
