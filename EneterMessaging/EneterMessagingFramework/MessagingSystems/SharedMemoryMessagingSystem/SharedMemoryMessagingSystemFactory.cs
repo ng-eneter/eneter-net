@@ -405,8 +405,20 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
+        /// <summary>
+        /// Maximum size of one message in bytes.
+        /// </summary>
+        /// <remarks>
+        /// The default value is 10 MB (10485760 bytes).
+        /// </remarks>
         public int MaxMessageSize { get; set; }
 
+        /// <summary>
+        /// Security settings for communication via the shared memory.
+        /// </summary>
+        /// <remarks>
+        /// The default value is null. It means security settings are not applied by default.
+        /// </remarks>
         public MemoryMappedFileSecurity SharedMemorySecurity { get; set; }
 
         private IProtocolFormatter myProtocolFormatter;
