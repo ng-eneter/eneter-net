@@ -18,7 +18,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Constructs the event arguments.
         /// </summary>
         /// <param name="serviceAddress">service id.</param>
-		public MessageBusServiceEventArgs(string serviceAddress)
+        /// <param name="responseReceiverId">response receiver id of the service.</param>
+		public MessageBusServiceEventArgs(string serviceAddress, string responseReceiverId)
 		{
 			ServiceAddress = serviceAddress;
 		}
@@ -27,5 +28,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Returns service id.
         /// </summary>
 		public string ServiceAddress { get; private set; }
+
+        /// <summary>
+        /// Returns response receiver id of the service.
+        /// </summary>
+        public string ResponseReceiverId { get; private set; }
 	}
 }

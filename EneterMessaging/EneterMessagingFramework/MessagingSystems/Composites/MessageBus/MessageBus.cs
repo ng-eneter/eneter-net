@@ -427,7 +427,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     {
                         try
                         {
-                            MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(serviceId);
+                            MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(serviceId, serviceResponseReceiverId);
                             ServiceRegistered(this, anEvent);
                         }
                         catch (Exception err)
@@ -520,7 +520,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                     try
                     {
-                        MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(aServiceId);
+                        MessageBusServiceEventArgs anEvent = new MessageBusServiceEventArgs(aServiceId, serviceResponseReceiverId);
                         ServiceUnregistered(this, anEvent);
                     }
                     catch (Exception err)

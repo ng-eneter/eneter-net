@@ -151,19 +151,20 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     /// </remarks>
     public class MessageBusMessagingFactory : IMessagingSystemFactory
     {
-        private class MessageBusConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
+        private class MessageBusOutputConnectorFactory : IOutputConnectorFactory
         {
-            public MessageBusConnectorFactory(string serviceConnectingAddress, string clientConnectingAddress, ISerializer serializer, IMessagingSystemFactory messageBusMessaging)
+            public MessageBusOutputConnectorFactory(string clientConnectingAddress, ISerializer serializer)
             {
                 using (EneterTrace.Entering())
                 {
                     myClientConnectingAddress = clientConnectingAddress;
-                    myServiceConnectingAddress = serviceConnectingAddress;
                     mySerializer = serializer;
-                    myMessageBusMessaging = messageBusMessaging;
-                    OpenConnectionTimeout = TimeSpan.FromMilliseconds(30000);
                 }
             }
+
+            public TimeSpan OpenConnectionTimeout { get; set; }
+
+            public IMessagingSystemFactory ClientMessaging { get; set; }
 
             public IOutputConnector CreateOutputConnector(string inputConnectorAddress, string outputConnectorAddress)
             {
@@ -171,10 +172,27 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     // myClientConnectingAddress is address where message bus listens to connecting clients.
                     // outputConnectorAddress is responseReceiverId of connecting client.
-                    IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, outputConnectorAddress);
+                    IDuplexOutputChannel aMessageBusOutputChannel = ClientMessaging.CreateDuplexOutputChannel(myClientConnectingAddress, outputConnectorAddress);
                     return new MessageBusOutputConnector(inputConnectorAddress, mySerializer, aMessageBusOutputChannel, (int)OpenConnectionTimeout.TotalMilliseconds);
                 }
             }
+
+            private string myClientConnectingAddress;
+            private ISerializer mySerializer;
+        }
+
+        private class MessageBusInputConnectorFactory : IInputConnectorFactory
+        {
+            public MessageBusInputConnectorFactory(string serviceConnectingAddress, ISerializer serializer)
+            {
+                using (EneterTrace.Entering())
+                {
+                    myServiceConnectingAddress = serviceConnectingAddress;
+                    mySerializer = serializer;
+                }
+            }
+
+            public IMessagingSystemFactory ServiceMessaging { get; set; }
 
             public IInputConnector CreateInputConnector(string inputConnectorAddress)
             {
@@ -182,18 +200,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     // myServiceConnectingAddress is address where message bus listen to connecting services.
                     // inputConnectorAddress is channelId of connecting service.
-                    IDuplexOutputChannel aMessageBusOutputChannel = myMessageBusMessaging.CreateDuplexOutputChannel(myServiceConnectingAddress, inputConnectorAddress);
+                    IDuplexOutputChannel aMessageBusOutputChannel = ServiceMessaging.CreateDuplexOutputChannel(myServiceConnectingAddress, inputConnectorAddress);
                     return new MessageBusInputConnector(mySerializer, aMessageBusOutputChannel);
                 }
             }
 
-            public TimeSpan OpenConnectionTimeout { get; set; }
-
-            private string myClientConnectingAddress;
             private string myServiceConnectingAddress;
             private ISerializer mySerializer;
-            private IMessagingSystemFactory myMessageBusMessaging;
         }
+
 
         /// <summary>
         /// Constructs the factory.
@@ -215,18 +230,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Constructs the factory.
         /// </summary>
-        /// <param name="serviceConnctingAddress">message bus address intended for services which want to register in the message bus.
+        /// <param name="serviceConnectingAddress">message bus address intended for services which want to register in the message bus.
         /// It can be null if the message bus factory is intended to create only duplex output channels.</param>
         /// <param name="clientConnectingAddress">clientConnectingAddress message bus address intended for clients which want to connect a registered service.
         /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
         /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         /// <param name="serializer">serializer which is used to serialize {@link MessageBusMessage} which is internally used for the communication with
         /// the message bus.</param>
-        public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
+        public MessageBusMessagingFactory(string serviceConnectingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
-                myConnectorFactory = new MessageBusConnectorFactory(serviceConnctingAddress, clientConnectingAddress, serializer, underlyingMessaging);
+                myOutputConnectorFactory = new MessageBusOutputConnectorFactory(clientConnectingAddress, serializer);
+                myInputConnectorFactory = new MessageBusInputConnectorFactory(serviceConnectingAddress, serializer);
+
+                ClientMessaging = underlyingMessaging;
+                ServiceMessaging = underlyingMessaging;
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
                 OutputChannelThreading = new NoDispatching();
@@ -248,7 +267,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory);
+                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, aDispatcherAfterMessageDecoded, myOutputConnectorFactory);
             }
         }
 
@@ -267,7 +286,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, myConnectorFactory);
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, aDispatcherAfterMessageDecoded, myOutputConnectorFactory);
             }
         }
 
@@ -285,12 +304,29 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
-                IInputConnector anInputConnector = myConnectorFactory.CreateInputConnector(channelId);
+                IInputConnector anInputConnector = myInputConnectorFactory.CreateInputConnector(channelId);
                 DefaultDuplexInputChannel anInputChannel = new DefaultDuplexInputChannel(channelId, aDispatcher, aDispatcherAfterMessageDecoded, anInputConnector);
                 return anInputChannel;
             }
         }
 
+        /// <summary>
+        /// Get or set the messaging used by clients to connect the message bus.
+        /// </summary>
+        public IMessagingSystemFactory ClientMessaging
+        {
+            get { return myOutputConnectorFactory.ClientMessaging; }
+            set { myOutputConnectorFactory.ClientMessaging = value; }
+        }
+
+        /// <summary>
+        /// Get or set the messaging used by services to be exposed via the message bus.
+        /// </summary>
+        public IMessagingSystemFactory ServiceMessaging
+        {
+            get { return myInputConnectorFactory.ServiceMessaging; }
+            set { myInputConnectorFactory.ServiceMessaging = value; }
+        }
 
         /// <summary>
         /// Provides thread dispatcher responsible for routing events from duplex input channel according to
@@ -321,12 +357,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// </remarks>
         public TimeSpan ConnectTimeout
         {
-            get { return myConnectorFactory.OpenConnectionTimeout; }
-            set { myConnectorFactory.OpenConnectionTimeout = value; }
+            get { return myOutputConnectorFactory.OpenConnectionTimeout; }
+            set { myOutputConnectorFactory.OpenConnectionTimeout = value; }
         }
 
 
-        private MessageBusConnectorFactory myConnectorFactory;
+        private MessageBusOutputConnectorFactory myOutputConnectorFactory;
+        private MessageBusInputConnectorFactory myInputConnectorFactory;
         private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }
 }
