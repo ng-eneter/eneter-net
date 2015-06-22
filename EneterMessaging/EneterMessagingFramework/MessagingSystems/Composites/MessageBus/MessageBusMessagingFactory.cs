@@ -236,16 +236,35 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
         /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         /// <param name="serializer">serializer which is used to serialize {@link MessageBusMessage} which is internally used for the communication with
-        /// the message bus.</param>
+        /// the message bus. If null then custom message bus serializer is used.</param>
         public MessageBusMessagingFactory(string serviceConnectingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging, ISerializer serializer)
+            :this(serviceConnectingAddress, clientConnectingAddress, underlyingMessaging, underlyingMessaging, serializer)
+        {
+        }
+
+        /// <summary>
+        /// Constructs the factory.
+        /// </summary>
+        /// <param name="serviceConnectingAddress">message bus address intended for services which want to register in the message bus.
+        /// It can be null if the message bus factory is intended to create only duplex output channels.</param>
+        /// <param name="clientConnectingAddress">clientConnectingAddress message bus address intended for clients which want to connect a registered service.
+        /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
+        /// <param name="serviceUnderlyingMessaging">underlying messaging used for services which connect the message bus to expose services.
+        /// It can be null if the message bus factory is intended to create only duplex output channels.</param>
+        /// <param name="clientUnderlyingMessaging">underlying messaging used for clients which connect the message bus to consume an exposed service.
+        /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
+        /// <param name="serializer">serializer which is used to serialize {@link MessageBusMessage} which is internally used for the communication with
+        /// the message bus. If null then custom message bus serializer is used.</param>
+        public MessageBusMessagingFactory(string serviceConnectingAddress, string clientConnectingAddress, IMessagingSystemFactory serviceUnderlyingMessaging, IMessagingSystemFactory clientUnderlyingMessaging, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
+                ISerializer aSerializer = serializer ?? new MessageBusCustomSerializer();
                 myOutputConnectorFactory = new MessageBusOutputConnectorFactory(clientConnectingAddress, serializer);
                 myInputConnectorFactory = new MessageBusInputConnectorFactory(serviceConnectingAddress, serializer);
 
-                ClientMessaging = underlyingMessaging;
-                ServiceMessaging = underlyingMessaging;
+                ClientMessaging = clientUnderlyingMessaging;
+                ServiceMessaging = serviceUnderlyingMessaging;
 
                 // Dispatch events in the same thread as notified from the underlying messaging.
                 OutputChannelThreading = new NoDispatching();
