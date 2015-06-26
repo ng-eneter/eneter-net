@@ -159,6 +159,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     myClientConnectingAddress = clientConnectingAddress;
                     mySerializer = serializer;
+                    OpenConnectionTimeout = TimeSpan.FromMilliseconds(30000);
                 }
             }
 
@@ -223,7 +224,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// It can be null if the message bus factory is intended to create only duplex input channels.</param>
         /// <param name="underlyingMessaging">messaging system used by the message bus.</param>
         public MessageBusMessagingFactory(string serviceConnctingAddress, string clientConnectingAddress, IMessagingSystemFactory underlyingMessaging)
-            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, new MessageBusCustomSerializer())
+            : this(serviceConnctingAddress, clientConnectingAddress, underlyingMessaging, underlyingMessaging, new MessageBusCustomSerializer())
         {
         }
 
