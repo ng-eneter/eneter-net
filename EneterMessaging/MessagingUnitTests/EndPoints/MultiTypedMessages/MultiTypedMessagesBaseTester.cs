@@ -98,6 +98,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
             {
                 Requester.DetachDuplexOutputChannel();
                 Responser.DetachDuplexInputChannel();
+                Responser.DetachDuplexInputChannel();
             }
 
             // Check received values
@@ -111,6 +112,124 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
             Assert.IsNotNull(aReceivedResponse2);
             Assert.AreEqual("Car", aReceivedResponse2.Name);
             Assert.AreEqual(100, aReceivedResponse2.Count);
+        }
+
+        [Test]
+        public void SendReceive_Message_PerClientSerializer()
+        {
+            string aClient1Id = null;
+
+            IMultiTypedMessagesFactory aSender1Factory = new MultiTypedMessagesFactory(new XmlStringSerializer());
+            IMultiTypedMessagesFactory aSender2Factory = new MultiTypedMessagesFactory(new BinarySerializer());
+            IMultiTypedMessagesFactory aReceiverFactory = new MultiTypedMessagesFactory()
+            {
+                SerializerProvider = x => (x == aClient1Id) ? (ISerializer)new XmlStringSerializer() : (ISerializer)new BinarySerializer()
+            };
+
+            IMultiTypedMessageSender aSender1 = aSender1Factory.CreateMultiTypedMessageSender();
+            IMultiTypedMessageSender aSender2 = aSender2Factory.CreateMultiTypedMessageSender();
+            IMultiTypedMessageReceiver aReceiver = aReceiverFactory.CreateMultiTypedMessageReceiver();
+            aReceiver.ResponseReceiverConnected += (x, y) => aClient1Id = aClient1Id ?? y.ResponseReceiverId;
+
+            int aReceivedMessage1 = 0;
+            aReceiver.RegisterRequestMessageReceiver<int>((x, y) =>
+            {
+                aReceivedMessage1 = y.RequestMessage;
+
+                // Send the response
+                aReceiver.SendResponseMessage<string>(y.ResponseReceiverId, "hello");
+            });
+
+            CustomClass aReceivedMessage2 = null;
+            aReceiver.RegisterRequestMessageReceiver<CustomClass>((x, y) =>
+            {
+                aReceivedMessage2 = y.RequestMessage;
+
+                // Send the response
+                CustomClass aResponse = new CustomClass();
+                aResponse.Name = "Car";
+                aResponse.Count = 100;
+
+                aReceiver.SendResponseMessage<CustomClass>(y.ResponseReceiverId, aResponse);
+            });
+
+            aReceiver.AttachDuplexInputChannel(DuplexInputChannel);
+
+            string aSender1ReceivedResponse1 = "";
+            aSender1.RegisterResponseMessageReceiver<string>((x, y) =>
+            {
+                aSender1ReceivedResponse1 = y.ResponseMessage;
+            });
+
+            AutoResetEvent aSender1MessagesReceivedEvent = new AutoResetEvent(false);
+            CustomClass aSender1ReceivedResponse2 = null;
+            aSender1.RegisterResponseMessageReceiver<CustomClass>((x, y) =>
+            {
+                aSender1ReceivedResponse2 = y.ResponseMessage;
+
+                // Signal that the response message was received -> the loop is closed.
+                aSender1MessagesReceivedEvent.Set();
+            });
+            aSender1.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+
+
+            string aSender2ReceivedResponse1 = "";
+            aSender2.RegisterResponseMessageReceiver<string>((x, y) =>
+            {
+                aSender2ReceivedResponse1 = y.ResponseMessage;
+            });
+
+            AutoResetEvent aSender2MessagesReceivedEvent = new AutoResetEvent(false);
+            CustomClass aSender2ReceivedResponse2 = null;
+            aSender2.RegisterResponseMessageReceiver<CustomClass>((x, y) =>
+            {
+                aSender2ReceivedResponse2 = y.ResponseMessage;
+
+                // Signal that the response message was received -> the loop is closed.
+                aSender2MessagesReceivedEvent.Set();
+            });
+            aSender2.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+
+
+            try
+            {
+                aSender1.SendRequestMessage<int>(1000);
+
+                CustomClass aCustomRequest = new CustomClass();
+                aCustomRequest.Name = "House";
+                aCustomRequest.Count = 1000;
+                aSender1.SendRequestMessage<CustomClass>(aCustomRequest);
+
+                aSender2.SendRequestMessage<int>(1000);
+                aSender2.SendRequestMessage<CustomClass>(aCustomRequest);
+
+                // Wait for the signal that the message is received.
+                aSender1MessagesReceivedEvent.WaitIfNotDebugging(2000);
+                aSender2MessagesReceivedEvent.WaitIfNotDebugging(2000);
+            }
+            finally
+            {
+                aSender1.DetachDuplexOutputChannel();
+                aSender2.DetachDuplexOutputChannel();
+                aReceiver.DetachDuplexInputChannel();
+            }
+
+            // Check received values
+            Assert.AreEqual(1000, aReceivedMessage1);
+            Assert.AreEqual("hello", aSender1ReceivedResponse1);
+            Assert.AreEqual("hello", aSender2ReceivedResponse1);
+
+            Assert.IsNotNull(aReceivedMessage2);
+            Assert.AreEqual("House", aReceivedMessage2.Name);
+            Assert.AreEqual(1000, aReceivedMessage2.Count);
+
+            Assert.IsNotNull(aSender1ReceivedResponse2);
+            Assert.AreEqual("Car", aSender1ReceivedResponse2.Name);
+            Assert.AreEqual(100, aSender1ReceivedResponse2.Count);
+
+            Assert.IsNotNull(aSender2ReceivedResponse2);
+            Assert.AreEqual("Car", aSender2ReceivedResponse2.Name);
+            Assert.AreEqual(100, aSender2ReceivedResponse2.Count);
         }
 
         [Test]

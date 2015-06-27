@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if SILVERLIGHT3 || SILVERLIGHT4 || SILVERLIGHT5
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,3 +56,5 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ConnectionProtocols
         }
     }
 }
+
+#endif

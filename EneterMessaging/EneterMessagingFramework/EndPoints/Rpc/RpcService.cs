@@ -23,23 +23,25 @@ namespace Eneter.Messaging.EndPoints.Rpc
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
 
 
-        public RpcService(TServiceInterface singletonService, ISerializer serializer)
+        public RpcService(TServiceInterface singletonService, ISerializer serializer, GetSerializerCallback getSerializer)
         {
             using (EneterTrace.Entering())
             {
                 ServiceInterfaceChecker.Check<TServiceInterface>();
-                mySingletonService = new ServiceStub<TServiceInterface>(singletonService, serializer);
+                mySingletonService = new ServiceStub<TServiceInterface>(singletonService, serializer, getSerializer);
             }
         }
 
-        public RpcService(Func<TServiceInterface> serviceFactoryMethod, ISerializer serializer)
+        public RpcService(Func<TServiceInterface> serviceFactoryMethod, ISerializer serializer, GetSerializerCallback getSerializer)
         {
             using (EneterTrace.Entering())
             {
                 ServiceInterfaceChecker.Check<TServiceInterface>();
 
                 myServiceFactoryMethod = serviceFactoryMethod;
+
                 mySerializer = serializer;
+                myGetSerializer = getSerializer;
             }
         }
 
@@ -91,7 +93,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 if (myServiceFactoryMethod != null)
                 {
                     TServiceInterface aServiceInstanceForThisClient = myServiceFactoryMethod();
-                    ServiceStub<TServiceInterface> aServiceStub = new ServiceStub<TServiceInterface>(aServiceInstanceForThisClient, mySerializer);
+                    ServiceStub<TServiceInterface> aServiceStub = new ServiceStub<TServiceInterface>(aServiceInstanceForThisClient, mySerializer, myGetSerializer);
                     aServiceStub.AttachInputChannel(AttachedDuplexInputChannel);
 
                     lock (myPerConnectionServices)
@@ -167,6 +169,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private ServiceStub<TServiceInterface> mySingletonService;
         private Dictionary<string, ServiceStub<TServiceInterface>> myPerConnectionServices = new Dictionary<string, ServiceStub<TServiceInterface>>();
         private ISerializer mySerializer;
+        private GetSerializerCallback myGetSerializer;
         private Func<TServiceInterface> myServiceFactoryMethod;
 
         protected override string TracedObject { get { return GetType().Name + " "; } }

@@ -32,13 +32,18 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
 
 
-        public MultiTypedMessageReceiver(ISerializer serializer)
+        public MultiTypedMessageReceiver(ISerializer serializer, GetSerializerCallback getSerializerCallback)
         {
             using (EneterTrace.Entering())
             {
                 mySerializer = serializer;
+                myGetSerializerCallback = getSerializerCallback;
 
-                IDuplexTypedMessagesFactory aFactory = new DuplexTypedMessagesFactory(serializer);
+                IDuplexTypedMessagesFactory aFactory = new DuplexTypedMessagesFactory(serializer)
+                {
+                    SerializerProvider = getSerializerCallback
+                };
+
                 myReceiver = aFactory.CreateDuplexTypedMessageReceiver<MultiTypedMessage, MultiTypedMessage>();
                 myReceiver.ResponseReceiverConnected += OnResponseReceiverConnected;
                 myReceiver.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
@@ -147,9 +152,11 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
+                ISerializer aSerializer = GetSerializer(responseReceiverId);
+
                 MultiTypedMessage aMessage = new MultiTypedMessage();
                 aMessage.TypeName = typeof(TResponseMessage).Name;
-                aMessage.MessageData = mySerializer.Serialize<TResponseMessage>(responseMessage);
+                aMessage.MessageData = aSerializer.Serialize<TResponseMessage>(responseMessage);
 
                 myReceiver.SendResponseMessage(responseReceiverId, aMessage);
             }
@@ -200,7 +207,8 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                         object aMessageData;
                         try
                         {
-                            aMessageData = mySerializer.Deserialize(aMessageHandler.Type, e.RequestMessage.MessageData);
+                            ISerializer aSerializer = GetSerializer(e.ResponseReceiverId);
+                            aMessageData = aSerializer.Deserialize(aMessageHandler.Type, e.RequestMessage.MessageData);
 
                             try
                             {
@@ -231,7 +239,18 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
+        private ISerializer GetSerializer(string responseReceiverId)
+        {
+            if (myGetSerializerCallback != null && responseReceiverId == "*")
+            {
+                throw new NotSupportedException("Sending a message to all connected clients using wild character '*' is not supported when SerializerProvider is used.");
+            }
+
+            return (myGetSerializerCallback == null) ? mySerializer : myGetSerializerCallback(responseReceiverId);
+        }
+
         private ISerializer mySerializer;
+        private GetSerializerCallback myGetSerializerCallback;
         private IDuplexTypedMessageReceiver<MultiTypedMessage, MultiTypedMessage> myReceiver;
 
         private Dictionary<string, TMessageHandler> myMessageHandlers = new Dictionary<string, TMessageHandler>();

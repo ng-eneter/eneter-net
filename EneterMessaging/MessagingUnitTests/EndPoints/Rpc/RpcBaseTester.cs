@@ -215,7 +215,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
 #if !COMPACT_FRAMEWORK
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(RpcException))]
         public void RpcCallError()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
@@ -502,6 +502,88 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
+
+#if !COMPACT_FRAMEWORK
+        [Test]
+        public void RpcGenericEvent_SerializerPerClient()
+        {
+            string aFirstClientId = null;
+
+            RpcFactory anRpcClientFactory1 = new RpcFactory(new XmlStringSerializer());
+            RpcFactory anRpcClientFactory2 = new RpcFactory(new BinarySerializer());
+            RpcFactory anRpcServiceFactory = new RpcFactory()
+            {
+                SerializerProvider = x => (x == aFirstClientId) ? (ISerializer)new XmlStringSerializer() : (ISerializer)new BinarySerializer()
+            };
+            
+            HelloService aService = new HelloService();
+            IRpcService<IHello> anRpcService = anRpcServiceFactory.CreateSingleInstanceService<IHello>(aService);
+            anRpcService.ResponseReceiverConnected += (x, y) => aFirstClientId = aFirstClientId ?? y.ResponseReceiverId;
+
+            IRpcClient<IHello> anRpcClient1 = anRpcClientFactory1.CreateClient<IHello>();
+            IRpcClient<IHello> anRpcClient2 = anRpcClientFactory2.CreateClient<IHello>();
+
+            try
+            {
+                anRpcService.AttachDuplexInputChannel(myMessaging.CreateDuplexInputChannel(myChannelId));
+                anRpcClient1.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId, "Client1"));
+                anRpcClient2.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId, "Client2"));
+
+                AutoResetEvent anEvent1Received = new AutoResetEvent(false);
+                Action<object, OpenArgs> anEventHandler1 = (x, y) =>
+                {
+                    anEvent1Received.Set();
+                };
+
+                AutoResetEvent anEvent2Received = new AutoResetEvent(false);
+                Action<object, OpenArgs> anEventHandler2 = (x, y) =>
+                {
+                    anEvent2Received.Set();
+                };
+
+                // Subscribe.
+                anRpcClient1.Proxy.Open += anEventHandler1.Invoke;
+                anRpcClient2.Proxy.Open += anEventHandler2.Invoke;
+
+                // Raise the event in the service.
+                OpenArgs anOpenArgs = new OpenArgs()
+                {
+                    Name = "Hello"
+                };
+                aService.RaiseOpen(anOpenArgs);
+
+                anEvent1Received.WaitIfNotDebugging(1000);
+                anEvent2Received.WaitIfNotDebugging(1000);
+
+                // Unsubscribe.
+                anRpcClient1.Proxy.Open -= anEventHandler1.Invoke;
+                anRpcClient2.Proxy.Open -= anEventHandler2.Invoke;
+
+                // Try to raise again.
+                aService.RaiseOpen(anOpenArgs);
+
+                Assert.IsFalse(anEvent1Received.WaitOne(1000));
+                Assert.IsFalse(anEvent2Received.WaitOne(1000));
+            }
+            finally
+            {
+                if (anRpcClient1.IsDuplexOutputChannelAttached)
+                {
+                    anRpcClient1.DetachDuplexOutputChannel();
+                }
+
+                if (anRpcClient2.IsDuplexOutputChannelAttached)
+                {
+                    anRpcClient2.DetachDuplexOutputChannel();
+                }
+
+                if (anRpcService.IsDuplexInputChannelAttached)
+                {
+                    anRpcService.DetachDuplexInputChannel();
+                }
+            }
+        }
+#endif
 
 #if !COMPACT_FRAMEWORK
         [Test]

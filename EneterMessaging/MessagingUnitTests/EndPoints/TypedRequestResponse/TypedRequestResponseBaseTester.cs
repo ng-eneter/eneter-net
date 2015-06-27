@@ -70,6 +70,79 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
         }
 
         [Test]
+        public void SendReceive_1Message_PerClientSerializer()
+        {
+            string aClient1Id = null;
+
+            IDuplexTypedMessagesFactory aSender1Factory = new DuplexTypedMessagesFactory(new XmlStringSerializer());
+            IDuplexTypedMessagesFactory aSender2Factory = new DuplexTypedMessagesFactory(new BinarySerializer());
+            IDuplexTypedMessagesFactory aReceiverFactory = new DuplexTypedMessagesFactory()
+            {
+                SerializerProvider = x => (x == aClient1Id) ? (ISerializer)new XmlStringSerializer() : (ISerializer)new BinarySerializer()
+            };
+
+            IDuplexTypedMessageSender<int, int> aSender1 = aSender1Factory.CreateDuplexTypedMessageSender<int, int>();
+            IDuplexTypedMessageSender<int, int> aSender2 = aSender2Factory.CreateDuplexTypedMessageSender<int, int>();
+            IDuplexTypedMessageReceiver<int, int> aReceiver = aReceiverFactory.CreateDuplexTypedMessageReceiver<int, int>();
+            aReceiver.ResponseReceiverConnected += (x, y) => aClient1Id = aClient1Id ?? y.ResponseReceiverId;
+
+
+            int aReceivedMessage = 0;
+            aReceiver.MessageReceived += (x, y) =>
+            {
+                aReceivedMessage = y.RequestMessage;
+
+                // Send the response
+                aReceiver.SendResponseMessage(y.ResponseReceiverId, 1000);
+            };
+            aReceiver.AttachDuplexInputChannel(DuplexInputChannel);
+
+            AutoResetEvent aSender1MessageReceivedEvent = new AutoResetEvent(false);
+            int aSender1ReceivedResponse = 0;
+            aSender1.ResponseReceived += (x, y) =>
+            {
+                aSender1ReceivedResponse = y.ResponseMessage;
+
+                // Signal that the response message was received -> the loop is closed.
+                aSender1MessageReceivedEvent.Set();
+            };
+            aSender1.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+
+            AutoResetEvent aSender2MessageReceivedEvent = new AutoResetEvent(false);
+            int aSender2ReceivedResponse = 0;
+            aSender2.ResponseReceived += (x, y) =>
+            {
+                aSender2ReceivedResponse = y.ResponseMessage;
+
+                // Signal that the response message was received -> the loop is closed.
+                aSender2MessageReceivedEvent.Set();
+            };
+            aSender2.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+
+            try
+            {
+                aSender1.SendRequestMessage(2000);
+                aSender2.SendRequestMessage(2000);
+
+                // Wait for the signal that the message is received.
+                aSender1MessageReceivedEvent.WaitIfNotDebugging(2000);
+                aSender2MessageReceivedEvent.WaitIfNotDebugging(2000);
+                //Assert.IsTrue(aMessageReceivedEvent.WaitOne(2000));
+            }
+            finally
+            {
+                aSender1.DetachDuplexOutputChannel();
+                aSender2.DetachDuplexOutputChannel();
+                aReceiver.DetachDuplexInputChannel();
+            }
+
+            // Check received values
+            Assert.AreEqual(2000, aReceivedMessage);
+            Assert.AreEqual(1000, aSender1ReceivedResponse);
+            Assert.AreEqual(1000, aSender2ReceivedResponse);
+        }
+
+        [Test]
         public void SendReceive_MultiThreadAccess_1000Messages()
         {
             // The test can be performed from more thread therefore we must synchronize.

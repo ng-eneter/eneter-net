@@ -118,6 +118,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
                 Serializer = serializer;
+                SerializerProvider = null;
 
                 // Default timeout is set to infinite by default.
                 RpcTimeout = TimeSpan.FromMilliseconds(-1);
@@ -153,7 +154,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
 #if !COMPACT_FRAMEWORK20
-                return new RpcService<TServiceInterface>(service, Serializer);
+                return new RpcService<TServiceInterface>(service, Serializer, SerializerProvider);
 #else
                 throw new NotSupportedException("RPC service is not supported in Compact Framework 2.0.");
 #endif
@@ -175,7 +176,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
 #if !COMPACT_FRAMEWORK20
-                return new RpcService<TServiceInterface>(serviceFactoryMethod, Serializer);
+                return new RpcService<TServiceInterface>(serviceFactoryMethod, Serializer, SerializerProvider);
 #else
                 throw new NotSupportedException("RPC service is not supported in Compact Framework 2.0.");
 #endif
@@ -186,6 +187,18 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// Gets/sets serializer used for serializing messages between RpcClient and RpcService.
         /// </summary>
         public ISerializer Serializer { get; set; }
+
+        /// <summary>
+        /// Gets/sets callback for retrieving serializer based on response receiver id.
+        /// </summary>
+        /// <remarks>
+        /// This callback is used by RpcService when it needs to serialize/deserialize the communication with RpcClient.
+        /// Providing this callback allows to use a different serializer for each connected client.
+        /// This can be used e.g. if the communication with each client needs to be encrypted by a differently.<br/>
+        /// <br/>
+        /// The default value is null and it means the serializer specified in the Serializer property is used for all serialization/deserialization.
+        /// </remarks>
+        public GetSerializerCallback SerializerProvider { get; set; }
 
         /// <summary>
         /// Gets/sets threading mechanism used for invoking events (if RPC interface has some) and ConnectionOpened and ConnectionClosed events.

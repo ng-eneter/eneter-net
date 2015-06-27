@@ -63,13 +63,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
             public Type[] InputParameterTypes { get; private set; }
         }
 
-
-        public ServiceStub(TServiceInterface service, ISerializer serializer)
+        public ServiceStub(TServiceInterface service, ISerializer serializer, GetSerializerCallback getSerializer)
         {
             using (EneterTrace.Entering())
             {
                 myService = service;
                 mySerializer = serializer;
+                myGetSerializer = getSerializer;
 
                 foreach (MethodInfo aMethod in typeof(TServiceInterface).GetMethods())
                 {
@@ -118,26 +118,31 @@ namespace Eneter.Messaging.EndPoints.Rpc
                             if (aSubscribedClients != null && aSubscribedClients.Length > 0)
                             {
                                 object aSerializedEvent = null;
-                                try
-                                {
-                                    // Serialize the event and send it to subscribed clients.
-                                    RpcMessage anEventMessage = new RpcMessage()
-                                    {
-                                        Id = 0, // dummy - because we do not need to track it.
-                                        Flag = RpcFlags.RaiseEvent,
-                                        OperationName = aTmpEventInfo.Name,
-                                        SerializedData = (anEventArgsType == typeof(EventArgs)) ?
-                                            null : // EventArgs is a known type without parameters - we do not need to serialize it.
-                                            new object[] { mySerializer.Serialize(anEventArgsType, e) }
-                                    };
-                                    aSerializedEvent = mySerializer.Serialize<RpcMessage>(anEventMessage);
-                                }
-                                catch (Exception err)
-                                {
-                                    EneterTrace.Error(TracedObject + "failed to serialize the event '" + aTmpEventInfo.Name + "'.", err);
 
-                                    // Note: this exception will be thrown to the delegate that raised the event.
-                                    throw;
+                                // If there is one serializer for all clients then pre-serialize the message to increase the performance.
+                                if (myGetSerializer == null)
+                                {
+                                    try
+                                    {
+                                        // Serialize the event and send it to subscribed clients.
+                                        RpcMessage anEventMessage = new RpcMessage()
+                                            {
+                                                Id = 0, // dummy - because we do not need to track it.
+                                                Flag = RpcFlags.RaiseEvent,
+                                                OperationName = aTmpEventInfo.Name,
+                                                SerializedData = (anEventArgsType == typeof(EventArgs)) ?
+                                                    null : // EventArgs is a known type without parameters - we do not need to serialize it.
+                                                    new object[] { mySerializer.Serialize(anEventArgsType, e) }
+                                            };
+                                        aSerializedEvent = mySerializer.Serialize<RpcMessage>(anEventMessage);
+                                    }
+                                    catch (Exception err)
+                                    {
+                                        EneterTrace.Error(TracedObject + "failed to serialize the event '" + aTmpEventInfo.Name + "'.", err);
+
+                                        // Note: this exception will be thrown to the delegate that raised the event.
+                                        throw;
+                                    }
                                 }
 
                                 // Iterate via subscribed clients and send them the event.
@@ -145,7 +150,32 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                 {
                                     try
                                     {
-                                        myInputChannel.SendResponseMessage(aClient, aSerializedEvent);
+                                        // If there is serializer per client then serialize the message for each client.
+                                        if (myGetSerializer != null)
+                                        {
+                                            ISerializer aSerializer = myGetSerializer(aClient);
+
+                                            RpcMessage anEventMessage = new RpcMessage()
+                                                {
+                                                    Id = 0, // dummy - because we do not need to track it.
+                                                    Flag = RpcFlags.RaiseEvent,
+                                                    OperationName = aTmpEventInfo.Name,
+                                                    SerializedData = (anEventArgsType == typeof(EventArgs)) ?
+                                                        null : // EventArgs is a known type without parameters - we do not need to serialize it.
+                                                        new object[] { aSerializer.Serialize(anEventArgsType, e) }
+                                                };
+
+                                            // Note: do not store serialized data to aSerializedEvent because
+                                            //       if SendResponseMessage works asynchronously then the reference to serialized
+                                            //       data could be overridden.
+                                            object aSerializedEventForClient = aSerializer.Serialize<RpcMessage>(anEventMessage);
+
+                                            myInputChannel.SendResponseMessage(aClient, aSerializedEventForClient);
+                                        }
+                                        else
+                                        {
+                                            myInputChannel.SendResponseMessage(aClient, aSerializedEvent);
+                                        }
                                     }
                                     catch (Exception err)
                                     {
@@ -153,6 +183,10 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                                         // Suppose the client is disconnected so unsubscribe it from all events.
                                         UnsubscribeClientFromEvents(aClient);
+
+                                        // Note: do not retrow the exception because other subscribed clients would not be notified.
+                                        //       E.g. if the exception occured because the client disconnected other clients should
+                                        //       not be affected.
                                     }
                                 }
                             }
@@ -215,11 +249,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
+                ISerializer aSerializer = (myGetSerializer == null) ? mySerializer : myGetSerializer(e.ResponseReceiverId);
+
                 // Deserialize the incoming message.
                 RpcMessage aRequestMessage = null;
                 try
                 {
-                    aRequestMessage = mySerializer.Deserialize<RpcMessage>(e.Message);
+                    aRequestMessage = aSerializer.Deserialize<RpcMessage>(e.Message);
                 }
                 catch (Exception err)
                 {
@@ -251,7 +287,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                             {
                                 for (int i = 0; i < aServiceMethod.InputParameterTypes.Length; ++i)
                                 {
-                                    aDeserializedInputParameters[i] = mySerializer.Deserialize(aServiceMethod.InputParameterTypes[i], aRequestMessage.SerializedData[i]);
+                                    aDeserializedInputParameters[i] = aSerializer.Deserialize(aServiceMethod.InputParameterTypes[i], aRequestMessage.SerializedData[i]);
                                 }
                             }
                             catch (Exception err)
@@ -291,7 +327,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                     {
                                         // Serialize the result.
                                         object aSerializedReturnValue = (aServiceMethod.Method.ReturnType != typeof(void)) ?
-                                            mySerializer.Serialize(aServiceMethod.Method.ReturnType, aResult) :
+                                            aSerializer.Serialize(aServiceMethod.Method.ReturnType, aResult) :
                                             null;
 
                                         aResponseMessage.SerializedData = new object[] { aSerializedReturnValue };
@@ -366,7 +402,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 try
                 {
                     // Serialize the response message.
-                    object aSerializedResponse = mySerializer.Serialize<RpcMessage>(aResponseMessage);
+                    object aSerializedResponse = aSerializer.Serialize<RpcMessage>(aResponseMessage);
                     myInputChannel.SendResponseMessage(e.ResponseReceiverId, aSerializedResponse);
                 }
                 catch (Exception err)
@@ -391,6 +427,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
         }
 
         private ISerializer mySerializer;
+        private GetSerializerCallback myGetSerializer;
+
         private TServiceInterface myService;
         private HashSet<EventContext> myServiceEvents = new HashSet<EventContext>();
         private Dictionary<string, ServiceMethod> myServiceMethods = new Dictionary<string, ServiceMethod>();
