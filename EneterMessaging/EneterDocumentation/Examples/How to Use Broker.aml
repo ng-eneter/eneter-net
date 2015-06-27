@@ -152,7 +152,7 @@ namespace Subscriber
             InitializeComponent();
 
             // Create the broker client that will receive notification messages.
-            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory(new XmlStringSerializer());
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory();
             myBrokerClient = aBrokerFactory.CreateBrokerClient();
             myBrokerClient.BrokerMessageReceived += OnNotificationMessageReceived;
 
