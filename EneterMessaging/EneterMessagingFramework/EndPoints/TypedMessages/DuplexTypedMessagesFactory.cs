@@ -407,7 +407,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         /// <remarks>
         /// This callback is used by DuplexTypedMessageReceiver when it needs to serialize/deserialize the communication with DuplexTypedMessageSender.
         /// Providing this callback allows to use a different serializer for each connected client.
-        /// This can be used e.g. if the communication with each client needs to be encrypted by a differently.<br/>
+        /// This can be used e.g. if the communication with each client needs to be encrypted differently.<br/>
         /// <br/>
         /// The default value is null and it means the serializer specified in the Serializer property is used for all serialization/deserialization.
         /// </remarks>
