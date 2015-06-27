@@ -122,7 +122,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexBroker(IsPublisherNotified, Serializer);
+                return new DuplexBroker(IsPublisherNotified, Serializer, SerializerProvider);
             }
         }
 
@@ -133,6 +133,18 @@ namespace Eneter.Messaging.Nodes.Broker
         /// <see cref="BrokerMessage"/> is used for the communication with the broker.
         /// </remarks>
         public ISerializer Serializer { get; set; }
+
+        /// <summary>
+        /// Gets/sets callback for retrieving serializer based on response receiver id.
+        /// </summary>
+        /// <remarks>
+        /// This callback is used by DuplexBroker when it needs to serialize/deserialize the BrokerMessage from a DuplexBrokerClient.
+        /// Providing this callback allows to use a different serializer for each connected DuplexBrokerClient.
+        /// This can be used e.g. if the communication with each DuplexBrokerClient needs to be encrypted using a different password.<br/>
+        /// <br/>
+        /// The default value is null and it means the serializer specified in the Serializer property is used for all serialization/deserialization.
+        /// </remarks>
+        public GetSerializerCallback SerializerProvider { get; set; }
 
         /// <summary>
         /// Sets the flag whether the publisher which sent a message shall be notified in case it is subscribed to the same message.

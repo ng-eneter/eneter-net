@@ -35,12 +35,13 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
 
 
-        public DuplexChannelUnwrapper(IMessagingSystemFactory outputMessagingFactory, ISerializer serializer)
+        public DuplexChannelUnwrapper(IMessagingSystemFactory outputMessagingFactory, ISerializer serializer, GetSerializerCallback getSerializerCallback)
         {
             using (EneterTrace.Entering())
             {
                 myOutputMessagingFactory = outputMessagingFactory;
                 mySerializer = serializer;
+                myGetSerializerCallback = getSerializerCallback;
             }
         }
 
@@ -69,8 +70,10 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
                 try
                 {
+                    ISerializer aSerializer = GetSerializer(e.ResponseReceiverId);
+
                     // Unwrap the incoming message.
-                    aWrappedData = DataWrapper.Unwrap(e.Message, mySerializer);
+                    aWrappedData = DataWrapper.Unwrap(e.Message, aSerializer);
                 }
                 catch (Exception err)
                 {
@@ -227,7 +230,9 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
                     if (aConnction != null)
                     {
-                        object aMessage = DataWrapper.Wrap(e.ChannelId, e.Message, mySerializer);
+                        ISerializer aSerializer = GetSerializer(aConnction.ResponseReceiverId);
+
+                        object aMessage = DataWrapper.Wrap(e.ChannelId, e.Message, aSerializer);
                         AttachedDuplexInputChannel.SendResponseMessage(aConnction.ResponseReceiverId, aMessage);
                     }
                     else
@@ -242,9 +247,20 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             }
         }
 
+        private ISerializer GetSerializer(string responseReceiverId)
+        {
+            if (myGetSerializerCallback != null && responseReceiverId == "*")
+            {
+                throw new NotSupportedException("Sending a message to all connected clients using wild character '*' is not supported when SerializerProvider is used.");
+            }
+
+            return (myGetSerializerCallback == null) ? mySerializer : myGetSerializerCallback(responseReceiverId);
+        }
+
 
         private IMessagingSystemFactory myOutputMessagingFactory;
         private ISerializer mySerializer;
+        private GetSerializerCallback myGetSerializerCallback;
 
         private HashSet<TDuplexConnection> myConnections = new HashSet<TDuplexConnection>();
 

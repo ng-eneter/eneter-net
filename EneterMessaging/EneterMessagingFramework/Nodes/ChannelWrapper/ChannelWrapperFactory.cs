@@ -56,7 +56,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexChannelUnwrapper(outputMessagingSystem, Serializer);
+                return new DuplexChannelUnwrapper(outputMessagingSystem, Serializer, SerializerProvider);
             }
         }
 
@@ -64,5 +64,17 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         /// Serializer which is used to serialize/deserialize DataWrapper.
         /// </summary>
         public ISerializer Serializer { get; set; }
+
+        /// <summary>
+        /// Gets/sets callback for retrieving serializer based on response receiver id.
+        /// </summary>
+        /// <remarks>
+        /// This callback is used by DuplexChannelUnwrapper when it needs to serialize/deserialize the communication with DuplexChannelWrapper.
+        /// Providing this callback allows to use a different serializer for each connected client.
+        /// This can be used e.g. if the communication with each client needs to be encrypted using a different password.<br/>
+        /// <br/>
+        /// The default value is null and it means the serializer specified in the Serializer property is used for all serialization/deserialization.
+        /// </remarks>
+        public GetSerializerCallback SerializerProvider { get; set; }
     }
 }
