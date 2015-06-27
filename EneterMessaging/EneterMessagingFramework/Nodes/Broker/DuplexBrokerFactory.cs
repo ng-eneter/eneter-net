@@ -94,6 +94,7 @@ namespace Eneter.Messaging.Nodes.Broker
             {
                 IsPublisherNotified = true;
                 Serializer = serializer;
+                SerializerProvider = null;
             }
         }
 

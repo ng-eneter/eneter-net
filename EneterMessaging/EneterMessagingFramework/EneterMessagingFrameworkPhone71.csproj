@@ -74,6 +74,7 @@
     <Compile Include="DataProcessing\Serializing\DataContractJsonStringSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractXmlStringSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\EncoderDecoder.cs" />
+    <Compile Include="DataProcessing\Serializing\GetSerializerCallback.cs" />
     <Compile Include="DataProcessing\Serializing\GZipSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\ISerializer.cs" />
     <Compile Include="DataProcessing\Serializing\RijndaelSerializer.cs" />

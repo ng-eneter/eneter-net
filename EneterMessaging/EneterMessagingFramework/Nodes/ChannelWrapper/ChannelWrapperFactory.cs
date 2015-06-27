@@ -33,6 +33,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             using (EneterTrace.Entering())
             {
                 Serializer = serializer;
+                SerializerProvider = null;
             }
         }
 

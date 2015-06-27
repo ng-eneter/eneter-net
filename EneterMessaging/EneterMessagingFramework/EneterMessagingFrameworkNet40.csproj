@@ -56,8 +56,6 @@
   <ItemGroup>
     <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
     <Compile Include="DataProcessing\Serializing\GetSerializerCallback.cs" />
-    <Compile Include="DataProcessing\Serializing\ISerializerStrategy.cs" />
-    <Compile Include="DataProcessing\Serializing\SerializerStrategyFactory.cs" />
     <Compile Include="EndPoints\Rpc\RpcException.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
     <Compile Include="EndPoints\Rpc\ServiceStub.cs" />
