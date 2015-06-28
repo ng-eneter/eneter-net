@@ -196,7 +196,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// Providing this callback allows to use a different serializer for each connected client.
         /// This can be used e.g. if the communication with each client needs to be encrypted by a differently.<br/>
         /// <br/>
-        /// The default value is null and it means the serializer specified in the Serializer property is used for all serialization/deserialization.
+        /// The default value is null and it means SerializerProvider callback is not used and one serializer which specified in the Serializer property is used for all serialization/deserialization.<br/>
+        /// If SerializerProvider is not null then the setting in the Serializer property is ignored.
         /// </remarks>
         public GetSerializerCallback SerializerProvider { get; set; }
 

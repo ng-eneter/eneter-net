@@ -48,7 +48,7 @@ namespace Eneter.Messaging.Nodes.Broker
             {
                 BrokerMessage aNotifyMessage = new BrokerMessage(eventId, serializedMessage);
 
-                // If one serializer is used for the whole commeunication then pre-serialize the message to increase the performance.
+                // If one serializer is used for the whole communication then pre-serialize the message to increase the performance.
                 // If there is SerializerProvider callback then the serialization must be performed before sending individualy
                 // for each client.
                 object aSerializedNotifyMessage = (myGetSerializerCallback == null) ?
