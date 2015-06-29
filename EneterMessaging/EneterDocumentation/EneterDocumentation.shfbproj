@@ -16,7 +16,7 @@
     <Name>EneterDocumentation</Name>
     <!-- SHFB properties -->
     <OutputPath>.\Help\</OutputPath>
-    <HtmlHelpName>Eneter.Messaging.Framework650.Doc</HtmlHelpName>
+    <HtmlHelpName>Eneter.Messaging.Framework652.Doc</HtmlHelpName>
     <Language>en-US</Language>
     <ApiFilter />
     <ComponentConfigurations>
@@ -62,31 +62,8 @@
       <PlugInConfig id="Additional Content Only" enabled="False">
         <configuration />
       </PlugInConfig>
-      <PlugInConfig id="Version Builder" enabled="True">
-        <configuration>
-          <currentProject label=".NET" version=".NET 4.5" ripOldApis="False" />
-          <versions>
-            <version label="Windows Phone" version="Windows Phone 8.1" helpFileProject="OtherPlatforms\Phone81.shfbproj" />
-            <version label="Windows Phone" version="Windows Phone 8.0" helpFileProject="OtherPlatforms\Phone80.shfbproj" />
-            <version label=".NET" version=".NET 4.0" helpFileProject="OtherPlatforms\Net40.shfbproj" />
-            <version label=".NET" version=".NET 3.5" helpFileProject="OtherPlatforms\Net35.shfbproj" />
-            <version label="Compact Framework" version="Compact Framework 2.0" helpFileProject="OtherPlatforms\CompactFramework20.shfbproj" />
-            <version label="Compact Framework" version="Compact Framework 3.5" helpFileProject="OtherPlatforms\CompactFramework35.shfbproj" />
-            <version label="Mono" version="Mono 2.6.4" helpFileProject="OtherPlatforms\Mono264.shfbproj" />
-            <version label="Silverlight" version="Silverlight 3" helpFileProject="OtherPlatforms\Silverlight3.shfbproj" />
-            <version label="Silverlight" version="Silverlight 4" helpFileProject="OtherPlatforms\Silverlight4.shfbproj" />
-            <version label="Silverlight" version="Silverlight 5" helpFileProject="OtherPlatforms\Silverlight5.shfbproj" />
-            <version label="Windows Phone" version="Windows Phone 7" helpFileProject="OtherPlatforms\Phone7.shfbproj" />
-            <version label="Windows Phone" version="Windows Phone 7.1" helpFileProject="OtherPlatforms\Phone71.shfbproj" />
-          </versions>
-        </configuration>
-      </PlugInConfig>
-      <PlugInConfig id="Hierarchical Table of Contents" enabled="True">
-        <configuration>
-          <toc minParts="3" insertBelow="False" />
-        </configuration>
-      </PlugInConfig>
-    </PlugInConfigurations>
+<PlugInConfig id="Version Builder" enabled="True"><configuration><currentProject label=".NET" version=".NET 4.5" ripOldApis="False" /><versions><version label="Windows Phone" version="Windows Phone 8.1" helpFileProject="OtherPlatforms\Phone81.shfbproj" /><version label="Windows Phone" version="Windows Phone 8.0" helpFileProject="OtherPlatforms\Phone80.shfbproj" /><version label=".NET" version=".NET 4.0" helpFileProject="OtherPlatforms\Net40.shfbproj" /><version label=".NET" version=".NET 3.5" helpFileProject="OtherPlatforms\Net35.shfbproj" /><version label="Compact Framework" version="Compact Framework 2.0" helpFileProject="OtherPlatforms\CompactFramework20.shfbproj" /><version label="Compact Framework" version="Compact Framework 3.5" helpFileProject="OtherPlatforms\CompactFramework35.shfbproj" /><version label="Mono" version="Mono 2.6.4" helpFileProject="OtherPlatforms\Mono264.shfbproj" /><version label="Silverlight" version="Silverlight 3" helpFileProject="OtherPlatforms\Silverlight3.shfbproj" /><version label="Silverlight" version="Silverlight 4" helpFileProject="OtherPlatforms\Silverlight4.shfbproj" /><version label="Silverlight" version="Silverlight 5" helpFileProject="OtherPlatforms\Silverlight5.shfbproj" /><version label="Windows Phone" version="Windows Phone 7" helpFileProject="OtherPlatforms\Phone7.shfbproj" /><version label="Windows Phone" version="Windows Phone 7.1" helpFileProject="OtherPlatforms\Phone71.shfbproj" /></versions></configuration></PlugInConfig>
+<PlugInConfig id="Hierarchical Table of Contents" enabled="False"><configuration><toc minParts="3" insertBelow="False" /></configuration></PlugInConfig></PlugInConfigurations>
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
     <HtmlHelp2xCompilerPath />
@@ -111,7 +88,7 @@
     <FeedbackEMailAddress>
     </FeedbackEMailAddress>
     <CopyrightText>Copyright &amp;#169%3b Ondrej Uzovic 2015, All Rights Reserved</CopyrightText>
-    <HelpFileVersion>6.5.0.0</HelpFileVersion>
+    <HelpFileVersion>6.5.2.0</HelpFileVersion>
     <PlugInNamespaces>ms.vsipcc+, ms.vsexpresscc+</PlugInNamespaces>
     <CollectionTocStyle>Hierarchical</CollectionTocStyle>
     <MSHelp2SdkLinkType>Msdn</MSHelp2SdkLinkType>
@@ -123,8 +100,8 @@
     <SccAuxPath>Svn</SccAuxPath>
     <SccLocalPath>Svn</SccLocalPath>
     <ComponentPath />
-    <MaximumGroupParts>2</MaximumGroupParts>
-    <NamespaceGrouping>False</NamespaceGrouping>
+    <MaximumGroupParts>3</MaximumGroupParts>
+    <NamespaceGrouping>True</NamespaceGrouping>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional
