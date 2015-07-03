@@ -22,6 +22,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		public MessageBusServiceEventArgs(string serviceAddress, string responseReceiverId)
 		{
 			ServiceAddress = serviceAddress;
+            ResponseReceiverId = responseReceiverId;
 		}
 
         /// <summary>

@@ -261,8 +261,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 ISerializer aSerializer = serializer ?? new MessageBusCustomSerializer();
-                myOutputConnectorFactory = new MessageBusOutputConnectorFactory(clientConnectingAddress, serializer);
-                myInputConnectorFactory = new MessageBusInputConnectorFactory(serviceConnectingAddress, serializer);
+                myOutputConnectorFactory = new MessageBusOutputConnectorFactory(clientConnectingAddress, aSerializer);
+                myInputConnectorFactory = new MessageBusInputConnectorFactory(serviceConnectingAddress, aSerializer);
 
                 ClientMessaging = clientUnderlyingMessaging;
                 ServiceMessaging = serviceUnderlyingMessaging;
