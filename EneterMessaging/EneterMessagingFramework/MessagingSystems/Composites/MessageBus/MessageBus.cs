@@ -17,6 +17,7 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using System.Text;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
@@ -87,6 +88,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
 		public event EventHandler<MessageBusServiceEventArgs> ServiceRegistered;
 		public event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
+
+        public event EventHandler<MessageBusClientEventArgs> ClientConnected;
+        public event EventHandler<MessageBusClientEventArgs> ClientDisconnected;
+        public event EventHandler<MessageBusClientEventArgs> DataTransferred;
+
 
 
         public MessageBus(ISerializer serializer)
@@ -237,6 +243,20 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         if (anInputChannel != null)
                         {
                             anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
+
+                            if (ClientConnected != null)
+                            {
+                                MessageBusClientEventArgs anEvent = new MessageBusClientEventArgs(serviceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
+
+                                try
+                                {
+                                    ClientConnected(this, anEvent);
+                                }
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                }
+                            }
                         }
                     }
                     catch (Exception err)
@@ -308,21 +328,34 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                             anInputChannel1.DisconnectResponseReceiver(aClientContext.ClientResponseReceiverId);
                         }
                     }
+
+                    if (ClientDisconnected != null)
+                    {
+                        MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
+                        try
+                        {
+                            ClientDisconnected(this, anEventArgs);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        }
+                    }
                 }
             }
         }
 
-        private void ForwardMessageToService(string clientresponseReceiverId, MessageBusMessage messageFromClient)
+        private void ForwardMessageToService(string clientResponseReceiverId, MessageBusMessage messageFromClient)
         {
             using (EneterTrace.Entering())
             {
-                TClientContext aCientContext = null;
+                TClientContext aClientContext = null;
                 lock (myConnectionLock)
                 {
-                    aCientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientresponseReceiverId);
+                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId);
                 }
 
-                if (aCientContext != null)
+                if (aClientContext != null)
                 {
                     // Forward the incoming message to the service.
                     IDuplexInputChannel anInputChannel = myServiceConnector.AttachedDuplexInputChannel;
@@ -333,17 +366,31 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                             // Add the client id into the message.
                             // Note: Because of security reasons we do not expect Ids from the client but using Ids associated with the connection session.
                             //       Otherwise it would be possible that some client could use id of another client to pretend a different client.
-                            messageFromClient.Id = clientresponseReceiverId;
+                            messageFromClient.Id = clientResponseReceiverId;
                             object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(messageFromClient);
 
-                            anInputChannel.SendResponseMessage(aCientContext.ServiceResponseReceiverId, aSerializedMessage);
+                            anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
+
+                            if (DataTransferred != null)
+                            {
+                                MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
+                                anEventArgs.BytesToService = GetMessageSize(messageFromClient.MessageData);
+                                try
+                                {
+                                    DataTransferred(this, anEventArgs);
+                                }
+                                catch (Exception err)
+                                {
+                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                }
+                            }
                         }
                         catch (Exception err)
                         {
-                            string anErrorMessage = TracedObject + "failed to send message to the service '" + aCientContext.ServiceId + "'.";
+                            string anErrorMessage = TracedObject + "failed to send message to the service '" + aClientContext.ServiceId + "'.";
                             EneterTrace.Error(anErrorMessage, err);
 
-                            UnregisterService(aCientContext.ServiceResponseReceiverId);
+                            UnregisterService(aClientContext.ServiceResponseReceiverId);
                         }
                     }
                 }
@@ -389,7 +436,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 else if (aMessageBusMessage.Request == EMessageBusRequest.SendResponseMessage)
                 {
                     // Note: forward the same message - it does not have to be serialized again.
-                    ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message);
+                    ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message, aMessageBusMessage.MessageData);
                 }
                 else if (aMessageBusMessage.Request == EMessageBusRequest.DisconnectClient)
                 {
@@ -399,7 +446,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 else if (aMessageBusMessage.Request == EMessageBusRequest.ConfirmClient)
                 {
                     EneterTrace.Debug("SERVICE CONFIRMS CLIENT");
-                    ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message);
+                    ForwardMessageToClient(aMessageBusMessage.Id, e.ResponseReceiverId, e.Message, null);
                 }
             }
         }
@@ -531,7 +578,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        private void ForwardMessageToClient(string clientResponseReceiverId, string serviceResponseReceiverId, object serializedMessage)
+        private void ForwardMessageToClient(string clientResponseReceiverId, string serviceResponseReceiverId, object serializedMessage, object messageToCountBytes)
         {
             using (EneterTrace.Entering())
             {
@@ -556,6 +603,20 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     try
                     {
                         anInputChannel.SendResponseMessage(clientResponseReceiverId, serializedMessage);
+
+                        if (messageToCountBytes != null && DataTransferred != null)
+                        {
+                            MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId);
+                            anEventArgs.BytesFromService = GetMessageSize(messageToCountBytes);
+                            try
+                            {
+                                DataTransferred(this, anEventArgs);
+                            }
+                            catch (Exception err)
+                            {
+                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                            }
+                        }
                     }
                     catch (Exception err)
                     {
@@ -568,6 +629,23 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
+        private int GetMessageSize(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                int aBytes = 0;
+                if (message is byte[])
+                {
+                    aBytes = ((byte[])message).Length;
+                }
+                else if (message is string)
+                {
+                    aBytes = Encoding.UTF8.GetByteCount((string)message);
+                }
+
+                return aBytes;
+            }
+        }
 
 
         private object myAttachDetachLock = new object();

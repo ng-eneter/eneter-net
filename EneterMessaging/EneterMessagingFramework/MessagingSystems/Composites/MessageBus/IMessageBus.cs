@@ -36,6 +36,18 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
         /// <summary>
+        /// The event is raised when a client connected the service.
+        /// </summary>
+        event EventHandler<MessageBusClientEventArgs> ClientConnected;
+
+        /// <summary>
+        /// The event is raised when a client disconnected the service.
+        /// </summary>
+        event EventHandler<MessageBusClientEventArgs> ClientDisconnected;
+
+        event EventHandler<MessageBusClientEventArgs> DataTransferred;
+
+        /// <summary>
         /// Attaches input channels which are used for the communication with the message bus.
         /// </summary>
         /// <remarks>

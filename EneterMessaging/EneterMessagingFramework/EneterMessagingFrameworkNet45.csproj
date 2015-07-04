@@ -145,6 +145,7 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusClientEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusCustomSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
