@@ -38,8 +38,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// </summary>
         public string ClientResponseReceiverId { get; private set; }
 
-        public int BytesToService { get; set; }
+        public int TransferredBytes { get; set; }
 
-        public int BytesFromService { get; set; }
+        public bool IsTransferredToService { get; set; }
     }
 }

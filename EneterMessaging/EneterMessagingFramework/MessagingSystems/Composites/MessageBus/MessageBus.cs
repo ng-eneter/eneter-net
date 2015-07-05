@@ -374,7 +374,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                             if (DataTransferred != null)
                             {
                                 MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
-                                anEventArgs.BytesToService = GetMessageSize(messageFromClient.MessageData);
+                                anEventArgs.IsTransferredToService = true;
+                                anEventArgs.TransferredBytes = GetMessageSize(messageFromClient.MessageData);
                                 try
                                 {
                                     DataTransferred(this, anEventArgs);
@@ -607,7 +608,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         if (messageToCountBytes != null && DataTransferred != null)
                         {
                             MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId);
-                            anEventArgs.BytesFromService = GetMessageSize(messageToCountBytes);
+                            anEventArgs.IsTransferredToService = false;
+                            anEventArgs.TransferredBytes = GetMessageSize(messageToCountBytes);
                             try
                             {
                                 DataTransferred(this, anEventArgs);
