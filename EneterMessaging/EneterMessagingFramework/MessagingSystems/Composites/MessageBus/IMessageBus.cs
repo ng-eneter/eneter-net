@@ -45,7 +45,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// </summary>
         event EventHandler<MessageBusClientEventArgs> ClientDisconnected;
 
-        event EventHandler<MessageBusClientEventArgs> DataTransferred;
+        /// <summary>
+        /// The event is raised when a client sends a message to a service.
+        /// </summary>
+        event EventHandler<MessageBusMessageEventArgs> MessageToServiceSent;
+
+        /// <summary>
+        /// The event is raised when a service sends a message to a client.
+        /// </summary>
+        event EventHandler<MessageBusMessageEventArgs> MessageToClientSent;
 
         /// <summary>
         /// Attaches input channels which are used for the communication with the message bus.

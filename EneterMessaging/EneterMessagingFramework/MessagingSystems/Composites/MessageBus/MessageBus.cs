@@ -91,7 +91,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
         public event EventHandler<MessageBusClientEventArgs> ClientConnected;
         public event EventHandler<MessageBusClientEventArgs> ClientDisconnected;
-        public event EventHandler<MessageBusClientEventArgs> DataTransferred;
+
+        public event EventHandler<MessageBusMessageEventArgs> MessageToServiceSent;
+        public event EventHandler<MessageBusMessageEventArgs> MessageToClientSent;
 
 
 
@@ -371,14 +373,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                             anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
 
-                            if (DataTransferred != null)
+                            if (MessageToServiceSent != null)
                             {
-                                MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
-                                anEventArgs.IsTransferredToService = true;
-                                anEventArgs.TransferredBytes = GetMessageSize(messageFromClient.MessageData);
+                                MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId, messageFromClient.MessageData);
                                 try
                                 {
-                                    DataTransferred(this, anEventArgs);
+                                    MessageToServiceSent(this, anEventArgs);
                                 }
                                 catch (Exception err)
                                 {
@@ -579,7 +579,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
-        private void ForwardMessageToClient(string clientResponseReceiverId, string serviceResponseReceiverId, object serializedMessage, object messageToCountBytes)
+        private void ForwardMessageToClient(string clientResponseReceiverId, string serviceResponseReceiverId, object serializedMessage, object originalMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -605,14 +605,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     {
                         anInputChannel.SendResponseMessage(clientResponseReceiverId, serializedMessage);
 
-                        if (messageToCountBytes != null && DataTransferred != null)
+                        if (originalMessage != null && MessageToClientSent != null)
                         {
-                            MessageBusClientEventArgs anEventArgs = new MessageBusClientEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId);
-                            anEventArgs.IsTransferredToService = false;
-                            anEventArgs.TransferredBytes = GetMessageSize(messageToCountBytes);
+                            MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId, originalMessage);
                             try
                             {
-                                DataTransferred(this, anEventArgs);
+                                MessageToClientSent(this, anEventArgs);
                             }
                             catch (Exception err)
                             {
@@ -628,24 +626,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         UnregisterClient(aClientContext.ClientResponseReceiverId, true, true);
                     }
                 }
-            }
-        }
-
-        private int GetMessageSize(object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                int aBytes = 0;
-                if (message is byte[])
-                {
-                    aBytes = ((byte[])message).Length;
-                }
-                else if (message is string)
-                {
-                    aBytes = Encoding.UTF8.GetByteCount((string)message);
-                }
-
-                return aBytes;
             }
         }
 

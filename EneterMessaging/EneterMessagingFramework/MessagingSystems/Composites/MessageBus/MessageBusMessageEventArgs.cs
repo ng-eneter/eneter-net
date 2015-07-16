@@ -10,21 +10,23 @@ using System;
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Event arguments used by the message bus when a client is connected/diconnected.
+    /// Event arguments used by message when a message was transferred to a service or to a client.
     /// </summary>
-    public sealed class MessageBusClientEventArgs : EventArgs
+    public sealed class MessageBusMessageEventArgs : EventArgs
     {
         /// <summary>
         /// Constructs the event arguments.
         /// </summary>
-        /// <param name="serviceAddress">id of service</param>
-        /// <param name="clientResponseReceiverId">response receiver id of the client.</param>
+        /// <param name="serviceAddress">id of service.</param>
         /// <param name="serviceResponseReceiverId">response receiver id of the service.</param>
-        public MessageBusClientEventArgs(string serviceAddress, string serviceResponseReceiverId, string clientResponseReceiverId)
+        /// <param name="clientResponseReceiverId">response receiver id of the client.</param>
+        /// <param name="message">message which is sent from client to service or from service to client.</param>
+        public MessageBusMessageEventArgs(string serviceAddress, string serviceResponseReceiverId, string clientResponseReceiverId, object message)
         {
             ServiceAddress = serviceAddress;
             ServiceResponseReceiverId = serviceResponseReceiverId;
             ClientResponseReceiverId = clientResponseReceiverId;
+            Message = message;
         }
 
         /// <summary>
@@ -41,5 +43,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Returns response receiver id of the client.
         /// </summary>
         public string ClientResponseReceiverId { get; private set; }
+
+        /// <summary>
+        /// Returns message which is between client and service.
+        /// </summary>
+        public object Message { get; set; }
     }
 }

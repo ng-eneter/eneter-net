@@ -150,6 +150,7 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessage.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessageEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
