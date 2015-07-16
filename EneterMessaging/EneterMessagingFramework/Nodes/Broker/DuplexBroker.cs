@@ -32,13 +32,16 @@ namespace Eneter.Messaging.Nodes.Broker
 
         public event EventHandler<BrokerMessageReceivedEventArgs> BrokerMessageReceived;
 
-        public DuplexBroker(bool isPublisherNotified, ISerializer serializer, GetSerializerCallback getSerializerCallback)
+        public DuplexBroker(bool isPublisherNotified, ISerializer serializer,
+            GetSerializerCallback getSerializerCallback,
+            ValidateBrokerRequestCallback validateBrokerRequestCallback)
         {
             using (EneterTrace.Entering())
             {
                 myIsPublisherSelfnotified = isPublisherNotified;
                 mySerializer = serializer;
                 myGetSerializerCallback = getSerializerCallback;
+                myValidateBrokerRequestCallback = validateBrokerRequestCallback;
             }
         }
 
@@ -118,6 +121,31 @@ namespace Eneter.Messaging.Nodes.Broker
                     return;
                 }
 
+                if (myValidateBrokerRequestCallback != null)
+                {
+                    bool isValidated = false;
+                    try
+                    {
+                        isValidated = myValidateBrokerRequestCallback(e.ResponseReceiverId, aBrokerMessage);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Error(TracedObject + ErrorHandler.DetectedException, err);
+                    }
+
+                    if (!isValidated)
+                    {
+                        try
+                        {
+                            AttachedDuplexInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + "failed to disconnect response receiver.", err);
+                        }
+                        return;
+                    }
+                }
 
                 if (aBrokerMessage.Request == EBrokerRequest.Publish)
                 {
@@ -302,11 +330,11 @@ namespace Eneter.Messaging.Nodes.Broker
             }
         }
 
-
         private HashSet<TSubscription> mySubscribtions = new HashSet<TSubscription>();
         private bool myIsPublisherSelfnotified;
         private ISerializer mySerializer;
         private GetSerializerCallback myGetSerializerCallback;
+        private ValidateBrokerRequestCallback myValidateBrokerRequestCallback;
 
         private readonly string myLocalReceiverId = "Eneter.Broker.LocalReceiver";
 
