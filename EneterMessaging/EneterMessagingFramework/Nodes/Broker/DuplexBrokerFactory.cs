@@ -22,7 +22,7 @@ namespace Eneter.Messaging.Nodes.Broker
     /// <returns>true if the request is valid, false if the request is invalid. If it returns false the request
     /// will be not invoked and the client will be disconnected.
     /// </returns>
-    public delegate bool ValidateBrokerRequestCallback(string responseReceiverId, BrokerMessage request);
+    public delegate bool AuthorizeBrokerRequestCallback(string responseReceiverId, BrokerMessage request);
 
 
     /// <summary>
@@ -171,7 +171,7 @@ namespace Eneter.Messaging.Nodes.Broker
         /// E.g. if a DuplexBrokerClient asks broker to publish a message and the callback returns false the message will not be sent
         /// to subscribers and DuplexBrokerClient which sent this invalid request will be disconnected.
         /// </remarks>
-        public ValidateBrokerRequestCallback BrokerRequestValidator { get; set; }
+        public AuthorizeBrokerRequestCallback BrokerRequestValidator { get; set; }
 
         /// <summary>
         /// Sets the flag whether the publisher which sent a message shall be notified in case it is subscribed to the same message.

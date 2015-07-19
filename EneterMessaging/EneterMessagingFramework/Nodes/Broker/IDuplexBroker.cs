@@ -7,6 +7,7 @@
 
 using System;
 using Eneter.Messaging.Infrastructure.Attachable;
+using System.Collections.Generic;
 
 namespace Eneter.Messaging.Nodes.Broker
 {
@@ -23,6 +24,22 @@ namespace Eneter.Messaging.Nodes.Broker
     /// </remarks>
     public interface IDuplexBroker : IAttachableDuplexInputChannel
     {
+        /// <summary>
+        /// The event is invoked when the publisher published a message to subscribers.
+        /// </summary>
+        event EventHandler<PublishInfoEventArgs> MessagePublished;
+
+        /// <summary>
+        /// The event is invoked when the broker subscribed a client for messages.
+        /// </summary>
+        event EventHandler<SubscribeInfoEventArgs> ClientSubscribed;
+
+        /// <summary>
+        /// The event is invoked when the broker unsubscribed a client from messages.
+        /// </summary>
+        event EventHandler<SubscribeInfoEventArgs> ClientUnsubscribed;
+        
+
         /// <summary>
         /// The event is invoked when the observed message is received.
         /// </summary>
@@ -64,5 +81,19 @@ namespace Eneter.Messaging.Nodes.Broker
         /// Unsubscribe all messages.
         /// </summary>
         void Unsubscribe();
+
+        /// <summary>
+        /// Returns messages which are subscribed by the given subscriber.
+        /// </summary>
+        /// <param name="responseReceiverId">subscriber response receiver id.</param>
+        /// <returns>subscribed messages</returns>
+        IEnumerable<string> GetSubscribedMessages(string responseReceiverId);
+
+        /// <summary>
+        /// Returns subscribers which are subscribed for the given message type id.
+        /// </summary>
+        /// <param name="messageTypeId">message type id</param>
+        /// <returns>subscribed subscribers</returns>
+        IEnumerable<string> GetSubscribedResponseReceivers(string messageTypeId);
     }
 }

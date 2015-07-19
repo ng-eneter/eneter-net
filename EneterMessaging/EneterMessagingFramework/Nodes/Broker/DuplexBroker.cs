@@ -5,13 +5,13 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Eneter.Messaging.Nodes.Broker
 {
@@ -30,11 +30,14 @@ namespace Eneter.Messaging.Nodes.Broker
             public string ReceiverId { get; private set; }
         }
 
+        public event EventHandler<PublishInfoEventArgs> MessagePublished;
+        public event EventHandler<SubscribeInfoEventArgs> ClientSubscribed;
+        public event EventHandler<SubscribeInfoEventArgs> ClientUnsubscribed;
         public event EventHandler<BrokerMessageReceivedEventArgs> BrokerMessageReceived;
 
         public DuplexBroker(bool isPublisherNotified, ISerializer serializer,
             GetSerializerCallback getSerializerCallback,
-            ValidateBrokerRequestCallback validateBrokerRequestCallback)
+            AuthorizeBrokerRequestCallback validateBrokerRequestCallback)
         {
             using (EneterTrace.Entering())
             {
@@ -84,7 +87,8 @@ namespace Eneter.Messaging.Nodes.Broker
             using (EneterTrace.Entering())
             {
                 string[] aEventsToUnsubscribe = { eventId };
-                Unsubscribe(myLocalReceiverId, aEventsToUnsubscribe);
+                IEnumerable<string> anUnsubscribedMessages = Unsubscribe(myLocalReceiverId, aEventsToUnsubscribe);
+                RaiseClientUnsubscribed(myLocalReceiverId, anUnsubscribedMessages);
             }
         }
 
@@ -92,7 +96,8 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                Unsubscribe(myLocalReceiverId, eventIds);
+                IEnumerable<string> anUnsubscribedMessages = Unsubscribe(myLocalReceiverId, eventIds);
+                RaiseClientUnsubscribed(myLocalReceiverId, anUnsubscribedMessages);
             }
         }
 
@@ -100,7 +105,32 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                Unsubscribe(myLocalReceiverId, null);
+                IEnumerable<string> anUnsubscribedMessages = Unsubscribe(myLocalReceiverId, null);
+                RaiseClientUnsubscribed(myLocalReceiverId, anUnsubscribedMessages);
+            }
+        }
+
+        public IEnumerable<string> GetSubscribedMessages(string responseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (mySubscribtions)
+                {
+                    string[] aResult = mySubscribtions.Where(x => x.ReceiverId == responseReceiverId).Select(y => y.MessageTypeId).ToArray();
+                    return aResult;
+                }
+            }
+        }
+
+        public IEnumerable<string> GetSubscribedResponseReceivers(string messageTypeId)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (mySubscribtions)
+                {
+                    string[] aResult = mySubscribtions.Where(x => x.MessageTypeId == messageTypeId).Select(y => y.MessageTypeId).ToArray();
+                    return aResult;
+                }
             }
         }
 
@@ -135,6 +165,9 @@ namespace Eneter.Messaging.Nodes.Broker
 
                     if (!isValidated)
                     {
+                        IEnumerable<string> anUnsubscribedMessages = Unsubscribe(e.ResponseReceiverId, null);
+                        RaiseClientUnsubscribed(e.ResponseReceiverId, anUnsubscribedMessages);
+
                         try
                         {
                             AttachedDuplexInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
@@ -168,11 +201,13 @@ namespace Eneter.Messaging.Nodes.Broker
                 }
                 else if (aBrokerMessage.Request == EBrokerRequest.Unsubscribe)
                 {
-                    Unsubscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes);
+                    IEnumerable<string> anUnsubscribedMessages = Unsubscribe(e.ResponseReceiverId, aBrokerMessage.MessageTypes);
+                    RaiseClientUnsubscribed(e.ResponseReceiverId, anUnsubscribedMessages);
                 }
                 else if (aBrokerMessage.Request == EBrokerRequest.UnsubscribeAll)
                 {
-                    Unsubscribe(e.ResponseReceiverId, null);
+                    IEnumerable<string> anUnsubscribedMessages = Unsubscribe(e.ResponseReceiverId, null);
+                    RaiseClientUnsubscribed(e.ResponseReceiverId, anUnsubscribedMessages);
                 }
             }
         }
@@ -186,7 +221,8 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                Unsubscribe(e.ResponseReceiverId, null);
+                IEnumerable<string> anUnsubscribedMessages = Unsubscribe(e.ResponseReceiverId, null);
+                RaiseClientUnsubscribed(e.ResponseReceiverId, anUnsubscribedMessages);
             }
         }
 
@@ -208,6 +244,8 @@ namespace Eneter.Messaging.Nodes.Broker
                     }
                 }
 
+                Dictionary<string, IEnumerable<string>> aFailedSubscribers = new Dictionary<string, IEnumerable<string>>();
+                int aNumberOfSentSubscribers = 0;
                 foreach (TSubscription aSubscription in anIdetifiedSubscriptions)
                 {
                     if (aSubscription.ReceiverId == myLocalReceiverId)
@@ -223,6 +261,8 @@ namespace Eneter.Messaging.Nodes.Broker
                             {
                                 EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                             }
+
+                            ++aNumberOfSentSubscribers;
                         }
                     }
                     else
@@ -243,14 +283,41 @@ namespace Eneter.Messaging.Nodes.Broker
 
                         if (aSerializedMessage != null)
                         {
-                            Send(aSubscription.ReceiverId, aSerializedMessage);
+                            IEnumerable<string> anUnsubscribedMessagesDueToFailure = Send(aSubscription.ReceiverId, aSerializedMessage);
+                            if (anUnsubscribedMessagesDueToFailure.Any())
+                            {
+                                aFailedSubscribers[aSubscription.ReceiverId] = anUnsubscribedMessagesDueToFailure;
+                            }
+                            else
+                            {
+                                ++aNumberOfSentSubscribers;
+                            }
                         }
                     }
+                }
+
+                if (MessagePublished != null)
+                {
+                    PublishInfoEventArgs anEvent = new PublishInfoEventArgs(publisherResponseReceiverId, message.MessageTypes[0], message.Message, aNumberOfSentSubscribers);
+                    try
+                    {
+                        MessagePublished(this, anEvent);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
+                }
+
+                // If sending to some subscribers failed then they were unsubscribed.
+                foreach(KeyValuePair<string, IEnumerable<string>> aFailedSubscriber in aFailedSubscribers)
+                {
+                    RaiseClientUnsubscribed(aFailedSubscriber.Key, aFailedSubscriber.Value);
                 }
             }
         }
 
-        private void Send(string responseReceiverId, object serializedMessage)
+        private IEnumerable<string> Send(string responseReceiverId, object serializedMessage)
         {
             using (EneterTrace.Entering())
             {
@@ -279,8 +346,10 @@ namespace Eneter.Messaging.Nodes.Broker
                     }
 
                     // Unsubscribe the failed client.
-                    Unsubscribe(responseReceiverId, null);
+                    return Unsubscribe(responseReceiverId, null);
                 }
+
+                return new string[0];
             }
         }
 
@@ -288,10 +357,11 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
+                List<string> aMessagesToSubscribe = new List<string>(messageTypes);
+
                 lock (mySubscribtions)
                 {
                     // Subscribe only messages that are not subscribed yet.
-                    List<string> aMessagesToSubscribe = new List<string>(messageTypes);
                     foreach (TSubscription aSubscription in mySubscribtions)
                     {
                         if (aSubscription.ReceiverId == responseReceiverId &&
@@ -307,25 +377,75 @@ namespace Eneter.Messaging.Nodes.Broker
                         mySubscribtions.Add(new TSubscription(aMessageType, responseReceiverId));
                     }
                 }
+
+                if (ClientSubscribed != null && aMessagesToSubscribe.Count > 0)
+                {
+                    SubscribeInfoEventArgs anEvent = new SubscribeInfoEventArgs(responseReceiverId, aMessagesToSubscribe);
+                    try
+                    {
+                        ClientSubscribed(this, anEvent);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
+                }
             }
         }
 
-        private void Unsubscribe(string responseReceiverId, string[] messageTypes)
+        private IEnumerable<string> Unsubscribe(string responseReceiverId, string[] messageTypes)
         {
             using (EneterTrace.Entering())
             {
+                List<string> anUnsubscribedMessages = new List<string>();
                 lock (mySubscribtions)
                 {
                     // If unsubscribe from all messages
                     if (messageTypes == null || messageTypes.Length == 0)
                     {
-                        mySubscribtions.RemoveWhere(x => x.ReceiverId == responseReceiverId);
+                        mySubscribtions.RemoveWhere(x =>
+                            {
+                                if (x.ReceiverId == responseReceiverId)
+                                {
+                                    anUnsubscribedMessages.Add(x.MessageTypeId);
+                                    return true;
+                                }
+
+                                return false;
+                            });
                     }
                     // If unsubscribe from specified messages
                     else
                     {
-                        mySubscribtions.RemoveWhere(x => x.ReceiverId == responseReceiverId && messageTypes.Any(y => x.MessageTypeId == y));
+                        mySubscribtions.RemoveWhere(x =>
+                            {
+                                if (x.ReceiverId == responseReceiverId && messageTypes.Any(y => x.MessageTypeId == y))
+                                {
+                                    anUnsubscribedMessages.Add(x.MessageTypeId);
+                                    return true;
+                                }
+
+                                return false;
+                            });
                     }
+                }
+
+                return anUnsubscribedMessages;
+            }
+        }
+
+        private void RaiseClientUnsubscribed(string responseReceiverId, IEnumerable<string> messageTypeIds)
+        {
+            if (ClientUnsubscribed != null && messageTypeIds != null && messageTypeIds.Any())
+            {
+                SubscribeInfoEventArgs anEvent = new SubscribeInfoEventArgs(responseReceiverId, messageTypeIds);
+                try
+                {
+                    ClientUnsubscribed(this, anEvent);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }
@@ -334,7 +454,7 @@ namespace Eneter.Messaging.Nodes.Broker
         private bool myIsPublisherSelfnotified;
         private ISerializer mySerializer;
         private GetSerializerCallback myGetSerializerCallback;
-        private ValidateBrokerRequestCallback myValidateBrokerRequestCallback;
+        private AuthorizeBrokerRequestCallback myValidateBrokerRequestCallback;
 
         private readonly string myLocalReceiverId = "Eneter.Broker.LocalReceiver";
 

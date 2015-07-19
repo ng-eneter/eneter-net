@@ -295,6 +295,8 @@
     <Compile Include="Nodes\Broker\IDuplexBroker.cs" />
     <Compile Include="Nodes\Broker\IDuplexBrokerClient.cs" />
     <Compile Include="Nodes\Broker\IDuplexBrokerFactory.cs" />
+    <Compile Include="Nodes\Broker\PublishInfoEventArgs.cs" />
+    <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
     <Compile Include="Nodes\Broker\_NamespaceDoc.cs" />
     <Compile Include="Nodes\ChannelWrapper\ChannelWrapperFactory.cs" />
     <Compile Include="Nodes\ChannelWrapper\DataWrapper.cs" />
