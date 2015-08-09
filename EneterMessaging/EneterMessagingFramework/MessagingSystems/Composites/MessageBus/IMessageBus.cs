@@ -77,6 +77,23 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		IEnumerable<string> ConnectedServices { get; }
 
         /// <summary>
+        /// Returns list od all clients connected to the specified service.
+        /// </summary>
+        /// <param name="serviceAddress">id of the service</param>
+        /// <returns>sequence of response receiver ids representing clients</returns>
+        IEnumerable<string> GetConnectedClients(string serviceAddress);
+
+        /// <summary>
+        /// Returns number of clients connected to the specified service.
+        /// </summary>
+        /// <remarks>
+        /// Using this method is faster than GetConnectedClients because it does not have to copy data.
+        /// </remarks>
+        /// <param name="serviceAddress">id of the service</param>
+        /// <returns>number of connected clients</returns>
+        int GetNumberOfConnectedClients(string serviceAddress);
+
+        /// <summary>
         /// Disconnect and unregisters the specified service.
         /// </summary>
         /// <param name="serviceAddress">id of the service that shall be unregistered</param>

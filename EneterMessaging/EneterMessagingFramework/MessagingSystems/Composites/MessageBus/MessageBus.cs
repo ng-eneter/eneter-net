@@ -147,20 +147,62 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
 		public IEnumerable<string> ConnectedServices
 		{
-			get
-			{
-				lock (myConnectionLock)
-				{
-					List<string> aServices = new List<string>();
-                    foreach (TServiceContext aServiceContext in myConnectedServices)
+            get
+            {
+                using (EneterTrace.Entering())
+                {
+                    lock (myConnectionLock)
                     {
-                        aServices.Add(aServiceContext.ServiceId);
+                        List<string> aServices = new List<string>();
+                        foreach (TServiceContext aServiceContext in myConnectedServices)
+                        {
+                            aServices.Add(aServiceContext.ServiceId);
+                        }
+
+                        return aServices;
+                    }
+                }
+            }
+		}
+
+        public IEnumerable<string> GetConnectedClients(string serviceAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionLock)
+                {
+                    List<string> aClients = new List<string>();
+                    foreach (TClientContext aClientContext in myConnectedClients)
+                    {
+                        if (aClientContext.ServiceId == serviceAddress)
+                        {
+                            aClients.Add(aClientContext.ClientResponseReceiverId);
+                        }
+                    }
+                    return aClients;
+                }
+            }
+        }
+
+        public int GetNumberOfConnectedClients(string serviceAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                lock (myConnectionLock)
+                {
+                    int aCount = 0;
+                    foreach (TClientContext aClientContext in myConnectedClients)
+                    {
+                        if (aClientContext.ServiceId == serviceAddress)
+                        {
+                            ++aCount;
+                        }
                     }
 
-					return aServices;
-				}
-			}
-		}
+                    return aCount;
+                }
+            }
+        }
 
 		public void DisconnectService(string serviceAddress)
 		{
