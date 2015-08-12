@@ -104,6 +104,7 @@
     <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusClientEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusCustomSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs">
       <SubType>Code</SubType>
@@ -121,6 +122,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessage.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessageEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -354,6 +356,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Nodes\Broker\BrokerCustomSerializer.cs" />
+    <Compile Include="Nodes\Broker\PublishInfoEventArgs.cs" />
+    <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
     <Compile Include="System\ListExt.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />

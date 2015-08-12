@@ -260,12 +260,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 {
                     aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId);
 
-                    // If such client does not exist yet.
+                    // If such client does not exist yet then create it.
                     if (aClientContext == null)
                     {
                         TServiceContext aServiceContext = myConnectedServices.FirstOrDefault(x => x.ServiceId == serviceId);
 
-                        // If requestedservice exists.
+                        // If requested service exists.
                         if (aServiceContext != null)
                         {
                             aClientContext = new TClientContext(clientResponseReceiverId, serviceId, aServiceContext.ServiceResponseReceiverId);
@@ -314,8 +314,16 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 }
                 else
                 {
-                    EneterTrace.Warning(TracedObject + "failed to connect the client already exists. The connection will be closed.");
-                    UnregisterClient(clientResponseReceiverId, true, true);
+                    if (aClientContext != null)
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to connect the client already exists. The connection will be closed.");
+                        UnregisterClient(clientResponseReceiverId, false, true);
+                    }
+                    else
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to connec the client because the service '" + serviceId + "' does not exist. The connection will be closed.");
+                        UnregisterClient(clientResponseReceiverId, false, true);
+                    }
                 }
             }
         }
