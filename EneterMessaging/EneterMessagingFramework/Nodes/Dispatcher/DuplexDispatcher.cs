@@ -16,7 +16,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
 {
     internal class DuplexDispatcher : IAttachableMultipleDuplexInputChannels, IDuplexDispatcher
     {
-        // Represents one particular client which connected via the input channel.
+        // Represents one particular client which is connected via the input channel.
         private class TClient
         {
             public TClient(IDuplexInputChannel inputChannel, string inputResponseReceiverId)
@@ -122,20 +122,24 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
+                    IDuplexOutputChannel[] anOutputChannels = null;
+
                     lock (myOutputConnectionLock)
                     {
-                        // Forward the incoming message to all output channels.
-                        foreach (IDuplexOutputChannel anOutputChannel in myOpenOutputConnections)
+                        anOutputChannels = myOpenOutputConnections.ToArray();
+                    }
+
+                    // Forward the incoming message to all output channels.
+                    foreach (IDuplexOutputChannel anOutputChannel in anOutputChannels)
+                    {
+                        try
                         {
-                            try
-                            {
-                                anOutputChannel.SendMessage(message);
-                            }
-                            catch (Exception err)
-                            {
-                                // Note: do not rethrow the exception because it woiuld stop forwarding the message to other output channels.
-                                EneterTrace.Warning("Failed to send message to '" + anOutputChannel.ChannelId + "'.", err);
-                            }
+                            anOutputChannel.SendMessage(message);
+                        }
+                        catch (Exception err)
+                        {
+                            // Note: do not rethrow the exception because it woiuld stop forwarding the message to other output channels.
+                            EneterTrace.Warning("Failed to send message to '" + anOutputChannel.ChannelId + "'.", err);
                         }
                     }
                 }
@@ -279,15 +283,15 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                     lock (myClientConnectionLock)
                     {
                         myConnectedClients.TryGetValue(e.ResponseReceiverId, out aClient);
+                    }
 
-                        if (aClient != null)
-                        {
-                            aClient.ForwardMessage(e.Message);
-                        }
-                        else
-                        {
-                            EneterTrace.Warning(TracedObject + "failed to forward the message because ResponseReceiverId '" + e.ResponseReceiverId + "' was not found among open connections.");
-                        }
+                    if (aClient != null)
+                    {
+                        aClient.ForwardMessage(e.Message);
+                    }
+                    else
+                    {
+                        EneterTrace.Warning(TracedObject + "failed to forward the message because ResponseReceiverId '" + e.ResponseReceiverId + "' was not found among open connections.");
                     }
                 }
             }
