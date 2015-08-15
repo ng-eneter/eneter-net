@@ -57,7 +57,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         {
             using (EneterTrace.Entering())
             {
-                lock (myReceiverManipulatorLock)
+                using (ThreadLock.Lock(myReceiverManipulatorLock))
                 {
                     if (!myAvailableReceivers.Contains(channelId))
                     {
@@ -72,7 +72,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         {
             using (EneterTrace.Entering())
             {
-                lock (myReceiverManipulatorLock)
+                using (ThreadLock.Lock(myReceiverManipulatorLock))
                 {
                     myAvailableReceivers.Remove(channelId);
 
@@ -108,7 +108,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         {
             using (EneterTrace.Entering())
             {
-                lock (myReceiverManipulatorLock)
+                using (ThreadLock.Lock(myReceiverManipulatorLock))
                 {
                     myAvailableReceivers.Clear();
 
@@ -147,7 +147,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                     string aChannelId;
 
                     // Get the next available receiver.
-                    lock (myReceiverManipulatorLock)
+                    using (ThreadLock.Lock(myReceiverManipulatorLock))
                     {
                         if (myAvailableReceivers.Count == 0)
                         {
@@ -239,7 +239,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
             using (EneterTrace.Entering())
             {
                 // Response receiver disconected one client so remove the connection.
-                lock (myReceiverManipulatorLock)
+                using (ThreadLock.Lock(myReceiverManipulatorLock))
                 {
                     myOpenConnections.RemoveWhere(x =>
                     {
@@ -262,7 +262,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         {
             using (EneterTrace.Entering())
             {
-                lock (myReceiverManipulatorLock)
+                using (ThreadLock.Lock(myReceiverManipulatorLock))
                 {
                     // Find the connection associated with the ResponseRecieverId to which this response message
                     // was delivered.
@@ -342,7 +342,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         {
             using (EneterTrace.Entering())
             {
-                lock (myReceiverManipulatorLock)
+                using (ThreadLock.Lock(myReceiverManipulatorLock))
                 {
                     myOpenConnections.RemoveWhere(x =>
                         {
@@ -373,7 +373,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
 
         private string GetNextAvailableReceiver()
         {
-            lock (myDuplexInputChannelManipulatorLock)
+            using (ThreadLock.Lock(myDuplexInputChannelManipulatorLock))
             {
                 // Move to the next receiver.
                 ++myCurrentAvailableReceiverIdx;

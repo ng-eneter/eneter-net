@@ -466,7 +466,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
 
                 Type anImplementedClass = null;
-                lock (myImplementedInterfaces)
+                using (ThreadLock.Lock(myImplementedInterfaces))
                 {
                     myImplementedInterfaces.TryGetValue(anInterfaceType, out anImplementedClass);
                     if (anImplementedClass == null)

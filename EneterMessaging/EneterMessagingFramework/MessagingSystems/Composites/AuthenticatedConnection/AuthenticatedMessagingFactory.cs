@@ -443,7 +443,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// When opening connection the authenticated output channel communicates with the authenticated input channel.
         /// During this communication the openConnection() is blocked until the whole authentication communication is performed.
         /// It means if openConnection() is called from the same thread into which the underlying duplex output channel
-        /// routes events the openConneciton() would get into the deadlock (because the underlying output channel would
+        /// routes events the openConneciton() would get into the deadusing (ThreadLock.Lock(because the underlying output channel would
         /// route authentication messages into the same thread).<br/>
         /// <br/>
         /// Therefore it is possible to set the threading mode of the authenticated output channel independently. 

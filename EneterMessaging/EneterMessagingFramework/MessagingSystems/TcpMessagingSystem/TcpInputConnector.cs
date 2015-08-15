@@ -44,7 +44,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (mySenderLock)
+                    using (ThreadLock.Lock(mySenderLock))
                     {
                         byte[] aMessage = (byte[])message;
                         myClientStream.Write(aMessage, 0, aMessage.Length);
@@ -103,7 +103,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -123,7 +123,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myTcpListenerProvider.StopListening();
                     myMessageHandler = null;
@@ -135,7 +135,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             get
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     return myTcpListenerProvider.IsListening;
                 }
@@ -147,7 +147,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
@@ -167,7 +167,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
@@ -210,7 +210,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     {
                         // Generate client id.
                         aClientId = Guid.NewGuid().ToString();
-                        lock (myConnectedClients)
+                        using (ThreadLock.Lock(myConnectedClients))
                         {
                             myConnectedClients[aClientId] = aClientContext;
                         }
@@ -253,7 +253,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                     {
                                         aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
 
-                                        lock (myConnectedClients)
+                                        using (ThreadLock.Lock(myConnectedClients))
                                         {
                                             if (!myConnectedClients.ContainsKey(aClientId))
                                             {
@@ -299,7 +299,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     // Remove client from connected clients.
                     if (aClientId != null)
                     {
-                        lock (myConnectedClients)
+                        using (ThreadLock.Lock(myConnectedClients))
                         {
                             myConnectedClients.Remove(aClientId);
                         }

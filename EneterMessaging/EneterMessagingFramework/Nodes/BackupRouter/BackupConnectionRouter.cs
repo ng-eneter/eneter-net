@@ -53,7 +53,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             get
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     return myAvailableReceivers.ToArray();
                 }
@@ -64,7 +64,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     if (!myAvailableReceivers.Any(x => x == channelId))
                     {
@@ -89,7 +89,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     // Find all open connections with this receiver then close them and remove from the list.
                     List<string> aClientsToBeRedirected = new List<string>();
@@ -151,7 +151,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     // Close all connections.
                     myOpenConnections.ForEach(x => CloseConnection(x));
@@ -172,7 +172,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     // Open the associated connection with the service for the incoming client.
                     TConnection aConnection = OpenConnection(e.ResponseReceiverId);
@@ -191,7 +191,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     TConnection aConnetion = myOpenConnections.FirstOrDefault(x => x.ResponseReceiverId == e.ResponseReceiverId);
                     CloseConnection(aConnetion);
@@ -213,7 +213,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
             using (EneterTrace.Entering())
             {
                 TConnection aConnection;
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     // If the client does not have associated connection to the service behind the router create it.
                     aConnection = myOpenConnections.FirstOrDefault(x => x.ResponseReceiverId == e.ResponseReceiverId);
@@ -269,7 +269,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     // If the client is already connected.
                     if (myOpenConnections.Any(x => x.ResponseReceiverId == responseReceiverId))
@@ -337,7 +337,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     if (connection != null)
                     {
@@ -368,7 +368,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
             using (EneterTrace.Entering())
             {
                 string aResponseReceiverId = null;
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     TConnection aConnection = myOpenConnections.FirstOrDefault(x => x.DuplexOutputChannel.ResponseReceiverId == e.ResponseReceiverId);
                     if (aConnection != null)
@@ -383,7 +383,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
                     return;
                 }
 
-                lock (myDuplexInputChannelManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelManipulatorLock))
                 {
                     // Send the response message via the duplex input channel to the sender.
                     if (AttachedDuplexInputChannel != null)
@@ -415,7 +415,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
             using (EneterTrace.Entering())
             {
                 TConnection aNewConnection = null;
-                lock (myConnectionsLock)
+                using (ThreadLock.Lock(myConnectionsLock))
                 {
                     // Find the client id associated with the duplex output channel which raised this event.
                     // Note: We need to get the response receiver id representing the client connected to this BackupRouter.
@@ -498,7 +498,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
 
         private void SetNextAvailableReceiver()
         {
-            lock (myConnectionsLock)
+            using (ThreadLock.Lock(myConnectionsLock))
             {
                 myAvailableReceiverIdx = (myAvailableReceiverIdx < myAvailableReceivers.Count) ? myAvailableReceiverIdx + 1 : 0;
             }

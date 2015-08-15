@@ -31,7 +31,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     if (IsListening)
                     {
@@ -85,7 +85,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myStopListeningRequested = true;
 
@@ -141,7 +141,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         return myListener != null;
                     }

@@ -153,7 +153,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         {
                             // Note: In Java, the following 'lock' section is located in RemoteEvent class.
                             //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
-                            lock (aRemoteEvent.Value.SubscribeUnsubscribeLock)
+                            using (ThreadLock.Lock(aRemoteEvent.Value.SubscribeUnsubscribeLock))
                             {
                                 if (aRemoteEvent.Value.Subscribers.Count > 0)
                                 {
@@ -202,7 +202,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                     // Try to find if there is a pending request waiting for the response.
                     RemoteCallContext anRpcContext;
-                    lock (myPendingRemoteCalls)
+                    using (ThreadLock.Lock(myPendingRemoteCalls))
                     {
                         myPendingRemoteCalls.TryGetValue(aMessage.Id, out anRpcContext);
                     }
@@ -335,7 +335,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                 // Note: In Java, the following 'lock' section is located in RemoteEvent class.
                 //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
-                lock (aRemoteEvent.SubscribeUnsubscribeLock)
+                using (ThreadLock.Lock(aRemoteEvent.SubscribeUnsubscribeLock))
                 {
                     // Store the subscriber.
                     aRemoteEvent.Subscribers[handler] = handlerWrapper;
@@ -376,7 +376,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                 // Note: In Java, the following 'lock' section is located in RemoteEvent class.
                 //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
-                lock (aServiceEvent.SubscribeUnsubscribeLock)
+                using (ThreadLock.Lock(aServiceEvent.SubscribeUnsubscribeLock))
                 {
                     // Remove the subscriber from the list.
                     aServiceEvent.Subscribers.Remove(handler);
@@ -442,7 +442,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 try
                 {
                     RemoteCallContext anRpcSyncContext = new RemoteCallContext();
-                    lock (myPendingRemoteCalls)
+                    using (ThreadLock.Lock(myPendingRemoteCalls))
                     {
                         myPendingRemoteCalls.Add(rpcRequest.Id, anRpcSyncContext);
                     }
@@ -471,7 +471,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
                 finally
                 {
-                    lock (myPendingRemoteCalls)
+                    using (ThreadLock.Lock(myPendingRemoteCalls))
                     {
                         myPendingRemoteCalls.Remove(rpcRequest.Id);
                     }
@@ -508,7 +508,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 // Note: In Java, the following 'lock' section is located in RemoteEvent class.
                 //       It is not possible to locate it there in C# because inner class cannot reach methods of outer class.
                 // Notify all subscribers.
-                lock (aRemoteEvent.SubscribeUnsubscribeLock)
+                using (ThreadLock.Lock(aRemoteEvent.SubscribeUnsubscribeLock))
                 {
                     foreach (KeyValuePair<Delegate, Action<object, EventArgs>> aSubscriber in aRemoteEvent.Subscribers)
                     {

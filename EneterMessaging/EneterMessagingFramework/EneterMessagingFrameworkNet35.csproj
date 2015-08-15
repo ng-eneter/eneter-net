@@ -105,6 +105,7 @@
     <Compile Include="DataProcessing\Serializing\SerializerExt.cs" />
     <Compile Include="DataProcessing\Streaming\StreamUtil.cs" />
     <Compile Include="Diagnostic\ErrorHandler.cs" />
+    <Compile Include="Diagnostic\ThreadLock.cs" />
     <Compile Include="EndPoints\Rpc\IRpcClient.cs" />
     <Compile Include="EndPoints\Rpc\IRpcFactory.cs" />
     <Compile Include="EndPoints\Rpc\IRpcService.cs" />

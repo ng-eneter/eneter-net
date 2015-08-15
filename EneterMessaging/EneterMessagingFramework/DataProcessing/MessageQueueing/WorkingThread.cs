@@ -29,7 +29,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myLock)
+                using (ThreadLock.Lock(myLock))
                 {
                     if (myMessageHandler != null)
                     {
@@ -50,7 +50,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myLock)
+                using (ThreadLock.Lock(myLock))
                 {
                     myMessageHandler = null;
                 }
@@ -65,7 +65,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myLock)
+                using (ThreadLock.Lock(myLock))
                 {
                     if (myMessageHandler == null)
                     {

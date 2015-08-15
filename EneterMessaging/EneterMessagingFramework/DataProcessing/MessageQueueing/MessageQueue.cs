@@ -32,7 +32,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myMessageQueue)
+                using (ThreadLock.Lock(myMessageQueue))
                 {
                     myMessageQueue.Enqueue(message);
 
@@ -115,7 +115,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myMessageQueue)
+                using (ThreadLock.Lock(myMessageQueue))
                 {
                     myMessageQueue.Clear();
                 }
@@ -133,7 +133,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myMessageQueue)
+                using (ThreadLock.Lock(myMessageQueue))
                 {
                     myIsBlockingMode = false;
 #if COMPACT_FRAMEWORK
@@ -155,7 +155,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             using (EneterTrace.Entering())
             {
-                lock (myMessageQueue)
+                using (ThreadLock.Lock(myMessageQueue))
                 {
                     myIsBlockingMode = true;
                 }
@@ -182,7 +182,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myMessageQueue)
+                    using (ThreadLock.Lock(myMessageQueue))
                     {
                         return myMessageQueue.Count;
                     }
@@ -201,7 +201,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             //using (EneterTrace.Entering())
             //{
-                lock (myMessageQueue)
+                using (ThreadLock.Lock(myMessageQueue))
                 {
                     while (myIsBlockingMode && myMessageQueue.Count == 0)
                     {
@@ -228,7 +228,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             //using (EneterTrace.Entering())
             //{
-                lock (myMessageQueue)
+                using (ThreadLock.Lock(myMessageQueue))
                 {
                     while (myIsBlockingMode && myMessageQueue.Count == 0)
                     {

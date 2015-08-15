@@ -46,7 +46,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         return myConnectionIsOpenFlag;
                     }
@@ -58,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (IsConnected)
                     {
@@ -94,7 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myConnectionOpeningRequestedToStopFlag = true;
                     if (!myConnectionOpeningEndedEvent.WaitOne(5000))
@@ -119,7 +119,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (!IsConnected)
                     {
@@ -145,7 +145,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     Notify(ConnectionOpened, e, false);
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     SendMessagesFromQueue();
                 }
@@ -156,7 +156,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     // Try to reopen the connection in a different thread.
                     if (!myConnectionOpeningActiveFlag)

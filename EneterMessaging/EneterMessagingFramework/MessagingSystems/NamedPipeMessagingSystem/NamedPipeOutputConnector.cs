@@ -39,7 +39,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -74,7 +74,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     return myResponseReceiver != null && myResponseReceiver.IsListening;
                 }
@@ -85,7 +85,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
                     mySender.SendMessage(anEncodedMessage);
@@ -123,7 +123,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (myResponseReceiver != null)
                     {

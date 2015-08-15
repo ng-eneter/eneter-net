@@ -64,7 +64,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     Attach(duplexInputChannel);
 
@@ -89,7 +89,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     // Get the context of the requested input channel.
                     TDuplexInputChannelContext aDuplexInputChannelContext = myDuplexInputChannelContexts.FirstOrDefault(x => x.AttachedDuplexInputChannel.ChannelId == channelId);
@@ -119,7 +119,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     foreach (TDuplexInputChannelContext aDuplexInputChannelContext in myDuplexInputChannelContexts)
                     {
@@ -150,7 +150,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myDuplexInputChannelContextManipulatorLock)
+                    using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                     {
                         return myDuplexInputChannelContexts.Any();
                     }
@@ -166,7 +166,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
                 {
                     // Note: Because of thread safety, create a new container to store the references.
                     List<IDuplexInputChannel> anAttachedChannels = new List<IDuplexInputChannel>();
-                    lock (myDuplexInputChannelContextManipulatorLock)
+                    using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                     {
                         foreach (TDuplexInputChannelContext aContextItem in myDuplexInputChannelContexts)
                         {
@@ -183,7 +183,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     // Go via all attached input channel contexts.
                     foreach (TDuplexInputChannelContext aContext in myDuplexInputChannelContexts)
@@ -206,7 +206,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     foreach (TDuplexInputChannelContext aDuplexInputChannelContext in myDuplexInputChannelContexts)
                     {
@@ -223,7 +223,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     try
                     {
@@ -244,7 +244,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     TConnection anAssociatedConnection = null;
                     TDuplexInputChannelContext aDuplexInputChannelContext = myDuplexInputChannelContexts.FirstOrDefault(x =>
@@ -284,7 +284,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     if (duplexInputChannel == null)
                     {
@@ -321,7 +321,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     TDuplexInputChannelContext aDuplexInputChannelContext = myDuplexInputChannelContexts.FirstOrDefault(x => x.AttachedDuplexInputChannel.ChannelId == duplexInputChannelId);
                     if (aDuplexInputChannelContext == null)
@@ -368,7 +368,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     foreach (TConnection aConnection in connections)
                     {
@@ -391,7 +391,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelContextManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
                     foreach (TDuplexInputChannelContext aDuplexInputChannelContext in myDuplexInputChannelContexts)
                     {

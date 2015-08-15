@@ -137,7 +137,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myInputChannel.ResponseReceiverConnected += OnResponseReceiverConnected;
                     myInputChannel.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
@@ -163,7 +163,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     // Indicate, that the timer responsible for checking if response receivers are timeouted (i.e. exceeded the max offline time)
                     // shall stop.
@@ -178,7 +178,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         EneterTrace.Warning(TracedObject + ErrorHandler.IncorrectlyStoppedListening, err);
                     }
 
-                    lock (myResponseReceivers)
+                    using (ThreadLock.Lock(myResponseReceivers))
                     {
                         myBroadcasts.Clear();
                         myResponseReceivers.Clear();
@@ -197,7 +197,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         return myInputChannel.IsListening;
                     }
@@ -212,7 +212,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 // If it is a broadcast response message.
                 if (responseReceiverId == "*")
                 {
-                    lock (myResponseReceivers)
+                    using (ThreadLock.Lock(myResponseReceivers))
                     {
                         TBroadcast aBroadcastMessage = new TBroadcast(message);
                         myBroadcasts.Add(aBroadcastMessage);
@@ -227,7 +227,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 else
                 {
                     bool aNotifyOffline = false;
-                    lock (myResponseReceivers)
+                    using (ThreadLock.Lock(myResponseReceivers))
                     {
                         TBufferedResponseReceiver aResponseReciever = GetResponseReceiver(responseReceiverId);
                         if (aResponseReciever == null)
@@ -252,7 +252,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         {
             using (EneterTrace.Entering())
             {
-                lock (myResponseReceivers)
+                using (ThreadLock.Lock(myResponseReceivers))
                 {
                     myResponseReceivers.RemoveWhere(x => x.ResponseReceiverId == responseReceiverId);
                 }
@@ -268,7 +268,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 bool aPendingResponseReceicerConnectedEvent = false;
                 bool aNewResponseReceiverFlag = false;
                 TBufferedResponseReceiver aResponseReciever;
-                lock (myResponseReceivers)
+                using (ThreadLock.Lock(myResponseReceivers))
                 {
                     aResponseReciever = GetResponseReceiver(e.ResponseReceiverId);
                     if (aResponseReciever == null)
@@ -313,7 +313,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             using (EneterTrace.Entering())
             {
                 bool aNotify = false;
-                lock (myResponseReceivers)
+                using (ThreadLock.Lock(myResponseReceivers))
                 {
                     TBufferedResponseReceiver aResponseReciever = GetResponseReceiver(e.ResponseReceiverId);
                     if (aResponseReciever != null)
@@ -385,7 +385,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 DateTime aCurrentCheckTime = DateTime.Now;
                 bool aTimerShallContinueFlag;
 
-                lock (myResponseReceivers)
+                using (ThreadLock.Lock(myResponseReceivers))
                 {
                     // Remove all expired broadcasts.
                     myBroadcasts.RemoveAll(x => aCurrentCheckTime - x.SentAt > myMaxOfflineTime);

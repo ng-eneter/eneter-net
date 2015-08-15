@@ -54,7 +54,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     if (IsListening)
                     {
@@ -156,7 +156,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     // Stop the thread listening to messages from the shared memory.
                     myStopListeningRequested = true;
@@ -205,7 +205,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             get
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     return myMemoryMappedFile != null;
                 }

@@ -61,7 +61,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 try
                 {
-                    lock (myListeners)
+                    using (ThreadLock.Lock(myListeners))
                     {
                         // Get all possible end points for the given hostname/address.
                         IEnumerable<IPEndPoint> anEndPoints = GetEndPoints(address);
@@ -111,7 +111,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 try
                 {
-                    lock (myListeners)
+                    using (ThreadLock.Lock(myListeners))
                     {
                         // Get all possible listening endpoints.
                         IEnumerable<IPEndPoint> anEndPoints = GetEndPoints(uri);
@@ -150,7 +150,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeners)
+                using (ThreadLock.Lock(myListeners))
                 {
                     // Get all possible listening endpoints.
                     // Note: if URI contains hostname (instead of IP) then it returns false if none endpoints is listening.

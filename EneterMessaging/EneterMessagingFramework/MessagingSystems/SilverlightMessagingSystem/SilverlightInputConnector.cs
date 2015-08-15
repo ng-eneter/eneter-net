@@ -42,7 +42,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     try
                     {
@@ -64,7 +64,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     if (myReceiver != null)
                     {
@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             get
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     return myReceiver != null && myReceiver.IsListening;
                 }
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             using (EneterTrace.Entering())
             {
                 SilverlightSender aClientSender;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
                 }
@@ -112,7 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             using (EneterTrace.Entering())
             {
                 SilverlightSender aClientSender;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
                     if (aClientSender != null)
@@ -149,7 +149,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
                                 {
@@ -174,7 +174,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 SilverlightSender aClientSender;
                                 myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aClientSender);

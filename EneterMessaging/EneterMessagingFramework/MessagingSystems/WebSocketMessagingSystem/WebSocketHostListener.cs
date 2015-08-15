@@ -96,7 +96,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     // Get handler for that path.
                     Uri aHandlerUri;
                     Action<IWebSocketClientContext> aPathHandler;
-                    lock (myHandlers)
+                    using (ThreadLock.Lock(myHandlers))
                     {
                         KeyValuePair<Uri, object> aPair = myHandlers.FirstOrDefault(x => x.Key.AbsolutePath == anAbsolutePath);
                         aPathHandler = aPair.Value as Action<IWebSocketClientContext>;

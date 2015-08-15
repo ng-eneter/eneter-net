@@ -34,7 +34,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -55,7 +55,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myIsListeningFlag = false;
                     myMessagingProvider.UnregisterMessageHandler(myInputConnectorAddress);
@@ -68,7 +68,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             get
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     return myIsListeningFlag;
                 }

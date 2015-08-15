@@ -105,7 +105,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         using (EneterTrace.Entering())
                         {
                             string[] aSubscribedClients = null;
-                            lock (myServiceEvents)
+                            using (ThreadLock.Lock(myServiceEvents))
                             {
                                 EventContext anEventContextTmp = myServiceEvents.FirstOrDefault(x => x.EventInfo.Name == aTmpEventInfo.Name);
                                 if (anEventContextTmp != null)
@@ -206,7 +206,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         throw;
                     }
 
-                    lock (myServiceEvents)
+                    using (ThreadLock.Lock(myServiceEvents))
                     {
                         if (!myServiceEvents.Add(anEventContext))
                         {
@@ -224,7 +224,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
                 // Clean subscription for all clients.
-                lock (myServiceEvents)
+                using (ThreadLock.Lock(myServiceEvents))
                 {
                     foreach (EventContext anEventContext in myServiceEvents)
                     {
@@ -362,7 +362,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 else if (aRequestMessage.Flag == RpcFlags.SubscribeEvent || aRequestMessage.Flag == RpcFlags.UnsubscribeEvent)
                 {
                     EventContext anEventContext = null;
-                    lock (myServiceEvents)
+                    using (ThreadLock.Lock(myServiceEvents))
                     {
                         anEventContext = myServiceEvents.FirstOrDefault(x => x.EventInfo.Name == aRequestMessage.OperationName);
                         if (anEventContext != null)
@@ -416,7 +416,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-                lock (myServiceEvents)
+                using (ThreadLock.Lock(myServiceEvents))
                 {
                     foreach (EventContext anEventContext in myServiceEvents)
                     {

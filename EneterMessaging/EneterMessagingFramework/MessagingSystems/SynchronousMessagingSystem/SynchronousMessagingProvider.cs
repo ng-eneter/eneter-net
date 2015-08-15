@@ -21,7 +21,7 @@ namespace Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem
                 // Get the message handler
                 Action<object> aMessageHandler = null;
 
-                lock (myRegisteredMessageHandlers)
+                using (ThreadLock.Lock(myRegisteredMessageHandlers))
                 {
                     myRegisteredMessageHandlers.TryGetValue(receiverId, out aMessageHandler);
                 }
@@ -46,7 +46,7 @@ namespace Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myRegisteredMessageHandlers)
+                using (ThreadLock.Lock(myRegisteredMessageHandlers))
                 {
                     if (myRegisteredMessageHandlers.ContainsKey(receiverId))
                     {
@@ -65,7 +65,7 @@ namespace Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myRegisteredMessageHandlers)
+                using (ThreadLock.Lock(myRegisteredMessageHandlers))
                 {
                     myRegisteredMessageHandlers.Remove(receiverId);
                 }

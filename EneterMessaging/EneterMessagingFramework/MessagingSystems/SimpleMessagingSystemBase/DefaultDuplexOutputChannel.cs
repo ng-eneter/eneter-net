@@ -71,7 +71,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (IsConnected)
                     {
@@ -123,7 +123,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     return (myOutputConnector.IsConnected);
                 }
@@ -134,7 +134,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (!IsConnected)
                     {
@@ -189,7 +189,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 bool aConnectionWasCorrectlyOpen = false;
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (sendCloseMessageFlag)
                     {

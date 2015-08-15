@@ -41,7 +41,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myHandlers)
+                using (ThreadLock.Lock(myHandlers))
                 {
                     // If the path listener already exists then error, because only one instance can listen.
                     if (myHandlers.Any(x => x.Key.AbsolutePath == address.AbsolutePath))
@@ -82,7 +82,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 try
                 {
-                    lock (myHandlers)
+                    using (ThreadLock.Lock(myHandlers))
                     {
                         // Remove handler for that path.
                         myHandlers.RemoveWhere(x => x.Key.AbsolutePath == address.AbsolutePath);
@@ -107,7 +107,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myHandlers)
+                using (ThreadLock.Lock(myHandlers))
                 {
                     bool isAny = myHandlers.Any(x => x.Key.AbsolutePath == address.AbsolutePath);
                     return isAny;
@@ -119,7 +119,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myHandlers)
+                using (ThreadLock.Lock(myHandlers))
                 {
                     return myHandlers.Count > 0;
                 }

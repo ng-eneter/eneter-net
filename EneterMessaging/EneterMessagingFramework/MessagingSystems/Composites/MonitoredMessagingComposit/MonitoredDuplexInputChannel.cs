@@ -74,7 +74,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     if (IsListening)
                     {
@@ -104,7 +104,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -128,7 +128,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         return myUnderlyingInputChannel != null && myUnderlyingInputChannel.IsListening;
                     }
@@ -163,7 +163,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 try
                 {
-                    lock (myResponseReceiverContexts)
+                    using (ThreadLock.Lock(myResponseReceiverContexts))
                     {
                         myResponseReceiverContexts.RemoveWhere(x => x.ResponseReceiverId == responseReceiverId);
                     }
@@ -181,7 +181,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myResponseReceiverContexts)
+                using (ThreadLock.Lock(myResponseReceiverContexts))
                 {
                     TResponseReceiverContext aResponseReceiver = GetResponseReceiver(e.ResponseReceiverId);
                     if (aResponseReceiver != null)
@@ -214,7 +214,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 int aNumberOfRemoved;
-                lock (myResponseReceiverContexts)
+                using (ThreadLock.Lock(myResponseReceiverContexts))
                 {
                     aNumberOfRemoved = myResponseReceiverContexts.RemoveWhere(x => x.ResponseReceiverId == e.ResponseReceiverId);
                 }
@@ -232,7 +232,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 try
                 {
-                    lock (myResponseReceiverContexts)
+                    using (ThreadLock.Lock(myResponseReceiverContexts))
                     {
                         TResponseReceiverContext aResponseReceiver = GetResponseReceiver(e.ResponseReceiverId);
                         if (aResponseReceiver == null)
@@ -281,7 +281,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 List<TResponseReceiverContext> aTimeoutedResponseReceivers = new List<TResponseReceiverContext>();
                 bool aContinueTimerFlag = false;
 
-                lock (myResponseReceiverContexts)
+                using (ThreadLock.Lock(myResponseReceiverContexts))
                 {
                     DateTime aCurrentTime = DateTime.Now;
 

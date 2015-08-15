@@ -49,7 +49,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnections)
+                using (ThreadLock.Lock(myConnections))
                 {
                     TDuplexConnection aConnection = myConnections.FirstOrDefault(x => x.DuplexOutputChannel.ResponseReceiverId == responseReceiverId);
                     if (aConnection != null)
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
                     // Try to find if the output channel with the required channel id and for the incoming response receiver
                     // already exists.
-                    lock (myConnections)
+                    using (ThreadLock.Lock(myConnections))
                     {
                         aConectionToOutput = myConnections.FirstOrDefault(x => x.DuplexOutputChannel.ChannelId == aMessageReceiverId && x.ResponseReceiverId == e.ResponseReceiverId);
 
@@ -156,7 +156,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnections)
+                using (ThreadLock.Lock(myConnections))
                 {
                     IEnumerable<TDuplexConnection> aConnections = myConnections.Where(x => x.ResponseReceiverId == e.ResponseReceiverId);
                     foreach (TDuplexConnection aConnection in aConnections)
@@ -223,7 +223,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                 {
                     // try to find the response receiver id where the wrapped message should be responded.
                     TDuplexConnection aConnction = null;
-                    lock (myConnections)
+                    using (ThreadLock.Lock(myConnections))
                     {
                         aConnction = myConnections.FirstOrDefault(x => x.DuplexOutputChannel == (IDuplexOutputChannel)sender);
                     }

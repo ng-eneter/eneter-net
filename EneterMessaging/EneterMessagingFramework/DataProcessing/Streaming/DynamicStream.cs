@@ -136,7 +136,7 @@ namespace Eneter.Messaging.DataProcessing.Streaming
                 // Only one thread can be reading.
                 // The thread waits until all data is available.
                 // Note: If more threads would try to read in parallel then it would be bad because the reading removes the data from the queue.
-                lock (myLockDuringReading)
+                using (ThreadLock.Lock(myLockDuringReading))
                 {
                     int aReadSize = 0;
 
@@ -196,7 +196,7 @@ namespace Eneter.Messaging.DataProcessing.Streaming
         {
             using (EneterTrace.Entering())
             {
-                lock (myLockDuringWriting)
+                using (ThreadLock.Lock(myLockDuringWriting))
                 {
                     if (myIsClosed)
                     {
@@ -226,7 +226,7 @@ namespace Eneter.Messaging.DataProcessing.Streaming
         {
             using (EneterTrace.Entering())
             {
-                lock (myLockDuringWriting)
+                using (ThreadLock.Lock(myLockDuringWriting))
                 {
                     if (myIsClosed)
                     {
@@ -246,7 +246,7 @@ namespace Eneter.Messaging.DataProcessing.Streaming
         {
             using (EneterTrace.Entering())
             {
-                lock (myLockDuringWriting)
+                using (ThreadLock.Lock(myLockDuringWriting))
                 {
                     myMessageQueue.UnblockProcessingThreads();
                     myIsClosed = true;

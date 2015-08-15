@@ -65,7 +65,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -102,7 +102,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     // Note: do not send a close message in WebSockets. Just close the socket.
 
@@ -122,7 +122,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
                     myClient.SendMessage(anEncodedMessage);
@@ -135,7 +135,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             using (EneterTrace.Entering())
             {
                 Action<MessageContext> aResponseHandler;
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     aResponseHandler = myResponseMessageHandler;
                     CloseConnection();

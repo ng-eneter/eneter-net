@@ -35,7 +35,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.Sequencin
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myPendingSequences)
+                    using (ThreadLock.Lock(myPendingSequences))
                     {
                         return IsFinalFragmentReceived && myPendingSequences.Count == 0;
                     }
@@ -54,7 +54,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.Sequencin
                     throw new ArgumentException(anError);
                 }
 
-                lock (myPendingSequences)
+                using (ThreadLock.Lock(myPendingSequences))
                 {
                     // Insert incoming fragment to pendings ordered according to fragment index
                     bool isInserted = false;

@@ -57,7 +57,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     throw new InvalidOperationException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     // If responses are expected then listener is supposed to run in order to say the connection is open.
                     return myReceiver != null && myReceiver.IsListening;
@@ -107,7 +107,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     mySender.SendMessage(x => myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message, x));
                 }
@@ -143,7 +143,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (myReceiver != null)
                     {

@@ -16,7 +16,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
     {
         public void Execute(Action job)
         {
-            lock (myJobQueue)
+            using (ThreadLock.Lock(myJobQueue))
             {
                 if (!myIsWorkingThreadRunning)
                 {
@@ -48,7 +48,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
             while (true)
             {
                 Action aJob;
-                lock (myJobQueue)
+                using (ThreadLock.Lock(myJobQueue))
                 {
                     if (myJobQueue.Count == 0)
                     {

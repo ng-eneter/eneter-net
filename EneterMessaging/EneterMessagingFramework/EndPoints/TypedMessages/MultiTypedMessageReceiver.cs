@@ -88,7 +88,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                     throw new ArgumentNullException(anError);
                 }
 
-                lock (myMessageHandlers)
+                using (ThreadLock.Lock(myMessageHandlers))
                 {
                     TMessageHandler aMessageHandler;
                     myMessageHandlers.TryGetValue(typeof(T).Name, out aMessageHandler);
@@ -125,7 +125,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                lock (myMessageHandlers)
+                using (ThreadLock.Lock(myMessageHandlers))
                 {
                     myMessageHandlers.Remove(typeof(T).Name);
                 }
@@ -136,7 +136,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             get
             {
-                lock (myMessageHandlers)
+                using (ThreadLock.Lock(myMessageHandlers))
                 {
                     List<Type> aRegisteredMessageTypes = new List<Type>();
                     foreach (TMessageHandler aHandler in myMessageHandlers.Values)
@@ -197,7 +197,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                 {
                     TMessageHandler aMessageHandler;
 
-                    lock (myMessageHandlers)
+                    using (ThreadLock.Lock(myMessageHandlers))
                     {
                         myMessageHandlers.TryGetValue(e.RequestMessage.TypeName, out aMessageHandler);
                     }

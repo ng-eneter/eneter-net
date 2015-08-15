@@ -39,7 +39,7 @@ namespace Eneter.Messaging.Nodes.Router
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnections)
+                using (ThreadLock.Lock(myConnections))
                 {
                     if (!myConnections.Any(x => x.DuplexInputChannelId == duplexInputChannelId && x.DuplexOutputChannelId == duplexOutputChannelId))
                     {
@@ -53,7 +53,7 @@ namespace Eneter.Messaging.Nodes.Router
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnections)
+                using (ThreadLock.Lock(myConnections))
                 {
                     IEnumerable<TConnection> aConnections = myConnections.Where(x => x.DuplexInputChannelId == duplexInputChannelId && x.DuplexOutputChannelId == duplexOutputChannelId);
                     foreach (TConnection aConnection in aConnections)
@@ -70,7 +70,7 @@ namespace Eneter.Messaging.Nodes.Router
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnections)
+                using (ThreadLock.Lock(myConnections))
                 {
                     foreach (TConnection aConnection in myConnections)
                     {
@@ -86,7 +86,7 @@ namespace Eneter.Messaging.Nodes.Router
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnections)
+                using (ThreadLock.Lock(myConnections))
                 {
                     IEnumerable<TConnection> aConfiguredConnections = myConnections.Where(x => x.DuplexInputChannelId == e.ChannelId);
                     foreach (TConnection aConnection in aConfiguredConnections)

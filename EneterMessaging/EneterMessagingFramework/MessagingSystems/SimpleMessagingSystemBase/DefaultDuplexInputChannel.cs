@@ -53,7 +53,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     // If the channel is already listening.
                     if (IsListening)
@@ -86,7 +86,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -116,7 +116,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         return myInputConnector.IsListening;
                     }
@@ -148,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     List<string> aDisconnectedClients = new List<string>();
 
-                    lock (myConnectedClients)
+                    using (ThreadLock.Lock(myConnectedClients))
                     {
                         // Send the response message to all connected clients.
                         foreach (KeyValuePair<string, string> aConnectedClient in myConnectedClients)
@@ -207,7 +207,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     foreach (KeyValuePair<string, string> aConnection in myConnectedClients)
                     {
@@ -277,7 +277,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 bool aNewConnectionFlag = false;
 
                 // If the connection is not open yet.
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     if (!myConnectedClients.ContainsKey(responseReceiverId))
                     {
@@ -304,7 +304,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 bool aConnecionExisted = false;
                 try
                 {
-                    lock (myConnectedClients)
+                    using (ThreadLock.Lock(myConnectedClients))
                     {
                         myConnectedClients.TryGetValue(responseReceiverId, out aSenderAddress);
                         aConnecionExisted = myConnectedClients.Remove(responseReceiverId);

@@ -50,7 +50,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                 try
                 {
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         myStopReceivingRequestedFlag = false;
 
@@ -93,7 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeMessage(myResponseReceiverId, message);
                     SendMessage(anEncodedMessage);
@@ -212,7 +212,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myStopReceivingRequestedFlag = true;
                     myStopPollingWaitingEvent.Set();

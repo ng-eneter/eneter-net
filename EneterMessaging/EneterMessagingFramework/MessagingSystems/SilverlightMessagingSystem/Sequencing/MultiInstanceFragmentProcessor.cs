@@ -31,7 +31,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem.Sequencin
         {
             using (EneterTrace.Entering())
             {
-                lock (myProcessedFragmentInstances)
+                using (ThreadLock.Lock(myProcessedFragmentInstances))
                 {
                     // Get the processer for the incoming instance.
                     IFragmentProcessor aFragmentProcessor;

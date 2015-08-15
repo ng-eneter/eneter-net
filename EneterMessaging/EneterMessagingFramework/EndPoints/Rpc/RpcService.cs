@@ -73,7 +73,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 else
                 {
                     // If per client mode then detach all service stubs.
-                    lock (myPerConnectionServices)
+                    using (ThreadLock.Lock(myPerConnectionServices))
                     {
                         foreach (KeyValuePair<string, ServiceStub<TServiceInterface>> aServiceStub in myPerConnectionServices)
                         {
@@ -96,7 +96,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     ServiceStub<TServiceInterface> aServiceStub = new ServiceStub<TServiceInterface>(aServiceInstanceForThisClient, mySerializer, myGetSerializer);
                     aServiceStub.AttachInputChannel(AttachedDuplexInputChannel);
 
-                    lock (myPerConnectionServices)
+                    using (ThreadLock.Lock(myPerConnectionServices))
                     {
                         myPerConnectionServices[e.ResponseReceiverId] = aServiceStub;
                     }
@@ -120,7 +120,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 else
                 {
                     // If per client mode then remove service stub for the disconnected client.
-                    lock (myPerConnectionServices)
+                    using (ThreadLock.Lock(myPerConnectionServices))
                     {
                         // Unsubscribe disconnected client from all events.
                         ServiceStub<TServiceInterface> aServiceStub;
@@ -153,7 +153,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 {
                     // If per client mode then find the service stub associated with the client and execute the
                     // remote request.
-                    lock (myPerConnectionServices)
+                    using (ThreadLock.Lock(myPerConnectionServices))
                     {
                         ServiceStub<TServiceInterface> aServiceStub;
                         myPerConnectionServices.TryGetValue(e.ResponseReceiverId, out aServiceStub);

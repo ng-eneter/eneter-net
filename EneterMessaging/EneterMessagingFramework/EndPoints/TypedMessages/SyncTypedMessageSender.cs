@@ -38,7 +38,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                lock (myAttachDetachLock)
+                using (ThreadLock.Lock(myAttachDetachLock))
                 {
                     mySender.AttachDuplexOutputChannel(duplexOutputChannel);
                 }
@@ -50,7 +50,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                lock (myAttachDetachLock)
+                using (ThreadLock.Lock(myAttachDetachLock))
                 {
                     // Stop waiting for the response.
                     myResponseAvailableEvent.Set();
@@ -82,7 +82,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             using (EneterTrace.Entering())
             {
                 // During sending and receiving only one caller is allowed.
-                lock (myRequestResponseLock)
+                using (ThreadLock.Lock(myRequestResponseLock))
                 {
                     TypedResponseReceivedEventArgs<TResponse> aReceivedResponse = null;
                     EventHandler<TypedResponseReceivedEventArgs<TResponse>> aResponseHandler = (x, y) =>

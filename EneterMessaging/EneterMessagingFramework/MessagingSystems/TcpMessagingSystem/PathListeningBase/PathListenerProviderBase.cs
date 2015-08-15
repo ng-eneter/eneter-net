@@ -43,7 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 try
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         if (IsListening)
                         {
@@ -76,7 +76,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 try
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         HostListenerController.StopListening(Address);
                         myConnectionHandler = null;
@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myListeningManipulatorLock)
+                    using (ThreadLock.Lock(myListeningManipulatorLock))
                     {
                         return HostListenerController.IsListening(Address);
                     }

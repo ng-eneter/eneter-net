@@ -22,7 +22,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             AutoResetEvent aPulseEvent;
             
-            lock (myQueueForPulse)
+            using (ThreadLock.Lock(myQueueForPulse)
             {
                 // Get the waiting queue for the given obj.
                 Queue<AutoResetEvent> aWaitingQueue = null;
@@ -53,7 +53,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         {
             AutoResetEvent aPulseEvent;
             
-            lock (myQueueForPulse)
+            using (ThreadLock.Lock(myQueueForPulse)
             {
                 // Get the waiting queue for the given obj.
                 Queue<AutoResetEvent> aWaitingQueue = null;
@@ -84,7 +84,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         
         public static void Pulse(object obj)
         {
-            lock (myQueueForPulse)
+            using (ThreadLock.Lock(myQueueForPulse)
             {
                 // Get the waiting queue for the given obj.
                 Queue<AutoResetEvent> aWaitingQueue = null;
@@ -113,7 +113,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
         
         public static void PulseAll(object obj)
         {
-            lock (myQueueForPulse)
+            using (ThreadLock.Lock(myQueueForPulse)
             {
                 // Get the waiting queue for the given obj.
                 Queue<AutoResetEvent> aWaitingQueue = null;

@@ -102,12 +102,37 @@ namespace Eneter.Messaging.Diagnostic
         {
             EneterTrace aTraceObject = null;
 
+#if !COMPACT_FRAMEWORK
+            if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
+#else
             if (DetailLevel == EDetailLevel.Debug)
+#endif
             {
                 aTraceObject = new EneterTrace();
 
-                WriteMessage(ENTERING, null);
+                if (!myProfilerIsRunning)
+                {
+                    WriteMessage(ENTERING, null);
+                }
+
+#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
+                aTraceObject.myStopWatch.Start();
+#else
+                aTraceObject.myEnteringTime = DateTime.Now;
+#endif
             }
+
+            return aTraceObject;
+        }
+
+        /// <summary>
+        /// Tracing time for a given scope.
+        /// </summary>
+        /// <param name="message">message identifying the time tracking</param>
+        /// <returns></returns>
+        public static IDisposable TimeTracking(string message)
+        {
+            EneterTrace aTraceObject = null;
 
 #if !COMPACT_FRAMEWORK
             if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
@@ -116,6 +141,12 @@ namespace Eneter.Messaging.Diagnostic
 #endif
             {
                 aTraceObject = new EneterTrace();
+                aTraceObject.myIsTimeTracker = true;
+
+                if (!myProfilerIsRunning)
+                {
+                    WriteMessage(STARTTIMING, message);
+                }
 
 #if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
                 aTraceObject.myStopWatch.Start();
@@ -144,12 +175,13 @@ namespace Eneter.Messaging.Diagnostic
                 {
                     double aMicroseconds = (myStopWatch.Elapsed.TotalMilliseconds - myStopWatch.ElapsedMilliseconds) * 1000;
 
-                    WriteMessage(LEAVING, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
-                        myStopWatch.Elapsed.Hours,
-                        myStopWatch.Elapsed.Minutes,
-                        myStopWatch.Elapsed.Seconds,
-                        myStopWatch.Elapsed.Milliseconds,
-                        aMicroseconds));
+                    string aPrefix = (!myIsTimeTracker) ? LEAVING : STOPTIMING;
+                    WriteMessage(aPrefix, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
+                            myStopWatch.Elapsed.Hours,
+                            myStopWatch.Elapsed.Minutes,
+                            myStopWatch.Elapsed.Seconds,
+                            myStopWatch.Elapsed.Milliseconds,
+                            aMicroseconds));
                 }
 #if !COMPACT_FRAMEWORK
                 else if (myProfilerIsRunning)
@@ -163,7 +195,7 @@ namespace Eneter.Messaging.Diagnostic
                     DateTime aCurrentTime = DateTime.Now;
                     TimeSpan aDuration = aCurrentTime - myEnteringTime;
 
-                    WriteMessage("<--", string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms]",
+                    WriteMessage("LEAVING", string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms]",
                         aDuration.Hours,
                         aDuration.Minutes,
                         aDuration.Seconds,
@@ -756,12 +788,16 @@ namespace Eneter.Messaging.Diagnostic
         private static volatile bool myProfilerIsRunning;
 #endif
 
+        private bool myIsTimeTracker;
+
         private const string ENTERING = "-->";
         private const string LEAVING = "<--";
         private const string INFO = " I:";
         private const string WARNING = " W:";
         private const string ERROR = " E:";
         private const string DEBUG = " D:";
+        private const string STARTTIMING = " >T";
+        private const string STOPTIMING = " T<";
         private const string NEXTLINE = "\r\n";
         private const string DETAILS = "\r\nDetails: ";
 

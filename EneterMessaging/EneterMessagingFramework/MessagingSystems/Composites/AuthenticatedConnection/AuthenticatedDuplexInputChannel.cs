@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                 if (responseReceiverId == "*")
                 {
-                    lock (myAuthenticatedConnections)
+                    using (ThreadLock.Lock(myAuthenticatedConnections))
                     {
                         // Send the response message to all connected clients.
                         foreach (string aConnectedClient in myAuthenticatedConnections)
@@ -101,7 +101,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
                 else
                 {
-                    lock (myAuthenticatedConnections)
+                    using (ThreadLock.Lock(myAuthenticatedConnections))
                     {
                         if (!myAuthenticatedConnections.Contains(responseReceiverId))
                         {
@@ -120,12 +120,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                lock (myAuthenticatedConnections)
+                using (ThreadLock.Lock(myAuthenticatedConnections))
                 {
                     myAuthenticatedConnections.Remove(responseReceiverId);
                 }
 
-                lock (myNotYetAuthenticatedConnections)
+                using (ThreadLock.Lock(myNotYetAuthenticatedConnections))
                 {
                     myNotYetAuthenticatedConnections.Remove(responseReceiverId);
                 }
@@ -139,12 +139,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             using (EneterTrace.Entering())
             {
                 bool anIsAuthenticatedConnection;
-                lock (myAuthenticatedConnections)
+                using (ThreadLock.Lock(myAuthenticatedConnections))
                 {
                     anIsAuthenticatedConnection = myAuthenticatedConnections.Remove(e.ResponseReceiverId);
                 }
 
-                lock (myNotYetAuthenticatedConnections)
+                using (ThreadLock.Lock(myNotYetAuthenticatedConnections))
                 {
                     myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
                 }
@@ -162,7 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
             {
                 // If the connection has already been authenticated then this is a regular request message that will be notified.
                 bool anIsAuthenticated;
-                lock (myAuthenticatedConnections)
+                using (ThreadLock.Lock(myAuthenticatedConnections))
                 {
                     anIsAuthenticated = myAuthenticatedConnections.Contains(e.ResponseReceiverId);
                 }
@@ -176,7 +176,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 bool aDisconnectFlag = true;
                 bool aNewResponseReceiverAuthenticated = false;
 
-                lock (myNotYetAuthenticatedConnections)
+                using (ThreadLock.Lock(myNotYetAuthenticatedConnections))
                 {
                     TNotYetAuthenticatedConnection aConnection;
                     myNotYetAuthenticatedConnections.TryGetValue(e.ResponseReceiverId, out aConnection);
@@ -206,7 +206,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                                     // Move the connection among authenticated connections.
                                     myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
-                                    lock (myAuthenticatedConnections)
+                                    using (ThreadLock.Lock(myAuthenticatedConnections))
                                     {
                                         myAuthenticatedConnections.Add(e.ResponseReceiverId);
                                     }

@@ -36,7 +36,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -70,7 +70,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     return myResponseReceiver != null && myResponseReceiver.IsListening;
                 }
@@ -81,7 +81,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     string anEncodedMessage = (string)myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
                     mySender.SendMessage(anEncodedMessage);
@@ -119,7 +119,7 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (mySender != null)
                     {

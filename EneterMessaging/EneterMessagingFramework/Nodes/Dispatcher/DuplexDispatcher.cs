@@ -48,7 +48,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                     IDuplexOutputChannel anOutputChannel = null;
                     try
                     {
-                        lock (myOutputConnectionLock)
+                        using (ThreadLock.Lock(myOutputConnectionLock))
                         {
                             anOutputChannel = messaging.CreateDuplexOutputChannel(channelId);
                             anOutputChannel.ConnectionClosed += OnConnectionClosed;
@@ -80,7 +80,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myOutputConnectionLock)
+                    using (ThreadLock.Lock(myOutputConnectionLock))
                     {
                         for (int i = myOpenOutputConnections.Count - 1; i >= 0; --i)
                         {
@@ -103,7 +103,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myOutputConnectionLock)
+                    using (ThreadLock.Lock(myOutputConnectionLock))
                     {
                         foreach (IDuplexOutputChannel anOutputChannel in myOpenOutputConnections)
                         {
@@ -124,7 +124,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                 {
                     IDuplexOutputChannel[] anOutputChannels = null;
 
-                    lock (myOutputConnectionLock)
+                    using (ThreadLock.Lock(myOutputConnectionLock))
                     {
                         anOutputChannels = myOpenOutputConnections.ToArray();
                     }
@@ -149,7 +149,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myOutputConnectionLock)
+                    using (ThreadLock.Lock(myOutputConnectionLock))
                     {
                         return myOpenOutputConnections.Any(x => x.ResponseReceiverId == responseReceiverId);
                     }
@@ -161,7 +161,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myOutputConnectionLock)
+                    using (ThreadLock.Lock(myOutputConnectionLock))
                     {
                         IDuplexOutputChannel anOutputChannel = (IDuplexOutputChannel)sender;
                         anOutputChannel.ConnectionClosed -= OnConnectionClosed;
@@ -214,7 +214,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                 {
                     base.DetachDuplexInputChannel();
 
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         // Close connections of all clients.
                         foreach (KeyValuePair<string, TClient> aClient in myConnectedClients)
@@ -231,7 +231,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         foreach (KeyValuePair<string, TClient> aClient in myConnectedClients)
                         {
@@ -246,7 +246,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         foreach (KeyValuePair<string, TClient> aClient in myConnectedClients)
                         {
@@ -260,7 +260,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         foreach (KeyValuePair<string, TClient> aClient in myConnectedClients)
                         {
@@ -280,7 +280,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                 using (EneterTrace.Entering())
                 {
                     TClient aClient;
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         myConnectedClients.TryGetValue(e.ResponseReceiverId, out aClient);
                     }
@@ -303,7 +303,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                     TClient aNewClient = new TClient(AttachedDuplexInputChannel, e.ResponseReceiverId);
                     IEnumerable<string> anOutputChannelIds = myGetOutputChannelIds();
 
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         // Opens connections to all available outputs.
                         aNewClient.OpenOutputConnections(myMessaging, anOutputChannelIds);
@@ -317,7 +317,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myClientConnectionLock)
+                    using (ThreadLock.Lock(myClientConnectionLock))
                     {
                         TClient aClient;
                         myConnectedClients.TryGetValue(e.ResponseReceiverId, out aClient);
@@ -351,7 +351,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     myOutputChannelIds.Add(channelId);
 
@@ -368,7 +368,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     myOutputChannelIds.Remove(channelId);
                     CloseOutputChannel(channelId);
@@ -381,7 +381,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     try
                     {
@@ -402,7 +402,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     TInputChannelContext anInpuChannelContext = new TInputChannelContext(myMessagingSystemFactory, GetOutputChannelIds);
                     try
@@ -423,7 +423,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     for (int i = myInputChannelContexts.Count - 1; i >= 0; --i)
                     {
@@ -442,7 +442,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     foreach (TInputChannelContext anInputChannelContext in myInputChannelContexts)
                     {
@@ -460,7 +460,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myChannelManipulatorLock)
+                    using (ThreadLock.Lock(myChannelManipulatorLock))
                     {
                         return myInputChannelContexts.Any();
                     }
@@ -474,7 +474,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myChannelManipulatorLock)
+                    using (ThreadLock.Lock(myChannelManipulatorLock))
                     {
                         List<IDuplexInputChannel> anInputChannels = new List<IDuplexInputChannel>();
 
@@ -493,7 +493,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
         {
             using (EneterTrace.Entering())
             {
-                lock (myChannelManipulatorLock)
+                using (ThreadLock.Lock(myChannelManipulatorLock))
                 {
                     foreach (TInputChannelContext anInputChannelContext in myInputChannelContexts)
                     {
@@ -522,7 +522,7 @@ namespace Eneter.Messaging.Nodes.Dispatcher
 
         private IEnumerable<string> GetOutputChannelIds()
         {
-            lock (myChannelManipulatorLock)
+            using (ThreadLock.Lock(myChannelManipulatorLock))
             {
                 return myOutputChannelIds.ToArray();
             }

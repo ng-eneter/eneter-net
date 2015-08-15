@@ -43,7 +43,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannels)
+                using (ThreadLock.Lock(myDuplexInputChannels))
                 {
                     Attach(duplexInputChannel);
 
@@ -75,7 +75,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannels)
+                using (ThreadLock.Lock(myDuplexInputChannels))
                 {
                     TDuplexInputChannel anInputChannel = null;
                     myDuplexInputChannels.TryGetValue(channelId, out anInputChannel);
@@ -94,7 +94,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannels)
+                using (ThreadLock.Lock(myDuplexInputChannels))
                 {
                     foreach (TDuplexInputChannel anInputChannel in myDuplexInputChannels.Values)
                     {
@@ -113,7 +113,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myDuplexInputChannels)
+                    using (ThreadLock.Lock(myDuplexInputChannels))
                     {
                         return myDuplexInputChannels.Count > 0;
                     }
@@ -129,7 +129,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                 {
                     // Note: Because of thread safety, create a new container to store the references.
                     List<IDuplexInputChannel> anAttachedChannels = new List<IDuplexInputChannel>();
-                    lock (myDuplexInputChannels)
+                    using (ThreadLock.Lock(myDuplexInputChannels))
                     {
                         foreach (TDuplexInputChannel aDuplexInputChannelItem in myDuplexInputChannels.Values)
                         {
@@ -160,7 +160,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
                 try
                 {
-                    lock (myDuplexInputChannels)
+                    using (ThreadLock.Lock(myDuplexInputChannels))
                     {
                         myDuplexInputChannels[e.ChannelId].ResponseReceiverId = e.ResponseReceiverId;
                     }
@@ -212,7 +212,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                         // Get the output channel according to the channel id.
                         TDuplexInputChannel aDuplexInputChannel = null;
 
-                        lock (myDuplexInputChannels)
+                        using (ThreadLock.Lock(myDuplexInputChannels))
                         {
                             myDuplexInputChannels.TryGetValue((string)aWrappedData.AddedData, out aDuplexInputChannel);
                         }
@@ -242,7 +242,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannels)
+                using (ThreadLock.Lock(myDuplexInputChannels))
                 {
                     if (duplexInputChannel == null)
                     {

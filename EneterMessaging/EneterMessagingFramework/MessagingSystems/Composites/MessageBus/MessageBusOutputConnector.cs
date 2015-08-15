@@ -38,7 +38,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulator)
+                using (ThreadLock.Lock(myConnectionManipulator))
                 {
                     try
                     {
@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulator)
+                using (ThreadLock.Lock(myConnectionManipulator))
                 {
                     myResponseMessageHandler = null;
 
@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             get
             {
-                lock (myConnectionManipulator)
+                using (ThreadLock.Lock(myConnectionManipulator))
                 {
                     return myMessageBusOutputChannel.IsConnected;
                 }

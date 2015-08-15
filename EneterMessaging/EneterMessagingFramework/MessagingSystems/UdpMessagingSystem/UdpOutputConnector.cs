@@ -47,7 +47,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     return myResponseReceiver != null && myResponseReceiver.IsListening;
                 }
@@ -90,7 +90,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutpuConnectorAddress, message);
                     myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
@@ -138,7 +138,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myResponseMessageHandler = null;
 

@@ -114,7 +114,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                lock (mySubscribtions)
+                using (ThreadLock.Lock(mySubscribtions))
                 {
                     string[] aResult = mySubscribtions.Where(x => x.ReceiverId == responseReceiverId).Select(y => y.MessageTypeId).ToArray();
                     return aResult;
@@ -126,7 +126,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                lock (mySubscribtions)
+                using (ThreadLock.Lock(mySubscribtions))
                 {
                     string[] aResult = mySubscribtions.Where(x => x.MessageTypeId == messageTypeId).Select(y => y.MessageTypeId).ToArray();
                     return aResult;
@@ -232,7 +232,7 @@ namespace Eneter.Messaging.Nodes.Broker
             {
                 List<TSubscription> anIdetifiedSubscriptions = new List<TSubscription>();
 
-                lock (mySubscribtions)
+                using (ThreadLock.Lock(mySubscribtions))
                 {
                     foreach (TSubscription aMessageSubscription in mySubscribtions)
                     {
@@ -359,7 +359,7 @@ namespace Eneter.Messaging.Nodes.Broker
             {
                 List<string> aMessagesToSubscribe = new List<string>(messageTypes);
 
-                lock (mySubscribtions)
+                using (ThreadLock.Lock(mySubscribtions))
                 {
                     // Subscribe only messages that are not subscribed yet.
                     foreach (TSubscription aSubscription in mySubscribtions)
@@ -398,7 +398,7 @@ namespace Eneter.Messaging.Nodes.Broker
             using (EneterTrace.Entering())
             {
                 List<string> anUnsubscribedMessages = new List<string>();
-                lock (mySubscribtions)
+                using (ThreadLock.Lock(mySubscribtions))
                 {
                     // If unsubscribe from all messages
                     if (messageTypes == null || messageTypes.Length == 0)

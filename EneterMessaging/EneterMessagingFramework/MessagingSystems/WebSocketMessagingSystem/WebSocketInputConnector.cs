@@ -84,7 +84,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     try
                     {
@@ -104,7 +104,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     myListener.StopListening();
                     myMessageHandler = null;
@@ -116,7 +116,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             get
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     return myListener.IsListening;
                 }
@@ -128,7 +128,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
@@ -148,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
@@ -177,7 +177,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     if (!myProtocolUsesOpenConnectionMessage)
                     {
                         aClientId = Guid.NewGuid().ToString();
-                        lock (myConnectedClients)
+                        using (ThreadLock.Lock(myConnectedClients))
                         {
                             myConnectedClients[aClientId] = aClientContext;
                         }
@@ -212,7 +212,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                     {
                                         aClientId = !string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId) ? aProtocolMessage.ResponseReceiverId : Guid.NewGuid().ToString();
 
-                                        lock (myConnectedClients)
+                                        using (ThreadLock.Lock(myConnectedClients))
                                         {
                                             if (!myConnectedClients.ContainsKey(aClientId))
                                             {
@@ -263,7 +263,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     // Remove client from connected clients.
                     if (aClientId != null)
                     {
-                        lock (myConnectedClients)
+                        using (ThreadLock.Lock(myConnectedClients))
                         {
                             myConnectedClients.Remove(aClientId);
                         }

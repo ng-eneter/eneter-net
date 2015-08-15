@@ -5,6 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
+using Eneter.Messaging.Diagnostic;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -23,7 +24,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         public static object Serialize(this ISerializer serializer, Type dataType, object dataToSerialzier)
         {
             MethodInfo aGenericMethod;
-            lock (mySerializeCache)
+            using (ThreadLock.Lock(mySerializeCache))
             {
                 mySerializeCache.TryGetValue(dataType, out aGenericMethod);
                 if (aGenericMethod == null)
@@ -47,7 +48,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         public static object Deserialize(this ISerializer serializer, Type dataType, object serializedData)
         {
             MethodInfo aGenericMethod;
-            lock (myDeserializeCache)
+            using (ThreadLock.Lock(myDeserializeCache))
             {
                 myDeserializeCache.TryGetValue(dataType, out aGenericMethod);
                 if (aGenericMethod == null)

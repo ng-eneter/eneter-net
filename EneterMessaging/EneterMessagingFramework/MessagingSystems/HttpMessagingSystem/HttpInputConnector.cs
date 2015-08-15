@@ -52,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         throw new ObjectDisposedException(GetType().Name);
                     }
 
-                    lock (myMessages)
+                    using (ThreadLock.Lock(myMessages))
                     {
                         byte[] aMessage = (byte[])message;
                         myMessages.Enqueue(aMessage);
@@ -67,7 +67,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 {
                     byte[] aDequedMessages = null;
 
-                    lock (myMessages)
+                    using (ThreadLock.Lock(myMessages))
                     {
                         // Update the polling time.
                         LastPollingActivityTime = DateTime.Now;
@@ -143,7 +143,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -163,7 +163,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myHttpListenerProvider.StopListening();
                     myMessageHandler = null;
@@ -175,7 +175,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             get
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     return myHttpListenerProvider.IsListening;
                 }
@@ -187,7 +187,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
                 HttpResponseSender aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == outputConnectorAddress);
                 }
@@ -207,7 +207,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
                 HttpResponseSender aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == outputConnectorAddress);
 
@@ -255,7 +255,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                         // Find the client.
                         HttpResponseSender aClientContext;
-                        lock (myConnectedClients)
+                        using (ThreadLock.Lock(myConnectedClients))
                         {
                             aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aResponseReceiverId);
                         }
@@ -301,7 +301,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                         if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 HttpResponseSender aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
                                 if (aClientContext != null && aClientContext.IsDisposed)
@@ -335,7 +335,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         }
                         else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 HttpResponseSender aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
 
@@ -379,7 +379,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 List<HttpResponseSender> aClientsToNotify = new List<HttpResponseSender>();
                 bool aStartTimerFlag = false;
 
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     DateTime aTime = DateTime.Now;
 

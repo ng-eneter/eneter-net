@@ -34,7 +34,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -70,7 +70,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     return myIsConnected;
                 }
@@ -81,7 +81,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
                     myMessagingProvider.SendMessage(myInputConnectorAddress, anEncodedMessage);
@@ -118,7 +118,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (myIsConnected)
                     {

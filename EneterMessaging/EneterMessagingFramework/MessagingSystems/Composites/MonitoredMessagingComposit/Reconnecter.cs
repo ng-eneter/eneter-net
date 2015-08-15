@@ -71,7 +71,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myMonitoringManipulatorLock)
+                using (ThreadLock.Lock(myMonitoringManipulatorLock))
                 {
                     if (IsReconnectingEnabled)
                     {
@@ -94,7 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myMonitoringManipulatorLock)
+                using (ThreadLock.Lock(myMonitoringManipulatorLock))
                 {
                     myIsMonitoringFlag = false;
 
@@ -112,7 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myMonitoringManipulatorLock)
+                    using (ThreadLock.Lock(myMonitoringManipulatorLock))
                     {
                         return myIsMonitoringFlag;
                     }

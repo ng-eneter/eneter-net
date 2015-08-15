@@ -61,7 +61,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     throw new ArgumentNullException("responseMessageHandler is null.");
                 }
 
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     try
                     {
@@ -148,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myStopReceivingRequestedFlag = true;
 
@@ -203,7 +203,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 using (EneterTrace.Entering())
                 {
 
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         return myIsListeningToResponses;
                     }
@@ -215,7 +215,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
                     myClientStream.Write(anEncodedMessage, 0, anEncodedMessage.Length);

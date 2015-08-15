@@ -55,7 +55,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (IsConnected)
                     {
@@ -97,7 +97,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         return myUnderlyingOutputChannel.IsConnected;
                     }
@@ -109,7 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (!IsConnected)
                     {
@@ -154,7 +154,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                     // Note: timer setting is after deserialization.
                     //       reason: if deserialization fails the timer is not updated and the client will be disconnected.
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         // Cancel the current response timeout and set the new one.
                         myReceiveTimer.Change(myReceiveTimeout, -1);
@@ -197,7 +197,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             {
                 try
                 {
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         // Send the ping message.
                         myUnderlyingOutputChannel.SendMessage(myPreserializedPingMessage);
@@ -227,7 +227,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     // Stop timers.
                     myPingingTimer.Change(-1, -1);

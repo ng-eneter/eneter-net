@@ -43,7 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     try
                     {
@@ -63,7 +63,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     myReceiver.StopListening();
                     myRequestMessageHandler = null;
@@ -75,7 +75,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             get
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     return myReceiver.IsListening;
                 }
@@ -87,7 +87,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             using (EneterTrace.Entering())
             {
                 SharedMemorySender aClientSender;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
                 }
@@ -107,7 +107,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             using (EneterTrace.Entering())
             {
                 SharedMemorySender aClientSender;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
                     if (aClientSender != null)
@@ -145,7 +145,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
                                 {
@@ -170,7 +170,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 SharedMemorySender aClientSender;
                                 myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aClientSender);

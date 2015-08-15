@@ -88,7 +88,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     try
                     {
@@ -109,7 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     if (myReceiver != null)
                     {
@@ -123,7 +123,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             get
             {
-                lock (myListenerManipulatorLock)
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     return myReceiver != null && myReceiver.IsListening;
                 }
@@ -135,7 +135,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
@@ -155,7 +155,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                     myConnectedClients.Remove(outputConnectorAddress);
@@ -197,7 +197,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
                                 {
@@ -219,7 +219,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
                             }

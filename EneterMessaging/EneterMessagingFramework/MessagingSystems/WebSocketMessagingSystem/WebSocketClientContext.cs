@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myConnectionManipulatorLock)
+                    using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         return myTcpClient != null && myIsListeningToResponses;
                     }
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myStopReceivingRequestedFlag = true;
                     myMessageInSendProgress = EMessageInSendProgress.None;
@@ -148,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     // If there is no message that was not finalized yet then send the binary or text data frame.
                     if (myMessageInSendProgress == EMessageInSendProgress.None)
@@ -248,7 +248,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (!IsConnected)
                     {

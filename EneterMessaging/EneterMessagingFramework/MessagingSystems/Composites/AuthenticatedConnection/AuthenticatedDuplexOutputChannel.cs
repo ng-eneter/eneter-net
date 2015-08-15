@@ -51,7 +51,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (IsConnected)
                     {
@@ -121,7 +121,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myUnderlyingOutputChannel.CloseConnection();
                 }
@@ -132,7 +132,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             get
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     return myIsConnectionAcknowledged && myUnderlyingOutputChannel.IsConnected;
                 }
@@ -145,7 +145,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     if (!IsConnected)
                     {
@@ -169,7 +169,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                 // If there is waiting for connection open release it.
                 myConnectionAcknowledged.Set();
-                lock (myConnectionManipulatorLock)
+                using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     myIsHandshakeResponseSent = false;
                     myIsConnectionAcknowledged = false;

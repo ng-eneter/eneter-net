@@ -17,7 +17,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelManipulatorLock))
                 {
                     Attach(duplexInputChannel);
 
@@ -47,7 +47,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelManipulatorLock))
                 {
                     if (AttachedDuplexInputChannel != null)
                     {
@@ -73,7 +73,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myDuplexInputChannelManipulatorLock)
+                    using (ThreadLock.Lock(myDuplexInputChannelManipulatorLock))
                     {
                         return AttachedDuplexInputChannel != null;
                     }
@@ -86,7 +86,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             using (EneterTrace.Entering())
             {
-                lock (myDuplexInputChannelManipulatorLock)
+                using (ThreadLock.Lock(myDuplexInputChannelManipulatorLock))
                 {
                     if (duplexInputChannel == null)
                     {

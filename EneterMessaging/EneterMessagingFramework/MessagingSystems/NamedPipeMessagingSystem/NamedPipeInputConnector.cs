@@ -41,7 +41,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -62,7 +62,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     if (myReceiver != null)
                     {
@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             get
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     return myReceiver != null && myReceiver.IsListening;
                 }
@@ -91,7 +91,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             using (EneterTrace.Entering())
             {
                 NamedPipeSender aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                 }
@@ -112,7 +112,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             using (EneterTrace.Entering())
             {
                 NamedPipeSender aClientContext;
-                lock (myConnectedClients)
+                using (ThreadLock.Lock(myConnectedClients))
                 {
                     myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
                     if (aClientContext != null)
@@ -151,7 +151,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
                                 {
@@ -173,10 +173,10 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
-                            lock (myConnectedClients)
+                            using (ThreadLock.Lock(myConnectedClients))
                             {
                                 NamedPipeSender aClientContext;
-                                lock (myConnectedClients)
+                                using (ThreadLock.Lock(myConnectedClients))
                                 {
                                     myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aClientContext);
                                     if (aClientContext != null)

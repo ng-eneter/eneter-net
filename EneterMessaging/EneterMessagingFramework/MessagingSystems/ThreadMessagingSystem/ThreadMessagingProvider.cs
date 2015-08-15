@@ -22,7 +22,7 @@ namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
                 // Get the thread handling the input channel.
                 WorkingThread<object> aWorkingThread = null;
 
-                lock (myRegisteredMessageHandlers)
+                using (ThreadLock.Lock(myRegisteredMessageHandlers))
                 {
                     myRegisteredMessageHandlers.TryGetValue(receiverId, out aWorkingThread);
                 }
@@ -44,7 +44,7 @@ namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myRegisteredMessageHandlers)
+                using (ThreadLock.Lock(myRegisteredMessageHandlers))
                 {
                     if (myRegisteredMessageHandlers.ContainsKey(receiverId))
                     {
@@ -67,7 +67,7 @@ namespace Eneter.Messaging.MessagingSystems.ThreadMessagingSystem
             {
                 WorkingThread<object> aWorkingThread = null;
 
-                lock (myRegisteredMessageHandlers)
+                using (ThreadLock.Lock(myRegisteredMessageHandlers))
                 {
                     myRegisteredMessageHandlers.TryGetValue(receiverId, out aWorkingThread);
                     myRegisteredMessageHandlers.Remove(receiverId);

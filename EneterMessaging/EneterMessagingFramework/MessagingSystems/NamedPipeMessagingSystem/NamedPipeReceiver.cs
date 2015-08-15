@@ -52,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     if (IsListening)
                     {
@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     try
                     {
@@ -114,7 +114,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             get
             {
-                lock (myListeningManipulatorLock)
+                using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     return myPipeServerListeners.Any();
                 }

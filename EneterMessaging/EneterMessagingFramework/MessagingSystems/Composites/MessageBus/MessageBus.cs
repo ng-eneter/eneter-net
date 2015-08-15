@@ -18,6 +18,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using System.Text;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
@@ -30,11 +31,15 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 ClientResponseReceiverId = clientResponseReceiverId;
                 ServiceId = serviceId;
                 ServiceResponseReceiverId = serviceResponseReceiverId;
+                ForwardToClientThreadDispatcher = new SyncDispatching().GetDispatcher();
+                ForwardToServiceThreadDispatcher = new SyncDispatching().GetDispatcher();
             }
 
             public string ClientResponseReceiverId { get; private set; }
             public string ServiceId { get; private set; }
             public string ServiceResponseReceiverId { get; private set; }
+            public IThreadDispatcher ForwardToClientThreadDispatcher { get; private set; }
+            public IThreadDispatcher ForwardToServiceThreadDispatcher { get; private set; }
         }
 
         private class TServiceContext
@@ -119,7 +124,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                lock (myAttachDetachLock)
+                using (ThreadLock.Lock(myAttachDetachLock))
                 {
                     myServiceConnector.AttachDuplexInputChannel(serviceInputChannel);
                     myClientConnector.AttachDuplexInputChannel(clientInputChannel);
@@ -131,13 +136,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     myConnectedClients.Clear();
                     myConnectedServices.Clear();
                 }
 
-                lock (myAttachDetachLock)
+                using (ThreadLock.Lock(myAttachDetachLock))
                 {
                     myClientConnector.DetachDuplexInputChannel();
                     myServiceConnector.DetachDuplexInputChannel();
@@ -151,7 +156,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 using (EneterTrace.Entering())
                 {
-                    lock (myConnectionLock)
+                    using (ThreadLock.Lock(myConnectionLock))
                     {
                         List<string> aServices = new List<string>();
                         foreach (TServiceContext aServiceContext in myConnectedServices)
@@ -169,7 +174,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     List<string> aClients = new List<string>();
                     foreach (TClientContext aClientContext in myConnectedClients)
@@ -188,7 +193,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     int aCount = 0;
                     foreach (TClientContext aClientContext in myConnectedClients)
@@ -256,7 +261,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 bool anIsNewClientConnected = false;
                 TClientContext aClientContext = null;
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId);
 
@@ -334,7 +339,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 // Unregistering client. 
                 TClientContext aClientContext = null;
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     myConnectedClients.RemoveWhere(x =>
                         {
@@ -402,7 +407,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             using (EneterTrace.Entering())
             {
                 TClientContext aClientContext = null;
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId);
                 }
@@ -413,36 +418,43 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     IDuplexInputChannel anInputChannel = myServiceConnector.AttachedDuplexInputChannel;
                     if (anInputChannel != null)
                     {
-                        try
-                        {
-                            // Add the client id into the message.
-                            // Note: Because of security reasons we do not expect Ids from the client but using Ids associated with the connection session.
-                            //       Otherwise it would be possible that some client could use id of another client to pretend a different client.
-                            messageFromClient.Id = clientResponseReceiverId;
-                            object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(messageFromClient);
-
-                            anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
-
-                            if (MessageToServiceSent != null)
+                        aClientContext.ForwardToServiceThreadDispatcher.Invoke(
+                            () =>
                             {
-                                MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId, messageFromClient.MessageData);
-                                try
+                                using (EneterTrace.Entering())
                                 {
-                                    MessageToServiceSent(this, anEventArgs);
-                                }
-                                catch (Exception err)
-                                {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                                }
-                            }
-                        }
-                        catch (Exception err)
-                        {
-                            string anErrorMessage = TracedObject + "failed to send message to the service '" + aClientContext.ServiceId + "'.";
-                            EneterTrace.Error(anErrorMessage, err);
+                                    try
+                                    {
+                                        // Add the client id into the message.
+                                        // Note: Because of security reasons we do not expect Ids from the client but using Ids associated with the connection session.
+                                        //       Otherwise it would be possible that some client could use id of another client to pretend a different client.
+                                        messageFromClient.Id = clientResponseReceiverId;
+                                        object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(messageFromClient);
 
-                            UnregisterService(aClientContext.ServiceResponseReceiverId);
-                        }
+                                        anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
+
+                                        if (MessageToServiceSent != null)
+                                        {
+                                            MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId, messageFromClient.MessageData);
+                                            try
+                                            {
+                                                MessageToServiceSent(this, anEventArgs);
+                                            }
+                                            catch (Exception err)
+                                            {
+                                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                            }
+                                        }
+                                    }
+                                    catch (Exception err)
+                                    {
+                                        string anErrorMessage = TracedObject + "failed to send message to the service '" + aClientContext.ServiceId + "'.";
+                                        EneterTrace.Error(anErrorMessage, err);
+
+                                        UnregisterService(aClientContext.ServiceResponseReceiverId);
+                                    }
+                                }
+                            });
                     }
                 }
                 else
@@ -508,7 +520,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             {
                 bool anIsNewServiceRegistered = false;
                 TServiceContext aServiceContext = null;
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     aServiceContext = myConnectedServices.FirstOrDefault(x => x.ServiceId == serviceId || x.ServiceResponseReceiverId == serviceResponseReceiverId);
                     if (aServiceContext == null)
@@ -564,7 +576,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 List<string> aClientsToDisconnect = new List<string>();
 
                 string aServiceId = null;
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     // Remove the service.
                     myConnectedServices.RemoveWhere(x =>
@@ -636,7 +648,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 // Check if the requested client id has a connection with the service session which forwards the message.
                 // Note: this is to prevent that a sevice sends a message to a client which is not connected to it.
                 TClientContext aClientContext;
-                lock (myConnectionLock)
+                using (ThreadLock.Lock(myConnectionLock))
                 {
                     aClientContext = myConnectedClients.FirstOrDefault(x => x.ClientResponseReceiverId == clientResponseReceiverId && x.ServiceResponseReceiverId == serviceResponseReceiverId);
                 }
@@ -651,30 +663,40 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 IDuplexInputChannel anInputChannel = myClientConnector.AttachedDuplexInputChannel;
                 if (anInputChannel != null)
                 {
-                    try
-                    {
-                        anInputChannel.SendResponseMessage(clientResponseReceiverId, serializedMessage);
-
-                        if (originalMessage != null && MessageToClientSent != null)
+                    // Invoke sending of the message in the client particular thread.
+                    // So that e.g. if there are communication problems sending to other clients
+                    // is not affected.
+                    aClientContext.ForwardToClientThreadDispatcher.Invoke(
+                        () =>
                         {
-                            MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId, originalMessage);
-                            try
+                            using (EneterTrace.Entering())
                             {
-                                MessageToClientSent(this, anEventArgs);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                            }
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        string anErrorMessage = TracedObject + "failed to send message to the client.";
-                        EneterTrace.Error(anErrorMessage, err);
+                                try
+                                {
+                                    anInputChannel.SendResponseMessage(clientResponseReceiverId, serializedMessage);
 
-                        UnregisterClient(aClientContext.ClientResponseReceiverId, true, true);
-                    }
+                                    if (originalMessage != null && MessageToClientSent != null)
+                                    {
+                                        MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId, originalMessage);
+                                        try
+                                        {
+                                            MessageToClientSent(this, anEventArgs);
+                                        }
+                                        catch (Exception err)
+                                        {
+                                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                        }
+                                    }
+                                }
+                                catch (Exception err)
+                                {
+                                    string anErrorMessage = TracedObject + "failed to send message to the client.";
+                                    EneterTrace.Error(anErrorMessage, err);
+
+                                    UnregisterClient(aClientContext.ClientResponseReceiverId, true, true);
+                                }
+                            }
+                        });
                 }
             }
         }

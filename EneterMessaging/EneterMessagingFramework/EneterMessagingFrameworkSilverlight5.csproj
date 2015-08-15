@@ -102,6 +102,7 @@
     <Compile Include="DataProcessing\Streaming\_NamespaceDoc.cs" />
     <Compile Include="Diagnostic\EneterTrace.cs" />
     <Compile Include="Diagnostic\ErrorHandler.cs" />
+    <Compile Include="Diagnostic\ThreadLock.cs" />
     <Compile Include="Diagnostic\_NamespaceDoc.cs" />
     <Compile Include="EndPoints\Rpc\IRpcClient.cs" />
     <Compile Include="EndPoints\Rpc\IRpcFactory.cs" />
