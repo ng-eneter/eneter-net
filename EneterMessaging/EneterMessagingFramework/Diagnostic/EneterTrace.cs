@@ -112,7 +112,7 @@ namespace Eneter.Messaging.Diagnostic
 
                 if (!myProfilerIsRunning)
                 {
-                    WriteMessage(ENTERING, null);
+                    WriteMessage(0, ENTERING, null);
                 }
 
 #if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
@@ -143,7 +143,7 @@ namespace Eneter.Messaging.Diagnostic
                     double aMicroseconds = (myStopWatch.Elapsed.TotalMilliseconds - myStopWatch.ElapsedMilliseconds) * 1000;
 
                     string aPrefix = (!myIsTimeTracker) ? LEAVING : STOPTIMING;
-                    WriteMessage(aPrefix, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
+                    WriteMessage(0, aPrefix, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
                             myStopWatch.Elapsed.Hours,
                             myStopWatch.Elapsed.Minutes,
                             myStopWatch.Elapsed.Seconds,
@@ -162,7 +162,7 @@ namespace Eneter.Messaging.Diagnostic
                     DateTime aCurrentTime = DateTime.Now;
                     TimeSpan aDuration = aCurrentTime - myEnteringTime;
 
-                    WriteMessage("LEAVING", string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms]",
+                    WriteMessage(0, "LEAVING", string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms]",
                         aDuration.Hours,
                         aDuration.Minutes,
                         aDuration.Seconds,
@@ -185,7 +185,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(INFO, message);
+                WriteMessage(0, INFO, message);
             }
         }
 
@@ -198,7 +198,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(INFO, message + DETAILS + details);
+                WriteMessage(0, INFO, message + DETAILS + details);
             }
         }
 
@@ -212,7 +212,7 @@ namespace Eneter.Messaging.Diagnostic
             if (DetailLevel != EDetailLevel.None)
             {
                 string aDetails = GetDetailsFromException(err);
-                WriteMessage(INFO, message + NEXTLINE + aDetails);
+                WriteMessage(0, INFO, message + NEXTLINE + aDetails);
             }
         }
 
@@ -224,7 +224,15 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(WARNING, message);
+                WriteMessage(0, WARNING, message);
+            }
+        }
+
+        internal static void Warning(int skipFrames, string message)
+        {
+            if (DetailLevel != EDetailLevel.None)
+            {
+                WriteMessage(skipFrames, WARNING, message);
             }
         }
 
@@ -237,7 +245,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(WARNING, message + DETAILS + details);
+                WriteMessage(0, WARNING, message + DETAILS + details);
             }
         }
 
@@ -251,7 +259,7 @@ namespace Eneter.Messaging.Diagnostic
             if (DetailLevel != EDetailLevel.None)
             {
                 string aDetails = GetDetailsFromException(err);
-                WriteMessage(WARNING, message + NEXTLINE + aDetails);
+                WriteMessage(0, WARNING, message + NEXTLINE + aDetails);
             }
         }
 
@@ -263,7 +271,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(ERROR, message);
+                WriteMessage(0, ERROR, message);
             }
         }
 
@@ -276,7 +284,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(ERROR, message + DETAILS + errorDetails);
+                WriteMessage(0, ERROR, message + DETAILS + errorDetails);
             }
         }
 
@@ -290,7 +298,7 @@ namespace Eneter.Messaging.Diagnostic
             if (DetailLevel != EDetailLevel.None)
             {
                 string aDetails = GetDetailsFromException(err);
-                WriteMessage(ERROR, message + NEXTLINE + aDetails);
+                WriteMessage(0, ERROR, message + NEXTLINE + aDetails);
             }
         }
 
@@ -305,7 +313,15 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel == EDetailLevel.Debug)
             {
-                WriteMessage(DEBUG, message);
+                WriteMessage(0, DEBUG, message);
+            }
+        }
+
+        internal static void Debug(int skipFrame, string message)
+        {
+            if (DetailLevel == EDetailLevel.Debug)
+            {
+                WriteMessage(skipFrame, DEBUG, message);
             }
         }
 
@@ -471,7 +487,7 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-        private static void WriteMessage(string prefix, string message)
+        private static void WriteMessage(int skipFrames, string prefix, string message)
         {
             try
             {
@@ -483,7 +499,7 @@ namespace Eneter.Messaging.Diagnostic
                 //       If the attribute is set, then only trusted Silverlight applications can use the functionality.
                 //       The current constructor does not have that attribute.
 #if !COMPACT_FRAMEWORK
-                StackFrame aCallStack = new StackFrame(2);
+                StackFrame aCallStack = new StackFrame(2 + skipFrames);
 #endif
                 int aThreadId = Thread.CurrentThread.ManagedThreadId;
                 Action aTraceJob = () =>
