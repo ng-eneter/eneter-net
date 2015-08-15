@@ -6,25 +6,27 @@
 */
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Eneter.Messaging.Diagnostic
 {
     internal class ThreadLock : IDisposable
     {
-        private IDisposable myEneterTimingTrace;
+        private Stopwatch myStopWatch;
         private object myObj;
 
         private ThreadLock(object obj)
         {
             myObj = obj;
 
-            using (EneterTrace.TimeTracking("LOCKING"))
-            {
-                Monitor.Enter(myObj);
-            }
+            EneterTrace.Debug("LOCKING");
+            Stopwatch aStopWatch = Stopwatch.StartNew();
+            Monitor.Enter(myObj);
+            aStopWatch.Stop();
+            EneterTrace.Debug(string.Join(" ", "LOCKED", aStopWatch.Elapsed));
 
-            myEneterTimingTrace = EneterTrace.TimeTracking("LOCKED");
+            myStopWatch = Stopwatch.StartNew();
         }
 
         public static ThreadLock Lock(object obj)
@@ -35,10 +37,8 @@ namespace Eneter.Messaging.Diagnostic
         public void Dispose()
         {
             Monitor.Exit(myObj);
-            if (myEneterTimingTrace != null)
-            {
-                myEneterTimingTrace.Dispose();
-            }
+            myStopWatch.Stop();
+            EneterTrace.Debug(string.Join(" ", "UNLOCKED", myStopWatch.Elapsed));
         }
     }
 }

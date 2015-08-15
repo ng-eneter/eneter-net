@@ -126,39 +126,6 @@ namespace Eneter.Messaging.Diagnostic
         }
 
         /// <summary>
-        /// Tracing time for a given scope.
-        /// </summary>
-        /// <param name="message">message identifying the time tracking</param>
-        /// <returns></returns>
-        public static IDisposable TimeTracking(string message)
-        {
-            EneterTrace aTraceObject = null;
-
-#if !COMPACT_FRAMEWORK
-            if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
-#else
-            if (DetailLevel == EDetailLevel.Debug)
-#endif
-            {
-                aTraceObject = new EneterTrace();
-                aTraceObject.myIsTimeTracker = true;
-
-                if (!myProfilerIsRunning)
-                {
-                    WriteMessage(STARTTIMING, message);
-                }
-
-#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
-                aTraceObject.myStopWatch.Start();
-#else
-                aTraceObject.myEnteringTime = DateTime.Now;
-#endif
-            }
-
-            return aTraceObject;
-        }
-
-        /// <summary>
         /// Traces the leaving from the method including the duration time.
         /// </summary>
         void IDisposable.Dispose()
