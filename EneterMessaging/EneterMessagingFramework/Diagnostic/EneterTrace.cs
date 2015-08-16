@@ -142,8 +142,7 @@ namespace Eneter.Messaging.Diagnostic
                 {
                     double aMicroseconds = (myStopWatch.Elapsed.TotalMilliseconds - myStopWatch.ElapsedMilliseconds) * 1000;
 
-                    string aPrefix = (!myIsTimeTracker) ? LEAVING : STOPTIMING;
-                    WriteMessage(0, aPrefix, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
+                    WriteMessage(0, LEAVING, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
                             myStopWatch.Elapsed.Hours,
                             myStopWatch.Elapsed.Minutes,
                             myStopWatch.Elapsed.Seconds,
@@ -771,16 +770,12 @@ namespace Eneter.Messaging.Diagnostic
         private static volatile bool myProfilerIsRunning;
 #endif
 
-        private bool myIsTimeTracker;
-
         private const string ENTERING = "-->";
         private const string LEAVING = "<--";
         private const string INFO = " I:";
         private const string WARNING = " W:";
         private const string ERROR = " E:";
         private const string DEBUG = " D:";
-        private const string STARTTIMING = " >T";
-        private const string STOPTIMING = " T<";
         private const string NEXTLINE = "\r\n";
         private const string DETAILS = "\r\nDetails: ";
 
