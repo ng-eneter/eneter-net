@@ -5,12 +5,14 @@
  * Copyright © Ondrej Uzovic 2014
 */
 
-using System;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.Threading.Dispatching;
+using System;
+using System.Collections.Generic;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
@@ -129,19 +131,53 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
                     ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aMessageBusMessage.Id, null);
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
-                    NotifyMessageContext(aMessageContext);
+
+                    IThreadDispatcher aDispatcher = myThreadDispatcherProvider.GetDispatcher();
+                    using(ThreadLock.Lock(myConnectedClients))
+                    {
+                        myConnectedClients[aProtocolMessage.ResponseReceiverId] = aDispatcher;
+                    }
+
+                    aDispatcher.Invoke(() => NotifyMessageContext(aMessageContext));
                 }
                 else if (aMessageBusMessage.Request == EMessageBusRequest.DisconnectClient)
                 {
                     ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aMessageBusMessage.Id, aMessageBusMessage.MessageData);
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
-                    NotifyMessageContext(aMessageContext);
+
+                    IThreadDispatcher aDispatcher;
+                    using (ThreadLock.Lock(myConnectedClients))
+                    {
+                        myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aDispatcher);
+                        if (aDispatcher != null)
+                        {
+                            myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
+                        }
+                        else
+                        {
+                            aDispatcher = myThreadDispatcherProvider.GetDispatcher();
+                        }
+                    }
+                    
+                    aDispatcher.Invoke(() => NotifyMessageContext(aMessageContext));
                 }
                 else if (aMessageBusMessage.Request == EMessageBusRequest.SendRequestMessage)
                 {
                     ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.MessageReceived, aMessageBusMessage.Id, aMessageBusMessage.MessageData);
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
-                    NotifyMessageContext(aMessageContext);
+
+                    IThreadDispatcher aDispatcher;
+                    using (ThreadLock.Lock(myConnectedClients))
+                    {
+                        myConnectedClients.TryGetValue(aProtocolMessage.ResponseReceiverId, out aDispatcher);
+                        if (aDispatcher == null)
+                        {
+                            aDispatcher = myThreadDispatcherProvider.GetDispatcher();
+                            myConnectedClients[aProtocolMessage.ResponseReceiverId] = aDispatcher;
+                        }
+                    }
+
+                    aDispatcher.Invoke(() => NotifyMessageContext(aMessageContext));
                 }
             }
         }
@@ -170,6 +206,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         private IDuplexOutputChannel myMessageBusOutputChannel;
         private Action<MessageContext> myMessageHandler;
         private object myListeningManipulatorLock = new object();
+
+        private IThreadDispatcherProvider myThreadDispatcherProvider = new SyncDispatching();
+        private Dictionary<string, IThreadDispatcher> myConnectedClients = new Dictionary<string, IThreadDispatcher>();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
