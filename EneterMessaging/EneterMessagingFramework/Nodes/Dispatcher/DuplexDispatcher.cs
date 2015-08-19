@@ -429,8 +429,8 @@ namespace Eneter.Messaging.Nodes.Dispatcher
                     {
                         if (myInputChannelContexts[i].AttachedDuplexInputChannel.ChannelId == channelId)
                         {
-                            myInputChannelContexts.RemoveAt(i);
                             myInputChannelContexts[i].DetachDuplexInputChannel();
+                            myInputChannelContexts.RemoveAt(i);
                             break;
                         }
                     }
