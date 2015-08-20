@@ -56,7 +56,7 @@ namespace Eneter.Messaging.Diagnostic
                     EneterTrace.Debug(1, string.Join("", "LOCKED ", aStopWatch.Elapsed));
                 }
 
-                if (aStopWatch.Elapsed >= TimeSpan.FromMilliseconds(10))
+                if (aStopWatch.Elapsed >= TimeSpan.FromMilliseconds(1000))
                 {
                     EneterTrace.Warning(1, string.Join("", "Locked after [ms]: ", aStopWatch.ElapsedMilliseconds));
                 }
