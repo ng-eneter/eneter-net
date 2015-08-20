@@ -10,7 +10,7 @@ using System;
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
     /// <summary>
-    /// Event arguments used by the message bus when a client is connected/diconnected.
+    /// Event arguments used by the message bus when a client is connected/disconnected.
     /// </summary>
     public sealed class MessageBusClientEventArgs : EventArgs
     {
@@ -18,8 +18,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// Constructs the event arguments.
         /// </summary>
         /// <param name="serviceAddress">id of service</param>
-        /// <param name="clientResponseReceiverId">response receiver id of the client.</param>
         /// <param name="serviceResponseReceiverId">response receiver id of the service.</param>
+        /// <param name="clientResponseReceiverId">response receiver id of the client.</param>
         public MessageBusClientEventArgs(string serviceAddress, string serviceResponseReceiverId, string clientResponseReceiverId)
         {
             ServiceAddress = serviceAddress;

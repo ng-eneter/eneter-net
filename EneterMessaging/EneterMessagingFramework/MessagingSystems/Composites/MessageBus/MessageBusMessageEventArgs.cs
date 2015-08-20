@@ -35,7 +35,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         public string ServiceAddress { get; private set; }
 
         /// <summary>
-        /// Rrturns response receiver id of the service.
+        /// Returns response receiver id of the service.
         /// </summary>
         public string ServiceResponseReceiverId { get; private set; }
 
@@ -47,6 +47,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         /// <summary>
         /// Returns message which is between client and service.
         /// </summary>
-        public object Message { get; set; }
+        public object Message { get; private set; }
     }
 }

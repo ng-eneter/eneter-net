@@ -36,22 +36,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		event EventHandler<MessageBusServiceEventArgs> ServiceUnregistered;
 
         /// <summary>
-        /// The event is raised when a client connected the service.
+        /// The event is raised when a client is connected to the service.
         /// </summary>
         event EventHandler<MessageBusClientEventArgs> ClientConnected;
 
         /// <summary>
-        /// The event is raised when a client disconnected the service.
+        /// The event is raised when a client is disconnected from the service.
         /// </summary>
         event EventHandler<MessageBusClientEventArgs> ClientDisconnected;
 
         /// <summary>
-        /// The event is raised when a client sends a message to a service.
+        /// The event is raised when a client sent a message to the service.
         /// </summary>
         event EventHandler<MessageBusMessageEventArgs> MessageToServiceSent;
 
         /// <summary>
-        /// The event is raised when a service sends a message to a client.
+        /// The event is raised when a service sent a message to the client.
         /// </summary>
         event EventHandler<MessageBusMessageEventArgs> MessageToClientSent;
 
@@ -77,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 		IEnumerable<string> ConnectedServices { get; }
 
         /// <summary>
-        /// Returns list od all clients connected to the specified service.
+        /// Returns list of all clients connected to the specified service.
         /// </summary>
         /// <param name="serviceAddress">id of the service</param>
         /// <returns>sequence of response receiver ids representing clients</returns>

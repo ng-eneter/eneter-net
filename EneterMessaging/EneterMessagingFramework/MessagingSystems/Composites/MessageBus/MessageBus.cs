@@ -10,15 +10,14 @@
 //       therefore in order to keep dll smaller it is not included in Silverlight platforms.
 #if !SILVERLIGHT
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using System.Text;
 using Eneter.Messaging.Threading.Dispatching;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 {
@@ -292,20 +291,6 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                         if (anInputChannel != null)
                         {
                             anInputChannel.SendResponseMessage(aClientContext.ServiceResponseReceiverId, aSerializedMessage);
-
-                            if (ClientConnected != null)
-                            {
-                                MessageBusClientEventArgs anEvent = new MessageBusClientEventArgs(serviceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
-
-                                try
-                                {
-                                    ClientConnected(this, anEvent);
-                                }
-                                catch (Exception err)
-                                {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                                }
-                            }
                         }
                     }
                     catch (Exception err)
@@ -503,7 +488,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                 }
                 else if (aMessageBusMessage.Request == EMessageBusRequest.DisconnectClient)
                 {
-                    EneterTrace.Debug("SERVICE DISCONNECTs CLIENT");
+                    EneterTrace.Debug("SERVICE DISCONNECTS CLIENT");
                     UnregisterClient(aMessageBusMessage.Id, false, true);
                 }
                 else if (aMessageBusMessage.Request == EMessageBusRequest.ConfirmClient)
@@ -675,7 +660,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                                 {
                                     anInputChannel.SendResponseMessage(clientResponseReceiverId, serializedMessage);
 
-                                    if (originalMessage != null && MessageToClientSent != null)
+                                    // If originalMessage is null then service forwards just confirmation the connection was open.
+                                    if (originalMessage == null && ClientConnected != null)
+                                    {
+                                        MessageBusClientEventArgs anEvent = new MessageBusClientEventArgs(aClientContext.ServiceId, aClientContext.ServiceResponseReceiverId, clientResponseReceiverId);
+
+                                        try
+                                        {
+                                            ClientConnected(this, anEvent);
+                                        }
+                                        catch (Exception err)
+                                        {
+                                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                                        }
+                                    }
+                                    // If original message is not null then the service sends a response message to the client.
+                                    else if (originalMessage != null && MessageToClientSent != null)
                                     {
                                         MessageBusMessageEventArgs anEventArgs = new MessageBusMessageEventArgs(aClientContext.ServiceId, serviceResponseReceiverId, clientResponseReceiverId, originalMessage);
                                         try
