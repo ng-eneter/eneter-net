@@ -19,7 +19,7 @@ namespace Eneter.Messaging.Nodes.Broker
         /// Constructs the event.
         /// </summary>
         /// <param name="subscriberResponseReceiverId">response reciver id of subscriber</param>
-        /// <param name="messageTypes"></param>
+        /// <param name="messageTypes">message ids which are subscribed or unsubscribed</param>
         public SubscribeInfoEventArgs(string subscriberResponseReceiverId, IEnumerable<string> messageTypes)
         {
             SubscriberResponseReceiverId = subscriberResponseReceiverId;

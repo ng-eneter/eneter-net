@@ -15,12 +15,12 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.Nodes.Broker
 {
     /// <summary>
-    /// Delegate id called when broker receives the request to Publish, Subscribe or Unsubscribe from BrokerDuplexClient.
+    /// Delegate is called when broker receives the request to Publish, Subscribe or Unsubscribe from BrokerDuplexClient.
     /// </summary>
     /// <param name="responseReceiverId">id of client which sent the request.</param>
     /// <param name="request">request sent by the client.</param>
     /// <returns>true if the request is valid, false if the request is invalid. If it returns false the request
-    /// will be not invoked and the client will be disconnected.
+    /// will not be invoked and the client will be disconnected.
     /// </returns>
     public delegate bool AuthorizeBrokerRequestCallback(string responseReceiverId, BrokerMessage request);
 
@@ -134,7 +134,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexBroker(IsPublisherNotified, Serializer, SerializerProvider, BrokerRequestValidator);
+                return new DuplexBroker(IsPublisherNotified, Serializer, SerializerProvider, BrokerRequestAuthorizer);
             }
         }
 
@@ -160,18 +160,18 @@ namespace Eneter.Messaging.Nodes.Broker
         public GetSerializerCallback SerializerProvider { get; set; }
 
         /// <summary>
-        /// Gets/sets callback for validating request messages received from DuplexBrokerClient.
+        /// Gets/sets callback for authorizing request messages received from DuplexBrokerClient.
         /// </summary>
         /// <remarks>
         /// DuplexBrokerClient can send request messages for publishing, subscribing or unsubscribing of messages.
-        /// If the callback is specified it is called whenever a such request is received from DuplexBrokerClient.
-        /// If the callback returns true the request is considered validated and the broker will perform it.
+        /// If the callback is not null it is called whenever such request is received from DuplexBrokerClient.
+        /// If the callback returns true the request is considered authorized and the broker will perform it.
         /// If the callback returns false the request is considered invalid and will not be performed and DuplexBrokerClient
         /// will be disconnected.
         /// E.g. if a DuplexBrokerClient asks broker to publish a message and the callback returns false the message will not be sent
-        /// to subscribers and DuplexBrokerClient which sent this invalid request will be disconnected.
+        /// to subscribers and DuplexBrokerClient will be disconnected.
         /// </remarks>
-        public AuthorizeBrokerRequestCallback BrokerRequestValidator { get; set; }
+        public AuthorizeBrokerRequestCallback BrokerRequestAuthorizer { get; set; }
 
         /// <summary>
         /// Sets the flag whether the publisher which sent a message shall be notified in case it is subscribed to the same message.

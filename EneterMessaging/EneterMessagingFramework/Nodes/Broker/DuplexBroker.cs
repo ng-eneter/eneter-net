@@ -436,16 +436,19 @@ namespace Eneter.Messaging.Nodes.Broker
 
         private void RaiseClientUnsubscribed(string responseReceiverId, IEnumerable<string> messageTypeIds)
         {
-            if (ClientUnsubscribed != null && messageTypeIds != null && messageTypeIds.Any())
+            using (EneterTrace.Entering())
             {
-                SubscribeInfoEventArgs anEvent = new SubscribeInfoEventArgs(responseReceiverId, messageTypeIds);
-                try
+                if (ClientUnsubscribed != null && messageTypeIds != null && messageTypeIds.Any())
                 {
-                    ClientUnsubscribed(this, anEvent);
-                }
-                catch (Exception err)
-                {
-                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    SubscribeInfoEventArgs anEvent = new SubscribeInfoEventArgs(responseReceiverId, messageTypeIds);
+                    try
+                    {
+                        ClientUnsubscribed(this, anEvent);
+                    }
+                    catch (Exception err)
+                    {
+                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                    }
                 }
             }
         }
