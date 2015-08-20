@@ -14,10 +14,6 @@ namespace Eneter.Messaging.Diagnostic
 {
     internal class ThreadLock : IDisposable
     {
-        private Stopwatch myStopWatch;
-        private object myObj;
-        private static Dictionary<object, int> myWaitings = new Dictionary<object, int>();
-
         private ThreadLock(object obj)
         {
             if (!Monitor.IsEntered(obj))
@@ -81,11 +77,16 @@ namespace Eneter.Messaging.Diagnostic
                 Monitor.Exit(myObj);
                 myStopWatch.Stop();
                 EneterTrace.Debug(1, string.Join(" ", "UNLOCKED", myStopWatch.Elapsed));
-                if (myStopWatch.Elapsed >= TimeSpan.FromMilliseconds(10))
+                if (myStopWatch.Elapsed >= TimeSpan.FromMilliseconds(1000))
                 {
                     EneterTrace.Warning(1, string.Join("", "Unlocked after [ms]: ", myStopWatch.ElapsedMilliseconds));
                 }
             }
         }
+
+
+        private Stopwatch myStopWatch;
+        private object myObj;
+        private static Dictionary<object, int> myWaitings = new Dictionary<object, int>();
     }
 }
