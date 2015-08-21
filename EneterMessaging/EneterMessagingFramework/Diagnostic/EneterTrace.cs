@@ -227,11 +227,11 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-        internal static void Warning(int skipFrames, string message)
+        internal static void Warning(int skipCallstackFrames, string message)
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(skipFrames, WARNING, message);
+                WriteMessage(skipCallstackFrames, WARNING, message);
             }
         }
 
@@ -316,11 +316,11 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-        internal static void Debug(int skipFrame, string message)
+        internal static void Debug(int skipCallstackFrames, string message)
         {
             if (DetailLevel == EDetailLevel.Debug)
             {
-                WriteMessage(skipFrame, DEBUG, message);
+                WriteMessage(skipCallstackFrames, DEBUG, message);
             }
         }
 

@@ -16,53 +16,58 @@ namespace Eneter.Messaging.Diagnostic
     {
         private ThreadLock(object obj)
         {
-            if (!Monitor.IsEntered(obj))
-            {
-                myObj = obj;
-                int aNumberOfWaitings;
+            myObj = obj;
 
-                if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
+            if (Monitor.IsEntered(obj))
+            {
+                Monitor.Enter(obj);
+                return;
+            }
+            
+            if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
+            {
+                int aNumberOfWaitings;
+                lock (myWaitings)
                 {
-                    lock (myWaitings)
+                    myWaitings.TryGetValue(obj, out aNumberOfWaitings);
+                    ++aNumberOfWaitings;
+                    myWaitings[obj] = aNumberOfWaitings;
+                }
+
+                EneterTrace.Debug(1, string.Join("", "LOCKING ", aNumberOfWaitings));
+            }
+
+            DateTime aStartAcquiringTime = DateTime.Now;
+            Monitor.Enter(myObj);
+            DateTime aStopAcquiringTime = DateTime.Now;
+            TimeSpan anElapsedTime = aStartAcquiringTime - aStartAcquiringTime;
+
+            if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
+            {
+                lock (myWaitings)
+                {
+                    int aNumberOfWaitings;
+                    myWaitings.TryGetValue(obj, out aNumberOfWaitings);
+                    --aNumberOfWaitings;
+                    if (aNumberOfWaitings <= 0)
                     {
-                        myWaitings.TryGetValue(obj, out aNumberOfWaitings);
-                        ++aNumberOfWaitings;
+                        myWaitings.Remove(obj);
+                    }
+                    else
+                    {
                         myWaitings[obj] = aNumberOfWaitings;
                     }
-
-                    EneterTrace.Debug(1, string.Join("", "LOCKING ", aNumberOfWaitings));
                 }
 
-                Stopwatch aStopWatch = Stopwatch.StartNew();
-                Monitor.Enter(myObj);
-                aStopWatch.Stop();
-
-                if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
-                {
-                    lock (myWaitings)
-                    {
-                        myWaitings.TryGetValue(obj, out aNumberOfWaitings);
-                        --aNumberOfWaitings;
-                        if (aNumberOfWaitings <= 0)
-                        {
-                            myWaitings.Remove(obj);
-                        }
-                        else
-                        {
-                            myWaitings[obj] = aNumberOfWaitings;
-                        }
-                    }
-
-                    EneterTrace.Debug(1, string.Join("", "LOCKED ", aStopWatch.Elapsed));
-                }
-
-                if (aStopWatch.Elapsed >= TimeSpan.FromMilliseconds(1000))
-                {
-                    EneterTrace.Warning(1, string.Join("", "Locked after [ms]: ", aStopWatch.ElapsedMilliseconds));
-                }
-
-                myStopWatch = Stopwatch.StartNew();
+                EneterTrace.Debug(1, string.Join("", "LOCKED ", anElapsedTime));
             }
+
+            if (anElapsedTime >= TimeSpan.FromMilliseconds(1000))
+            {
+                EneterTrace.Warning(1, string.Join("", "Locked after [ms]: ", anElapsedTime.TotalMilliseconds));
+            }
+
+            myLockTime = aStopAcquiringTime;
         }
 
         public static ThreadLock Lock(object obj)
@@ -72,20 +77,25 @@ namespace Eneter.Messaging.Diagnostic
 
         public void Dispose()
         {
-            if (myObj != null)
+            Monitor.Exit(myObj);
+
+            if (!Monitor.IsEntered(myObj))
             {
-                Monitor.Exit(myObj);
-                myStopWatch.Stop();
-                EneterTrace.Debug(1, string.Join(" ", "UNLOCKED", myStopWatch.Elapsed));
-                if (myStopWatch.Elapsed >= TimeSpan.FromMilliseconds(1000))
+                TimeSpan anElapsedTime = DateTime.Now - myLockTime;
+
+                if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
                 {
-                    EneterTrace.Warning(1, string.Join("", "Unlocked after [ms]: ", myStopWatch.ElapsedMilliseconds));
+                    EneterTrace.Debug(1, string.Join(" ", "UNLOCKED", anElapsedTime));
+                }
+                if (anElapsedTime >= TimeSpan.FromMilliseconds(1000))
+                {
+                    EneterTrace.Warning(1, string.Join("", "Unlocked after [ms]: ", anElapsedTime.TotalMilliseconds));
                 }
             }
         }
 
 
-        private Stopwatch myStopWatch;
+        private DateTime myLockTime;
         private object myObj;
         private static Dictionary<object, int> myWaitings = new Dictionary<object, int>();
     }
