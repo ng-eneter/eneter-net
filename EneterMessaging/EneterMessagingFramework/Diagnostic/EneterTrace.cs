@@ -104,16 +104,20 @@ namespace Eneter.Messaging.Diagnostic
 
 #if !COMPACT_FRAMEWORK
             if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
-#else
-            if (DetailLevel == EDetailLevel.Debug)
-#endif
             {
-                aTraceObject = new EneterTrace();
+            	aTraceObject = new EneterTrace();
 
-                if (!myProfilerIsRunning)
+            	if (!myProfilerIsRunning)
                 {
                     WriteMessage(0, ENTERING, null);
                 }
+#else
+            if (DetailLevel == EDetailLevel.Debug)
+            {
+            	aTraceObject = new EneterTrace();
+            	WriteMessage(0, ENTERING, null);
+#endif
+
 
 #if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
                 aTraceObject.myStopWatch.Start();

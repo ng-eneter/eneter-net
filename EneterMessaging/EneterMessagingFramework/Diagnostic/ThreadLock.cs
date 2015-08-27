@@ -16,13 +16,13 @@ namespace Eneter.Messaging.Diagnostic
     {
         private ThreadLock(object obj)
         {
-            myObj = obj;
-
-            if (Monitor.IsEntered(obj))
+            if (IsEntered(obj))
             {
-                Monitor.Enter(obj);
+                //Monitor.Enter(obj);
                 return;
             }
+
+            myObj = obj;
             
             if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
             {
@@ -34,11 +34,21 @@ namespace Eneter.Messaging.Diagnostic
                     myWaitings[obj] = aNumberOfWaitings;
                 }
 
-                EneterTrace.Debug(1, string.Join("", "LOCKING ", aNumberOfWaitings));
+                string[] aMessage = { "LOCKING ", aNumberOfWaitings.ToString() };
+                EneterTrace.Debug(1, string.Join("", aMessage));
             }
 
             DateTime aStartAcquiringTime = DateTime.Now;
+
             Monitor.Enter(myObj);
+
+#if !NET45
+            lock (myAcquiredLocks)
+            {
+                myAcquiredLocks[myObj] = Thread.CurrentThread;
+            }
+#endif
+
             DateTime aStopAcquiringTime = DateTime.Now;
             TimeSpan anElapsedTime = aStartAcquiringTime - aStartAcquiringTime;
 
@@ -59,12 +69,14 @@ namespace Eneter.Messaging.Diagnostic
                     }
                 }
 
-                EneterTrace.Debug(1, string.Join("", "LOCKED ", anElapsedTime));
+                string[] aMessage = { "LOCKED ", anElapsedTime.ToString() };
+                EneterTrace.Debug(1, string.Join("", aMessage));
             }
 
             if (anElapsedTime >= TimeSpan.FromMilliseconds(1000))
             {
-                EneterTrace.Warning(1, string.Join("", "Locked after [ms]: ", anElapsedTime.TotalMilliseconds));
+                string[] aMessage = { "Locked after [ms]: ", anElapsedTime.TotalMilliseconds.ToString() };
+                EneterTrace.Warning(1, string.Join("", aMessage));
             }
 
             myLockTime = aStopAcquiringTime;
@@ -77,26 +89,71 @@ namespace Eneter.Messaging.Diagnostic
 
         public void Dispose()
         {
+            if (myObj == null)
+            {
+                return;
+            }
+
+#if !NET45
+            lock (myAcquiredLocks)
+            {
+                myAcquiredLocks.Remove(myObj);
+            }
+#endif
+
             Monitor.Exit(myObj);
 
-            if (!Monitor.IsEntered(myObj))
+            if (myObj != null)
             {
                 TimeSpan anElapsedTime = DateTime.Now - myLockTime;
 
                 if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
                 {
-                    EneterTrace.Debug(1, string.Join(" ", "UNLOCKED", anElapsedTime));
+                    string[] aMessage = { "UNLOCKED ", anElapsedTime.ToString() };
+                    EneterTrace.Debug(1, string.Join("", aMessage));
                 }
                 if (anElapsedTime >= TimeSpan.FromMilliseconds(1000))
                 {
-                    EneterTrace.Warning(1, string.Join("", "Unlocked after [ms]: ", anElapsedTime.TotalMilliseconds));
+                    string[] aMessage = { "Unlocked after [ms]: ", anElapsedTime.TotalMilliseconds.ToString() };
+                    EneterTrace.Warning(1, string.Join("", aMessage));
+                }
+
+
+            }
+        }
+
+
+        private bool IsEntered(object obj)
+        {
+#if NET45
+            return Monitor.IsEntered(obj);
+#else
+            Thread aThread;
+
+            lock (myAcquiredLocks)
+            {
+                myAcquiredLocks.TryGetValue(obj, out aThread);
+            }
+
+            if (aThread != null)
+            {
+                if (Thread.CurrentThread == aThread)
+                {
+                    return true;
                 }
             }
+
+            return false;
+#endif
         }
 
 
         private DateTime myLockTime;
         private object myObj;
         private static Dictionary<object, int> myWaitings = new Dictionary<object, int>();
+
+#if !NET45
+        private static Dictionary<object, Thread> myAcquiredLocks = new Dictionary<object, Thread>();
+#endif
     }
 }

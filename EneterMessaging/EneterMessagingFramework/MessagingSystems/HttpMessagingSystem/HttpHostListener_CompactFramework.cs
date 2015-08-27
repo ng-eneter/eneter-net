@@ -78,7 +78,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     // Get handler for that path.
                     Uri aHandlerUri;
                     Action<HttpRequestContext> aPathHandler;
-                    using (ThreadLock.Lock(myHandlers)
+                    using (ThreadLock.Lock(myHandlers))
                     {
                         KeyValuePair<Uri, object> aPair = myHandlers.FirstOrDefault(x => x.Key.AbsolutePath == anAbsolutePath);
                         aPathHandler = aPair.Value as Action<HttpRequestContext>;

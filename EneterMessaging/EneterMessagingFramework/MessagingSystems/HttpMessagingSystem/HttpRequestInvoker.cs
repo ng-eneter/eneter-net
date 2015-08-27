@@ -24,7 +24,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
 #if COMPACT_FRAMEWORK
-            	using (ThreadLock.Lock(myLock)
+                using (ThreadLock.Lock(myLock))
 #endif
                 {
                     HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(uri);
@@ -43,7 +43,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
 #if COMPACT_FRAMEWORK
-            	using (ThreadLock.Lock(myLock)
+                using (ThreadLock.Lock(myLock))
 #endif
             	{
                     HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(uri);

@@ -120,6 +120,7 @@
     <Compile Include="Diagnostic\ErrorHandler.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Diagnostic\ThreadLock.cs" />
     <Compile Include="Diagnostic\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -263,10 +264,12 @@
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBus.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusClientEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusCustomSerializer.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusInputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessage.cs" />
+    <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessageEventArgs.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusOutputConnector.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\MessageBusServiceEventArgs.cs" />
@@ -543,6 +546,8 @@
     <Compile Include="Nodes\Broker\IDuplexBrokerFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Nodes\Broker\PublishInfoEventArgs.cs" />
+    <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
     <Compile Include="Nodes\Broker\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
