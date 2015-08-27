@@ -85,6 +85,7 @@
     <Compile Include="DataProcessing\Serializing\Test_XmlStringSerializer.cs" />
     <Compile Include="DataProcessing\Streaming\Test_DynamicStream.cs" />
     <Compile Include="Diagnostic\Test_EneterTrace.cs" />
+    <Compile Include="Diagnostic\Test_ThreadLock.cs" />
     <Compile Include="EndPoints\MultiTypedMessages\MultiTypedMessagesBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
