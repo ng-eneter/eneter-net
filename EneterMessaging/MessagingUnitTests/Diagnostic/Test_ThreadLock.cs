@@ -45,7 +45,6 @@ namespace Eneter.MessagingUnitTests.Diagnostic
             aCompleted.WaitOne();
             aTimer.Stop();
 
-
             // Using ThreadLock
             aCompleted.Reset();
             aTimer.Start();
@@ -71,6 +70,23 @@ namespace Eneter.MessagingUnitTests.Diagnostic
 
             aCompleted.WaitOne();
             aTimer.Stop();
+        }
+
+
+        [Test]
+        public void HoldingLockLongTime()
+        {
+            EneterTrace.TraceLog = Console.Out;
+
+            object aLock = new object();
+            using(ThreadLock.Lock(aLock))
+            {
+                Thread.Sleep(1100);
+            }
+
+            Thread.Sleep(300);
+
+            EneterTrace.TraceLog = null;
         }
 
     }
