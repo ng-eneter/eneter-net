@@ -27,11 +27,17 @@ namespace Eneter.Messaging.Diagnostic
 
         private ThreadLock(object obj)
         {
+            myObj = obj;
+
             int aStartAcquiringTime = Environment.TickCount;
 
             // Wait until the lock is acquired.
             Monitor.Enter(obj);
-            myObj = obj;
+
+            lock (myLocks)
+            {
+                myLocks[obj] = Thread.CurrentThread;
+            }
 
             int aStopAcquiringTime = Environment.TickCount;
             int anElapsedTime = aStartAcquiringTime - aStartAcquiringTime;
@@ -53,9 +59,14 @@ namespace Eneter.Messaging.Diagnostic
 
         void IDisposable.Dispose()
         {
+            lock (myLocks)
+            {
+                myLocks.Remove(myObj);
+            }
+
             // Release the lock.
             Monitor.Exit(myObj);
-            myObj = null;
+            
 
             int anElapsedTime = Environment.TickCount - myLockTime;
 
@@ -73,13 +84,17 @@ namespace Eneter.Messaging.Diagnostic
 
         private static bool IsHeldByCurrentThread(object obj)
         {
-            return obj == myObj;
+            lock (myLocks)
+            {
+                return myLocks.ContainsKey(obj);
+            }
         }
 
-        [ThreadStatic]
-        private static object myObj;
+
+        private static Dictionary<object, Thread> myLocks = new Dictionary<object, Thread>();
 
         private int myLockTime;
+        private object myObj;
     }
 }
 
