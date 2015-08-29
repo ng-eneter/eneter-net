@@ -27,7 +27,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     internal class TcpOutputConnector : IOutputConnector
     {
         public TcpOutputConnector(string ipAddressAndPort, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
-            int connectTimeout, int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer)
+            int connectTimeout, int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer,
+            bool reuseAddressFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -49,6 +50,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 myReceiveTimeout = receiveTimeout;
                 mySendBuffer = sendBuffer;
                 myReceiveBuffer = receiveBuffer;
+                myReuseAddressFlag = reuseAddressFlag;
             }
         }
 
@@ -71,12 +73,14 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         AddressFamily anAddressFamily = AddressFamily.InterNetwork;
 #endif
                         myTcpClient = new TcpClient(anAddressFamily);
+
                         myTcpClient.NoDelay = true;
 #if !COMPACT_FRAMEWORK
                         myTcpClient.SendTimeout = mySendTimeout;
                         myTcpClient.ReceiveTimeout = myReceiveTimeout;
                         myTcpClient.SendBufferSize = mySendBuffer;
                         myTcpClient.ReceiveBufferSize = myReceiveBuffer;
+                        myTcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 #endif
 
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
@@ -295,6 +299,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private int myReceiveTimeout;
         private int mySendBuffer;
         private int myReceiveBuffer;
+        private bool myReuseAddressFlag;
         private Stream myClientStream;
 
         private string myIpAddress;

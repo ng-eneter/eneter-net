@@ -28,8 +28,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     internal class WebSocketHostListener : HostListenerBase
     {
-        public WebSocketHostListener(IPEndPoint address, ISecurityFactory securityFactory)
-            : base(address, securityFactory)
+        public WebSocketHostListener(IPEndPoint address, ISecurityFactory securityFactory, bool reuseAddressFlag)
+            : base(address, securityFactory,reuseAddressFlag)
         {
         }
 

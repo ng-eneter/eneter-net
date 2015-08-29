@@ -62,7 +62,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             int sendTimeout,
             int receiveTimeout,
             int sendBuffer,
-            int receiveBuffer)
+            int receiveBuffer,
+            bool reuseAddressFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -79,7 +80,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         throw;
                     }
 
-                    myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aUri.Port);
+                    myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aUri.Port, reuseAddressFlag);
                     myProtocolFormatter = protocolFormatter;
                     mySecurityStreamFactory = securityFactory;
                     mySendTimeout = sendTimeout;
@@ -184,7 +185,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IPEndPoint anEndPoint = tcpClient.Client.RemoteEndPoint as IPEndPoint;
-                string aClientIp = (anEndPoint != null) ? anEndPoint.Address.ToString() : "";
+                string aClientIp = (anEndPoint != null) ? anEndPoint.ToString() : "";
 
                 Stream anInputOutputStream = null;
 

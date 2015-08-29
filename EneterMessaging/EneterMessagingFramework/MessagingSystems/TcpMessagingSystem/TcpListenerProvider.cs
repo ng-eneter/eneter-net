@@ -18,16 +18,17 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     internal class TcpListenerProvider
     {
-        public TcpListenerProvider(IPAddress ipAddress, int port)
-            : this(new IPEndPoint(ipAddress, port))
+        public TcpListenerProvider(IPAddress ipAddress, int port, bool reuseAddressFlag)
+            : this(new IPEndPoint(ipAddress, port), reuseAddressFlag)
         {
         }
 
-        public TcpListenerProvider(IPEndPoint address)
+        public TcpListenerProvider(IPEndPoint address, bool reuseAddressFlag)
         {
             using (EneterTrace.Entering())
             {
                 myAddress = address;
+                myReuseAddressFlag = reuseAddressFlag;
             }
         }
 
@@ -56,6 +57,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myConnectionHandler = connectionHandler;
 
                         myListener = new TcpListener(myAddress);
+                        myListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
 #if !COMPACT_FRAMEWORK && !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myListener.Server.LingerState = new LingerOption(true, 0);
 #endif
@@ -203,6 +206,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
         private IPEndPoint myAddress;
         private Action<TcpClient> myConnectionHandler;
+
+        private bool myReuseAddressFlag;
 
         private TcpListener myListener;
         private Thread myListeningThread;

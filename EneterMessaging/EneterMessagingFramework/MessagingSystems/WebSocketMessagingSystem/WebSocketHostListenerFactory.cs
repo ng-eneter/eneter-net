@@ -17,6 +17,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     internal class WebSocketHostListenerFactory : IHostListenerFactory
     {
+        public WebSocketHostListenerFactory(bool reuseAddressFlag)
+        {
+            myReuseAddressFlag = reuseAddressFlag;
+        }
+
         public Type ListenerType
         {
             get { return typeof(WebSocketHostListener); }
@@ -26,10 +31,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                WebSocketHostListener aPathListener = new WebSocketHostListener(address, securityFactory);
+                WebSocketHostListener aPathListener = new WebSocketHostListener(address, securityFactory, myReuseAddressFlag);
                 return aPathListener;
             }
         }
+
+        private bool myReuseAddressFlag;
     }
 }
 

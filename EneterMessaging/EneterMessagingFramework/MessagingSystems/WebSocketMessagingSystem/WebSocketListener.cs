@@ -71,18 +71,18 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </summary>
         private class WebSocketListenerImpl : PathListenerProviderBase<IWebSocketClientContext>
         {
-            public WebSocketListenerImpl(string absoluteUri)
-                : base(new WebSocketHostListenerFactory(), new Uri(absoluteUri, UriKind.Absolute))
+            public WebSocketListenerImpl(string absoluteUri, bool reuseAddressFlag)
+                : base(new WebSocketHostListenerFactory(reuseAddressFlag), new Uri(absoluteUri, UriKind.Absolute))
             {
             }
 
-            public WebSocketListenerImpl(Uri uri)
-                : base(new WebSocketHostListenerFactory(), uri)
+            public WebSocketListenerImpl(Uri uri, bool reuseAddressFlag)
+                : base(new WebSocketHostListenerFactory(reuseAddressFlag), uri)
             {
             }
 
-            public WebSocketListenerImpl(Uri uri, ISecurityFactory securityFactory)
-                : base(new WebSocketHostListenerFactory(), uri, securityFactory)
+            public WebSocketListenerImpl(Uri uri, ISecurityFactory securityFactory, bool reuseAddressFlag)
+                : base(new WebSocketHostListenerFactory(reuseAddressFlag), uri, securityFactory)
             {
             }
 
@@ -96,7 +96,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <param name="webSocketUri">service address. Provide port number too.</param>
         public WebSocketListener(Uri webSocketUri)
         {
-            myListenerImpl = new WebSocketListenerImpl(webSocketUri);
+            myListenerImpl = new WebSocketListenerImpl(webSocketUri, ReuseAddress);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </param>
         public WebSocketListener(Uri webSocketUri, ISecurityFactory securityFactory)
         {
-            myListenerImpl = new WebSocketListenerImpl(webSocketUri, securityFactory);
+            myListenerImpl = new WebSocketListenerImpl(webSocketUri, securityFactory, ReuseAddress);
         }
 
         /// <summary>
@@ -143,6 +143,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 return myListenerImpl.IsListening;
             }
         }
+
+        public bool ReuseAddress { get; set; }
 
         private WebSocketListenerImpl myListenerImpl;
     }

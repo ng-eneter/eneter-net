@@ -242,6 +242,11 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerController.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\IHostListenerFactory.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\PathListenerProviderBase.cs" />
+    <Compile Include="Nodes\HolePunching\HolePunchingInputChannel.cs" />
+    <Compile Include="Nodes\HolePunching\HolePunchingOutputChannel.cs" />
+    <Compile Include="Nodes\HolePunching\IRendezvousClient.cs" />
+    <Compile Include="Nodes\HolePunching\RendezvousClient.cs" />
+    <Compile Include="Nodes\HolePunching\RendezvousService.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientNegotiateFactory.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientSslFactory.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ISecurityFactory.cs" />
@@ -314,6 +319,7 @@
     <Compile Include="Nodes\Dispatcher\IDuplexDispatcher.cs" />
     <Compile Include="Nodes\Dispatcher\IDuplexDispatcherFactory.cs" />
     <Compile Include="Nodes\Dispatcher\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\HolePunching\RendezvousMessage.cs" />
     <Compile Include="Nodes\LoadBalancer\ILoadBalancer.cs" />
     <Compile Include="Nodes\LoadBalancer\ILoadBalancerFactory.cs" />
     <Compile Include="Nodes\LoadBalancer\RequestReceiverRemovedEventArgs.cs" />

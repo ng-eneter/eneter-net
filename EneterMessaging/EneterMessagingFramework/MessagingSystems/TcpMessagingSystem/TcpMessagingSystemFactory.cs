@@ -38,7 +38,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private class TcpInputConnectorFactory : IInputConnectorFactory
         {
             public TcpInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory,
-                int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer)
+                int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer,
+                bool reuseAddressFlag)
             {
                 using (EneterTrace.Entering())
                 {
@@ -48,6 +49,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myReceiveTimeout = receiveTimeout;
                     mySendBuffer = sendBuffer;
                     myReceiveBuffer = receiveBuffer;
+                    myReuseAddressFlag = reuseAddressFlag;
                 }
             }
 
@@ -55,7 +57,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new TcpInputConnector(inputConnectorAddress, myProtocolFormatter, mySecurityFactory, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer);
+                    return new TcpInputConnector(inputConnectorAddress, myProtocolFormatter, mySecurityFactory, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer, myReuseAddressFlag);
                 }
             }
 
@@ -65,13 +67,15 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private int myReceiveTimeout;
             private int mySendBuffer;
             private int myReceiveBuffer;
+            private bool myReuseAddressFlag;
         }
 #endif
 
         private class TcpOutputConnectorFactory : IOutputConnectorFactory
         {
             public TcpOutputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory, int connectionTimeout, int sendTimeout, int receiveTimeout,
-                int sendBuffer, int receiveBuffer)
+                int sendBuffer, int receiveBuffer,
+                bool reuseAddressFlag)
             {
                 using (EneterTrace.Entering())
                 {
@@ -82,6 +86,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myReceiveTimeout = receiveTimeout;
                     mySendBuffer = sendBuffer;
                     myReceiveBuffer = receiveBuffer;
+                    myReuseAddressFlag = reuseAddressFlag;
                 }
             }
 
@@ -89,7 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new TcpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, mySecurityFactory, myConnectionTimeout, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer);
+                    return new TcpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, mySecurityFactory, myConnectionTimeout, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer, myReuseAddressFlag);
                 }
             }
 
@@ -100,6 +105,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private int myReceiveTimeout;
             private int mySendBuffer;
             private int myReceiveBuffer;
+            private bool myReuseAddressFlag;
         }
 
 
@@ -179,7 +185,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
-                    SendBufferSize, ReceiveBufferSize);
+                    SendBufferSize, ReceiveBufferSize,
+                    ReuseAddress);
 
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
@@ -216,7 +223,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
-                    SendBufferSize, ReceiveBufferSize);
+                    SendBufferSize, ReceiveBufferSize,
+                    ReuseAddress);
 
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
@@ -251,7 +259,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IInputConnectorFactory aFactory = new TcpInputConnectorFactory(
                     myProtocolFormatter,
                     ServerSecurityStreamFactory,
-                    (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, SendBufferSize, ReceiveBufferSize);
+                    (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, SendBufferSize, ReceiveBufferSize,
+                    ReuseAddress);
                 IInputConnector anInputConnector = aFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -346,14 +355,23 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Sets or gets timeout to receive a message. If not received within the time the connection is closed. Default is 0 what it infinite time.
         /// </summary>
         public TimeSpan ReceiveTimeout { get; set; }
+
+        /// <summary>
+        /// Sets or gets the flag indicating whether the socket can be bound to the address which is already used.
+        /// </summary>
+        /// <remarks>
+        /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
+        /// </remarks>
+        public bool ReuseAddress { get; set; }
 #else
         // Note: Compact framework does not support these settings in Sockets. - it throws exception.
         private int SendBufferSize { get; set; }
         private int ReceiveBufferSize { get; set; }
         private TimeSpan SendTimeout { get; set; }
         private TimeSpan ReceiveTimeout { get; set; }
+        private bool ReuseAddress { get; set; }
 #endif
-        
+
         /// <summary>
         /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.
         /// </summary>
