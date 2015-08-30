@@ -242,10 +242,11 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerController.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\IHostListenerFactory.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\PathListenerProviderBase.cs" />
-    <Compile Include="Nodes\HolePunching\HolePunchingInputChannel.cs" />
-    <Compile Include="Nodes\HolePunching\HolePunchingOutputChannel.cs" />
     <Compile Include="Nodes\HolePunching\IRendezvousClient.cs" />
+    <Compile Include="Nodes\HolePunching\IRendezvousFactory.cs" />
+    <Compile Include="Nodes\HolePunching\IRendezvousService.cs" />
     <Compile Include="Nodes\HolePunching\RendezvousClient.cs" />
+    <Compile Include="Nodes\HolePunching\RendezvousFactory.cs" />
     <Compile Include="Nodes\HolePunching\RendezvousService.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientNegotiateFactory.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\Security\ClientSslFactory.cs" />

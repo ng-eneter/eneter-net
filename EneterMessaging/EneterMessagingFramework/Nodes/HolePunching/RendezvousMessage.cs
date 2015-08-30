@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2015
+*/
+
+
+using System;
+using System.Runtime.Serialization;
 
 namespace Eneter.Messaging.Nodes.HolePunching
 {
@@ -13,9 +18,16 @@ namespace Eneter.Messaging.Nodes.HolePunching
         AddressResponse = 120
     }
 
+#if !SILVERLIGHT
+    [Serializable]
+#endif
+    [DataContract]
     public class RendezvousMessage
     {
+        [DataMember]
         public ERendezvousMessage MessageType { get; set; }
-        public string MessageData { get; set; }
+
+        [DataMember]
+        public string[] MessageData { get; set; }
     }
 }

@@ -36,7 +36,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private class WebSocketInputConnectorFactory : IInputConnectorFactory
         {
-            public WebSocketInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory serverSecurityFactory, int sendTimeout, int receiveTimeout)
+            public WebSocketInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory serverSecurityFactory, int sendTimeout, int receiveTimeout,
+                bool reuseAddressFlag)
             {
                 using (EneterTrace.Entering())
                 {
@@ -44,6 +45,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     myServerSecurityFactory = serverSecurityFactory;
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
+                    myReuseAddressFlag = reuseAddressFlag;
                 }
             }
 
@@ -51,7 +53,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketInputConnector(inputConnectorAddress, myProtocolFormatter, myServerSecurityFactory, mySendTimeout, myReceiveTimeout);
+                    return new WebSocketInputConnector(inputConnectorAddress, myProtocolFormatter, myServerSecurityFactory, mySendTimeout, myReceiveTimeout, myReuseAddressFlag);
                 }
             }
 
@@ -59,6 +61,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             private ISecurityFactory myServerSecurityFactory;
             private int mySendTimeout;
             private int myReceiveTimeout;
+            private bool myReuseAddressFlag;
         }
 #endif
 
@@ -196,7 +199,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory anInputConnectorFactory = new WebSocketInputConnectorFactory(myProtocolFormatter, ServerSecurityStreamFactory,
-                    (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                    (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, ReuseAddress);
                 IInputConnector anInputConnector = anInputConnectorFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -258,10 +261,19 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// Sets or gets timeout to receive a message. If not received within the time the connection is closed. Default is 0 what it infinite time.
         /// </summary>
         public TimeSpan ReceiveTimeout { get; set; }
+
+        /// <summary>
+        /// Sets or gets the flag indicating whether the socket can be bound to the address which is already used.
+        /// </summary>
+        /// <remarks>
+        /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
+        /// </remarks>
+        public bool ReuseAddress { get; set; }
 #else
         // Dummy timeouts - Compact Framework does not support timeouts.
         private TimeSpan SendTimeout { get; set; }
         private TimeSpan ReceiveTimeout { get; set; }
+        private bool ReuseAddress { get; set; }
 #endif
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81

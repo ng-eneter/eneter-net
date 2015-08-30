@@ -10,9 +10,7 @@ using Eneter.Messaging.Infrastructure.Attachable;
 
 namespace Eneter.Messaging.Nodes.HolePunching
 {
-    public interface IRendezvousClient : IAttachableDuplexOutputChannel
+    public interface IRendezvousService : IAttachableDuplexInputChannel
     {
-        string Register(string rendezvousId);
-        string[] GetAddresses(string rendezvousId);
     }
 }

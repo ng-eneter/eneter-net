@@ -50,7 +50,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             public IWebSocketClientContext myClient;
         }
 
-        public WebSocketInputConnector(string wsUriAddress, IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory, int sendTimeout, int receiveTimeout)
+        public WebSocketInputConnector(string wsUriAddress, IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory, int sendTimeout, int receiveTimeout,
+            bool reuseAddressFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -67,6 +68,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                 myProtocolFormatter = protocolFormatter;
                 myListener = new WebSocketListener(aUri, securityFactory);
+                myListener.ReuseAddress = reuseAddressFlag;
+
                 mySendTimeout = sendTimeout;
                 myReceiveTimeout = receiveTimeout;
 
@@ -164,7 +167,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                string aClientIp = (client.ClientEndPoint != null) ? client.ClientEndPoint.Address.ToString() : "";
+                string aClientIp = (client.ClientEndPoint != null) ? client.ClientEndPoint.ToString() : "";
 
                 TClientContext aClientContext = new TClientContext(client);
                 string aClientId = null;

@@ -1,17 +1,20 @@
 ﻿using Eneter.Messaging.DataProcessing.Serializing;
+/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2015
+*/
+
+
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.EndPoints.TypedMessages;
-using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eneter.Messaging.Nodes.HolePunching
 {
-    public class RendezvousClient : IAttachableDuplexOutputChannel
+    internal class RendezvousClient : IRendezvousClient
     {
         public RendezvousClient(ISerializer serializer)
         {
@@ -28,7 +31,7 @@ namespace Eneter.Messaging.Nodes.HolePunching
             {
                 RendezvousMessage aRequest = new RendezvousMessage();
                 aRequest.MessageType = ERendezvousMessage.RegisterRequest;
-                aRequest.MessageData = rendezvousId;
+                aRequest.MessageData = new string[] { rendezvousId };
 
                 RendezvousMessage aResponse = myRendezvousSender.SendRequestMessage(aRequest);
 
@@ -37,17 +40,17 @@ namespace Eneter.Messaging.Nodes.HolePunching
                     throw new InvalidOperationException(TracedObject + "failed to register in rendezvous service.");
                 }
 
-                return aResponse.MessageData;
+                return aResponse.MessageData[0];
             }
         }
 
-        public string GetAddress(string rendezvousId)
+        public string[] GetAddresses(string rendezvousId)
         {
             using (EneterTrace.Entering())
             {
                 RendezvousMessage aRequest = new RendezvousMessage();
                 aRequest.MessageType = ERendezvousMessage.GetAddressRequest;
-                aRequest.MessageData = rendezvousId;
+                aRequest.MessageData = new string[] { rendezvousId };
 
                 RendezvousMessage aResponse = myRendezvousSender.SendRequestMessage(aRequest);
 

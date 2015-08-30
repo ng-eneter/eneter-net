@@ -1,34 +1,46 @@
-﻿using Eneter.Messaging.DataProcessing.Serializing;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright © Ondrej Uzovic 2015
+*/
+
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.EndPoints.TypedMessages;
-using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eneter.Messaging.Nodes.HolePunching
 {
-    public class RendezvousService : IAttachableDuplexInputChannel
+    internal class RendezvousService : IRendezvousService
     {
+        private class TRendezvousContext
+        {
+            public TRendezvousContext(string responseReceiverId, string rendezvousId, string ipAddressAndPort)
+            {
+                ResponseReceiverId = responseReceiverId;
+                RendezvousId = rendezvousId;
+                IpAddressAndPort = ipAddressAndPort;
+            }
+
+            public string RendezvousId { get; private set; }
+            public string ResponseReceiverId { get; private set; }
+            public string IpAddressAndPort { get; private set; }
+        }
+
         public RendezvousService(ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
                 DuplexTypedMessagesFactory aFactory = new DuplexTypedMessagesFactory(serializer);
                 myReceiver = aFactory.CreateDuplexTypedMessageReceiver<RendezvousMessage, RendezvousMessage>();
-                myReceiver.ResponseReceiverConnected += OnResponseReceiverConnected;
                 myReceiver.ResponseReceiverDisconnected += OnResponseReceiverDisconnected;
                 myReceiver.MessageReceived += OnMessageReceived;
             }
         }
 
-        
-
-        
-        
 
         public void AttachDuplexInputChannel(IDuplexInputChannel duplexInputChannel)
         {
@@ -48,21 +60,25 @@ namespace Eneter.Messaging.Nodes.HolePunching
 
         public bool IsDuplexInputChannelAttached
         {
-            get { throw new NotImplementedException(); }
+            get { return myReceiver.IsDuplexInputChannelAttached; }
         }
 
         public IDuplexInputChannel AttachedDuplexInputChannel
         {
-            get { throw new NotImplementedException(); }
+            get { return myReceiver.AttachedDuplexInputChannel; }
         }
 
-
-        private void OnResponseReceiverConnected(object sender, ResponseReceiverEventArgs e)
-        {
-        }
 
         private void OnResponseReceiverDisconnected(object sender, ResponseReceiverEventArgs e)
         {
+            using (EneterTrace.Entering())
+            {
+                using (ThreadLock.Lock(myRegisteredEndPoints))
+                {
+                    int anIdx = myRegisteredEndPoints.FindIndex(x => x.ResponseReceiverId == e.ResponseReceiverId);
+                    myRegisteredEndPoints.RemoveAt(anIdx);
+                }
+            }
         }
 
         private void OnMessageReceived(object sender, TypedRequestReceivedEventArgs<RendezvousMessage> e)
@@ -77,11 +93,11 @@ namespace Eneter.Messaging.Nodes.HolePunching
 
                 if (e.RequestMessage.MessageType == ERendezvousMessage.RegisterRequest)
                 {
-                    Register(e.RequestMessage.MessageData, e.SenderAddress, e.ResponseReceiverId);
+                    Register(e.RequestMessage.MessageData[0], e.SenderAddress, e.ResponseReceiverId);
                 }
                 else if (e.RequestMessage.MessageType == ERendezvousMessage.GetAddressRequest)
                 {
-                    ProvideAddress(e.RequestMessage.MessageData, e.ResponseReceiverId);
+                    ProvideAddress(e.RequestMessage.MessageData[0], e.ResponseReceiverId);
                 }
             }
         }
@@ -102,15 +118,16 @@ namespace Eneter.Messaging.Nodes.HolePunching
                     return;
                 }
 
+                TRendezvousContext aContext = new TRendezvousContext(responseReceiverId, rendezvousId, ipAddressAndPort);
                 using (ThreadLock.Lock(myRegisteredEndPoints))
                 {
-                    myRegisteredEndPoints[rendezvousId] = ipAddressAndPort;
-
-                    RendezvousMessage aResponse = new RendezvousMessage();
-                    aResponse.MessageType = ERendezvousMessage.AddressResponse;
-                    aResponse.MessageData = ipAddressAndPort;
-                    myReceiver.SendResponseMessage(responseReceiverId, aResponse);
+                    myRegisteredEndPoints.Add(aContext);
                 }
+
+                RendezvousMessage aResponse = new RendezvousMessage();
+                aResponse.MessageType = ERendezvousMessage.AddressResponse;
+                aResponse.MessageData = new string[] { ipAddressAndPort };
+                myReceiver.SendResponseMessage(responseReceiverId, aResponse);
             }
         }
 
@@ -118,26 +135,24 @@ namespace Eneter.Messaging.Nodes.HolePunching
         {
             using (EneterTrace.Entering())
             {
-                string anIpAddressAndPort;
+                string[] anAvailableEndPoints;
                 using (ThreadLock.Lock(myRegisteredEndPoints))
                 {
-                    myRegisteredEndPoints.TryGetValue(rendezvousId, out anIpAddressAndPort);
+                    anAvailableEndPoints = myRegisteredEndPoints.Where(x => x.ResponseReceiverId == responseReceiverId)
+                        .Select(x => x.IpAddressAndPort).ToArray();
                 }
 
-                if (!string.IsNullOrEmpty(anIpAddressAndPort))
-                {
-                    RendezvousMessage aResponse = new RendezvousMessage();
-                    aResponse.MessageType = ERendezvousMessage.AddressResponse;
-                    aResponse.MessageData = anIpAddressAndPort;
-                    myReceiver.SendResponseMessage(responseReceiverId, aResponse);
-                }
+                RendezvousMessage aResponse = new RendezvousMessage();
+                aResponse.MessageType = ERendezvousMessage.AddressResponse;
+                aResponse.MessageData = anAvailableEndPoints;
+                myReceiver.SendResponseMessage(responseReceiverId, aResponse);
             }
         }
 
 
         private IDuplexTypedMessageReceiver<RendezvousMessage, RendezvousMessage> myReceiver;
 
-        private Dictionary<string, string> myRegisteredEndPoints = new Dictionary<string, string>();
+        private List<TRendezvousContext> myRegisteredEndPoints = new List<TRendezvousContext>();
 
         private string TracedObject
         {

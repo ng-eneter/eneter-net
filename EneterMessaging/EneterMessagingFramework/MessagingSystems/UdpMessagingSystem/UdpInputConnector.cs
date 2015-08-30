@@ -185,7 +185,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
 
                 // Get the sender IP address.
-                string aClientIp = (clientAddress != null) ? ((IPEndPoint)clientAddress).Address.ToString() : "";
+                string aClientIp = (clientAddress != null) ? ((IPEndPoint)clientAddress).ToString() : "";
 
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
 
