@@ -57,7 +57,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myConnectionHandler = connectionHandler;
 
                         myListener = new TcpListener(myAddress);
-                        myListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+#if !COMPACT_FRAMEWORK
+                        myListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
+#endif
 
 #if !COMPACT_FRAMEWORK && !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myListener.Server.LingerState = new LingerOption(true, 0);
