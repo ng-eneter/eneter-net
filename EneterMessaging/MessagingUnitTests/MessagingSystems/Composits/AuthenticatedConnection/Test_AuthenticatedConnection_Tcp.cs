@@ -36,7 +36,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
             MessagingSystemFactory = new AuthenticatedMessagingFactory(anUnderlyingMessaging,
                 GetLoginMessage,
                 GetHandshakeResponseMessage,
-                GetHandshakeMessage, VerifyHandshakeResponseMessage)
+                GetHandshakeMessage, VerifyHandshakeResponseMessage, HandleAuthenticationCancelled)
                 {
                     AuthenticationTimeout = TimeSpan.FromMilliseconds(2000)
                 };

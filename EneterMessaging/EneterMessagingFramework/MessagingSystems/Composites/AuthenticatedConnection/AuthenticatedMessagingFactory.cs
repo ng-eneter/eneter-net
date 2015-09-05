@@ -72,9 +72,17 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     /// <param name="loginMessage">login message that was sent from the client</param>
     /// <param name="handshakeMessage">verification message (question) that service sent to the client</param>
     /// <param name="handshakeResponseMessage">client's response to the handshake message</param>
-    /// <returns>true if the authentication passed and the connection can be established</returns>
+    /// <returns>true if the authentication passed and the connection can be established.
+    /// If false the authentication failed and the connection will be closed.</returns>
     public delegate bool Authenticate(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponseMessage);
 
+    /// <summary>
+    /// Callback method to handle when the authentication is cancelled.
+    /// </summary>
+    /// <param name="channelId"></param>
+    /// <param name="responseReceiverId"></param>
+    /// <param name="loginMessage"></param>
+    public delegate void HandleAuthenticationCancelled(string channelId, string responseReceiverId, object loginMessage);
 
     /// <summary>
     /// Extension for authentication during connecting.
@@ -280,12 +288,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// you can create only duplex output channels.
         /// </remarks>
         /// <param name="underlyingMessagingSystem">underlying messaging upon which the authentication will work.</param>
-        /// <param name="getLoginMessageCallback">callback returning the login message.</param>
-        /// <param name="getHandshakeResponseMessageCallback">callback returning the response message for the handshake.</param>
+        /// <param name="getLoginMessageCallback">callback called by the output channel to get the login message which shall be used to open the connection</param>
+        /// <param name="getHandshakeResponseMessageCallback">callback called by the output channel to get the response for the handshake message which was received from the input channel.</param>
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
             GetLoginMessage getLoginMessageCallback,
             GetHandshakeResponseMessage getHandshakeResponseMessageCallback)
-            : this(underlyingMessagingSystem, getLoginMessageCallback, getHandshakeResponseMessageCallback, null, null)
+            : this(underlyingMessagingSystem, getLoginMessageCallback, getHandshakeResponseMessageCallback, null, null, null)
         {
         }
 
@@ -302,7 +310,28 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
             GetHanshakeMessage getHandshakeMessageCallback,
             Authenticate authenticateCallback)
-            : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, authenticateCallback)
+            : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, authenticateCallback, null)
+        {
+        }
+
+        /// <summary>
+        /// Constructs factory that will be used only by a service.
+        /// </summary>
+        /// <remarks>
+        /// The constructor takes only callbacks which are used by the service. Therefore if you use this constructor
+        /// you can create only duplex input channels.
+        /// </remarks>
+        /// <param name="underlyingMessagingSystem">underlying messaging upon which the authentication will work.</param>
+        /// <param name="getHandshakeMessageCallback">callback called by the input chanel to get the handshake message for the login message which was received from the output channel.</param>
+        /// <param name="authenticateCallback">callback called by the input channe to perform the authentication.</param>
+        /// <param name="handleAuthenticationCancelledCallback">callback called by the input channel to indicate the output channel closed the connection during the authentication procedure.
+        /// Can be null if your authentication code does not need to handle it.
+        /// (E.g. if the authentication logic needs to clean if the authentication fails.)</param>
+        public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
+            GetHanshakeMessage getHandshakeMessageCallback,
+            Authenticate authenticateCallback,
+            HandleAuthenticationCancelled handleAuthenticationCancelledCallback)
+            : this(underlyingMessagingSystem, null, null, getHandshakeMessageCallback, authenticateCallback, handleAuthenticationCancelledCallback)
         {
         }
 
@@ -314,15 +343,19 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// duplex input channels.
         /// </remarks>
         /// <param name="underlyingMessagingSystem">underlying messaging upon which the authentication will work.</param>
-        /// <param name="getLoginMessageCallback">returning the login message.</param>
-        /// <param name="getHandshakeResponseMessageCallback">callback returning the response message for the handshake.</param>
-        /// <param name="getHandshakeMessageCallback">callback returning the handshake message.</param>
-        /// <param name="authenticateCallback">callback performing the authentication.</param>
+        /// <param name="getLoginMessageCallback">callback called by the output channel to get the login message which shall be used to open the connection</param>
+        /// <param name="getHandshakeResponseMessageCallback">callback called by the output channel to get the response for the handshake message which was received from the input channel.</param>
+        /// <param name="getHandshakeMessageCallback">callback called by the input chanel to get the handshake message for the login message which was received from the output channel.</param>
+        /// <param name="authenticateCallback">callback called by the input channe to perform the authentication.</param>
+        /// <param name="handleAuthenticationCancelledCallback">callback called by the input channel to indicate the output channel closed the connection during the authentication procedure.
+        /// Can be null if your authentication code does not need to handle it.
+        /// (E.g. if the authentication logic needs to clean if the authentication fails.)</param>
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
             GetLoginMessage getLoginMessageCallback,
             GetHandshakeResponseMessage getHandshakeResponseMessageCallback,
             GetHanshakeMessage getHandshakeMessageCallback,
-            Authenticate authenticateCallback)
+            Authenticate authenticateCallback,
+            HandleAuthenticationCancelled handleAuthenticationCancelledCallback)
         {
             using (EneterTrace.Entering())
             {
@@ -333,6 +366,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 myGetHandShakeMessageCallback = getHandshakeMessageCallback;
                 myGetHandshakeResponseMessageCallback = getHandshakeResponseMessageCallback;
                 myAuthenticateCallback = authenticateCallback;
+                myHandleAuthenticationCancelled = handleAuthenticationCancelledCallback;
 
                 OutputChannelThreading = new SyncDispatching();
             }
@@ -341,6 +375,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// <summary>
         /// Creates duplex output channel which performs authentication procedure during opening the connection.
         /// </summary>
+        /// <remarks>
+        /// The created authenticated output channel can throw following exceptions when opening the connection:
+        /// <ul>
+        /// <li>TimeOutException - if the authentication sequence exceeds the specified AuthenticationTimeout.</li>
+        /// <li>AuthenticationException - if the authentication fails and the conneciton is not granted.</li>
+        /// <li>Other underlying messaging specific exception - if it fails to open the connection and start the authentication.</li>
+        /// </ul>
+        /// </remarks>
         /// <param name="channelId">service address</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
@@ -371,6 +413,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// <summary>
         /// Creates duplex output channel which performs authentication procedure during opening the connection.
         /// </summary>
+        /// <remarks>
+        /// The created authenticated output channel can throw following exceptions when opening the connection:
+        /// <ul>
+        /// <li>TimeOutException - if the authentication sequence exceeds the specified AuthenticationTimeout.</li>
+        /// <li>AuthenticationException - if the authentication fails and the conneciton is not granted.</li>
+        /// <li>Other underlying messaging specific exception - if it fails to open the connection and start the authentication.</li>
+        /// </ul>
+        /// </remarks>
         /// <param name="channelId">service address</param>
         /// <param name="responseReceiverId">unique identifier of the connection with the service.</param>
         /// <returns></returns>
@@ -421,7 +471,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
 
                 IDuplexInputChannel anUnderlyingInputChannel = myUnderlyingMessaging.CreateDuplexInputChannel(channelId);
-                return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myGetHandShakeMessageCallback, myAuthenticateCallback);
+                return new AuthenticatedDuplexInputChannel(anUnderlyingInputChannel, myGetHandShakeMessageCallback, myAuthenticateCallback, myHandleAuthenticationCancelled);
             }
         }
 
@@ -457,6 +507,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private GetHanshakeMessage myGetHandShakeMessageCallback;
         private GetHandshakeResponseMessage myGetHandshakeResponseMessageCallback;
         private Authenticate myAuthenticateCallback;
+        private HandleAuthenticationCancelled myHandleAuthenticationCancelled;
 
         private string TracedObject
         {

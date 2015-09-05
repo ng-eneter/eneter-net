@@ -10,6 +10,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using System.Security.Authentication;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
@@ -65,7 +66,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         // Reset internal states.
                         myIsHandshakeResponseSent = false;
                         myIsConnectionAcknowledged = false;
-                        myConnectionAcknowledged.Reset();
+                        myAuthenticationEnded.Reset();
 
                         myUnderlyingOutputChannel.OpenConnection();
 
@@ -94,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         }
 
                         // Wait until the hanshake is completed.
-                        if (!myConnectionAcknowledged.WaitOne((int)myAuthenticationTimeout.TotalMilliseconds))
+                        if (!myAuthenticationEnded.WaitOne((int)myAuthenticationTimeout.TotalMilliseconds))
                         {
                             string anErrorMessage = TracedObject + "failed to process authentication within defined timeout " + myAuthenticationTimeout.TotalMilliseconds + " ms.";
                             EneterTrace.Error(anErrorMessage);
@@ -103,9 +104,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                         if (!IsConnected)
                         {
-                            String anErrorMessage = TracedObject + ErrorHandler.FailedToOpenConnection;
+                            string anErrorMessage = TracedObject + "failed to authenticate '" + aLoginMessage + "'.";
                             EneterTrace.Error(anErrorMessage);
-                            throw new InvalidOperationException(anErrorMessage);
+                            throw new AuthenticationException(anErrorMessage);
                         }
                     }
                     catch
@@ -164,20 +165,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         {
             using (EneterTrace.Entering())
             {
-                // If the connection was authenticated then notify that it was closed.
-                bool aCloseNotifyFlag = myIsConnectionAcknowledged;
-
                 // If there is waiting for connection open release it.
-                myConnectionAcknowledged.Set();
-                using (ThreadLock.Lock(myConnectionManipulatorLock))
-                {
-                    myIsHandshakeResponseSent = false;
-                    myIsConnectionAcknowledged = false;
-                }
+                myAuthenticationEnded.Set();
 
-                if (aCloseNotifyFlag)
+                // If the connection was authenticated then notify that it was closed.
+                if (myIsConnectionAcknowledged)
                 {
-
                     myThreadDispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionClosed, e, false));
                 }
             }
@@ -198,33 +191,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 
                 bool aCloseConnectionFlag = false;
 
-                if (myIsHandshakeResponseSent)
-                {
-                    EneterTrace.Debug("CONNECTION ACKNOWLEDGE RECEIVED");
-
-                    // If the handshake was sent then this message must be acknowledgement.
-                    string anAcknowledgeMessage = e.Message as string;
-
-                    // If the acknowledge message is wrong then disconnect.
-                    if (String.IsNullOrEmpty(anAcknowledgeMessage) || anAcknowledgeMessage != "OK")
-                    {
-                        string anErrorMessage = TracedObject + "detected incorrect acknowledge message. The connection will be closed.";
-                        EneterTrace.Error(anErrorMessage);
-
-                        aCloseConnectionFlag = true;
-                    }
-                    else
-                    {
-                        myIsConnectionAcknowledged = true;
-                        myConnectionAcknowledged.Set();
-
-                        // Notify the connection is open.
-                        DuplexChannelEventArgs anEventArgs = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, e.SenderAddress);
-                        myThreadDispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionOpened, anEventArgs, false));
-                    }
-                }
-                else
-                    // This is the handshake message.
+                // This is the handshake message.
+                if (!myIsHandshakeResponseSent)
                 {
                     EneterTrace.Debug("HANDSHAKE RECEIVED");
 
@@ -238,7 +206,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                     catch (Exception err)
                     {
                         string anErrorMessage = TracedObject + "failed to get the handshake response message. The connection will be closed.";
-                        EneterTrace.Error(anErrorMessage, err);
+                        EneterTrace.Warning(anErrorMessage, err);
 
                         aCloseConnectionFlag = true;
                     }
@@ -263,10 +231,38 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         }
                     }
                 }
+                else
+                {
+                    EneterTrace.Debug("CONNECTION ACKNOWLEDGE RECEIVED");
+
+                    // If the handshake was sent then this message must be acknowledgement.
+                    string anAcknowledgeMessage = e.Message as string;
+
+                    // If the acknowledge message is wrong then disconnect.
+                    if (String.IsNullOrEmpty(anAcknowledgeMessage) || anAcknowledgeMessage != "OK")
+                    {
+                        string anErrorMessage = TracedObject + "detected incorrect acknowledge message. The connection will be closed.";
+                        EneterTrace.Error(anErrorMessage);
+
+                        aCloseConnectionFlag = true;
+                    }
+                    else
+                    {
+                        myIsConnectionAcknowledged = true;
+                        myAuthenticationEnded.Set();
+
+                        // Notify the connection is open.
+                        DuplexChannelEventArgs anEventArgs = new DuplexChannelEventArgs(ChannelId, ResponseReceiverId, e.SenderAddress);
+                        myThreadDispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionOpened, anEventArgs, false));
+                    }
+                }
 
                 if (aCloseConnectionFlag)
                 {
                     myUnderlyingOutputChannel.CloseConnection();
+
+                    // Release the waiting in OpenConnection(..).
+                    myAuthenticationEnded.Set();
                 }
             }
         }
@@ -302,7 +298,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         private TimeSpan myAuthenticationTimeout;
         private bool myIsHandshakeResponseSent;
         private bool myIsConnectionAcknowledged;
-        private ManualResetEvent myConnectionAcknowledged = new ManualResetEvent(false);
+        private ManualResetEvent myAuthenticationEnded = new ManualResetEvent(false);
         private object myConnectionManipulatorLock = new object();
 
 

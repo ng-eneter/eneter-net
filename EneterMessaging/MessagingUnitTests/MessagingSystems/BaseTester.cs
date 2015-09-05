@@ -498,13 +498,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
 
             aService.DoOnResponseReceiverConnected((x, y) =>
                 {
-
-#if !COMPACT_FRAMEWORK
-                    if (MessagingSystemFactory is NamedPipeMessagingSystemFactory)
+                    if (MessagingSystemFactory is SynchronousMessagingSystemFactory == false)
                     {
-                        Thread.Sleep(500);
+                        aClient.WaitUntilConnectionOpenIsNotified(1000);
                     }
-#endif
 
                     aService.InputChannel.DisconnectResponseReceiver(y.ResponseReceiverId);
                 });

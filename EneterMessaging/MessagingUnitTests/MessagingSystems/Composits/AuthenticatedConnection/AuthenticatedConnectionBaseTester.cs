@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Eneter.Messaging.DataProcessing.Serializing;
 using System.Threading;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using System.Security.Authentication;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConnection
 {
@@ -38,6 +39,68 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
             }
         }
 
+        [Test]
+        [ExpectedException(typeof(AuthenticationException))]
+        public virtual void ConnectionNotGranted()
+        {
+            IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
+            IDuplexOutputChannel anOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
+
+            try
+            {
+                myConnectionNotGranted = true;
+
+                anInputChannel.StartListening();
+
+                // Client opens the connection.
+                anOutputChannel.OpenConnection();
+            }
+            finally
+            {
+                myConnectionNotGranted = false;
+
+                anOutputChannel.CloseConnection();
+                anInputChannel.StopListening();
+            }
+        }
+
+        [Test]
+        public virtual void AuthenticationCancelledByClient()
+        {
+            IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
+            IDuplexOutputChannel anOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(ChannelId);
+
+            try
+            {
+                myClientCancelAuthentication = true;
+
+                anInputChannel.StartListening();
+
+                Exception anException = null;
+                try
+                {
+                    // Client opens the connection.
+                    anOutputChannel.OpenConnection();
+                }
+                catch (Exception err)
+                {
+                    anException = err;
+                }
+
+                Assert.IsInstanceOf<AuthenticationException>(anException);
+
+                // Check that the AuthenticationCancelled calleback was called.
+                Assert.IsTrue(myAuthenticationCancelled);
+            }
+            finally
+            {
+                myClientCancelAuthentication = false;
+                myAuthenticationCancelled = false;
+
+                anOutputChannel.CloseConnection();
+                anInputChannel.StopListening();
+            }
+        }
 
         protected object GetLoginMessage(string channelId, string responseReceiverId)
         {
@@ -49,6 +112,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
             // Sleep in case a timeout is needed.
             Thread.Sleep(myAuthenticationSleep);
 
+            if (myConnectionNotGranted)
+            {
+                return null;
+            }
+
             if ((string)loginMessage == "MyLoginName")
             {
                 return "MyHandshake";
@@ -59,6 +127,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
 
         protected object GetHandshakeResponseMessage(string channelId, string responseReceiverId, object handshakeMessage)
         {
+            if (myClientCancelAuthentication)
+            {
+                return null;
+            }
+
             object aHandshakeResponse = myHandshakeSerializer.Serialize<string>((string)handshakeMessage);
             return aHandshakeResponse;
         }
@@ -69,9 +142,17 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
             return (string)handshakeMessage == aHandshakeResponse;
         }
 
+        protected void HandleAuthenticationCancelled(string channelId, string responseReceiverId, object loginMassage)
+        {
+            myAuthenticationCancelled = true;
+        }
+
 
         protected ISerializer myHandshakeSerializer;
         protected TimeSpan myAuthenticationSleep = TimeSpan.FromMilliseconds(0);
+        protected bool myClientCancelAuthentication;
+        protected bool myAuthenticationCancelled;
+        protected bool myConnectionNotGranted;
     }
 }
 
