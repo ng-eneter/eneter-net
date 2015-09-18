@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2015
 */
 
-#if COMPACT_FRAMEWORK
+#if !COMPACT_FRAMEWORK
 
 using System;
 using System.Threading;
@@ -21,9 +21,10 @@ namespace Eneter.Messaging.Diagnostic
 
         private ThreadLock(object obj)
         {
-            // Wait until the lock is acquired.
-            Monitor.Enter(obj);
             myObj = obj;
+
+            // Wait until the lock is acquired.
+            Monitor.Enter(myObj);
         }
 
         void IDisposable.Dispose()
@@ -32,7 +33,7 @@ namespace Eneter.Messaging.Diagnostic
             Monitor.Exit(myObj);
         }
 
-        private object myObj;
+        private readonly object myObj;
     }
 }
 

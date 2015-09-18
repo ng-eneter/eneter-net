@@ -18,12 +18,27 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpReceiver
     {
-        public UdpReceiver(IPEndPoint serviceEndPoint, bool isService)
+        // Constructor used by services. (They listen to requests from clients.)
+        public UdpReceiver(IPEndPoint serviceEndPoint)
         {
             using (EneterTrace.Entering())
             {
                 myServiceEndpoint = serviceEndPoint;
-                myIsService = isService;
+                myIsService = true;
+                myWorkingThreadDispatcher = new SingleThreadExecutor();
+            }
+        }
+
+        // Constructors used by clients to listen to response messages.
+        public UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort)
+        {
+            using (EneterTrace.Entering())
+            {
+                myServiceEndpoint = serviceEndPoint;
+                myIsService = false;
+                myReuseAddressFlag = reuseAddressFlag;
+                myResponseReceivingPort = responseReceivingPort;
+
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
@@ -51,10 +66,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         myStopListeningRequested = false;
                         myMessageHandler = messageHandler;
 
-                        mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                        mySocket = new Socket(myServiceEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
 #if !COMPACT_FRAMEWORK
                         // Note: bigger buffer increases the chance the datagram is not lost.
                         mySocket.ReceiveBufferSize = 1048576;
+                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 #else
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
 #endif
@@ -71,6 +87,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         }
                         else
                         {
+#if !COMPACT_FRAMEWORK
+                            // If the client shall bind incoming responses to a specified port.
+                            if (myResponseReceivingPort > 0)
+                            {
+                                // Note: IPAddress.Any will be updated once the connection is established.
+                                mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
+                            }
+#endif
                             mySocket.Connect(myServiceEndpoint);
                         }
 
@@ -254,6 +278,9 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private bool myIsService;
         private EndPoint myServiceEndpoint;
         private Socket mySocket;
+        private bool myReuseAddressFlag;
+        private int myResponseReceivingPort;
+
         private volatile bool myIsListening;
         private volatile bool myStopListeningRequested;
         private object myListeningManipulatorLock = new object();

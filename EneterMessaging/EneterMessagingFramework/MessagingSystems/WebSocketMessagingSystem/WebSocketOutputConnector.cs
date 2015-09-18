@@ -28,7 +28,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             int connectTimeout,
             int sendTimeout,
             int receiveTimeout,
-            int pingFrequency)
+            int pingFrequency,
+            int responseReceivingPort)
         {
             using (EneterTrace.Entering())
             {
@@ -44,6 +45,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 }
 
                 myClient = new WebSocketClient(aUri, clientSecurityFactory);
+                myClient.ResponseReceivingPort = responseReceivingPort;
 
                 myOutputConnectorAddress = outputConnectorAddress;
                 myProtocolFormatter = protocolFormatter;

@@ -17,7 +17,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpOutputConnector : IOutputConnector
     {
-        public UdpOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter)
+        public UdpOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter,
+            bool reuseAddressFlag, int responseReceivingPort)
         {
             using (EneterTrace.Entering())
             {
@@ -35,6 +36,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), anServiceUri.Port);
                 myOutpuConnectorAddress = outpuConnectorAddress;
                 myProtocolFormatter = protocolFormatter;
+                myReuseAddressFlag = reuseAddressFlag;
+                myResponseReceivingPort = responseReceivingPort;
             }
         }
 
@@ -52,7 +55,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myResponseMessageHandler = responseMessageHandler;
-                        myResponseReceiver = new UdpReceiver(myServiceEndpoint, false);
+                        myResponseReceiver = new UdpReceiver(myServiceEndpoint, myReuseAddressFlag, myResponseReceivingPort);
                         myResponseReceiver.StartListening(OnResponseMessageReceived);
 
                         byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
@@ -167,6 +170,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private IProtocolFormatter myProtocolFormatter;
         private string myOutpuConnectorAddress;
         private IPEndPoint myServiceEndpoint;
+        private bool myReuseAddressFlag;
+        private int myResponseReceivingPort;
         private Action<MessageContext> myResponseMessageHandler;
         private UdpReceiver myResponseReceiver;
         private object myConnectionManipulatorLock = new object();

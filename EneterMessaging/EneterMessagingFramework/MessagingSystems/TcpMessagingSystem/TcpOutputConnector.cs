@@ -21,6 +21,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
+using System.Net;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -28,7 +29,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     {
         public TcpOutputConnector(string ipAddressAndPort, string outputConnectorAddress, IProtocolFormatter protocolFormatter, ISecurityFactory clientSecurityFactory,
             int connectTimeout, int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer,
-            bool reuseAddressFlag)
+            bool reuseAddressFlag,
+            int responseReceivingPort)
         {
             using (EneterTrace.Entering())
             {
@@ -51,6 +53,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 mySendBuffer = sendBuffer;
                 myReceiveBuffer = receiveBuffer;
                 myReuseAddressFlag = reuseAddressFlag;
+                myResponseReceivingPort = responseReceivingPort;
             }
         }
 
@@ -74,6 +77,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 #endif
                         myTcpClient = new TcpClient(anAddressFamily);
 
+                        
+
                         myTcpClient.NoDelay = true;
 #if !COMPACT_FRAMEWORK
                         myTcpClient.SendTimeout = mySendTimeout;
@@ -81,6 +86,12 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myTcpClient.SendBufferSize = mySendBuffer;
                         myTcpClient.ReceiveBufferSize = myReceiveBuffer;
                         myTcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
+
+                        if (myResponseReceivingPort > 0)
+                        {
+                            IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any;
+                            myTcpClient.Client.Bind(new IPEndPoint(aDummyIpAddress, myResponseReceivingPort));
+                        }
 #endif
 
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
@@ -301,6 +312,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private int myReceiveBuffer;
         private bool myReuseAddressFlag;
         private Stream myClientStream;
+        private int myResponseReceivingPort;
 
         private string myIpAddress;
         private object myConnectionManipulatorLock = new object();

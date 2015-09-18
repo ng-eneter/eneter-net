@@ -93,7 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
-                        myReceiver = new UdpReceiver(myServiceEndpoint, true);
+                        myReceiver = new UdpReceiver(myServiceEndpoint);
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch

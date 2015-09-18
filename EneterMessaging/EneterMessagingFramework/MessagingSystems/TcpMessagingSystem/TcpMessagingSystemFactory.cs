@@ -75,7 +75,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             public TcpOutputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory, int connectionTimeout, int sendTimeout, int receiveTimeout,
                 int sendBuffer, int receiveBuffer,
-                bool reuseAddressFlag)
+                bool reuseAddressFlag,
+                int responseReceivingPort)
             {
                 using (EneterTrace.Entering())
                 {
@@ -87,6 +88,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     mySendBuffer = sendBuffer;
                     myReceiveBuffer = receiveBuffer;
                     myReuseAddressFlag = reuseAddressFlag;
+                    myResponseReceivingPort = responseReceivingPort;
                 }
             }
 
@@ -94,7 +96,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new TcpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, mySecurityFactory, myConnectionTimeout, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer, myReuseAddressFlag);
+                    return new TcpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, mySecurityFactory,
+                        myConnectionTimeout, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer,
+                        myReuseAddressFlag,
+                        myResponseReceivingPort);
                 }
             }
 
@@ -106,6 +111,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private int mySendBuffer;
             private int myReceiveBuffer;
             private bool myReuseAddressFlag;
+            private int myResponseReceivingPort;
         }
 
 
@@ -186,7 +192,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     SendBufferSize, ReceiveBufferSize,
-                    ReuseAddress);
+                    ReuseAddress, -1);
 
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
@@ -224,7 +230,22 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     SendBufferSize, ReceiveBufferSize,
-                    ReuseAddress);
+                    ReuseAddress, -1);
+
+                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
+            }
+        }
+
+        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId, int responseReceivingPort)
+        {
+            using (EneterTrace.Entering())
+            {
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
+                    myProtocolFormatter, ClientSecurityStreamFactory,
+                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
+                    SendBufferSize, ReceiveBufferSize,
+                    ReuseAddress, responseReceivingPort);
 
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }

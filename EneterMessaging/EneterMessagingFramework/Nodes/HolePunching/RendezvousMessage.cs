@@ -14,8 +14,10 @@ namespace Eneter.Messaging.Nodes.HolePunching
     public enum ERendezvousMessage
     {
         RegisterRequest = 100,
-        GetAddressRequest = 110,
-        AddressResponse = 120
+        RegisterResponse = 110,
+        GetAddressRequest = 120,
+        GetAddressResponse = 130,
+        Drill = 140
     }
 
 #if !SILVERLIGHT
@@ -28,6 +30,6 @@ namespace Eneter.Messaging.Nodes.HolePunching
         public ERendezvousMessage MessageType { get; set; }
 
         [DataMember]
-        public string[] MessageData { get; set; }
+        public string MessageData { get; set; }
     }
 }

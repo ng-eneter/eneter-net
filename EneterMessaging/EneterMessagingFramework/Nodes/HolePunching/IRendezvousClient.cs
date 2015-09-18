@@ -13,6 +13,6 @@ namespace Eneter.Messaging.Nodes.HolePunching
     public interface IRendezvousClient : IAttachableDuplexOutputChannel
     {
         string Register(string rendezvousId);
-        string[] GetAddresses(string rendezvousId);
+        string GetEndPoint(string rendezvousId);
     }
 }

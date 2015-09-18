@@ -196,6 +196,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                 ConnectTimeout = 30000;
                 SendTimeout = 30000;
+
+                ResponseReceivingPort = -1;
             }
         }
 
@@ -227,6 +229,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// The header-field Sec-WebSocket-Key is generated and added when OpenConnection() is called.
         /// </remarks>
         public IDictionary<string, string> HeaderFields { get; private set; }
+
+        public int ResponseReceivingPort { get; set; }
 
         /// <summary>
         /// Returns true if the connection to the server is open.
@@ -320,6 +324,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #endif
                         myTcpClient = new TcpClient(anAddressFamily);
                         myTcpClient.NoDelay = true;
+
+                        if (ResponseReceivingPort > 0)
+                        {
+                            IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6None : IPAddress.None;
+                            myTcpClient.Client.Bind(new IPEndPoint(aDummyIpAddress, ResponseReceivingPort));
+                        }
 
 #if SILVERLIGHT
                         // Note: Silverlight has connection timeout too.

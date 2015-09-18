@@ -18,10 +18,10 @@ namespace Eneter.Messaging.Nodes.HolePunching
     {
         private class TRendezvousContext
         {
-            public TRendezvousContext(string responseReceiverId, string rendezvousId, string ipAddressAndPort)
+            public TRendezvousContext(string rendezvousId, string responseReceiverId, string ipAddressAndPort)
             {
-                ResponseReceiverId = responseReceiverId;
                 RendezvousId = rendezvousId;
+                ResponseReceiverId = responseReceiverId;
                 IpAddressAndPort = ipAddressAndPort;
             }
 
@@ -73,11 +73,7 @@ namespace Eneter.Messaging.Nodes.HolePunching
         {
             using (EneterTrace.Entering())
             {
-                using (ThreadLock.Lock(myRegisteredEndPoints))
-                {
-                    int anIdx = myRegisteredEndPoints.FindIndex(x => x.ResponseReceiverId == e.ResponseReceiverId);
-                    myRegisteredEndPoints.RemoveAt(anIdx);
-                }
+                UnregisterResponseReceiver(e.ResponseReceiverId);
             }
         }
 
@@ -91,13 +87,15 @@ namespace Eneter.Messaging.Nodes.HolePunching
                     return;
                 }
 
+                // If service registers in Rendezvous service.
                 if (e.RequestMessage.MessageType == ERendezvousMessage.RegisterRequest)
                 {
-                    Register(e.RequestMessage.MessageData[0], e.SenderAddress, e.ResponseReceiverId);
+                    Register(e.RequestMessage.MessageData, e.SenderAddress, e.ResponseReceiverId);
                 }
+                // If client asks Rendezvous service for serivice IP address and port.
                 else if (e.RequestMessage.MessageType == ERendezvousMessage.GetAddressRequest)
                 {
-                    ProvideAddress(e.RequestMessage.MessageData[0], e.ResponseReceiverId);
+                    ProvideAddress(e.RequestMessage.MessageData, e.SenderAddress, e.ResponseReceiverId);
                 }
             }
         }
@@ -118,41 +116,110 @@ namespace Eneter.Messaging.Nodes.HolePunching
                     return;
                 }
 
-                TRendezvousContext aContext = new TRendezvousContext(responseReceiverId, rendezvousId, ipAddressAndPort);
-                using (ThreadLock.Lock(myRegisteredEndPoints))
+                using (ThreadLock.Lock(myRendezvousManipulatorLock))
                 {
-                    myRegisteredEndPoints.Add(aContext);
+                    // If the rendezvous id already exists but is associated with another response receiver id then disconnect
+                    // this response receiver.
+                    TRendezvousContext aContext;
+                    myRendezvousIds.TryGetValue(rendezvousId, out aContext);
+                    if (aContext != null && aContext.ResponseReceiverId != responseReceiverId)
+                    {
+                        UnregisterResponseReceiver(responseReceiverId);
+                        myReceiver.AttachedDuplexInputChannel.DisconnectResponseReceiver(responseReceiverId);
+                        return;
+                    }
+
+                    aContext = new TRendezvousContext(responseReceiverId, rendezvousId, ipAddressAndPort);
+
+                    // Associate the rendezvous context with rendezvous id.
+                    myRendezvousIds[rendezvousId] = aContext;
+
+                    // Associate the rendezvous context with response receiver id.
+                    List<TRendezvousContext> aResponseReceiverContexts;
+                    myRendezvousResponseReceiverIds.TryGetValue(responseReceiverId, out aResponseReceiverContexts);
+                    if (aResponseReceiverContexts == null)
+                    {
+                        aResponseReceiverContexts = new List<TRendezvousContext>();
+                        myRendezvousResponseReceiverIds[responseReceiverId] = aResponseReceiverContexts;
+                    }
+                    aResponseReceiverContexts.Add(aContext);
                 }
 
                 RendezvousMessage aResponse = new RendezvousMessage();
-                aResponse.MessageType = ERendezvousMessage.AddressResponse;
-                aResponse.MessageData = new string[] { ipAddressAndPort };
+                aResponse.MessageType = ERendezvousMessage.RegisterResponse;
+                aResponse.MessageData = ipAddressAndPort;
                 myReceiver.SendResponseMessage(responseReceiverId, aResponse);
             }
         }
 
-        private void ProvideAddress(string rendezvousId, string responseReceiverId)
+        private void UnregisterResponseReceiver(string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
-                string[] anAvailableEndPoints;
-                using (ThreadLock.Lock(myRegisteredEndPoints))
+                using (ThreadLock.Lock(myRendezvousManipulatorLock))
                 {
-                    anAvailableEndPoints = myRegisteredEndPoints.Where(x => x.ResponseReceiverId == responseReceiverId)
-                        .Select(x => x.IpAddressAndPort).ToArray();
-                }
+                    // Get all rendezvous ids associted with response receiver id.
+                    List<TRendezvousContext> aRegisteredIds;
+                    myRendezvousResponseReceiverIds.TryGetValue(responseReceiverId, out aRegisteredIds);
+                    if (aRegisteredIds != null)
+                    {
+                        // Go via rendezvous ids and release them.
+                        foreach (TRendezvousContext aRendezvousContext in aRegisteredIds)
+                        {
+                            myRendezvousIds.Remove(aRendezvousContext.RendezvousId);
+                        }
 
-                RendezvousMessage aResponse = new RendezvousMessage();
-                aResponse.MessageType = ERendezvousMessage.AddressResponse;
-                aResponse.MessageData = anAvailableEndPoints;
-                myReceiver.SendResponseMessage(responseReceiverId, aResponse);
+                        // And finaly remove the response receiver id.
+                        myRendezvousResponseReceiverIds.Remove(responseReceiverId);
+                    }
+                }
             }
         }
+
+        private void ProvideAddress(string rendezvousId, string clientIpAddressAndPort, string clientResponseReceiverId)
+        {
+            using (EneterTrace.Entering())
+            {
+                string aServiceIpAddressAndPort = null;
+                string aServiceResponseReceiverId = null;
+                using (ThreadLock.Lock(myRendezvousManipulatorLock))
+                {
+                    TRendezvousContext aContext;
+                    myRendezvousIds.TryGetValue(rendezvousId, out aContext);
+                    if (aContext != null)
+                    {
+                        aServiceIpAddressAndPort = aContext.IpAddressAndPort;
+                        aServiceResponseReceiverId = aContext.ResponseReceiverId;
+                    }
+                }
+
+                // If the service is connected.
+                if (!string.IsNullOrEmpty(aServiceResponseReceiverId))
+                {
+                    // 1st send client's public IP address and port to the service.
+                    // So that service can drill the hole for the upcoming connection from the client.
+                    RendezvousMessage aResponseToService = new RendezvousMessage();
+                    aResponseToService.MessageType = ERendezvousMessage.Drill;
+                    aResponseToService.MessageData = clientIpAddressAndPort;
+                    myReceiver.SendResponseMessage(aServiceResponseReceiverId, aResponseToService);
+                }
+                
+                // Send service's public IP address and port to the client.
+                RendezvousMessage aResponse = new RendezvousMessage();
+                aResponse.MessageType = ERendezvousMessage.GetAddressResponse;
+                aResponse.MessageData = aServiceIpAddressAndPort;
+                myReceiver.SendResponseMessage(clientResponseReceiverId, aResponse);
+            }
+        }
+
+        
 
 
         private IDuplexTypedMessageReceiver<RendezvousMessage, RendezvousMessage> myReceiver;
 
-        private List<TRendezvousContext> myRegisteredEndPoints = new List<TRendezvousContext>();
+        private object myRendezvousManipulatorLock = new object();
+        private Dictionary<string, TRendezvousContext> myRendezvousIds = new Dictionary<string, TRendezvousContext>();
+        private Dictionary<string, List<TRendezvousContext>> myRendezvousResponseReceiverIds = new Dictionary<string, List<TRendezvousContext>>();
 
         private string TracedObject
         {
