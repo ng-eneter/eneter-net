@@ -108,11 +108,12 @@ namespace Eneter.Messaging.Nodes.HolePunching
                         {
                             if (e.ResponseMessage != null && e.ResponseMessage.MessageType == anExpectedResponseType)
                             {
+                                aResponse = e.ResponseMessage;
                                 aResponseAvailable.Set();
                             }
                         };
                     EventHandler<DuplexChannelEventArgs> aConnectionClosedHandler =
-                        (DuplexTypedMessageSender, e) =>
+                        (sender, e) =>
                         {
                             aResponseAvailable.Set();
                         };
@@ -136,6 +137,25 @@ namespace Eneter.Messaging.Nodes.HolePunching
                         myRendezvousSender.ConnectionClosed -= aConnectionClosedHandler;
                     }
 
+                    // If response data does not exist.
+                    if (aResponse == null)
+                    {
+                        string anErrorMessage = TracedObject + "failed to receive the response.";
+
+                        IDuplexOutputChannel anAttachedOutputChannel = myRendezvousSender.AttachedDuplexOutputChannel;
+                        if (anAttachedOutputChannel == null)
+                        {
+                            anErrorMessage += " The duplex outputchannel was detached.";
+                        }
+                        else if (!anAttachedOutputChannel.IsConnected)
+                        {
+                            anErrorMessage += " The connection was closed.";
+                        }
+
+                        EneterTrace.Error(anErrorMessage);
+                        throw new InvalidOperationException(anErrorMessage);
+                    }
+
                     return aResponse.MessageData;
                 }
             }
@@ -145,25 +165,45 @@ namespace Eneter.Messaging.Nodes.HolePunching
         {
             using (EneterTrace.Entering())
             {
-                if (e.ReceivingError == null && e.ResponseMessage.MessageType == ERendezvousMessage.Drill)
-                {
-                    for (int i = 0; i < 10; ++i)
+                Console.WriteLine("OnResponseReceived");
+
+                ThreadPool.QueueUserWorkItem(x =>
                     {
-                        string anIpAddressAndPort = "tcp://" + e.ResponseMessage.MessageData[0] + "/";
-                        Uri aUri = new Uri(anIpAddressAndPort);
-                        AddressFamily anAddressFamily = (aUri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+                        if (e.ReceivingError == null && e.ResponseMessage.MessageType == ERendezvousMessage.Drill)
+                        {
+                            string anIpAddressAndPort = "tcp://" + e.ResponseMessage.MessageData + "/";
+                            Console.WriteLine("Drilling to '" + anIpAddressAndPort + "'.");
 
-                        TcpClient aTcpClient = new TcpClient(anAddressFamily);
-                        aTcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                        IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any;
-                        
-                        // Set the response receiving port.
-                        aTcpClient.Client.Bind(new IPEndPoint(aDummyIpAddress, 8085));
+                            Uri aUri = new Uri(anIpAddressAndPort);
+                            Socket aTcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                            //TcpClient aTcpClient = new TcpClient(anAddressFamily);
+                            aTcpClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
-                        // This call also resolves host names.
-                        aTcpClient.Connect(aUri.Host, aUri.Port);
-                    }
-                }
+                            // Set the response receiving port.
+                            aTcpClient.Bind(new IPEndPoint(IPAddress.Any, 8085));
+                            Console.WriteLine("Bound to 8085.");
+
+                            //for (int i = 0; i < 10; ++i)
+                            {
+                                try
+                                {
+                                    Console.WriteLine("Connecting ... ");
+
+                                    // This call also resolves host names.
+                                    //aTcpClient.Connect(aUri.Host, aUri.Port);
+                                    aTcpClient.Connect(new IPEndPoint(IPAddress.Parse(aUri.Host), aUri.Port));
+                                }
+                                catch (Exception err)
+                                {
+                                    Console.WriteLine(err.Message);
+                                }
+
+                            }
+
+                            Console.WriteLine("Leaving ... ");
+                            //aTcpClient.Close();
+                        }
+                    });
             }
         }
 

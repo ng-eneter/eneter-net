@@ -10,7 +10,6 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.EndPoints.TypedMessages;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Eneter.Messaging.Nodes.HolePunching
 {
@@ -18,16 +17,16 @@ namespace Eneter.Messaging.Nodes.HolePunching
     {
         private class TRendezvousContext
         {
-            public TRendezvousContext(string rendezvousId, string responseReceiverId, string ipAddressAndPort)
+            public TRendezvousContext(string rendezvousId, string ipAddressAndPort, string responseReceiverId)
             {
                 RendezvousId = rendezvousId;
-                ResponseReceiverId = responseReceiverId;
                 IpAddressAndPort = ipAddressAndPort;
+                ResponseReceiverId = responseReceiverId;
             }
 
             public string RendezvousId { get; private set; }
-            public string ResponseReceiverId { get; private set; }
             public string IpAddressAndPort { get; private set; }
+            public string ResponseReceiverId { get; private set; }
         }
 
         public RendezvousService(ISerializer serializer)
@@ -129,7 +128,7 @@ namespace Eneter.Messaging.Nodes.HolePunching
                         return;
                     }
 
-                    aContext = new TRendezvousContext(responseReceiverId, rendezvousId, ipAddressAndPort);
+                    aContext = new TRendezvousContext(rendezvousId, ipAddressAndPort, responseReceiverId);
 
                     // Associate the rendezvous context with rendezvous id.
                     myRendezvousIds[rendezvousId] = aContext;
@@ -180,7 +179,7 @@ namespace Eneter.Messaging.Nodes.HolePunching
         {
             using (EneterTrace.Entering())
             {
-                string aServiceIpAddressAndPort = null;
+                string aServiceIpAddressAndPort = "";
                 string aServiceResponseReceiverId = null;
                 using (ThreadLock.Lock(myRendezvousManipulatorLock))
                 {
