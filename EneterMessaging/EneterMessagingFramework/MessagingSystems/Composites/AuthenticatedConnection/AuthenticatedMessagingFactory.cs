@@ -79,9 +79,12 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     /// <summary>
     /// Callback method to handle when the authentication is cancelled.
     /// </summary>
-    /// <param name="channelId"></param>
-    /// <param name="responseReceiverId"></param>
-    /// <param name="loginMessage"></param>
+    /// <remarks>
+    /// The callback method is used on the service side when the authentication sequence with the client is canceled.
+    /// </remarks>
+    /// <param name="channelId">service address</param>
+    /// <param name="responseReceiverId">unique id representing the connection with the client</param>
+    /// <param name="loginMessage">login message that was sent from the client</param>
     public delegate void HandleAuthenticationCancelled(string channelId, string responseReceiverId, object loginMessage);
 
     /// <summary>
