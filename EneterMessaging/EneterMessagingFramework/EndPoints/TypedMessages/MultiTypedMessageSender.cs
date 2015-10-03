@@ -150,7 +150,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                 {
                     MultiTypedMessage aMessage = new MultiTypedMessage();
                     aMessage.TypeName = typeof(TRequestMessage).Name;
-                    aMessage.MessageData = mySerializer.Serialize<TRequestMessage>(message);
+                    aMessage.MessageData = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Serialize<TRequestMessage>(message);
 
                     mySender.SendRequestMessage(aMessage);
                 }
@@ -204,7 +204,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                         object aMessageData;
                         try
                         {
-                            aMessageData = mySerializer.Deserialize(aMessageHandler.Type, e.ResponseMessage.MessageData);
+                            aMessageData = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Deserialize(aMessageHandler.Type, e.ResponseMessage.MessageData);
 
                             try
                             {

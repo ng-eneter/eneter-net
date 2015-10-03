@@ -62,6 +62,22 @@ namespace Eneter.Messaging.DataProcessing.Serializing
             return aDeserializedData;
         }
 
+        public static ISerializer ForResponseReceiver(this ISerializer serializer, string responseReceiverId)
+        {
+            ISerializer aSerializer;
+            if (serializer is CallbackSerializer)
+            {
+                aSerializer = ((CallbackSerializer)serializer).GetSerializerCallback(responseReceiverId);
+            }
+            else
+            {
+                aSerializer = serializer;
+            }
+
+            return aSerializer;
+        }
+
+
         private static MethodInfo mySerializeMethod = typeof(ISerializer).GetMethod("Serialize");
         private static MethodInfo myDeserializeMethod = typeof(ISerializer).GetMethod("Deserialize");
         private static Dictionary<Type, MethodInfo> mySerializeCache = new Dictionary<Type, MethodInfo>();

@@ -266,7 +266,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
-                return new MultiTypedMessageReceiver(Serializer, SerializerProvider);
+                return new MultiTypedMessageReceiver(Serializer);
             }
         }
 

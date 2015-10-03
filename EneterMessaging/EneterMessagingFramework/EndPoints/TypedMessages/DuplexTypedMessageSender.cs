@@ -41,7 +41,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
                 try
                 {
-                    object aRequestMessage = mySerializer.Serialize<_RequestType>(message);
+                    object aRequestMessage = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Serialize<_RequestType>(message);
                     AttachedDuplexOutputChannel.SendMessage(aRequestMessage);
                 }
                 catch (Exception err)
@@ -66,7 +66,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
                 try
                 {
-                    _ResponseType aResponseMessage = mySerializer.Deserialize<_ResponseType>(e.Message);
+                    _ResponseType aResponseMessage = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Deserialize<_ResponseType>(e.Message);
                     aResponseReceivedEventArgs = new TypedResponseReceivedEventArgs<_ResponseType>(aResponseMessage);
                 }
                 catch (Exception err)

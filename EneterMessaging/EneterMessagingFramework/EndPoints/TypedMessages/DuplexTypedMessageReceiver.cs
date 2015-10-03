@@ -22,12 +22,11 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         public event EventHandler<ResponseReceiverEventArgs> ResponseReceiverDisconnected;
 
 
-        public DuplexTypedMessageReceiver(ISerializer serializer, GetSerializerCallback getSerializerCallback)
+        public DuplexTypedMessageReceiver(ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
                 mySerializer = serializer;
-                myGetSerializerCallback = getSerializerCallback;
             }
         }
 
@@ -44,9 +43,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
                 try
                 {
-                    ISerializer aSerializer = GetSerializer(responseReceiverId);
-
-                    object aResponseMessage = aSerializer.Serialize<_ResponseType>(responseMessage);
+                    object aResponseMessage = mySerializer.ForResponseReceiver(responseReceiverId).Serialize<_ResponseType>(responseMessage);
                     AttachedDuplexInputChannel.SendResponseMessage(responseReceiverId, aResponseMessage);
                 }
                 catch (Exception err)
@@ -72,8 +69,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
 
                 try
                 {
-                    ISerializer aSerializer = GetSerializer(e.ResponseReceiverId);
-                    _RequestType aRequestMessage = aSerializer.Deserialize<_RequestType>(e.Message);
+                    _RequestType aRequestMessage = mySerializer.ForResponseReceiver(e.ResponseReceiverId).Deserialize<_RequestType>(e.Message);
                     aRequestReceivedEventArgs = new TypedRequestReceivedEventArgs<_RequestType>(e.ResponseReceiverId, e.SenderAddress, aRequestMessage);
                 }
                 catch (Exception err)
@@ -130,18 +126,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
         }
 
-        private ISerializer GetSerializer(string responseReceiverId)
-        {
-            if (myGetSerializerCallback != null && responseReceiverId == "*")
-            {
-                throw new NotSupportedException("Sending a message to all connected clients using wild character '*' is not supported when SerializerProvider is used.");
-            }
-
-            return (myGetSerializerCallback == null) ? mySerializer : myGetSerializerCallback(responseReceiverId);
-        }
-
         private ISerializer mySerializer;
-        private GetSerializerCallback myGetSerializerCallback;
 
         protected override string TracedObject
         {

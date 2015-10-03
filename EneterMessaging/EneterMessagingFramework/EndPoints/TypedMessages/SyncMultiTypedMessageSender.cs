@@ -67,13 +67,15 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             {
                 try
                 {
+                    ISerializer aSerializer = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId);
+
                     MultiTypedMessage aRequest = new MultiTypedMessage();
                     aRequest.TypeName = typeof(TRequest).Name;
-                    aRequest.MessageData = mySerializer.Serialize<TRequest>(message);
+                    aRequest.MessageData = aSerializer.Serialize<TRequest>(message);
 
                     MultiTypedMessage aResponse = mySender.SendRequestMessage(aRequest);
 
-                    TResponse aResult = mySerializer.Deserialize<TResponse>(aResponse.MessageData);
+                    TResponse aResult = aSerializer.Deserialize<TResponse>(aResponse.MessageData);
                     return aResult;
                 }
                 catch (Exception err)
