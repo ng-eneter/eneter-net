@@ -187,7 +187,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 RpcMessage aMessage = null;
                 try
                 {
-                    aMessage = mySerializer.Deserialize<RpcMessage>(e.Message);
+                    aMessage = mySerializer.ForResponseReceiver(e.ResponseReceiverId).Deserialize<RpcMessage>(e.Message);
                 }
                 catch (Exception err)
                 {
@@ -273,6 +273,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     throw new InvalidOperationException(anErrorMessage);
                 }
 
+                string aResponseReceiverId = AttachedDuplexOutputChannel.ResponseReceiverId;
+
                 // Serialize method parameters.
                 object[] aSerialzedMethodParameters = new object[parameters.Length];
                 try
@@ -281,7 +283,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     {
                         // The parameter can be null, therefore we need to get the parameter type from the method declaration
                         // and not from the parameter instance.
-                        aSerialzedMethodParameters[i] = mySerializer.Serialize(aRemoteMethod.ArgTypes[i], parameters[i]);
+                        aSerialzedMethodParameters[i] = mySerializer.ForResponseReceiver(aResponseReceiverId).Serialize(aRemoteMethod.ArgTypes[i], parameters[i]);
                     }
                 }
                 catch (Exception err)
@@ -305,7 +307,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 try
                 {
                     aDeserializedReturnValue = (aRemoteMethod.ReturnType != typeof(void)) ?
-                        mySerializer.Deserialize(aRemoteMethod.ReturnType, aSerializedReturnValue) :
+                        mySerializer.ForResponseReceiver(aResponseReceiverId).Deserialize(aRemoteMethod.ReturnType, aSerializedReturnValue) :
                         null;
                 }
                 catch (Exception err)
@@ -448,7 +450,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     }
 
                     // Send the request.
-                    object aSerializedMessage = mySerializer.Serialize<RpcMessage>(rpcRequest);
+                    object aSerializedMessage = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Serialize<RpcMessage>(rpcRequest);
                     AttachedDuplexOutputChannel.SendMessage(aSerializedMessage);
 
                     // Wait for the response.
@@ -497,7 +499,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 {
                     anEventArgs = (aRemoteEvent.EventArgsType == typeof(EventArgs)) ?
                         new EventArgs() :
-                        (EventArgs) mySerializer.Deserialize(aRemoteEvent.EventArgsType, serializedEventArgs);
+                        (EventArgs) mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Deserialize(aRemoteEvent.EventArgsType, serializedEventArgs);
                 }
                 catch (Exception err)
                 {

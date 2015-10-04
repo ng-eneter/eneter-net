@@ -63,13 +63,12 @@ namespace Eneter.Messaging.EndPoints.Rpc
             public Type[] InputParameterTypes { get; private set; }
         }
 
-        public ServiceStub(TServiceInterface service, ISerializer serializer, GetSerializerCallback getSerializer)
+        public ServiceStub(TServiceInterface service, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
                 myService = service;
                 mySerializer = serializer;
-                myGetSerializer = getSerializer;
 
                 foreach (MethodInfo aMethod in typeof(TServiceInterface).GetMethods())
                 {
@@ -120,7 +119,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                 object aSerializedEvent = null;
 
                                 // If there is one serializer for all clients then pre-serialize the message to increase the performance.
-                                if (myGetSerializer == null)
+                                if (mySerializer.IsSameForAllResponseReceivers())
                                 {
                                     try
                                     {
@@ -151,9 +150,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                     try
                                     {
                                         // If there is serializer per client then serialize the message for each client.
-                                        if (myGetSerializer != null)
+                                        if (!mySerializer.IsSameForAllResponseReceivers())
                                         {
-                                            ISerializer aSerializer = myGetSerializer(aClient);
+                                            ISerializer aSerializer = mySerializer.ForResponseReceiver(aClient);
 
                                             RpcMessage anEventMessage = new RpcMessage()
                                                 {
@@ -249,7 +248,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-                ISerializer aSerializer = (myGetSerializer == null) ? mySerializer : myGetSerializer(e.ResponseReceiverId);
+                ISerializer aSerializer = mySerializer.ForResponseReceiver(e.ResponseReceiverId);
 
                 // Deserialize the incoming message.
                 RpcMessage aRequestMessage = null;
@@ -427,7 +426,6 @@ namespace Eneter.Messaging.EndPoints.Rpc
         }
 
         private ISerializer mySerializer;
-        private GetSerializerCallback myGetSerializer;
 
         private TServiceInterface myService;
         private HashSet<EventContext> myServiceEvents = new HashSet<EventContext>();

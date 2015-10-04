@@ -57,7 +57,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexChannelUnwrapper(outputMessagingSystem, Serializer, SerializerProvider);
+                return new DuplexChannelUnwrapper(outputMessagingSystem, Serializer);
             }
         }
 
@@ -77,6 +77,21 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         /// The default value is null and it means SerializerProvider callback is not used and one serializer which specified in the Serializer property is used for all serialization/deserialization.<br/>
         /// If SerializerProvider is not null then the setting in the Serializer property is ignored.
         /// </remarks>
-        public GetSerializerCallback SerializerProvider { get; set; }
+        public GetSerializerCallback SerializerProvider
+        {
+            get
+            {
+                if (Serializer is CallbackSerializer)
+                {
+                    return ((CallbackSerializer)Serializer).GetSerializerCallback;
+                }
+
+                return null;
+            }
+            set
+            {
+                Serializer = new CallbackSerializer(value);
+            }
+        }
     }
 }

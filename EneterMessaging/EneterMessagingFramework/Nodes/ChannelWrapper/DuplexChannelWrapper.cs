@@ -165,7 +165,8 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
                         myDuplexInputChannels[e.ChannelId].ResponseReceiverId = e.ResponseReceiverId;
                     }
 
-                    object aMessage = DataWrapper.Wrap(e.ChannelId, e.Message, mySerializer);
+                    ISerializer aSerializer = mySerializer.ForResponseReceiver(e.ResponseReceiverId);
+                    object aMessage = DataWrapper.Wrap(e.ChannelId, e.Message, aSerializer);
                     AttachedDuplexOutputChannel.SendMessage(aMessage);
                 }
                 catch (Exception err)
@@ -203,7 +204,8 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             {
                 try
                 {
-                    WrappedData aWrappedData = DataWrapper.Unwrap(e.Message, mySerializer);
+                    ISerializer aSerializer = mySerializer.ForResponseReceiver(e.ResponseReceiverId);
+                    WrappedData aWrappedData = DataWrapper.Unwrap(e.Message, aSerializer);
 
                     // WrappedData.AddedData represents the channel id.
                     // Therefore if everything is ok then it must be string.

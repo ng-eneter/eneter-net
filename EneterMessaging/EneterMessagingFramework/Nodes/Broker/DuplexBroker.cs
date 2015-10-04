@@ -36,14 +36,12 @@ namespace Eneter.Messaging.Nodes.Broker
         public event EventHandler<BrokerMessageReceivedEventArgs> BrokerMessageReceived;
 
         public DuplexBroker(bool isPublisherNotified, ISerializer serializer,
-            GetSerializerCallback getSerializerCallback,
             AuthorizeBrokerRequestCallback validateBrokerRequestCallback)
         {
             using (EneterTrace.Entering())
             {
                 myIsPublisherSelfnotified = isPublisherNotified;
                 mySerializer = serializer;
-                myGetSerializerCallback = getSerializerCallback;
                 myValidateBrokerRequestCallback = validateBrokerRequestCallback;
             }
         }
@@ -57,9 +55,11 @@ namespace Eneter.Messaging.Nodes.Broker
                 // If one serializer is used for the whole communication then pre-serialize the message to increase the performance.
                 // If there is SerializerProvider callback then the serialization must be performed before sending individualy
                 // for each client.
-                object aSerializedNotifyMessage = (myGetSerializerCallback == null) ?
-                    mySerializer.Serialize<BrokerMessage>(aNotifyMessage) :
-                    null;
+                object aSerializedNotifyMessage = null;
+                if (mySerializer.IsSameForAllResponseReceivers())
+                {
+                    aSerializedNotifyMessage = mySerializer.Serialize<BrokerMessage>(aNotifyMessage);
+                }
 
                 Publish(myLocalReceiverId, aNotifyMessage, aSerializedNotifyMessage);
             }
@@ -142,8 +142,7 @@ namespace Eneter.Messaging.Nodes.Broker
                 BrokerMessage aBrokerMessage;
                 try
                 {
-                    ISerializer aSerializer = (myGetSerializerCallback == null) ? mySerializer : myGetSerializerCallback(e.ResponseReceiverId);
-                    aBrokerMessage = aSerializer.Deserialize<BrokerMessage>(e.Message);
+                    aBrokerMessage = mySerializer.ForResponseReceiver(e.ResponseReceiverId).Deserialize<BrokerMessage>(e.Message);
                 }
                 catch (Exception err)
                 {
@@ -182,7 +181,7 @@ namespace Eneter.Messaging.Nodes.Broker
 
                 if (aBrokerMessage.Request == EBrokerRequest.Publish)
                 {
-                    if (myGetSerializerCallback == null)
+                    if (mySerializer.IsSameForAllResponseReceivers())
                     {
                         // If only one serializer is used for communication with all clients then
                         // increase the performance by reusing already serialized message.
@@ -272,7 +271,7 @@ namespace Eneter.Messaging.Nodes.Broker
                         {
                             try
                             {
-                                ISerializer aSerializer = myGetSerializerCallback(aSubscription.ReceiverId);
+                                ISerializer aSerializer = mySerializer.ForResponseReceiver(aSubscription.ReceiverId);
                                 aSerializedMessage = aSerializer.Serialize<BrokerMessage>(message);
                             }
                             catch (Exception err)
@@ -456,7 +455,6 @@ namespace Eneter.Messaging.Nodes.Broker
         private HashSet<TSubscription> mySubscribtions = new HashSet<TSubscription>();
         private bool myIsPublisherSelfnotified;
         private ISerializer mySerializer;
-        private GetSerializerCallback myGetSerializerCallback;
         private AuthorizeBrokerRequestCallback myValidateBrokerRequestCallback;
 
         private readonly string myLocalReceiverId = "Eneter.Broker.LocalReceiver";

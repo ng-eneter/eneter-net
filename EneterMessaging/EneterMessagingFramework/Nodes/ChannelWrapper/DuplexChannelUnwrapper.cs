@@ -35,13 +35,12 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
 
 
-        public DuplexChannelUnwrapper(IMessagingSystemFactory outputMessagingFactory, ISerializer serializer, GetSerializerCallback getSerializerCallback)
+        public DuplexChannelUnwrapper(IMessagingSystemFactory outputMessagingFactory, ISerializer serializer)
         {
             using (EneterTrace.Entering())
             {
                 myOutputMessagingFactory = outputMessagingFactory;
                 mySerializer = serializer;
-                myGetSerializerCallback = getSerializerCallback;
             }
         }
 
@@ -70,7 +69,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
                 try
                 {
-                    ISerializer aSerializer = GetSerializer(e.ResponseReceiverId);
+                    ISerializer aSerializer = mySerializer.ForResponseReceiver(e.ResponseReceiverId);
 
                     // Unwrap the incoming message.
                     aWrappedData = DataWrapper.Unwrap(e.Message, aSerializer);
@@ -230,7 +229,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
 
                     if (aConnction != null)
                     {
-                        ISerializer aSerializer = GetSerializer(aConnction.ResponseReceiverId);
+                        ISerializer aSerializer = mySerializer.ForResponseReceiver(aConnction.ResponseReceiverId);
 
                         object aMessage = DataWrapper.Wrap(e.ChannelId, e.Message, aSerializer);
                         AttachedDuplexInputChannel.SendResponseMessage(aConnction.ResponseReceiverId, aMessage);
@@ -247,20 +246,9 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             }
         }
 
-        private ISerializer GetSerializer(string responseReceiverId)
-        {
-            if (myGetSerializerCallback != null && responseReceiverId == "*")
-            {
-                throw new NotSupportedException("Sending a message to all connected clients using wild character '*' is not supported when SerializerProvider is used.");
-            }
-
-            return (myGetSerializerCallback == null) ? mySerializer : myGetSerializerCallback(responseReceiverId);
-        }
-
 
         private IMessagingSystemFactory myOutputMessagingFactory;
         private ISerializer mySerializer;
-        private GetSerializerCallback myGetSerializerCallback;
 
         private HashSet<TDuplexConnection> myConnections = new HashSet<TDuplexConnection>();
 

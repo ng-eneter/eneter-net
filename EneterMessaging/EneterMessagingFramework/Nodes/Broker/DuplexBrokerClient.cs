@@ -120,7 +120,7 @@ namespace Eneter.Messaging.Nodes.Broker
                 BrokerMessageReceivedEventArgs anEvent = null;
                 try
                 {
-                    BrokerMessage aMessage = mySerializer.Deserialize<BrokerMessage>(e.Message);
+                    BrokerMessage aMessage = mySerializer.ForResponseReceiver(e.ResponseReceiverId).Deserialize<BrokerMessage>(e.Message);
                     anEvent = new BrokerMessageReceivedEventArgs(aMessage.MessageTypes[0], aMessage.Message);
                 }
                 catch (Exception err)
@@ -178,7 +178,7 @@ namespace Eneter.Messaging.Nodes.Broker
 
                 try
                 {
-                    object aSerializedMessage = mySerializer.Serialize<BrokerMessage>(message);
+                    object aSerializedMessage = mySerializer.ForResponseReceiver(AttachedDuplexOutputChannel.ResponseReceiverId).Serialize<BrokerMessage>(message);
                     AttachedDuplexOutputChannel.SendMessage(aSerializedMessage);
                 }
                 catch (Exception err)

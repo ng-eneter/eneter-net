@@ -77,6 +77,11 @@ namespace Eneter.Messaging.DataProcessing.Serializing
             return aSerializer;
         }
 
+        public static bool IsSameForAllResponseReceivers(this ISerializer serializer)
+        {
+            return serializer is CallbackSerializer == false;
+        }
+
 
         private static MethodInfo mySerializeMethod = typeof(ISerializer).GetMethod("Serialize");
         private static MethodInfo myDeserializeMethod = typeof(ISerializer).GetMethod("Deserialize");

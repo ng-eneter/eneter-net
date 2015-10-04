@@ -154,7 +154,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
 #if !COMPACT_FRAMEWORK20
-                return new RpcService<TServiceInterface>(service, Serializer, SerializerProvider);
+                return new RpcService<TServiceInterface>(service, Serializer);
 #else
                 throw new NotSupportedException("RPC service is not supported in Compact Framework 2.0.");
 #endif
@@ -176,7 +176,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
 #if !COMPACT_FRAMEWORK20
-                return new RpcService<TServiceInterface>(serviceFactoryMethod, Serializer, SerializerProvider);
+                return new RpcService<TServiceInterface>(serviceFactoryMethod, Serializer);
 #else
                 throw new NotSupportedException("RPC service is not supported in Compact Framework 2.0.");
 #endif
@@ -199,7 +199,22 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// The default value is null and it means SerializerProvider callback is not used and one serializer which specified in the Serializer property is used for all serialization/deserialization.<br/>
         /// If SerializerProvider is not null then the setting in the Serializer property is ignored.
         /// </remarks>
-        public GetSerializerCallback SerializerProvider { get; set; }
+        public GetSerializerCallback SerializerProvider
+        {
+            get
+            {
+                if (Serializer is CallbackSerializer)
+                {
+                    return ((CallbackSerializer)Serializer).GetSerializerCallback;
+                }
+
+                return null;
+            }
+            set
+            {
+                Serializer = new CallbackSerializer(value);
+            }
+        }
 
         /// <summary>
         /// Gets/sets threading mechanism used for invoking events (if RPC interface has some) and ConnectionOpened and ConnectionClosed events.

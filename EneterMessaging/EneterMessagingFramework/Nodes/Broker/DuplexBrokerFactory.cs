@@ -134,7 +134,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexBroker(IsPublisherNotified, Serializer, SerializerProvider, BrokerRequestAuthorizer);
+                return new DuplexBroker(IsPublisherNotified, Serializer, BrokerRequestAuthorizer);
             }
         }
 
@@ -157,7 +157,22 @@ namespace Eneter.Messaging.Nodes.Broker
         /// The default value is null and it means SerializerProvider callback is not used and one serializer which specified in the Serializer property is used for all serialization/deserialization.<br/>
         /// If SerializerProvider is not null then the setting in the Serializer property is ignored.
         /// </remarks>
-        public GetSerializerCallback SerializerProvider { get; set; }
+        public GetSerializerCallback SerializerProvider
+        {
+            get
+            {
+                if (Serializer is CallbackSerializer)
+                {
+                    return ((CallbackSerializer)Serializer).GetSerializerCallback;
+                }
+
+                return null;
+            }
+            set
+            {
+                Serializer = new CallbackSerializer(value);
+            }
+        }
 
         /// <summary>
         /// Gets/sets callback for authorizing request messages received from DuplexBrokerClient.
