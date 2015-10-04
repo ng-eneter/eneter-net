@@ -272,10 +272,6 @@
     <Compile Include="Nodes\ChannelWrapper\Mock_DuplexOutputChannelAttachable.cs" />
     <Compile Include="Nodes\ChannelWrapper\Tester_DuplexChannelWrapper.cs" />
     <Compile Include="Nodes\Dispatcher\Test_DuplexDispatcher.cs" />
-    <Compile Include="Nodes\HolePunching\Test_TcpHolePunching.cs" />
-    <Compile Include="Nodes\HolePunching\Test_TcpHolePunching_ExactPort.cs" />
-    <Compile Include="Nodes\HolePunching\Test_UdpHolePunching.cs" />
-    <Compile Include="Nodes\HolePunching\Test_WebSocketHolePunching.cs" />
     <Compile Include="Nodes\LoadBalancer\Test_LoadBalancer.cs" />
     <Compile Include="Nodes\Router\Test_DuplexRouter.cs" />
     <Compile Include="PerformanceTimer.cs" />
