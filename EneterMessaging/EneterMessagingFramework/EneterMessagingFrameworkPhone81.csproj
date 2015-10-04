@@ -92,6 +92,7 @@
     <Compile Include="DataProcessing\MessageQueueing\_NamespaceDoc.cs" />
     <Compile Include="DataProcessing\Serializing\AesSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\BinarySerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\CallbackSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\CryptoSerializerProvider.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractJsonStringSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractXmlStringSerializer.cs" />

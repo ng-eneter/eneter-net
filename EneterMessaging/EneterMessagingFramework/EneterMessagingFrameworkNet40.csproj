@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
+    <Compile Include="DataProcessing\Serializing\CallbackSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\GetSerializerCallback.cs" />
     <Compile Include="Diagnostic\ThreadLock.cs" />
     <Compile Include="Diagnostic\ThreadLock_CompactFramework.cs" />
