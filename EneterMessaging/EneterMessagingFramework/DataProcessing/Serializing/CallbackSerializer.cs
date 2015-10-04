@@ -18,11 +18,15 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     /// </remarks>
     internal class CallbackSerializer : ISerializer
     {
-        public CallbackSerializer(GetSerializerCallback getSerializer)
+        public CallbackSerializer(GetSerializerCallback getSerializerCallback)
         {
             using (EneterTrace.Entering())
             {
-                GetSerializerCallback = getSerializer;
+                if (getSerializerCallback == null)
+                {
+                    throw new ArgumentNullException("getSerializerCallback is null");
+                }
+                GetSerializerCallback = getSerializerCallback;
             }
         }
 

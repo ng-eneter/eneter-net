@@ -118,7 +118,6 @@ namespace Eneter.Messaging.EndPoints.Rpc
             using (EneterTrace.Entering())
             {
                 Serializer = serializer;
-                SerializerProvider = null;
 
                 // Default timeout is set to infinite by default.
                 RpcTimeout = TimeSpan.FromMilliseconds(-1);
@@ -212,7 +211,17 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
             set
             {
-                Serializer = new CallbackSerializer(value);
+                if (value == null)
+                {
+                    if (Serializer is CallbackSerializer)
+                    {
+                        Serializer = null;
+                    }
+                }
+                else
+                {
+                    Serializer = new CallbackSerializer(value);
+                }
             }
         }
 

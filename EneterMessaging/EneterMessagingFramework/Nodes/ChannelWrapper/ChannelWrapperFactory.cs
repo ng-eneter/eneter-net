@@ -33,7 +33,6 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             using (EneterTrace.Entering())
             {
                 Serializer = serializer;
-                SerializerProvider = null;
             }
         }
 
@@ -90,7 +89,17 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
             }
             set
             {
-                Serializer = new CallbackSerializer(value);
+                if (value == null)
+                {
+                    if (Serializer is CallbackSerializer)
+                    {
+                        Serializer = null;
+                    }
+                }
+                else
+                {
+                    Serializer = new CallbackSerializer(value);
+                }
             }
         }
     }

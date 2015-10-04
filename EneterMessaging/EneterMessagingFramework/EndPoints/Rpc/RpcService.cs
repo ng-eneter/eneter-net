@@ -27,6 +27,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
+                if (serializer == null)
+                {
+                    string anError = "Input parameter serializer is null.";
+                    EneterTrace.Error(anError);
+                    throw new ArgumentNullException(anError);
+                }
+
                 ServiceInterfaceChecker.Check<TServiceInterface>();
                 mySingletonService = new ServiceStub<TServiceInterface>(singletonService, serializer);
             }
@@ -36,6 +43,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
+                if (serializer == null)
+                {
+                    string anError = "Input parameter serializer is null.";
+                    EneterTrace.Error(anError);
+                    throw new ArgumentNullException(anError);
+                }
+
                 ServiceInterfaceChecker.Check<TServiceInterface>();
 
                 myServiceFactoryMethod = serviceFactoryMethod;

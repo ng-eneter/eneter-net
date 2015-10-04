@@ -40,6 +40,13 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
+                if (serializer == null)
+                {
+                    string anError = "Input parameter serializer is null.";
+                    EneterTrace.Error(anError);
+                    throw new ArgumentNullException(anError);
+                }
+
                 myIsPublisherSelfnotified = isPublisherNotified;
                 mySerializer = serializer;
                 myValidateBrokerRequestCallback = validateBrokerRequestCallback;

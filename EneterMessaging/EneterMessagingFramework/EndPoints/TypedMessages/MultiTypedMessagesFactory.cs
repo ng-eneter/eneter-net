@@ -223,7 +223,6 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             SyncResponseReceiveTimeout = TimeSpan.FromMilliseconds(-1);
             Serializer = serializer;
-            SerializerProvider = null;
             SyncDuplexTypedSenderThreadMode = new SyncDispatching();
         }
 
@@ -319,7 +318,17 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
             }
             set
             {
-                Serializer = new CallbackSerializer(value);
+                if (value == null)
+                {
+                    if (Serializer is CallbackSerializer)
+                    {
+                        Serializer = null;
+                    }
+                }
+                else
+                {
+                    Serializer = new CallbackSerializer(value);
+                }
             }
         }
 

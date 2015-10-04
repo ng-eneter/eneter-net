@@ -23,6 +23,13 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
         {
             using (EneterTrace.Entering())
             {
+                if (serializer == null)
+                {
+                    string anError = "Input parameter serializer is null.";
+                    EneterTrace.Error(anError);
+                    throw new ArgumentNullException(anError);
+                }
+
                 myResponseReceiveTimeout = responseReceiveTimeout;
 
                 IDuplexTypedMessagesFactory aSenderFactory = new DuplexTypedMessagesFactory(serializer);

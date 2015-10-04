@@ -39,6 +39,13 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         {
             using (EneterTrace.Entering())
             {
+                if (serializer == null)
+                {
+                    string anError = "Input parameter serializer is null.";
+                    EneterTrace.Error(anError);
+                    throw new ArgumentNullException(anError);
+                }
+
                 myOutputMessagingFactory = outputMessagingFactory;
                 mySerializer = serializer;
             }
