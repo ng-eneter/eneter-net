@@ -119,8 +119,15 @@ namespace Eneter.MessagingUnitTests.EndPoints.MultiTypedMessages
         {
             string aClient1Id = null;
 
-            IMultiTypedMessagesFactory aSender1Factory = new MultiTypedMessagesFactory(new XmlStringSerializer());
-            IMultiTypedMessagesFactory aSender2Factory = new MultiTypedMessagesFactory(new BinarySerializer());
+            IMultiTypedMessagesFactory aSender1Factory = new MultiTypedMessagesFactory()
+            {
+                SerializerProvider = x => new XmlStringSerializer()
+            };
+            IMultiTypedMessagesFactory aSender2Factory = new MultiTypedMessagesFactory()
+            {
+                SerializerProvider = x => new BinarySerializer()
+            };
+
             IMultiTypedMessagesFactory aReceiverFactory = new MultiTypedMessagesFactory()
             {
                 SerializerProvider = x => (x == aClient1Id) ? (ISerializer)new XmlStringSerializer() : (ISerializer)new BinarySerializer()
