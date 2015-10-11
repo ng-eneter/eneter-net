@@ -214,7 +214,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                         // Note: we must assign receiver id (and sender address) to a separate variable because aConnection is the same instance for all iterations.
                         //       And so the client could get incorrect id in the notified event.
                         string aResponseReceiverId = aConnection.Key;
-                        string aSenderAddress = aConnection.Value;
 
                         try
                         {
