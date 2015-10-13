@@ -62,6 +62,23 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (KeyValuePair<string, NamedPipeSender> aClient in myConnectedClients)
+                    {
+                        try
+                        {
+                            CloseConnection(aClient.Key, aClient.Value);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
+                }
+
                 using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     if (myReceiver != null)
@@ -106,34 +123,81 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             }
         }
 
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    // Send the response message to all connected clients.
+                    foreach (KeyValuePair<string, NamedPipeSender> aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            // Send the response message.
+                            SendResponseMessage(aClientContext.Key, message);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientContext.Key);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
+            }
+        }
+
         // When service disconnects a client.
         public void CloseConnection(string outputConnectorAddress)
         {
             using (EneterTrace.Entering())
             {
-                NamedPipeSender aClientContext;
+                CloseConnection(outputConnectorAddress, false);
+            }
+        }
+
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
                 using (ThreadLock.Lock(myConnectedClients))
                 {
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                    if (aClientContext != null)
+                    // Send the response message to all connected clients.
+                    foreach (string aResponseReceiverId in myConnectedClients.Keys)
                     {
-                        myConnectedClients.Remove(outputConnectorAddress);
+                        try
+                        {
+                            // Send the response message.
+                            SendResponseMessage(aResponseReceiverId, message);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aResponseReceiverId);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
                     }
                 }
 
-                if (aClientContext != null)
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
                 {
-                    try
-                    {
-                        object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
-                        aClientContext.SendMessage(anEncodedMessage);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning("failed to send the close message.", err);
-                    }
-
-                    aClientContext.Dispose();
+                    CloseConnection(anOutputConnectorAddress, true);
                 }
             }
         }
@@ -202,6 +266,72 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     {
                         EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                     }
+                }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                NamedPipeSender aClientContext;
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                    if (aClientContext != null)
+                    {
+                        myConnectedClients.Remove(outputConnectorAddress);
+                    }
+                }
+
+                if (aClientContext != null)
+                {
+                    CloseConnection(outputConnectorAddress, aClientContext);
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, NamedPipeSender clientContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                    clientContext.SendMessage(anEncodedMessage);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning("failed to send the close message.", err);
+                }
+
+                clientContext.Dispose();
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
+                    {
+                        aMessageHandler(messageContext);
+                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }

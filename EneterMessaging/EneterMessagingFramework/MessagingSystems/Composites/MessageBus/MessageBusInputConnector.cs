@@ -97,14 +97,45 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
             }
         }
 
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (string aClientId in myConnectedClients.Keys)
+                    {
+                        try
+                        {
+                            // Send the response message.
+                            SendResponseMessage(aClientId, message);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientId);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
+            }
+        }
+
         public void CloseConnection(string clientId)
         {
             using (EneterTrace.Entering())
             {
-                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.DisconnectClient, clientId, null);
-                object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
-
-                myMessageBusOutputChannel.SendMessage(aSerializedMessage);
+                CloseConnection(clientId, false);
             }
         }
 
@@ -133,7 +164,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, e.SenderAddress);
 
                     IThreadDispatcher aDispatcher = myThreadDispatcherProvider.GetDispatcher();
-                    using(ThreadLock.Lock(myConnectedClients))
+                    using (ThreadLock.Lock(myConnectedClients))
                     {
                         myConnectedClients[aProtocolMessage.ResponseReceiverId] = aDispatcher;
                     }
@@ -178,6 +209,32 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     }
 
                     aDispatcher.Invoke(() => NotifyMessageContext(aMessageContext));
+                }
+            }
+        }
+
+        private void CloseConnection(string clientId, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.DisconnectClient, clientId, null);
+                    object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+
+                    myMessageBusOutputChannel.SendMessage(aSerializedMessage);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, clientId, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
                 }
             }
         }

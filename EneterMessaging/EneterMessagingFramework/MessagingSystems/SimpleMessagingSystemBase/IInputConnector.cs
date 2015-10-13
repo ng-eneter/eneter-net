@@ -34,6 +34,8 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 
         void SendResponseMessage(string outputConnectorAddress, object message);
 
+        void SendBroadcast(object message);
+
         void CloseConnection(string outputConnectorAddress);
     }
 }

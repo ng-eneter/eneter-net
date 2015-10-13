@@ -46,6 +46,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 }
             }
 
+            public string ClientIp { get { return (myClient.ClientEndPoint != null) ? myClient.ClientEndPoint.ToString() : ""; } }
+
             public bool IsClosedFromService { get; private set; }
             public IWebSocketClientContext myClient;
         }
@@ -159,6 +161,19 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 if (aClientContext != null)
                 {
                     aClientContext.CloseConnection();
+                }
+            }
+        }
+
+        public string GetIpAddress(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    TClientContext aClientContext;
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                    return (aClientContext != null) ? aClientContext.ClientIp : "";
                 }
             }
         }

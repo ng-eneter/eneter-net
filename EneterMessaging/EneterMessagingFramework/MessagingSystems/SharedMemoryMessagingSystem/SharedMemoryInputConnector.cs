@@ -132,6 +132,14 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
             }
         }
 
+        public string GetIpAddress(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                return "";
+            }
+        }
+
         private void HandleRequestMessage(Stream message)
         {
             using (EneterTrace.Entering())

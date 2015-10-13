@@ -136,6 +136,14 @@ namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
             }
         }
 
+        public string GetIpAddress(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                return "";
+            }
+        }
+
         private void HandleRequestMessage(string message)
         {
             using (EneterTrace.Entering())

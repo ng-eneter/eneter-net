@@ -9,6 +9,7 @@
 using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
+using System.Collections.Generic;
 
 namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
 {
@@ -34,19 +35,16 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                using (ThreadLock.Lock(myListeningManipulatorLock))
+                try
                 {
-                    try
-                    {
-                        myMessageHandler = messageHandler;
-                        myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
-                        myIsListeningFlag = true;
-                    }
-                    catch
-                    {
-                        StopListening();
-                        throw;
-                    }
+                    myMessageHandler = messageHandler;
+                    myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
+                    myIsListeningFlag = true;
+                }
+                catch
+                {
+                    StopListening();
+                    throw;
                 }
             }
         }
@@ -55,12 +53,26 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                using (ThreadLock.Lock(myListeningManipulatorLock))
+                using (ThreadLock.Lock(myConnectedClients))
                 {
-                    myIsListeningFlag = false;
-                    myMessagingProvider.UnregisterMessageHandler(myInputConnectorAddress);
-                    myMessageHandler = null;
+                    foreach (string anOutputConnectorAddress in myConnectedClients)
+                    {
+                        try
+                        {
+                            CloseConnection(anOutputConnectorAddress, false);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
                 }
+
+                myIsListeningFlag = false;
+                myMessagingProvider.UnregisterMessageHandler(myInputConnectorAddress);
+                myMessageHandler = null;
             }
         }
 
@@ -68,10 +80,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             get
             {
-                using (ThreadLock.Lock(myListeningManipulatorLock))
-                {
-                    return myIsListeningFlag;
-                }
+                return myIsListeningFlag;
             }
         }
 
@@ -79,8 +88,51 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                myMessagingProvider.SendMessage(outputConnectorAddress, anEncodedMessage);
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    myMessagingProvider.SendMessage(outputConnectorAddress, anEncodedMessage);
+                }
+                catch
+                {
+                    CloseConnection(outputConnectorAddress, true);
+                    throw;
+                }
+            }
+        }
+
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    // Send the response message to all connected clients.
+                    foreach (string aResponseReceiverId in myConnectedClients)
+                    {
+                        try
+                        {
+                            // Send the response message.
+                            SendResponseMessage(aResponseReceiverId, message);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aResponseReceiverId);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
             }
         }
 
@@ -88,10 +140,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
-                myMessagingProvider.SendMessage(outputConnectorAddress, anEncodedMessage);
+                CloseConnection(outputConnectorAddress, false);
             }
         }
+
 
         private void OnRequestMessageReceived(object message)
         {
@@ -102,27 +154,92 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
 
-                    try
+                    if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                     {
-                        if (myMessageHandler != null)
+                        bool aNewConnectionAddedFlag = false;
+
+                        // If the connection is not open yet.
+                        using (ThreadLock.Lock(myConnectedClients))
                         {
-                            myMessageHandler(aMessageContext);
+                            aNewConnectionAddedFlag = myConnectedClients.Add(aProtocolMessage.ResponseReceiverId);
+                        }
+
+                        if (aNewConnectionAddedFlag)
+                        {
+                            NotifyMessageContext(aMessageContext);
                         }
                     }
-                    catch (Exception err)
+                    else if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        bool aConnectionRemovedFlag = false;
+                        using (ThreadLock.Lock(myConnectedClients))
+                        {
+                            aConnectionRemovedFlag = myConnectedClients.Remove(aProtocolMessage.ResponseReceiverId);
+                        }
+
+                        if (aConnectionRemovedFlag)
+                        {
+                            NotifyMessageContext(aMessageContext);
+                        }
+                    }
+                    else
+                    {
+                        NotifyMessageContext(aMessageContext);
                     }
                 }
             }
         }
 
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                    myMessagingProvider.SendMessage(outputConnectorAddress, anEncodedMessage);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
+                    {
+                        aMessageHandler(messageContext);
+                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
+            }
+        }
+
+
         private string myInputConnectorAddress;
         private IMessagingProvider myMessagingProvider;
         private IProtocolFormatter myProtocolFormatter;
-        private object myListeningManipulatorLock = new object();
         private bool myIsListeningFlag;
         private Action<MessageContext> myMessageHandler;
+        private HashSet<string> myConnectedClients = new HashSet<string>();
 
         private string TracedObject { get { return GetType().Name; } }
     }

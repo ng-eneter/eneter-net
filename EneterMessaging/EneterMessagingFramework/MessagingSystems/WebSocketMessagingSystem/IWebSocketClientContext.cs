@@ -49,7 +49,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         bool IsConnected { get; }
 
         /// <summary>
-        /// Returns URI of this connection including query parameters sent from by the client.
+        /// Returns URI of this connection including query parameters sent by the client.
         /// </summary>
         Uri Uri { get; }
 

@@ -23,11 +23,12 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     {
         private class TClientContext
         {
-            public TClientContext(Stream clientStream)
+            public TClientContext(Stream clientStream, string clientIp)
             {
                 using (EneterTrace.Entering())
                 {
                     myClientStream = clientStream;
+                    ClientIp = clientIp;
                 }
             }
 
@@ -53,6 +54,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
 
             public bool IsClosedByService { get; private set; }
+
+            public string ClientIp { get; private set; }
 
             private Stream myClientStream;
             private object mySenderLock = new object();
@@ -180,6 +183,19 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
+        public string GetIpAddress(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    TClientContext aClientContext;
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                    return (aClientContext != null) ? aClientContext.ClientIp : "";
+                }
+            }
+        }
+
         private void HandleConnection(TcpClient tcpClient)
         {
             using (EneterTrace.Entering())
@@ -203,7 +219,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                     // If the security communication is required, then wrap the network stream into the security stream.
                     anInputOutputStream = mySecurityStreamFactory.CreateSecurityStreamAndAuthenticate(tcpClient.GetStream());
-                    aClientContext = new TClientContext(anInputOutputStream);
+                    aClientContext = new TClientContext(anInputOutputStream, aClientIp);
 
                     // If current protocol formatter does not support OpenConnection message
                     // then open the connection now.

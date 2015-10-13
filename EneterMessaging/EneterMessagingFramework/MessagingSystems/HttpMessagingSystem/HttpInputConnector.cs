@@ -163,6 +163,23 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (HttpResponseSender aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            CloseConnection(aClientContext);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
+                }
+
                 using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myHttpListenerProvider.StopListening();
@@ -202,43 +219,48 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             }
         }
 
-        public void CloseConnection(string outputConnectorAddress)
+        public void SendBroadcast(object message)
         {
             using (EneterTrace.Entering())
             {
-                HttpResponseSender aClientContext;
+                List<string> aDisconnectedClients = new List<string>();
+
                 using (ThreadLock.Lock(myConnectedClients))
                 {
-                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == outputConnectorAddress);
+                    // Send the response message to all connected clients.
+                    foreach (HttpResponseSender aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            // Send the response message.
+                            SendResponseMessage(aClientContext.ResponseReceiverId, message);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientContext.ResponseReceiverId);
 
-                    // Note: we cannot remove the client context from myConnectedClients because the following close message
-                    //       will be put to the queue. And if it is removed from myConnectedClients then the client context
-                    //       would not be found during polling and the close connection message woiuld never be sent to the client.
-                    //       
-                    //       The removing of the client context works like this:
-                    //       The client gets the close connection message. The client processes it and stops polling.
-                    //       On the service side the time detects the client sopped polling and so it removes
-                    //       the client context from my connected clients.
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
                 }
 
-                if (aClientContext != null)
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
                 {
-                    try
-                    {
-                        // Send close connection message.
-                        object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
-                        aClientContext.SendResponseMessage(anEncodedMessage);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning("failed to send the close message.", err);
-                    }
-
-                    aClientContext.Dispose();
+                    CloseConnection(anOutputConnectorAddress, true);
                 }
             }
         }
 
+        public void CloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                CloseConnection(outputConnectorAddress, false);
+            }
+        }
 
         private void HandleConnection(HttpRequestContext httpRequestContext)
         {
@@ -352,14 +374,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                         if (anIsProcessingOk)
                         {
-                            try
-                            {
-                                myMessageHandler(aMessageContext);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                            }
+                            NotifyMessageContext(aMessageContext);
                         }
                     }
                     
@@ -369,6 +384,61 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         httpRequestContext.ResponseError(404);
                     }
                 }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                HttpResponseSender aClientContext;
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == outputConnectorAddress);
+
+                    // Note: we cannot remove the client context from myConnectedClients because the following close message
+                    //       will be put to the queue. And if it is removed from myConnectedClients then the client context
+                    //       would not be found during polling and the close connection message woiuld never be sent to the client.
+                    //       
+                    //       The removing of the client context works like this:
+                    //       The client gets the close connection message. The client processes it and stops polling.
+                    //       On the service side the time detects the client sopped polling and so it removes
+                    //       the client context from my connected clients.
+                }
+
+                if (aClientContext != null)
+                {
+                    CloseConnection(aClientContext);
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void CloseConnection(HttpResponseSender clientContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    // Send close connection message.
+                    object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(clientContext.ResponseReceiverId);
+                    clientContext.SendResponseMessage(anEncodedMessage);
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning("failed to send the close message.", err);
+                }
+
+                // Note: the client context will be removed by the timer.
+                //       The reason is the client can still poll for messages which are stored in the HttpResponseSender.
+                clientContext.Dispose();
             }
         }
 
@@ -415,23 +485,31 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 {
                     ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, aClientContext.ResponseReceiverId, null);
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientContext.ClientIp);
-
-                    try
-                    {
-                        if (myMessageHandler != null)
-                        {
-                            myMessageHandler(aMessageContext);
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
+                    NotifyMessageContext(aMessageContext);
                 }
 
                 if (aStartTimerFlag)
                 {
                     myResponseReceiverInactivityTimer.Change(myResponseReceiverInactivityTimeout, -1);
+                }
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
+                    {
+                        aMessageHandler(messageContext);
+                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }

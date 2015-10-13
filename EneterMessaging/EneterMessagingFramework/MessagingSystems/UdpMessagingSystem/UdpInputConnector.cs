@@ -21,12 +21,12 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     {
         private class TClientContext
         {
-            public TClientContext(Socket udpSocket, EndPoint clientAddress)
+            public TClientContext(Socket udpSocket, EndPoint clientEndPoint)
             {
                 using (EneterTrace.Entering())
                 {
                     myUdpSocket = udpSocket;
-                    myClientAddress = clientAddress;
+                    myClientEndPoint = clientEndPoint;
                 }
             }
 
@@ -43,12 +43,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 using (EneterTrace.Entering())
                 {
                     byte[] aMessageData = (byte[])message;
-                    myUdpSocket.SendTo(aMessageData, myClientAddress);
+                    myUdpSocket.SendTo(aMessageData, myClientEndPoint);
                 }
             }
 
+            public string ClientIp { get { return ((IPEndPoint)myClientEndPoint).ToString(); } }
+
             private Socket myUdpSocket;
-            private EndPoint myClientAddress;
+            private EndPoint myClientEndPoint;
         }
 
         public UdpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter)
@@ -167,9 +169,18 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     aClientContext.SendResponseMessage(anEncodedMessage);
                     aClientContext.CloseConnection();
                 }
-                else
+            }
+        }
+
+        public string GetIpAddress(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
+                using (ThreadLock.Lock(myConnectedClients))
                 {
-                    throw new InvalidOperationException("Could not send close connection message because the response receiver '" + outputConnectorAddress + "' was not found.");
+                    TClientContext aClientContext;
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                    return (aClientContext != null) ? aClientContext.ClientIp : "";
                 }
             }
         }
