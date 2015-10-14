@@ -127,6 +127,23 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (KeyValuePair<string, TClientContext> aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            aClientContext.Value.CloseConnection();
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
+                }
+
                 using (ThreadLock.Lock(myListeningManipulatorLock))
                 {
                     myTcpListenerProvider.StopListening();
@@ -161,8 +178,52 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
 
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                aClientContext.SendResponseMessage(anEncodedMessage);
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    aClientContext.SendResponseMessage(anEncodedMessage);
+                }
+                catch
+                {
+                    CloseConnection(outputConnectorAddress, true);
+                    throw;
+                }
+            }
+        }
+
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    // Send the response message to all connected clients.
+                    foreach (KeyValuePair<string, TClientContext> aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            // Send the response message.
+                            object anEncodedMessage = myProtocolFormatter.EncodeMessage(aClientContext.Key, message);
+                            aClientContext.Value.SendResponseMessage(anEncodedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientContext.Key);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
             }
         }
 
@@ -170,29 +231,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                TClientContext aClientContext;
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                }
-
-                if (aClientContext != null)
-                {
-                    aClientContext.CloseConnection();
-                }
-            }
-        }
-
-        public string GetIpAddress(string outputConnectorAddress)
-        {
-            using (EneterTrace.Entering())
-            {
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    TClientContext aClientContext;
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                    return (aClientContext != null) ? aClientContext.ClientIp : "";
-                }
+                CloseConnection(outputConnectorAddress, false);
             }
         }
 
@@ -234,15 +273,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                         ProtocolMessage anOpenConnectionProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aClientId, null);
                         MessageContext aMessageContext = new MessageContext(anOpenConnectionProtocolMessage, aClientIp);
-
-                        try
-                        {
-                            myMessageHandler(aMessageContext);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                        }
+                        NotifyMessageContext(aMessageContext);
                     }
 
                     // While the stop of listening is not requested and the connection is not closed.
@@ -291,18 +322,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                     }
                                 }
 
-                                try
-                                {
-                                    // Ensure that nobody will try to use id of somebody else.
-                                    aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
-
-                                    // Notify message.
-                                    myMessageHandler(aMessageContext);
-                                }
-                                catch (Exception err)
-                                {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                                }
+                                // Ensure that nobody will try to use id of somebody else.
+                                aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
+                                NotifyMessageContext(aMessageContext);
                             }
                         }
                         else
@@ -329,20 +351,57 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
 
                         // Notify duplex input channel about the disconnection.
-                        try
-                        {
-                            myMessageHandler(aMessageContext);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                        }
+                        NotifyMessageContext(aMessageContext);
                     }
 
                     if (anInputOutputStream != null)
                     {
                         anInputOutputStream.Close();
                     }
+                }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                }
+
+                if (aClientContext != null)
+                {
+                    aClientContext.CloseConnection();
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
+                    {
+                        aMessageHandler(messageContext);
+                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }

@@ -118,8 +118,16 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
 
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                aClientContext.SendMessage(anEncodedMessage);
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    aClientContext.SendMessage(anEncodedMessage);
+                }
+                catch
+                {
+                    CloseConnection(outputConnectorAddress, true);
+                    throw;
+                }
             }
         }
 
@@ -136,8 +144,8 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                     {
                         try
                         {
-                            // Send the response message.
-                            SendResponseMessage(aClientContext.Key, message);
+                            object anEncodedMessage = myProtocolFormatter.EncodeMessage(aClientContext.Key, message);
+                            aClientContext.Value.SendMessage(anEncodedMessage);
                         }
                         catch (Exception err)
                         {
@@ -167,40 +175,6 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             }
         }
 
-        public void SendBroadcast(object message)
-        {
-            using (EneterTrace.Entering())
-            {
-                List<string> aDisconnectedClients = new List<string>();
-
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    // Send the response message to all connected clients.
-                    foreach (string aResponseReceiverId in myConnectedClients.Keys)
-                    {
-                        try
-                        {
-                            // Send the response message.
-                            SendResponseMessage(aResponseReceiverId, message);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
-                            aDisconnectedClients.Add(aResponseReceiverId);
-
-                            // Note: Exception is not rethrown because if sending to one client fails it should not
-                            //       affect sending to other clients.
-                        }
-                    }
-                }
-
-                // Disconnect failed clients.
-                foreach (String anOutputConnectorAddress in aDisconnectedClients)
-                {
-                    CloseConnection(anOutputConnectorAddress, true);
-                }
-            }
-        }
 
         private void OnRequestMessageReceived(Stream message)
         {
@@ -257,15 +231,8 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                         }
                     }
 
-                    try
-                    {
-                        aMessageContext = new MessageContext(aProtocolMessage, "");
-                        myMessageHandler(aMessageContext);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
+                    aMessageContext = new MessageContext(aProtocolMessage, "");
+                    NotifyMessageContext(aMessageContext);
                 }
             }
         }

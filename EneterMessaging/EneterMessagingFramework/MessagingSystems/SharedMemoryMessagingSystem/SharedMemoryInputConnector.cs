@@ -47,7 +47,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                 {
                     try
                     {
-                        myRequestMessageHandler = messageHandler;
+                        myMessageHandler = messageHandler;
                         myReceiver.StartListening(HandleRequestMessage);
                     }
                     catch
@@ -63,10 +63,27 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (KeyValuePair<string, SharedMemorySender> aClient in myConnectedClients)
+                    {
+                        try
+                        {
+                            CloseConnection(aClient.Key, aClient.Value);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
+                }
+
                 using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     myReceiver.StopListening();
-                    myRequestMessageHandler = null;
+                    myMessageHandler = null;
                 }
             }
         }
@@ -97,7 +114,49 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
 
-                aClientSender.SendMessage(x => myProtocolFormatter.EncodeMessage(outputConnectorAddress, message, x));
+                try
+                {
+                    aClientSender.SendMessage(x => myProtocolFormatter.EncodeMessage(outputConnectorAddress, message, x));
+                }
+                catch
+                {
+                    CloseConnection(outputConnectorAddress, true);
+                    throw;
+                }
+            }
+        }
+
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    // Send the response message to all connected clients.
+                    foreach (KeyValuePair<string, SharedMemorySender> aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            aClientContext.Value.SendMessage(x => myProtocolFormatter.EncodeMessage(aClientContext.Key, message, x));
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientContext.Key);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
             }
         }
 
@@ -106,37 +165,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                SharedMemorySender aClientSender;
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
-                    if (aClientSender != null)
-                    {
-                        myConnectedClients.Remove(outputConnectorAddress);
-                    }
-                }
-
-                if (aClientSender != null)
-                {
-                    try
-                    {
-                        aClientSender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress, x));
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning("failed to send the close message.", err);
-                    }
-
-                    aClientSender.Dispose();
-                }
-            }
-        }
-
-        public string GetIpAddress(string outputConnectorAddress)
-        {
-            using (EneterTrace.Entering())
-            {
-                return "";
+                CloseConnection(outputConnectorAddress, false);
             }
         }
 
@@ -194,15 +223,72 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                     }
 
                     MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
 
-                    try
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                SharedMemorySender aClientSender;
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientSender);
+                    if (aClientSender != null)
                     {
-                        myRequestMessageHandler(aMessageContext);
+                        myConnectedClients.Remove(outputConnectorAddress);
                     }
-                    catch (Exception err)
+                }
+
+                if (aClientSender != null)
+                {
+                    CloseConnection(outputConnectorAddress, aClientSender);
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, SharedMemorySender clientSender)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    clientSender.SendMessage(x => myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress, x));
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning("failed to send the close message.", err);
+                }
+
+                clientSender.Dispose();
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
                     {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                        aMessageHandler(messageContext);
                     }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }
@@ -217,7 +303,7 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         private object myListenerManipulatorLock = new object();
         private SharedMemoryReceiver myReceiver;
 
-        private Action<MessageContext> myRequestMessageHandler;
+        private Action<MessageContext> myMessageHandler;
 
         private Dictionary<string, SharedMemorySender> myConnectedClients = new Dictionary<string, SharedMemorySender>();
 

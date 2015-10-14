@@ -90,10 +90,18 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         {
             using (EneterTrace.Entering())
             {
-                MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendResponseMessage, clientId, message);
-                object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+                try
+                {
+                    MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendResponseMessage, clientId, message);
+                    object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
 
-                myMessageBusOutputChannel.SendMessage(aSerializedMessage);
+                    myMessageBusOutputChannel.SendMessage(aSerializedMessage);
+                }
+                catch
+                {
+                    CloseConnection(clientId, true);
+                    throw;
+                }
             }
         }
 
@@ -109,8 +117,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
                     {
                         try
                         {
-                            // Send the response message.
-                            SendResponseMessage(aClientId, message);
+                            MessageBusMessage aMessage = new MessageBusMessage(EMessageBusRequest.SendResponseMessage, aClientId, message);
+                            object aSerializedMessage = mySerializer.Serialize<MessageBusMessage>(aMessage);
+                            myMessageBusOutputChannel.SendMessage(aSerializedMessage);
                         }
                         catch (Exception err)
                         {
