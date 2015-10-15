@@ -25,13 +25,13 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_01_Send1()
         {
-            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 1, 1000, 500);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 1, 2000, 1000);
         }
 
         [Test]
         public virtual void Duplex_02_Send500()
         {
-            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 500, 1000, 1000);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 500, 2000, 2000);
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
         [Test]
         public virtual void Duplex_04_Send50000()
         {
-            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 50000, 500, 20000);
+            SendMessageReceiveResponse(ChannelId, myRequestMessage, myResponseMessage, 1, 50000, 500, 30000);
         }
 
         [Test]
