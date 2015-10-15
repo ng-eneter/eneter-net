@@ -109,6 +109,23 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (KeyValuePair<string, TClientContext> aClient in myConnectedClients)
+                    {
+                        try
+                        {
+                            aClient.Value.CloseConnection();
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
+                }
+
                 using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     myListener.StopListening();
@@ -143,8 +160,51 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
 
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                aClientContext.SendResponseMessage(anEncodedMessage);
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    aClientContext.SendResponseMessage(anEncodedMessage);
+                }
+                catch
+                {
+                    CloseConnection(outputConnectorAddress, true);
+                    throw;
+                }
+            }
+        }
+
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    // Send the response message to all connected clients.
+                    foreach (KeyValuePair<string, TClientContext> aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            object anEncodedMessage = myProtocolFormatter.EncodeMessage(aClientContext.Key, message);
+                            aClientContext.Value.SendResponseMessage(anEncodedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientContext.Key);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
             }
         }
 
@@ -152,29 +212,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                TClientContext aClientContext;
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                }
-
-                if (aClientContext != null)
-                {
-                    aClientContext.CloseConnection();
-                }
-            }
-        }
-
-        public string GetIpAddress(string outputConnectorAddress)
-        {
-            using (EneterTrace.Entering())
-            {
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    TClientContext aClientContext;
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                    return (aClientContext != null) ? aClientContext.ClientIp : "";
-                }
+                CloseConnection(outputConnectorAddress, false);
             }
         }
 
@@ -202,7 +240,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                         ProtocolMessage anOpenConnectionProtocolMessage = new ProtocolMessage(EProtocolMessageType.OpenConnectionRequest, aClientId, null);
                         MessageContext aMessageContext = new MessageContext(anOpenConnectionProtocolMessage, aClientIp);
-                        myMessageHandler(aMessageContext);
+                        NotifyMessageContext(aMessageContext);
                     }
 
                     while (true)
@@ -252,17 +290,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                                 }
 
                                 // Notify message.
-                                try
-                                {
-                                    // Ensure that nobody will try to use id of somebody else.
-                                    aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
-
-                                    myMessageHandler(aMessageContext);
-                                }
-                                catch (Exception err)
-                                {
-                                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                                }
+                                // Ensure that nobody will try to use id of somebody else.
+                                aMessageContext.ProtocolMessage.ResponseReceiverId = aClientId;
+                                NotifyMessageContext(aMessageContext);
                             }
                             else if (aProtocolMessage == null)
                             {
@@ -295,14 +325,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         MessageContext aMessageContext = new MessageContext(aCloseProtocolMessage, aClientIp);
 
                         // Notify duplex input channel about the disconnection.
-                        try
-                        {
-                            myMessageHandler(aMessageContext);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                        }
+                        NotifyMessageContext(aMessageContext);
                     }
 
                     client.CloseConnection();
@@ -310,6 +333,49 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                }
+
+                if (aClientContext != null)
+                {
+                    aClientContext.CloseConnection();
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
+                    {
+                        aMessageHandler(messageContext);
+                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
+                }
+            }
+        }
 
         private IProtocolFormatter myProtocolFormatter;
         private bool myProtocolUsesOpenConnectionMessage;

@@ -47,8 +47,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
             }
 
-            public string ClientIp { get { return ((IPEndPoint)myClientEndPoint).ToString(); } }
-
             private Socket myUdpSocket;
             private EndPoint myClientEndPoint;
         }
@@ -111,6 +109,23 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    foreach (KeyValuePair<string, TClientContext> aClient in myConnectedClients)
+                    {
+                        try
+                        {
+                            CloseConnection(aClient.Key, aClient.Value);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                        }
+                    }
+
+                    myConnectedClients.Clear();
+                }
+
                 using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
                     if (myReceiver != null)
@@ -147,8 +162,51 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     throw new InvalidOperationException("The connection with client '" + outputConnectorAddress + "' is not open.");
                 }
 
-                object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                aClientContext.SendResponseMessage(anEncodedMessage);
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
+                    aClientContext.SendResponseMessage(anEncodedMessage);
+                }
+                catch
+                {
+                    CloseConnection(outputConnectorAddress, true);
+                    throw;
+                }
+            }
+        }
+
+        public void SendBroadcast(object message)
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> aDisconnectedClients = new List<string>();
+
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    // Send the response message to all connected clients.
+                    foreach (KeyValuePair<string, TClientContext> aClientContext in myConnectedClients)
+                    {
+                        try
+                        {
+                            object anEncodedMessage = myProtocolFormatter.EncodeMessage(aClientContext.Key, message);
+                            aClientContext.Value.SendResponseMessage(anEncodedMessage);
+                        }
+                        catch (Exception err)
+                        {
+                            EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                            aDisconnectedClients.Add(aClientContext.Key);
+
+                            // Note: Exception is not rethrown because if sending to one client fails it should not
+                            //       affect sending to other clients.
+                        }
+                    }
+                }
+
+                // Disconnect failed clients.
+                foreach (String anOutputConnectorAddress in aDisconnectedClients)
+                {
+                    CloseConnection(anOutputConnectorAddress, true);
+                }
             }
         }
 
@@ -156,32 +214,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                TClientContext aClientContext;
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                    myConnectedClients.Remove(outputConnectorAddress);
-                }
-
-                if (aClientContext != null)
-                {
-                    object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
-                    aClientContext.SendResponseMessage(anEncodedMessage);
-                    aClientContext.CloseConnection();
-                }
-            }
-        }
-
-        public string GetIpAddress(string outputConnectorAddress)
-        {
-            using (EneterTrace.Entering())
-            {
-                using (ThreadLock.Lock(myConnectedClients))
-                {
-                    TClientContext aClientContext;
-                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
-                    return (aClientContext != null) ? aClientContext.ClientIp : "";
-                }
+                CloseConnection(outputConnectorAddress, false);
             }
         }
 
@@ -237,15 +270,62 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         }
                     }
 
-                    try
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, bool notifyFlag)
+        {
+            using (EneterTrace.Entering())
+            {
+                TClientContext aClientContext;
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    myConnectedClients.TryGetValue(outputConnectorAddress, out aClientContext);
+                    myConnectedClients.Remove(outputConnectorAddress);
+                }
+
+                if (aClientContext != null)
+                {
+                    CloseConnection(outputConnectorAddress, aClientContext);
+                }
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void CloseConnection(string outputConnectorAddress, TClientContext clientContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                clientContext.SendResponseMessage(anEncodedMessage);
+                clientContext.CloseConnection();
+            }
+        }
+
+        private void NotifyMessageContext(MessageContext messageContext)
+        {
+            using (EneterTrace.Entering())
+            {
+                try
+                {
+                    Action<MessageContext> aMessageHandler = myMessageHandler;
+                    if (aMessageHandler != null)
                     {
-                        aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
-                        myMessageHandler(aMessageContext);
+                        aMessageHandler(messageContext);
                     }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                 }
             }
         }

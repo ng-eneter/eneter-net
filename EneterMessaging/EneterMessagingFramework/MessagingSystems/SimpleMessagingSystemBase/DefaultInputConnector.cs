@@ -35,16 +35,19 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     throw new ArgumentNullException("messageHandler is null.");
                 }
 
-                try
+                using (ThreadLock.Lock(myListenerManipulatorLock))
                 {
-                    myMessageHandler = messageHandler;
-                    myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
-                    myIsListeningFlag = true;
-                }
-                catch
-                {
-                    StopListening();
-                    throw;
+                    try
+                    {
+                        myMessageHandler = messageHandler;
+                        myMessagingProvider.RegisterMessageHandler(myInputConnectorAddress, OnRequestMessageReceived);
+                        myIsListeningFlag = true;
+                    }
+                    catch
+                    {
+                        StopListening();
+                        throw;
+                    }
                 }
             }
         }
@@ -70,9 +73,12 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     myConnectedClients.Clear();
                 }
 
-                myIsListeningFlag = false;
-                myMessagingProvider.UnregisterMessageHandler(myInputConnectorAddress);
-                myMessageHandler = null;
+                using (ThreadLock.Lock(myListenerManipulatorLock))
+                {
+                    myIsListeningFlag = false;
+                    myMessagingProvider.UnregisterMessageHandler(myInputConnectorAddress);
+                    myMessageHandler = null;
+                }
             }
         }
 
@@ -80,7 +86,10 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             get
             {
-                return myIsListeningFlag;
+                using (ThreadLock.Lock(myListenerManipulatorLock))
+                {
+                    return myIsListeningFlag;
+                }
             }
         }
 
@@ -239,6 +248,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         private IProtocolFormatter myProtocolFormatter;
         private bool myIsListeningFlag;
         private Action<MessageContext> myMessageHandler;
+        private object myListenerManipulatorLock = new object();
         private HashSet<string> myConnectedClients = new HashSet<string>();
 
         private string TracedObject { get { return GetType().Name; } }
