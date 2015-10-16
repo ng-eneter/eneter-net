@@ -270,6 +270,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         }
                     }
 
+                    aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
                     NotifyMessageContext(aMessageContext);
                 }
             }
