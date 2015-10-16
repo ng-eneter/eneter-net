@@ -51,7 +51,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             private EndPoint myClientEndPoint;
         }
 
-        public UdpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter)
+        public UdpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter, bool reuseAddress)
         {
             using (EneterTrace.Entering())
             {
@@ -75,6 +75,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
                 myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), anServiceUri.Port);
                 myProtocolFormatter = protocolFormatter;
+                myReuseAddressFlag = reuseAddress;
             }
         }
 
@@ -93,7 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
-                        myReceiver = new UdpReceiver(myServiceEndpoint);
+                        myReceiver = new UdpReceiver(myServiceEndpoint, myReuseAddressFlag);
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
@@ -333,6 +334,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
         private IProtocolFormatter myProtocolFormatter;
         private IPEndPoint myServiceEndpoint;
+        private bool myReuseAddressFlag;
         private UdpReceiver myReceiver;
         private object myListenerManipulatorLock = new object();
         private Action<MessageContext> myMessageHandler;

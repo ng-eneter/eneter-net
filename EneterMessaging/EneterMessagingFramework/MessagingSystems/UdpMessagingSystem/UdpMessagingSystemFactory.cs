@@ -26,13 +26,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     {
         private class UdpOutputConnectorFactory : IOutputConnectorFactory
         {
-            public UdpOutputConnectorFactory(IProtocolFormatter protocolFormatter, bool reuseAddressFlag, int responseReceivingPort)
+            public UdpOutputConnectorFactory(IProtocolFormatter protocolFormatter, bool reuseAddressFlag, int responseReceivingPort,
+                bool isSessionless)
             {
                 using (EneterTrace.Entering())
                 {
                     myProtocolFormatter = protocolFormatter;
                     myReuseAddressFlag = reuseAddressFlag;
                     myResponseReceivingPort = responseReceivingPort;
+                    myIsSessionlessFlag = isSessionless;
                 }
             }
 
@@ -40,22 +42,35 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new UdpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myResponseReceivingPort);
+                    IOutputConnector anOutputConnector;
+                    if (myIsSessionlessFlag)
+                    {
+                        anOutputConnector = new UdpSessionlessOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myReuseAddressFlag);
+                    }
+                    else
+                    {
+                        anOutputConnector = new UdpOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myResponseReceivingPort);
+                    }
+
+                    return anOutputConnector;
                 }
             }
 
             private IProtocolFormatter myProtocolFormatter;
             private bool myReuseAddressFlag;
             private int myResponseReceivingPort;
+            private bool myIsSessionlessFlag;
         }
 
         private class UdpInputConnectorFactory : IInputConnectorFactory
         {
-            public UdpInputConnectorFactory(IProtocolFormatter protocolFormatter)
+            public UdpInputConnectorFactory(IProtocolFormatter protocolFormatter, bool reuseAddressFlag, bool isSessionless)
             {
                 using (EneterTrace.Entering())
                 {
                     myProtocolFormatter = protocolFormatter;
+                    myReuseAddressFlag = reuseAddressFlag;
+                    myIsSessionlessFlag = isSessionless;
                 }
             }
 
@@ -63,11 +78,23 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new UdpInputConnector(inputConnectorAddress, myProtocolFormatter);
+                    IInputConnector anInputConnector;
+                    if (myIsSessionlessFlag)
+                    {
+                        anInputConnector = new UdpSessionlessInputConnector(inputConnectorAddress, myProtocolFormatter, myReuseAddressFlag);
+                    }
+                    else
+                    {
+                        anInputConnector = new UdpInputConnector(inputConnectorAddress, myProtocolFormatter, myReuseAddressFlag);
+                    }
+
+                    return anInputConnector;
                 }
             }
 
             private IProtocolFormatter myProtocolFormatter;
+            private bool myReuseAddressFlag;
+            private bool myIsSessionlessFlag;
         }
 
         /// <summary>
@@ -118,7 +145,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, -1);
+                IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, -1, IsSessionless);
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -151,7 +178,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, -1);
+                IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, -1, IsSessionless);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -161,7 +188,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, responseReceivingPort);
+                IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, responseReceivingPort, IsSessionless);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -190,12 +217,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
-                IInputConnectorFactory aConnectorFactory = new UdpInputConnectorFactory(myProtocolFormatter);
+                IInputConnectorFactory aConnectorFactory = new UdpInputConnectorFactory(myProtocolFormatter, ReuseAddress, IsSessionless);
                 IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
             }
         }
+
+        public bool IsSessionless { get; set; }
 
 
         /// <summary>

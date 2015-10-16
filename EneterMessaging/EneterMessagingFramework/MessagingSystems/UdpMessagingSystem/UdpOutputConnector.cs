@@ -59,7 +59,10 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         myResponseReceiver.StartListening(OnResponseMessageReceived);
 
                         byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
-                        myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                        if (anEncodedMessage != null)
+                        {
+                            myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                        }
                     }
                     catch
                     {
@@ -152,7 +155,10 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             try
                             {
                                 byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
-                                myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                                if (anEncodedMessage != null)
+                                {
+                                    myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                                }
                             }
                             catch (Exception err)
                             {

@@ -19,12 +19,13 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     internal class UdpReceiver
     {
         // Constructor used by services. (They listen to requests from clients.)
-        public UdpReceiver(IPEndPoint serviceEndPoint)
+        public UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag)
         {
             using (EneterTrace.Entering())
             {
                 myServiceEndpoint = serviceEndPoint;
                 myIsService = true;
+                myReuseAddressFlag = reuseAddressFlag;
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
