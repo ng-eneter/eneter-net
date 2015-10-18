@@ -18,25 +18,42 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpReceiver
     {
-        // Constructor used by services. (They listen to requests from clients.)
-        public UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag)
+        public static UdpReceiver CreateBoundReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast)
+        {
+            using (EneterTrace.Entering())
+            {
+                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, allowBroadcast);
+            }
+        }
+
+        public static UdpReceiver CreateConnectedReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort)
+        {
+            using (EneterTrace.Entering())
+            {
+                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, responseReceivingPort);
+            }
+        }
+
+        // Constructor binding to EndPoint.
+        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast)
         {
             using (EneterTrace.Entering())
             {
                 myServiceEndpoint = serviceEndPoint;
-                myIsService = true;
+                myIsBound = true;
                 myReuseAddressFlag = reuseAddressFlag;
+                myAllowBroadcastFlag = allowBroadcast;
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
 
-        // Constructors used by clients to listen to response messages.
-        public UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort)
+        // Constructor connecting the EndPoint.
+        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort)
         {
             using (EneterTrace.Entering())
             {
                 myServiceEndpoint = serviceEndPoint;
-                myIsService = false;
+                myIsBound = false;
                 myReuseAddressFlag = reuseAddressFlag;
                 myResponseReceivingPort = responseReceivingPort;
 
@@ -72,10 +89,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         // Note: bigger buffer increases the chance the datagram is not lost.
                         mySocket.ReceiveBufferSize = 1048576;
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
+                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
 #else
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
 #endif
-                        if (myIsService)
+                        if (myIsBound)
                         {
                             // Avoid getting exception when some UDP client disconnects.
                             // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
@@ -210,7 +228,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             // If this is service then continue in the loop if the exception
                             // occured because one of clients got disconnected.
 #if !COMPACT_FRAMEWORK
-                            if (myIsService && err.SocketErrorCode == SocketError.Interrupted)
+                            if (myIsBound && err.SocketErrorCode == SocketError.Interrupted)
 #else
                             if (myIsService && err.ErrorCode == 10004)
 #endif
@@ -276,10 +294,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        private bool myIsService;
+        private bool myIsBound;
         private EndPoint myServiceEndpoint;
         private Socket mySocket;
         private bool myReuseAddressFlag;
+        private bool myAllowBroadcastFlag;
         private int myResponseReceivingPort;
 
         private volatile bool myIsListening;
@@ -295,7 +314,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             get
             {
 
-                return (myIsService) ? "UdpReceiver (request receiver) " : "UdpReceiver (response receiver) ";
+                return (myIsBound) ? "UdpReceiver (request receiver) " : "UdpReceiver (response receiver) ";
             }
         }
     }

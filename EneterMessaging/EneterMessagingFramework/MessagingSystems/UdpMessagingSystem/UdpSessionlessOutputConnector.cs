@@ -70,7 +70,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myResponseMessageHandler = responseMessageHandler;
 
                     // Listen on the client address.
-                    myResponseReceiver = new UdpReceiver(myClientEndPoint, myReuseAddressFlag);
+                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, true);
                     myResponseReceiver.StartListening(OnRequestMessageReceived);
                 }
             }

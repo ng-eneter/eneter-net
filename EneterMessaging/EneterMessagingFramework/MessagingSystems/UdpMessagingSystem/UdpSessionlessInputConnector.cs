@@ -60,7 +60,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
-                        myReceiver = new UdpReceiver(myServiceEndpoint, myReuseAddressFlag);
+                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, true);
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
