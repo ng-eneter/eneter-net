@@ -11,18 +11,14 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpSessionlessOutputConnector : IOutputConnector
     {
         public UdpSessionlessOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter,
-            bool reuseAddressFlag)
+            bool reuseAddressFlag, short ttl)
         {
             using (EneterTrace.Entering())
             {
@@ -53,6 +49,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myOutpuConnectorAddress = outpuConnectorAddress;
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;
+                myTtl = ttl;
             }
         }
 
@@ -70,7 +67,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myResponseMessageHandler = responseMessageHandler;
 
                     // Listen on the client address.
-                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, true);
+                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, true, myTtl);
                     myResponseReceiver.StartListening(OnRequestMessageReceived);
                 }
             }
@@ -153,6 +150,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private IPEndPoint myClientEndPoint;
         private IPEndPoint myServiceEndpoint;
         private bool myReuseAddressFlag;
+        private short myTtl;
         private Action<MessageContext> myResponseMessageHandler;
         private UdpReceiver myResponseReceiver;
         private object myConnectionManipulatorLock = new object();

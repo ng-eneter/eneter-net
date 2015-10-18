@@ -18,24 +18,26 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpReceiver
     {
-        public static UdpReceiver CreateBoundReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast)
+        public static UdpReceiver CreateBoundReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast,
+            short ttl)
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, allowBroadcast);
+                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, allowBroadcast, ttl);
             }
         }
 
-        public static UdpReceiver CreateConnectedReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort)
+        public static UdpReceiver CreateConnectedReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort,
+            short ttl)
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, responseReceivingPort);
+                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, responseReceivingPort, ttl);
             }
         }
 
         // Constructor binding to EndPoint.
-        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast)
+        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast, short ttl)
         {
             using (EneterTrace.Entering())
             {
@@ -43,12 +45,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myIsBound = true;
                 myReuseAddressFlag = reuseAddressFlag;
                 myAllowBroadcastFlag = allowBroadcast;
+                myTtl = ttl;
+
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
 
         // Constructor connecting the EndPoint.
-        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort)
+        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort, short ttl)
         {
             using (EneterTrace.Entering())
             {
@@ -56,6 +60,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myIsBound = false;
                 myReuseAddressFlag = reuseAddressFlag;
                 myResponseReceivingPort = responseReceivingPort;
+                myTtl = ttl;
 
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
@@ -90,6 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         mySocket.ReceiveBufferSize = 1048576;
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
+                        mySocket.Ttl = myTtl;
 #else
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
 #endif
@@ -300,6 +306,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private bool myReuseAddressFlag;
         private bool myAllowBroadcastFlag;
         private int myResponseReceivingPort;
+        private short myTtl;
 
         private volatile bool myIsListening;
         private volatile bool myStopListeningRequested;

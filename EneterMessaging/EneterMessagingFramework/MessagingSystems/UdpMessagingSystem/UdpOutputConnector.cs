@@ -18,7 +18,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     internal class UdpOutputConnector : IOutputConnector
     {
         public UdpOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter,
-            bool reuseAddressFlag, int responseReceivingPort)
+            bool reuseAddressFlag, int responseReceivingPort, short ttl)
         {
             using (EneterTrace.Entering())
             {
@@ -38,6 +38,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;
                 myResponseReceivingPort = responseReceivingPort;
+                myTtl = ttl;
             }
         }
 
@@ -55,7 +56,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myResponseMessageHandler = responseMessageHandler;
-                        myResponseReceiver = UdpReceiver.CreateConnectedReceiver(myServiceEndpoint, myReuseAddressFlag, myResponseReceivingPort);
+                        myResponseReceiver = UdpReceiver.CreateConnectedReceiver(myServiceEndpoint, myReuseAddressFlag, myResponseReceivingPort, myTtl);
                         myResponseReceiver.StartListening(OnResponseMessageReceived);
 
                         byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
@@ -177,6 +178,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private string myOutpuConnectorAddress;
         private IPEndPoint myServiceEndpoint;
         private bool myReuseAddressFlag;
+        private short myTtl;
         private int myResponseReceivingPort;
         private Action<MessageContext> myResponseMessageHandler;
         private UdpReceiver myResponseReceiver;
