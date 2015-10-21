@@ -18,7 +18,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     internal class UdpSessionlessOutputConnector : IOutputConnector
     {
         public UdpSessionlessOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter,
-            bool reuseAddressFlag, short ttl)
+            bool reuseAddressFlag, short ttl, string multicastGroup)
         {
             using (EneterTrace.Entering())
             {
@@ -50,6 +50,10 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;
                 myTtl = ttl;
+                if (!string.IsNullOrEmpty(multicastGroup))
+                {
+                    myMulticastGroup = IPAddressExt.ParseMulticastGroup(multicastGroup);
+                }
             }
         }
 
@@ -67,7 +71,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myResponseMessageHandler = responseMessageHandler;
 
                     // Listen on the client address.
-                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, true, myTtl);
+                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, true, myTtl, myMulticastGroup);
                     myResponseReceiver.StartListening(OnRequestMessageReceived);
                 }
             }
@@ -149,6 +153,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private string myOutpuConnectorAddress;
         private IPEndPoint myClientEndPoint;
         private IPEndPoint myServiceEndpoint;
+        private IPAddress myMulticastGroup;
         private bool myReuseAddressFlag;
         private short myTtl;
         private Action<MessageContext> myResponseMessageHandler;

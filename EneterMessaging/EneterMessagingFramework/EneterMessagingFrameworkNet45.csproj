@@ -264,6 +264,7 @@
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\ThreadPoolMessagingProvider.cs" />
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\ThreadPoolMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\IPAddressExt.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessInputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpInputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpMessagingSystemFactory.cs" />

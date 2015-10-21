@@ -19,25 +19,26 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     internal class UdpReceiver
     {
         public static UdpReceiver CreateBoundReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast,
-            short ttl)
+            short ttl, IPAddress multicastGroup)
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, allowBroadcast, ttl);
+                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, allowBroadcast, ttl, multicastGroup);
             }
         }
 
         public static UdpReceiver CreateConnectedReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort,
-            short ttl)
+            short ttl, IPAddress multicastGroup)
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, responseReceivingPort, ttl);
+                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, responseReceivingPort, ttl, multicastGroup);
             }
         }
 
         // Constructor binding to EndPoint.
-        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast, short ttl)
+        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast, short ttl,
+            IPAddress multicastGroup)
         {
             using (EneterTrace.Entering())
             {
@@ -46,13 +47,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myReuseAddressFlag = reuseAddressFlag;
                 myAllowBroadcastFlag = allowBroadcast;
                 myTtl = ttl;
+                myMulticastGroup = multicastGroup;
 
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
 
         // Constructor connecting the EndPoint.
-        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort, short ttl)
+        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort, short ttl,
+            IPAddress multicastGroup)
         {
             using (EneterTrace.Entering())
             {
@@ -61,6 +64,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myReuseAddressFlag = reuseAddressFlag;
                 myResponseReceivingPort = responseReceivingPort;
                 myTtl = ttl;
+                myMulticastGroup = multicastGroup;
 
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
@@ -93,12 +97,13 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 #if !COMPACT_FRAMEWORK
                         // Note: bigger buffer increases the chance the datagram is not lost.
                         mySocket.ReceiveBufferSize = 1048576;
-                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
-                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
-                        mySocket.Ttl = myTtl;
 #else
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
 #endif
+                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
+                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
+                        mySocket.Ttl = myTtl;
+
                         if (myIsBound)
                         {
                             // Avoid getting exception when some UDP client disconnects.
@@ -109,17 +114,23 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
 
                             mySocket.Bind(myServiceEndpoint);
+
+                            // Note:  Joining the multicast group must be done after Bind.
+                            // Note: There is no need to drop the multicast group before closing the socket.
+                            //       When the socket is closed the multicast groups are dropped automatically.
+                            JoinMulticastGroup();
                         }
                         else
                         {
-#if !COMPACT_FRAMEWORK
                             // If the client shall bind incoming responses to a specified port.
                             if (myResponseReceivingPort > 0)
                             {
                                 // Note: IPAddress.Any will be updated once the connection is established.
                                 mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
                             }
-#endif
+
+                            JoinMulticastGroup();
+
                             mySocket.Connect(myServiceEndpoint);
                         }
 
@@ -300,8 +311,29 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
+        private void JoinMulticastGroup()
+        {
+            using (EneterTrace.Entering())
+            {
+                if (myMulticastGroup != null)
+                {
+                    if (myMulticastGroup.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        MulticastOption aMulticastOption = new MulticastOption(myMulticastGroup);
+                        mySocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, aMulticastOption);
+                    }
+                    else if (myMulticastGroup.AddressFamily == AddressFamily.InterNetworkV6)
+                    {
+                        IPv6MulticastOption aMulticastOption = new IPv6MulticastOption(myMulticastGroup);
+                        mySocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, aMulticastOption);
+                    }
+                }
+            }
+        }
+
         private bool myIsBound;
         private EndPoint myServiceEndpoint;
+        private IPAddress myMulticastGroup;
         private Socket mySocket;
         private bool myReuseAddressFlag;
         private bool myAllowBroadcastFlag;
