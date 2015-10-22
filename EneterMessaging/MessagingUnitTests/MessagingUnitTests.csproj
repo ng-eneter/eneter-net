@@ -256,9 +256,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\Test_ThreadPoolMessaging.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\Test_UdpBroadcast.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\Test_UdpMessagingSystem.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\UdpMessagingSystem\Test_UdpMulticast.cs" />
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\Test_WebSocketListener.cs">
       <SubType>Code</SubType>
     </Compile>

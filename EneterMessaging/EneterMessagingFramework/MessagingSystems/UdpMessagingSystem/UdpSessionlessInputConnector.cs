@@ -40,7 +40,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     throw;
                 }
 
-                myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), anServiceUri.Port);
+                int aPort = (anServiceUri.Port < 0) ? 0 : anServiceUri.Port;
+                myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), aPort);
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;
                 myTtl = ttl;

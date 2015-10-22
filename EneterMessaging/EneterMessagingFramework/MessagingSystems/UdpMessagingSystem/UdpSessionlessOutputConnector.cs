@@ -45,7 +45,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
 
                 myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), anServiceUri.Port);
-                myClientEndPoint = new IPEndPoint(IPAddress.Parse(aClientUri.Host), aClientUri.Port);
+                int aClientPort = (aClientUri.Port < 0) ? 0 : aClientUri.Port;
+                myClientEndPoint = new IPEndPoint(IPAddress.Parse(aClientUri.Host), aClientPort);
                 myOutpuConnectorAddress = outpuConnectorAddress;
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;

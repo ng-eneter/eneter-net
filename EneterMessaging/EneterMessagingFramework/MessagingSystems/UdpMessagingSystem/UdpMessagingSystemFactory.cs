@@ -12,6 +12,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using System;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
@@ -154,9 +155,19 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
+                string aResponseReceiverId = null;
+
+                if (IsSessionless)
+                {
+                    //Random aRnd = new Random();
+                    //int aPort = aRnd.Next(10000, 60000);
+
+                    aResponseReceiverId = "udp://0.0.0.0:0/";
+                }
+
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
                 IOutputConnectorFactory aConnectorFactory = new UdpOutputConnectorFactory(myProtocolFormatter, ReuseAddress, -1, IsSessionless, Ttl, MulticastGroup);
-                return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
+                return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
 

@@ -301,6 +301,7 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\UdpMessagingSystem\IPAddressExt.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpInputConnector.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -313,6 +314,8 @@
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessInputConnector.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
