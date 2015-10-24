@@ -22,7 +22,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(endPointToBind, reuseAddressFlag, ttl, allowBroadcast, multicastGroup, multicastLoopbackFlag);
+                return new UdpReceiver(null, -1, endPointToBind, reuseAddressFlag, ttl, allowBroadcast, multicastGroup, multicastLoopbackFlag);
             }
         }
 
@@ -31,20 +31,23 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(endPointToConnect, reuseAddressFlag, responseReceivingPort, ttl);
+                return new UdpReceiver(endPointToConnect, responseReceivingPort, null, reuseAddressFlag, ttl, false, null, false);
             }
         }
 
-        // Constructor binding to EndPoint.
-        private UdpReceiver(IPEndPoint endPointToBind, bool reuseAddressFlag, short ttl,
-            bool allowBroadcast, IPAddress multicastGroup, bool multicastLoopbackFlag)
+
+        private UdpReceiver(IPEndPoint endPointToConnect, int responseReceivingPort,
+                            IPEndPoint endPointToBind,
+                            bool reuseAddressFlag, short ttl, bool allowBroadcast, IPAddress multicastGroup, bool multicastLoopbackFlag)
         {
             using (EneterTrace.Entering())
             {
+                myEndPointToConnect = endPointToConnect;
+                myResponseReceivingPort = responseReceivingPort;
                 myEndPointToBind = endPointToBind;
                 myReuseAddressFlag = reuseAddressFlag;
-                myAllowBroadcastFlag = allowBroadcast;
                 myTtl = ttl;
+                myAllowBroadcastFlag = allowBroadcast;
                 myMulticastGroup = multicastGroup;
                 myMulticastLoopbackFlag = multicastLoopbackFlag;
 
@@ -52,19 +55,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        // Constructor connecting the EndPoint.
-        private UdpReceiver(IPEndPoint endPointToConnect, bool reuseAddressFlag, int responseReceivingPort, short ttl)
-        {
-            using (EneterTrace.Entering())
-            {
-                myEndPointToConnect = endPointToConnect;
-                myReuseAddressFlag = reuseAddressFlag;
-                myResponseReceivingPort = responseReceivingPort;
-                myTtl = ttl;
-
-                myWorkingThreadDispatcher = new SingleThreadExecutor();
-            }
-        }
 
         public void StartListening(Action<byte[], EndPoint> messageHandler)
         {
@@ -89,59 +79,77 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         myStopListeningRequested = false;
                         myMessageHandler = messageHandler;
 
+                        AddressFamily anAddressFamily = AddressFamily.InterNetworkV6;
                         if (myEndPointToBind != null)
                         {
-                            mySocket = new Socket(myEndPointToBind.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                            anAddressFamily = myEndPointToBind.AddressFamily;
                         }
-                        else
+                        else if (myEndPointToConnect != null)
                         {
-                            mySocket = new Socket(myEndPointToConnect.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                            anAddressFamily = myEndPointToConnect.AddressFamily;
                         }
 
-#if !COMPACT_FRAMEWORK
-                        // Note: bigger buffer increases the chance the datagram is not lost.
-                        mySocket.ReceiveBufferSize = 1048576;
-#else
-                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
-#endif
-                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
+                        mySocket = new Socket(anAddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                        
+                        // If IPv6 then still allow IPv4 
+                        if (anAddressFamily == AddressFamily.InterNetworkV6)
+                        {
+                            mySocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
+                        }
+
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
                         mySocket.Ttl = myTtl;
 
-                        if (myEndPointToBind != null)
+                        if (myEndPointToBind != null || myEndPointToConnect != null)
                         {
-                            // Avoid getting exception when some UDP client disconnects.
-                            // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
-                            const int SIO_UDP_CONNRESET = -1744830452;
-                            byte[] inValue = new byte[] { 0 };
-                            byte[] outValue = new byte[] { 0 };
-                            mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
+#if !COMPACT_FRAMEWORK
+                            // Note: bigger buffer increases the chance the datagram is not lost.
+                            mySocket.ReceiveBufferSize = 1048576;
+#else
+                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
+#endif
+                            mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 
-                            mySocket.Bind(myEndPointToBind);
-
-                            // Note:  Joining the multicast group must be done after Bind.
-                            // Note: There is no need to drop the multicast group before closing the socket.
-                            //       When the socket is closed the multicast groups are dropped automatically.
-                            JoinMulticastGroup();
-                            mySocket.MulticastLoopback = myMulticastLoopbackFlag;
-                        }
-                        else
-                        {
-                            // If the client shall bind incoming responses to a specified port.
-                            if (myResponseReceivingPort > 0)
+                            if (myEndPointToBind != null)
                             {
-                                // Note: IPAddress.Any will be updated once the connection is established.
-                                mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
+                                // Avoid getting exception when some UDP client disconnects.
+                                // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
+                                const int SIO_UDP_CONNRESET = -1744830452;
+                                byte[] inValue = new byte[] { 0 };
+                                byte[] outValue = new byte[] { 0 };
+                                mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
+
+                                mySocket.Bind(myEndPointToBind);
+
+                                // Note:  Joining the multicast group must be done after Bind.
+                                // Note: There is no need to drop the multicast group before closing the socket.
+                                //       When the socket is closed the multicast groups are dropped automatically.
+                                JoinMulticastGroup();
+                                mySocket.MulticastLoopback = myMulticastLoopbackFlag;
+                            }
+                            else
+                            {
+                                // If the client shall bind incoming responses to a specified port.
+                                if (myResponseReceivingPort > 0)
+                                {
+                                    // Note: IPAddress.Any will be updated once the connection is established.
+                                    mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
+                                }
+
+                                mySocket.Connect(myEndPointToConnect);
                             }
 
-                            mySocket.Connect(myEndPointToConnect);
+                            myListeningThread = new Thread(DoListening);
+                            myListeningThread.Start();
+
+                            // Wait until the listening thread is ready.
+                            myListeningToResponsesStartedEvent.WaitOne(5000);
                         }
-
-                        myListeningThread = new Thread(DoListening);
-                        myListeningThread.Start();
-
-                        // Wait until the listening thread is ready.
-                        myListeningToResponsesStartedEvent.WaitOne(5000);
+                        else
+                        // This is in case of one-way sender.
+                        {
+                            myIsListening = true;
+                        }
                     }
                     catch (Exception err)
                     {
@@ -203,6 +211,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myListeningThread = null;
 
                     myMessageHandler = null;
+                    myIsListening = false;
                 }
             }
         }

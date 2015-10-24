@@ -40,7 +40,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
                     aMessage2Received.Set();
                 };
 
-            IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8095/");
+            IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8095/", "udp://127.0.0.1");
 
             try
             {
@@ -48,7 +48,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
                 anInputChannel2.StartListening();
 
                 anOutputChannel.OpenConnection();
-
                 anOutputChannel.SendMessage("Hello");
 
                 aMessage1Received.WaitIfNotDebugging(1000);

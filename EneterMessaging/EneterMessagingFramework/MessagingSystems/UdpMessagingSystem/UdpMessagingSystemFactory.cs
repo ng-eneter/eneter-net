@@ -141,7 +141,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
                 if (AllowBroadcast || !string.IsNullOrEmpty(MulticastGroup))
                 {
-                    aResponseReceiverId = "udp://localhost/";
+                    aResponseReceiverId = "udp://0.0.0.0/";
                 }
 
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
