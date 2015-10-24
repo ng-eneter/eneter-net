@@ -18,53 +18,49 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
     internal class UdpReceiver
     {
-        public static UdpReceiver CreateBoundReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast,
-            short ttl, IPAddress multicastGroup)
+        public static UdpReceiver CreateBoundReceiver(IPEndPoint endPointToBind, bool reuseAddressFlag, short ttl, bool allowBroadcast, IPAddress multicastGroup, bool multicastLoopbackFlag)
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, allowBroadcast, ttl, multicastGroup);
+                return new UdpReceiver(endPointToBind, reuseAddressFlag, ttl, allowBroadcast, multicastGroup, multicastLoopbackFlag);
             }
         }
 
-        public static UdpReceiver CreateConnectedReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort,
-            short ttl, IPAddress multicastGroup)
+        public static UdpReceiver CreateConnectedReceiver(IPEndPoint endPointToConnect, bool reuseAddressFlag, int responseReceivingPort,
+            short ttl)
         {
             using (EneterTrace.Entering())
             {
-                return new UdpReceiver(serviceEndPoint, reuseAddressFlag, responseReceivingPort, ttl, multicastGroup);
+                return new UdpReceiver(endPointToConnect, reuseAddressFlag, responseReceivingPort, ttl);
             }
         }
 
         // Constructor binding to EndPoint.
-        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, bool allowBroadcast, short ttl,
-            IPAddress multicastGroup)
+        private UdpReceiver(IPEndPoint endPointToBind, bool reuseAddressFlag, short ttl,
+            bool allowBroadcast, IPAddress multicastGroup, bool multicastLoopbackFlag)
         {
             using (EneterTrace.Entering())
             {
-                myServiceEndpoint = serviceEndPoint;
-                myIsBound = true;
+                myEndPointToBind = endPointToBind;
                 myReuseAddressFlag = reuseAddressFlag;
                 myAllowBroadcastFlag = allowBroadcast;
                 myTtl = ttl;
                 myMulticastGroup = multicastGroup;
+                myMulticastLoopbackFlag = multicastLoopbackFlag;
 
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
         }
 
         // Constructor connecting the EndPoint.
-        private UdpReceiver(IPEndPoint serviceEndPoint, bool reuseAddressFlag, int responseReceivingPort, short ttl,
-            IPAddress multicastGroup)
+        private UdpReceiver(IPEndPoint endPointToConnect, bool reuseAddressFlag, int responseReceivingPort, short ttl)
         {
             using (EneterTrace.Entering())
             {
-                myServiceEndpoint = serviceEndPoint;
-                myIsBound = false;
+                myEndPointToConnect = endPointToConnect;
                 myReuseAddressFlag = reuseAddressFlag;
                 myResponseReceivingPort = responseReceivingPort;
                 myTtl = ttl;
-                myMulticastGroup = multicastGroup;
 
                 myWorkingThreadDispatcher = new SingleThreadExecutor();
             }
@@ -93,7 +89,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         myStopListeningRequested = false;
                         myMessageHandler = messageHandler;
 
-                        mySocket = new Socket(myServiceEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                        if (myEndPointToBind != null)
+                        {
+                            mySocket = new Socket(myEndPointToBind.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                        }
+                        else
+                        {
+                            mySocket = new Socket(myEndPointToConnect.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                        }
+
 #if !COMPACT_FRAMEWORK
                         // Note: bigger buffer increases the chance the datagram is not lost.
                         mySocket.ReceiveBufferSize = 1048576;
@@ -104,7 +108,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
                         mySocket.Ttl = myTtl;
 
-                        if (myIsBound)
+                        if (myEndPointToBind != null)
                         {
                             // Avoid getting exception when some UDP client disconnects.
                             // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
@@ -113,12 +117,13 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             byte[] outValue = new byte[] { 0 };
                             mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
 
-                            mySocket.Bind(myServiceEndpoint);
+                            mySocket.Bind(myEndPointToBind);
 
                             // Note:  Joining the multicast group must be done after Bind.
                             // Note: There is no need to drop the multicast group before closing the socket.
                             //       When the socket is closed the multicast groups are dropped automatically.
                             JoinMulticastGroup();
+                            mySocket.MulticastLoopback = myMulticastLoopbackFlag;
                         }
                         else
                         {
@@ -129,9 +134,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                                 mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
                             }
 
-                            JoinMulticastGroup();
-
-                            mySocket.Connect(myServiceEndpoint);
+                            mySocket.Connect(myEndPointToConnect);
                         }
 
                         myListeningThread = new Thread(DoListening);
@@ -245,9 +248,9 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             // If this is service then continue in the loop if the exception
                             // occured because one of clients got disconnected.
 #if !COMPACT_FRAMEWORK
-                            if (myIsBound && err.SocketErrorCode == SocketError.Interrupted)
+                            if (myEndPointToBind != null && err.SocketErrorCode == SocketError.Interrupted)
 #else
-                            if (myIsService && err.ErrorCode == 10004)
+                            if (myEndPointToBind != null && err.ErrorCode == 10004)
 #endif
                             {
                                 continue;
@@ -319,7 +322,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 {
                     if (myMulticastGroup.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        MulticastOption aMulticastOption = new MulticastOption(myMulticastGroup);
+                        MulticastOption aMulticastOption = new MulticastOption(myMulticastGroup, ((IPEndPoint) mySocket.LocalEndPoint).Address);
                         mySocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, aMulticastOption);
                     }
                     else if (myMulticastGroup.AddressFamily == AddressFamily.InterNetworkV6)
@@ -331,14 +334,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        private bool myIsBound;
-        private EndPoint myServiceEndpoint;
+        private EndPoint myEndPointToBind;
+        private EndPoint myEndPointToConnect;
         private IPAddress myMulticastGroup;
         private Socket mySocket;
         private bool myReuseAddressFlag;
         private bool myAllowBroadcastFlag;
         private int myResponseReceivingPort;
         private short myTtl;
+        private bool myMulticastLoopbackFlag;
 
         private volatile bool myIsListening;
         private volatile bool myStopListeningRequested;
@@ -353,7 +357,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             get
             {
 
-                return (myIsBound) ? "UdpReceiver (request receiver) " : "UdpReceiver (response receiver) ";
+                return GetType().Name + " ";
             }
         }
     }

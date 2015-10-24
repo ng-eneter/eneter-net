@@ -56,7 +56,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myResponseMessageHandler = responseMessageHandler;
-                        myResponseReceiver = UdpReceiver.CreateConnectedReceiver(myServiceEndpoint, myReuseAddressFlag, myResponseReceivingPort, myTtl, null);
+                        myResponseReceiver = UdpReceiver.CreateConnectedReceiver(myServiceEndpoint, myReuseAddressFlag, myResponseReceivingPort, myTtl);
                         myResponseReceiver.StartListening(OnResponseMessageReceived);
 
                         byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);

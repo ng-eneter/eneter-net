@@ -18,7 +18,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     internal class UdpSessionlessOutputConnector : IOutputConnector
     {
         public UdpSessionlessOutputConnector(string ipAddressAndPort, string outpuConnectorAddress, IProtocolFormatter protocolFormatter,
-            bool reuseAddressFlag, short ttl, string multicastGroup)
+            bool reuseAddressFlag, short ttl, bool allowBroadcast, string multicastGroup, bool multicastLoopbackFlag)
         {
             using (EneterTrace.Entering())
             {
@@ -51,10 +51,12 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;
                 myTtl = ttl;
+                myAllowBroadcastFlag = allowBroadcast;
                 if (!string.IsNullOrEmpty(multicastGroup))
                 {
                     myMulticastGroup = IPAddressExt.ParseMulticastGroup(multicastGroup);
                 }
+                myMulticastLoopbackFlag = multicastLoopbackFlag;
             }
         }
 
@@ -72,7 +74,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     myResponseMessageHandler = responseMessageHandler;
 
                     // Listen on the client address.
-                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, true, myTtl, myMulticastGroup);
+                    myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myReuseAddressFlag, myTtl, myAllowBroadcastFlag, myMulticastGroup, myMulticastLoopbackFlag);
                     myResponseReceiver.StartListening(OnRequestMessageReceived);
                 }
             }
@@ -157,6 +159,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private IPAddress myMulticastGroup;
         private bool myReuseAddressFlag;
         private short myTtl;
+        private bool myAllowBroadcastFlag;
+        private bool myMulticastLoopbackFlag;
         private Action<MessageContext> myResponseMessageHandler;
         private UdpReceiver myResponseReceiver;
         private object myConnectionManipulatorLock = new object();

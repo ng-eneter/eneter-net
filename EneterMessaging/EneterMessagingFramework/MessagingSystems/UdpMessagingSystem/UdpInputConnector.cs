@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
-                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, false, myTtl, null);
+                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, myTtl, false, null, false);
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
