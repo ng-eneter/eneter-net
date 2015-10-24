@@ -217,6 +217,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
+#if !NET35
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
@@ -224,6 +225,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 return TcpMessagingSystemFactory.GetAvailableIpAddresses();
             }
         }
+#endif
 
         public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
         {

@@ -85,6 +85,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myTcpClient.ReceiveTimeout = myReceiveTimeout;
                         myTcpClient.SendBufferSize = mySendBuffer;
                         myTcpClient.ReceiveBufferSize = myReceiveBuffer;
+
+#if !SILVERLIGHT
                         myTcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 
                         if (myResponseReceivingPort > 0)
@@ -92,6 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any;
                             myTcpClient.Client.Bind(new IPEndPoint(aDummyIpAddress, myResponseReceivingPort));
                         }
+#endif
 #endif
 
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.

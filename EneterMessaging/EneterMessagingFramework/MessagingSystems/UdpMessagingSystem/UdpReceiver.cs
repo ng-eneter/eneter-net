@@ -94,7 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         // If IPv6 then still allow IPv4 
                         if (anAddressFamily == AddressFamily.InterNetworkV6)
                         {
-                            mySocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
+                            mySocket.SetSocketOption(SocketOptionLevel.IPv6, (SocketOptionName)27, false);
                         }
 
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);

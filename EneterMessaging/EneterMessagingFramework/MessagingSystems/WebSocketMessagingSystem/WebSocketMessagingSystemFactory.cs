@@ -218,6 +218,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
+#if !NET35 && !SILVERLIGHT
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
@@ -225,14 +226,17 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 return TcpMessagingSystemFactory.GetAvailableIpAddresses();
             }
         }
+#endif
 
+#if !SILVERLIGHT
         public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
             {
-                return IsEndPointAvailableForListening(ipAddressAndPort);
+                return TcpMessagingSystemFactory.IsEndPointAvailableForListening(ipAddressAndPort);
             }
         }
+#endif
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>

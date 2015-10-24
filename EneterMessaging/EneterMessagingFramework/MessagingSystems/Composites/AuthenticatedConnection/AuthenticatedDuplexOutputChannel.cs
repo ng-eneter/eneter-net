@@ -10,7 +10,6 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
-using System.Security.Authentication;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
@@ -106,7 +105,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                         {
                             string anErrorMessage = TracedObject + "failed to authenticate '" + aLoginMessage + "'.";
                             EneterTrace.Error(anErrorMessage);
-                            throw new AuthenticationException(anErrorMessage);
+                            throw new InvalidOperationException(anErrorMessage);
                         }
                     }
                     catch

@@ -281,6 +281,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
+#if !NET35 && !SILVERLIGHT
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
@@ -295,7 +296,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 return anIpAddresses.ToArray();
             }
         }
+#endif
 
+#if !SILVERLIGHT
         public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
@@ -329,6 +332,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 return true;
             }
         }
+#endif
 
         /// <summary>
         /// Sets or gets the security stream factory for the server.
