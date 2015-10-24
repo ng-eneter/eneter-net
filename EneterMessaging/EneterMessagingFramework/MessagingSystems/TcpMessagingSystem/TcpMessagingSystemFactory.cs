@@ -14,6 +14,9 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 using Eneter.Messaging.Threading.Dispatching;
+using System.Net.NetworkInformation;
+using System.Net;
+using System.Collections.Generic;
 
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
@@ -291,6 +294,54 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
+        public static string[] GetAvailableIpAddresses()
+        {
+            using (EneterTrace.Entering())
+            {
+                IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+                UnicastIPAddressInformationCollection aCollection = anIpGlobalProperties.GetUnicastAddresses();
+                List<string> anIpAddresses = new List<string>();
+                foreach (UnicastIPAddressInformation anIpAddressInfo in aCollection)
+                {
+                    anIpAddresses.Add(anIpAddressInfo.Address.ToString());
+                }
+                return anIpAddresses.ToArray();
+            }
+        }
+
+        public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
+        {
+            using (EneterTrace.Entering())
+            {
+                Uri aVerifiedUri = new Uri(ipAddressAndPort, UriKind.Absolute);
+                IPEndPoint aVerifiedEndPoint = new IPEndPoint(IPAddress.Parse(aVerifiedUri.Host), aVerifiedUri.Port);
+
+                IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+
+                // First check service listeners.
+                IPEndPoint[] aListeners = anIpGlobalProperties.GetActiveTcpListeners();
+                foreach (IPEndPoint aListener in aListeners)
+                {
+                    if (aVerifiedEndPoint.Equals(aListener))
+                    {
+                        return false;
+                    }
+                }
+
+                // Second check response listeners.
+                TcpConnectionInformation[] aConnections = anIpGlobalProperties.GetActiveTcpConnections();
+
+                foreach (TcpConnectionInformation aConnection in aConnections)
+                {
+                    if (aVerifiedEndPoint.Equals(aConnection.LocalEndPoint))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
 
         /// <summary>
         /// Sets or gets the security stream factory for the server.

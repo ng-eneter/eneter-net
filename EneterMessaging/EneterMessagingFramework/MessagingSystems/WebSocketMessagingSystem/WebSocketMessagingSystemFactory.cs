@@ -7,13 +7,14 @@
 
 #if !WINDOWS_PHONE_70
 
-using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 using Eneter.Messaging.Threading.Dispatching;
+using System;
 
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
@@ -226,6 +227,22 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #else
                 throw new NotSupportedException("The WebSocket duplex input channel is not supported in Silverlight.");
 #endif
+            }
+        }
+
+        public static string[] GetAvailableIpAddresses()
+        {
+            using (EneterTrace.Entering())
+            {
+                return TcpMessagingSystemFactory.GetAvailableIpAddresses();
+            }
+        }
+
+        public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
+        {
+            using (EneterTrace.Entering())
+            {
+                return IsEndPointAvailableForListening(ipAddressAndPort);
             }
         }
 

@@ -160,6 +160,30 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
         }
 #endif
 
+        [Test]
+        public void TestPortAvailability()
+        {
+            IDuplexInputChannel anInputChannel1 = MessagingSystemFactory.CreateDuplexInputChannel("tcp://[::1]:8044/");
+            IDuplexInputChannel anInputChannel2 = MessagingSystemFactory.CreateDuplexInputChannel("tcp://127.0.0.1:8044/");
+
+            try
+            {
+                anInputChannel1.StartListening();
+                anInputChannel2.StartListening();
+
+                bool aResult = TcpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://[::1]:8044/");
+                Assert.IsFalse(aResult);
+
+                aResult = TcpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://0.0.0.0:8044/");
+                Assert.IsTrue(aResult);
+            }
+            finally
+            {
+                anInputChannel1.StopListening();
+                anInputChannel2.StopListening();
+            }
+        }
+
     }
 }
 

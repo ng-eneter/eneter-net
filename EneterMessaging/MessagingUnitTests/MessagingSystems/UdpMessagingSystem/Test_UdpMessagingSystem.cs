@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.UdpMessagingSystem;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
 {
@@ -46,6 +47,30 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         [Test]
         public override void Duplex_09_StopListening_SendMessage()
         {
+        }
+
+        [Test]
+        public void TestPortAvailability()
+        {
+            IDuplexInputChannel anInputChannel1 = MessagingSystemFactory.CreateDuplexInputChannel("udp://[::1]:8044/");
+            IDuplexInputChannel anInputChannel2 = MessagingSystemFactory.CreateDuplexInputChannel("udp://127.0.0.1:8044/");
+
+            try
+            {
+                anInputChannel1.StartListening();
+                anInputChannel2.StartListening();
+
+                bool aResult = UdpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://[::1]:8044/");
+                Assert.IsFalse(aResult);
+
+                aResult = UdpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://0.0.0.0:8044/");
+                Assert.IsTrue(aResult);
+            }
+            finally
+            {
+                anInputChannel1.StopListening();
+                anInputChannel2.StopListening();
+            }
         }
     }
 }

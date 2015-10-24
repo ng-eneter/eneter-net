@@ -11,8 +11,11 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.Threading.Dispatching;
 using System;
+using System.Net;
+using System.Net.NetworkInformation;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
@@ -211,6 +214,37 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
+            }
+        }
+
+        public static string[] GetAvailableIpAddresses()
+        {
+            using (EneterTrace.Entering())
+            {
+                return TcpMessagingSystemFactory.GetAvailableIpAddresses();
+            }
+        }
+
+        public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
+        {
+            using (EneterTrace.Entering())
+            {
+                Uri aVerifiedUri = new Uri(ipAddressAndPort, UriKind.Absolute);
+                IPEndPoint aVerifiedEndPoint = new IPEndPoint(IPAddress.Parse(aVerifiedUri.Host), aVerifiedUri.Port);
+
+                IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+
+                // First check service listeners.
+                IPEndPoint[] aListeners = anIpGlobalProperties.GetActiveUdpListeners();
+                foreach (IPEndPoint aListener in aListeners)
+                {
+                    if (aVerifiedEndPoint.Equals(aListener))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
 
