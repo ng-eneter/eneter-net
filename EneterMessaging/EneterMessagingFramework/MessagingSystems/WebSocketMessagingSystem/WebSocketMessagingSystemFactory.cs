@@ -135,6 +135,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 SendTimeout = TimeSpan.FromMilliseconds(0);
                 ReceiveTimeout = TimeSpan.FromMilliseconds(0);
 
+                ResponseReceiverPort = -1;
+
 #if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
@@ -166,7 +168,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     (int)PingFrequency.TotalMilliseconds,
-                    -1);
+                    ResponseReceiverPort);
 
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
             }
@@ -186,21 +188,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     (int)PingFrequency.TotalMilliseconds,
-                    -1);
-
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
-            }
-        }
-
-        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId, int responseReceivingPort)
-        {
-            using (EneterTrace.Entering())
-            {
-                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aFactory = new WebSocketOutputConnectorFactory(myProtocolFormatter, ClientSecurityStreamFactory,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
-                    (int)PingFrequency.TotalMilliseconds,
-                    responseReceivingPort);
+                    ResponseReceiverPort);
 
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aFactory);
             }
@@ -282,6 +270,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
+        public int ResponseReceiverPort { get; set; }
 
         /// <summary>
         /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.

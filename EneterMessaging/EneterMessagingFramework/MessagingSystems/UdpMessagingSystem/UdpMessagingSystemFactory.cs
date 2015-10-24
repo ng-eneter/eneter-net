@@ -148,7 +148,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
 
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, AllowBroadcast, Ttl, MulticastGroup, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, AllowBroadcast, Ttl, MulticastGroup, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }

@@ -149,6 +149,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 SendBufferSize = 8192;
                 ReceiveBufferSize = 8192;
 
+                ResponseReceiverPort = -1;
+
 #if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
@@ -195,7 +197,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     SendBufferSize, ReceiveBufferSize,
-                    ReuseAddress, -1);
+                    ReuseAddress, ResponseReceiverPort);
 
                 return new DefaultDuplexOutputChannel(channelId, null, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
@@ -233,22 +235,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myProtocolFormatter, ClientSecurityStreamFactory,
                     (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
                     SendBufferSize, ReceiveBufferSize,
-                    ReuseAddress, -1);
-
-                return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
-            }
-        }
-
-        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId, int responseReceivingPort)
-        {
-            using (EneterTrace.Entering())
-            {
-                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory anOutputConnectorFactory = new TcpOutputConnectorFactory(
-                    myProtocolFormatter, ClientSecurityStreamFactory,
-                    (int)ConnectTimeout.TotalMilliseconds, (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
-                    SendBufferSize, ReceiveBufferSize,
-                    ReuseAddress, responseReceivingPort);
+                    ReuseAddress, ResponseReceiverPort);
 
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, anOutputConnectorFactory);
             }
@@ -403,8 +390,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-        private ISecurityFactory myServerSecurityStreamFactory = new NonSecurityFactory();
-        private ISecurityFactory myClientSecurityStreamFactory = new NonSecurityFactory();
+        public int ResponseReceiverPort { get; set; }
 
 
 #if !COMPACT_FRAMEWORK
@@ -470,6 +456,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
 
+        private ISecurityFactory myServerSecurityStreamFactory = new NonSecurityFactory();
+        private ISecurityFactory myClientSecurityStreamFactory = new NonSecurityFactory();
         private IProtocolFormatter myProtocolFormatter;
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
