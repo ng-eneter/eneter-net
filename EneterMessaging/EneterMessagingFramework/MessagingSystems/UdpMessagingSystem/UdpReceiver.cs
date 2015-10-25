@@ -100,56 +100,48 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
                         mySocket.Ttl = myTtl;
 
-                        if (myEndPointToBind != null || myEndPointToConnect != null)
-                        {
 #if !COMPACT_FRAMEWORK
-                            // Note: bigger buffer increases the chance the datagram is not lost.
-                            mySocket.ReceiveBufferSize = 1048576;
+                        // Note: bigger buffer increases the chance the datagram is not lost.
+                        mySocket.ReceiveBufferSize = 1048576;
 #else
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
 #endif
-                            mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
+                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 
-                            if (myEndPointToBind != null)
-                            {
-                                // Avoid getting exception when some UDP client disconnects.
-                                // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
-                                const int SIO_UDP_CONNRESET = -1744830452;
-                                byte[] inValue = new byte[] { 0 };
-                                byte[] outValue = new byte[] { 0 };
-                                mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
+                        if (myEndPointToBind != null)
+                        {
+                            // Avoid getting exception when some UDP client disconnects.
+                            // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
+                            const int SIO_UDP_CONNRESET = -1744830452;
+                            byte[] inValue = new byte[] { 0 };
+                            byte[] outValue = new byte[] { 0 };
+                            mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
 
-                                mySocket.Bind(myEndPointToBind);
+                            mySocket.Bind(myEndPointToBind);
 
-                                // Note:  Joining the multicast group must be done after Bind.
-                                // Note: There is no need to drop the multicast group before closing the socket.
-                                //       When the socket is closed the multicast groups are dropped automatically.
-                                JoinMulticastGroup();
-                                mySocket.MulticastLoopback = myMulticastLoopbackFlag;
-                            }
-                            else
-                            {
-                                // If the client shall bind incoming responses to a specified port.
-                                if (myResponseReceivingPort > 0)
-                                {
-                                    // Note: IPAddress.Any will be updated once the connection is established.
-                                    mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
-                                }
-
-                                mySocket.Connect(myEndPointToConnect);
-                            }
-
-                            myListeningThread = new Thread(DoListening);
-                            myListeningThread.Start();
-
-                            // Wait until the listening thread is ready.
-                            myListeningToResponsesStartedEvent.WaitOne(5000);
+                            // Note:  Joining the multicast group must be done after Bind.
+                            // Note: There is no need to drop the multicast group before closing the socket.
+                            //       When the socket is closed the multicast groups are dropped automatically.
+                            JoinMulticastGroup();
+                            mySocket.MulticastLoopback = myMulticastLoopbackFlag;
                         }
                         else
-                        // This is in case of one-way sender.
                         {
-                            myIsListening = true;
+                            // If the client shall bind incoming responses to a specified port.
+                            if (myResponseReceivingPort > 0)
+                            {
+                                // Note: IPAddress.Any will be updated once the connection is established.
+                                mySocket.Bind(new IPEndPoint(IPAddress.Any, myResponseReceivingPort));
+                            }
+
+                            mySocket.Connect(myEndPointToConnect);
                         }
+
+                        myListeningThread = new Thread(DoListening);
+                        myListeningThread.Start();
+
+                        // Wait until the listening thread is ready.
+                        myListeningToResponsesStartedEvent.WaitOne(5000);
                     }
                     catch (Exception err)
                     {

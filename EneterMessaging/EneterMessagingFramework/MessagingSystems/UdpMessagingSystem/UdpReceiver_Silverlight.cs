@@ -71,6 +71,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     {
                         aWriter.WriteBytes(message);
                         aWriter.StoreAsync().AsTask().Wait();
+                        aWriter.DetachStream();
                     }
                 }
             }
@@ -163,25 +164,19 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         // Note: TTL can be set only for unicast in Windows Phone.
                         mySocketWrapper.Ttl = myTtl;
 
-                        if (myEndPointToBind != null || myEndPointToConnect != null)
+                        if (myEndPointToBind != null)
                         {
-                            if (myEndPointToBind != null)
-                            {
-                                mySocketWrapper.Bind(myEndPointToBind);
+                            mySocketWrapper.Bind(myEndPointToBind);
 
-                                // Note:  Joining the multicast group must be done after Bind.
-                                mySocketWrapper.JoinMulticast(myMulticastGroup);
-                            }
-                            else
-                            {
-                                mySocketWrapper.Connect(myEndPointToConnect);
-                            }
+                            // Note:  Joining the multicast group must be done after Bind.
+                            mySocketWrapper.JoinMulticast(myMulticastGroup);
                         }
                         else
-                        // This is in case of one-way sender.
                         {
-                            myIsListening = true;
+                            mySocketWrapper.Connect(myEndPointToConnect);
                         }
+
+                        myIsListening = true;
                     }
                     catch (Exception err)
                     {
