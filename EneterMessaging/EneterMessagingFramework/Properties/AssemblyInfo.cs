@@ -6,7 +6,7 @@ using System.Resources;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Eneter.Messaging.Framework 7.50")]
+[assembly: AssemblyTitle("Eneter.Messaging.Framework 7.0")]
 [assembly: AssemblyDescription("Cross-platform message oriented middleware")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Eneter")]
