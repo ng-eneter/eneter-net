@@ -11,6 +11,7 @@ using Eneter.Messaging.DataProcessing.MessageQueueing;
 using Eneter.Messaging.Diagnostic;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
@@ -39,7 +40,34 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 {
                     HostName aHostName = new HostName(endPoint.Address.ToString());
                     string aPort = endPoint.Port.ToString();
-                    mySocket.BindEndpointAsync(aHostName, aPort).AsTask().Wait();
+
+                    if (!endPoint.Address.Equals(IPAddress.Any))
+                    {
+                        try
+                        {
+                            mySocket.BindEndpointAsync(aHostName, aPort).AsTask().Wait();
+
+                            // Note: can receive messages from anybody.
+                            myIsUnicastFlag = false;
+                        }
+                        catch (Exception err)
+                        {
+                            SocketErrorStatus aSocketError = SocketError.GetStatus(err.HResult);
+                            throw new InvalidOperationException("DatagramSocket.BindEndpointAsync(..) failed to bind '" + endPoint.ToString() + "' SocketError: " + aSocketError, err);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            mySocket.BindServiceNameAsync(aPort).AsTask().Wait();
+                        }
+                        catch (Exception err)
+                        {
+                            SocketErrorStatus aSocketError = SocketError.GetStatus(err.HResult);
+                            throw new InvalidOperationException("DatagramSocket.BindServiceNameAsync(..) failed to bind '" + endPoint.ToString() + "' SocketError: " + aSocketError, err);
+                        }
+                    }
                 }
             }
 
@@ -49,7 +77,18 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 {
                     HostName aHostName = new HostName(endPoint.Address.ToString());
                     string aPort = endPoint.Port.ToString();
-                    mySocket.ConnectAsync(aHostName, aPort).AsTask().Wait();
+                    try
+                    {
+                        mySocket.ConnectAsync(aHostName, aPort).AsTask().Wait();
+
+                        // Note: can receive messages only from the address specified in ConnectAsync.
+                        myIsUnicastFlag = true;
+                    }
+                    catch (Exception err)
+                    {
+                        SocketErrorStatus aSocketError = SocketError.GetStatus(err.HResult);
+                        throw new InvalidOperationException("DatagramSocket.ConnectAsync(..) failed to connect '" + endPoint.ToString() + "' SocketError: " + aSocketError, err);
+                    }
                 }
             }
 
@@ -57,8 +96,16 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    mySocket.Dispose();
-                    mySocket.MessageReceived += OnDatagramReceived;
+                    try
+                    {
+                        mySocket.Dispose();
+
+                        // Note: this unsubscription sometime throws an exception - did not figure out why :-(.
+                        mySocket.MessageReceived -= OnDatagramReceived;
+                    }
+                    catch
+                    {
+                    }
                 }
             }
 
@@ -66,12 +113,41 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    IOutputStream anOutputStream = mySocket.OutputStream;
+                    IOutputStream anOutputStream;
+                    if (myIsUnicastFlag)
+                    {
+                        anOutputStream = mySocket.OutputStream;
+                    }
+                    else
+                    {
+                        HostName aHostName = new HostName(endPoint.Address.ToString());
+                        string aPort = endPoint.Port.ToString();
+
+                        Task<IOutputStream> aTask = mySocket.GetOutputStreamAsync(aHostName, aPort).AsTask();
+                        aTask.Wait();
+                        anOutputStream = aTask.Result;
+                    }
+
                     using (DataWriter aWriter = new DataWriter(anOutputStream))
                     {
-                        aWriter.WriteBytes(message);
-                        aWriter.StoreAsync().AsTask().Wait();
-                        aWriter.DetachStream();
+                        try
+                        {
+                            aWriter.WriteBytes(message);
+                            aWriter.StoreAsync().AsTask().Wait();
+                        }
+                        catch (Exception err)
+                        {
+                            SocketErrorStatus aSocketError = SocketError.GetStatus(err.HResult);
+                            throw new InvalidOperationException("DatagramSocket failed to send message to '" + endPoint.ToString() + "' SocketError: " + aSocketError, err);
+                        }
+                        finally
+                        {
+                            if (myIsUnicastFlag)
+                            {
+                                // Note: deteach the stream to avoid its dispose.
+                                aWriter.DetachStream();
+                            }
+                        }
                     }
                 }
             }
@@ -103,6 +179,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
 
             private DatagramSocket mySocket;
+            private bool myIsUnicastFlag;
         }
 
 
