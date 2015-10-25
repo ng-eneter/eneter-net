@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using System;
 using System.Collections.Generic;
@@ -21,11 +21,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     {
         private class TClientContext
         {
-            public TClientContext(Socket udpSocket, EndPoint clientEndPoint)
+            public TClientContext(UdpReceiver udpReceiver, IPEndPoint clientEndPoint)
             {
                 using (EneterTrace.Entering())
                 {
-                    myUdpSocket = udpSocket;
+                    myUdpReceiver = udpReceiver;
                     myClientEndPoint = clientEndPoint;
                 }
             }
@@ -43,12 +43,12 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 using (EneterTrace.Entering())
                 {
                     byte[] aMessageData = (byte[])message;
-                    myUdpSocket.SendTo(aMessageData, myClientEndPoint);
+                    myUdpReceiver.SendTo(aMessageData, myClientEndPoint);
                 }
             }
 
-            private Socket myUdpSocket;
-            private EndPoint myClientEndPoint;
+            private UdpReceiver myUdpReceiver;
+            private IPEndPoint myClientEndPoint;
         }
 
         public UdpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter, bool reuseAddress, short ttl)
@@ -95,7 +95,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, myTtl, false, null, false);
+#else
+                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myTtl, null);
+#endif
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
@@ -247,7 +251,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             {
                                 if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
                                 {
-                                    TClientContext aClientContext = new TClientContext(myReceiver.UdpSocket, clientAddress);
+                                    TClientContext aClientContext = new TClientContext(myReceiver, (IPEndPoint)clientAddress);
                                     myConnectedClients[aProtocolMessage.ResponseReceiverId] = aClientContext;
                                 }
                                 else

@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
@@ -217,7 +217,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-#if !NET35
+#if !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81)
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
@@ -227,6 +227,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 #endif
 
+#if !NET35 && !SILVERLIGHT
         public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
@@ -249,17 +250,27 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 return true;
             }
         }
+#endif
 
-        public bool AllowBroadcast { get; set; }
+        
 
         public short Ttl { get; set; }
 
         public string MulticastGroup { get; set; }
 
+#if !SILVERLIGHT
+        public bool AllowBroadcast { get; set; }
+
         public bool MulticastLoopback { get; set; }
 
         public int ResponseReceiverPort { get; set; }
+#else
+        private bool AllowBroadcast { get; set; }
 
+        private bool MulticastLoopback { get; set; }
+
+        private int ResponseReceiverPort { get; set; }
+#endif
 
 
         /// <summary>

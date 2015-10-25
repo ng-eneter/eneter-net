@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 using System.Runtime.CompilerServices;
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem

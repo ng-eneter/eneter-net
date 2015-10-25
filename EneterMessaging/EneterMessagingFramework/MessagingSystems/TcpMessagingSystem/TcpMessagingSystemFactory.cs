@@ -18,6 +18,11 @@ using System.Net.NetworkInformation;
 using System.Net;
 using System.Collections.Generic;
 
+#if WINDOWS_PHONE80 || WINDOWS_PHONE81
+using Windows.Networking.Connectivity;
+using Windows.Networking;
+#endif
+
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -292,6 +297,22 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 foreach (UnicastIPAddressInformation anIpAddressInfo in aCollection)
                 {
                     anIpAddresses.Add(anIpAddressInfo.Address.ToString());
+                }
+                return anIpAddresses.ToArray();
+            }
+        }
+#endif
+
+#if WINDOWS_PHONE80 || WINDOWS_PHONE81
+        public static string[] GetAvailableIpAddresses()
+        {
+            using (EneterTrace.Entering())
+            {
+                List<string> anIpAddresses = new List<string>();
+                IReadOnlyList<HostName> aHostNames = NetworkInformation.GetHostNames();
+                foreach (HostName aHostName in aHostNames)
+                {
+                    anIpAddresses.Add(aHostName.DisplayName);
                 }
                 return anIpAddresses.ToArray();
             }

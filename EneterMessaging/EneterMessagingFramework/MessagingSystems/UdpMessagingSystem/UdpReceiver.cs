@@ -229,6 +229,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
         public Socket UdpSocket { get { return mySocket; } }
 
+        public void SendTo(byte[] datagram, IPEndPoint endPoint)
+        {
+            //using (EneterTrace.Entering())
+            {
+                mySocket.SendTo(datagram, endPoint);
+            }
+        }
+
         private void DoListening()
         {
             using (EneterTrace.Entering())

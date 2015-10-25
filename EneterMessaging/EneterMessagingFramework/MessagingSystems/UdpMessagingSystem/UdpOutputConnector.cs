@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using System;
 using System.Net;
@@ -56,13 +56,17 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myResponseMessageHandler = responseMessageHandler;
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myResponseReceiver = UdpReceiver.CreateConnectedReceiver(myServiceEndpoint, myReuseAddressFlag, myResponseReceivingPort, myTtl);
+#else
+                        myResponseReceiver = UdpReceiver.CreateConnectedReceiver(myServiceEndpoint, myTtl);
+#endif
                         myResponseReceiver.StartListening(OnResponseMessageReceived);
 
                         byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
                         if (anEncodedMessage != null)
                         {
-                            myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                            myResponseReceiver.SendTo(anEncodedMessage, myServiceEndpoint);
                         }
                     }
                     catch
@@ -100,7 +104,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutpuConnectorAddress, message);
-                    myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                    myResponseReceiver.SendTo(anEncodedMessage, myServiceEndpoint);
                 }
             }
         }
@@ -158,7 +162,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                                 byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
                                 if (anEncodedMessage != null)
                                 {
-                                    myResponseReceiver.UdpSocket.SendTo(anEncodedMessage, myServiceEndpoint);
+                                    myResponseReceiver.SendTo(anEncodedMessage, myServiceEndpoint);
                                 }
                             }
                             catch (Exception err)

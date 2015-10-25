@@ -417,6 +417,7 @@
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver_Silverlight.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessInputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs" />

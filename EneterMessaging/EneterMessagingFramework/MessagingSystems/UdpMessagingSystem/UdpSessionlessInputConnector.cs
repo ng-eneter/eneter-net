@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
@@ -68,7 +68,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, myTtl, myAllowBroadcastFlag, myMulticastGroup, myMulticastLoopbackFlag);
+#else
+                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myTtl, myMulticastGroup);
+#endif
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
@@ -113,7 +117,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 IPAddress anIpAddress = IPAddress.Parse(aUri.Host);
                 IPEndPoint anEndpoint = new IPEndPoint(anIpAddress, aUri.Port);
                 byte[] anEncodedMessage = (byte[]) myProtocolFormatter.EncodeMessage(outputConnectorAddress, message);
-                myReceiver.UdpSocket.SendTo(anEncodedMessage, anEndpoint);
+                myReceiver.SendTo(anEncodedMessage, anEndpoint);
             }
         }
 

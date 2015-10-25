@@ -218,7 +218,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !NET35 && !SILVERLIGHT
+#if !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81)
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
