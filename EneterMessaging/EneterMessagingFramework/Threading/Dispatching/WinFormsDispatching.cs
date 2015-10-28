@@ -8,9 +8,9 @@
 
 #if !SILVERLIGHT
 
-using System;
-using System.Windows.Forms;
 using Eneter.Messaging.Diagnostic;
+using System;
+using System.ComponentModel;
 
 namespace Eneter.Messaging.Threading.Dispatching
 {
@@ -21,9 +21,9 @@ namespace Eneter.Messaging.Threading.Dispatching
     {
         private class WinFormDispatcher : IThreadDispatcher
         {
-            private Control myDispatcher;
+            private ISynchronizeInvoke myDispatcher;
 
-            public WinFormDispatcher(Control dispatcher)
+            public WinFormDispatcher(ISynchronizeInvoke dispatcher)
             {
                 myDispatcher = dispatcher;
             }
@@ -34,7 +34,7 @@ namespace Eneter.Messaging.Threading.Dispatching
                 {
                     if (myDispatcher.InvokeRequired)
                     {
-                        myDispatcher.Invoke(workItem);
+                        myDispatcher.Invoke(workItem, null);
                     }
                     else
                     {
@@ -50,7 +50,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         /// Constructs the dispatcher provider.
         /// </summary>
         /// <param name="dispatcher">UI control e.g. WinForm which represents the thread where invokes shall be routed.</param>
-        public WinFormsDispatching(Control dispatcher)
+        public WinFormsDispatching(ISynchronizeInvoke dispatcher)
         {
             myDispatcher = new WinFormDispatcher(dispatcher);
         }
