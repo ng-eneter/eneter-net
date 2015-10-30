@@ -18,7 +18,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
-                AllowBroadcast = true,
+                AllowReceivingBroadcasts = true,
                 ReuseAddress = true
             };
 
@@ -71,7 +71,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
-                AllowBroadcast = true,
+                AllowReceivingBroadcasts = true,
                 ReuseAddress = true
             };
 
@@ -126,7 +126,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
                 ReuseAddress = true,
-                MulticastGroup = "234.1.2.3",
+                ReceivingMulticastGroup = "234.1.2.3",
                 MulticastLoopback = true
             };
 
@@ -182,7 +182,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
                 ReuseAddress = true,
-                MulticastGroup = "234.1.2.3",
+                ReceivingMulticastGroup = "234.1.2.3",
                 MulticastLoopback = true
             };
 
@@ -235,9 +235,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
-                AllowBroadcast = true,
+                AllowReceivingBroadcasts = true,
                 ReuseAddress = true,
-                MulticastGroup = "234.1.2.3",
+                ReceivingMulticastGroup = "234.1.2.3",
                 MulticastLoopback = true
             };
 

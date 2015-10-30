@@ -31,14 +31,18 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private class UdpConnectorFactory : IOutputConnectorFactory, IInputConnectorFactory
         {
             public UdpConnectorFactory(IProtocolFormatter protocolFormatter, bool reuseAddressFlag, int responseReceivingPort,
-                bool allowBroadcast, short ttl, string multicastGroup, bool multicastLoopbackFlag)
+                bool isUnicast,
+                bool allowReceivingBroadcasts, short ttl, string multicastGroup, bool multicastLoopbackFlag)
             {
                 using (EneterTrace.Entering())
                 {
                     myProtocolFormatter = protocolFormatter;
                     myReuseAddressFlag = reuseAddressFlag;
                     myResponseReceivingPort = responseReceivingPort;
-                    myAllowBroadcast = allowBroadcast;
+
+                    myIsUnicastFlag = isUnicast;
+
+                    myAllowReceivingBroadcasts = allowReceivingBroadcasts;
                     myTtl = ttl;
                     myMulticastGroup = multicastGroup;
                     myMulticastLoopbackFlag = multicastLoopbackFlag;
@@ -50,7 +54,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 using (EneterTrace.Entering())
                 {
                     IOutputConnector anOutputConnector;
-                    if (myAllowBroadcast || !string.IsNullOrEmpty(myMulticastGroup))
+                    if (!myIsUnicastFlag)
                     {
                         anOutputConnector = new UdpSessionlessOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myTtl, true, myMulticastGroup, myMulticastLoopbackFlag);
                     }
@@ -68,7 +72,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 using (EneterTrace.Entering())
                 {
                     IInputConnector anInputConnector;
-                    if (myAllowBroadcast || !string.IsNullOrEmpty(myMulticastGroup))
+                    if (!myIsUnicastFlag)
                     {
                         anInputConnector = new UdpSessionlessInputConnector(inputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myTtl, true, myMulticastGroup, myMulticastLoopbackFlag);
                     }
@@ -84,7 +88,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             private IProtocolFormatter myProtocolFormatter;
             private bool myReuseAddressFlag;
             private int myResponseReceivingPort;
-            private bool myAllowBroadcast;
+            private bool myIsUnicastFlag;
+            private bool myAllowReceivingBroadcasts;
             private short myTtl;
             private string myMulticastGroup;
             private bool myMulticastLoopbackFlag;
@@ -112,6 +117,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 OutputChannelThreading = InputChannelThreading;
                 Ttl = 128;
                 ResponseReceiverPort = -1;
+                UnicastCommunication = true;
             }
         }
 
@@ -142,13 +148,13 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 string aResponseReceiverId = null;
 
-                if (AllowBroadcast || !string.IsNullOrEmpty(MulticastGroup))
+                if (!UnicastCommunication)
                 {
                     aResponseReceiverId = "udp://0.0.0.0/";
                 }
 
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, AllowBroadcast, Ttl, MulticastGroup, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, ReceivingFromMulticastGroup, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -181,7 +187,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, AllowBroadcast, Ttl, MulticastGroup, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, ReceivingFromMulticastGroup, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -210,7 +216,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
-                IInputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, AllowBroadcast, Ttl, MulticastGroup, MulticastLoopback);
+                IInputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, UnicastCommunication, AllowReceivingBroadcasts, Ttl, ReceivingFromMulticastGroup, MulticastLoopback);
                 IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -252,20 +258,20 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 #endif
 
-        
+        public bool UnicastCommunication { get; set; }
 
         public short Ttl { get; set; }
 
-        public string MulticastGroup { get; set; }
+        public string ReceivingFromMulticastGroup { get; set; }
 
 #if !SILVERLIGHT
-        public bool AllowBroadcast { get; set; }
+        public bool AllowReceivingBroadcasts { get; set; }
 
         public bool MulticastLoopback { get; set; }
 
         public int ResponseReceiverPort { get; set; }
 #else
-        private bool AllowBroadcast { get; set; }
+        private bool AllowReceivingBroadcasts { get; set; }
 
         private bool MulticastLoopback { get; set; }
 
@@ -298,8 +304,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
         /// </remarks>
         public bool ReuseAddress { get; set; }
-
-        
 
         private IProtocolFormatter myProtocolFormatter;
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
