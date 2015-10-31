@@ -123,7 +123,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                             // Note: There is no need to drop the multicast group before closing the socket.
                             //       When the socket is closed the multicast groups are dropped automatically.
                             JoinMulticastGroup();
-                            mySocket.MulticastLoopback = myMulticastLoopbackFlag;
                         }
                         else
                         {
@@ -329,6 +328,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 if (myMulticastGroup != null)
                 {
+                    mySocket.MulticastLoopback = myMulticastLoopbackFlag;
+
                     if (myMulticastGroup.AddressFamily == AddressFamily.InterNetwork)
                     {
                         MulticastOption aMulticastOption = new MulticastOption(myMulticastGroup, ((IPEndPoint) mySocket.LocalEndPoint).Address);
