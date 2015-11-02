@@ -154,7 +154,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
 
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, ReceivingFromMulticastGroup, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -187,7 +187,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, ReceivingFromMulticastGroup, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -216,7 +216,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
-                IInputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, UnicastCommunication, AllowReceivingBroadcasts, Ttl, ReceivingFromMulticastGroup, MulticastLoopback);
+                IInputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, UnicastCommunication, AllowReceivingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
                 IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -224,6 +224,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
 #if !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81)
+        
+        /// <summary>
+        /// Helper method returning IP addresses assigned to the device.
+        /// </summary>
+        /// <returns>array of available addresses</returns>
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
@@ -234,6 +239,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 #endif
 
 #if !NET35 && !SILVERLIGHT
+        /// <summary>
+        /// Checks if the port is available for listening.
+        /// </summary>
+        /// <param name="ipAddressAndPort">IP address and port.
+        /// The IP address must be an address which is assigned to the local device. The method then checks whether the port
+        /// is available for listening for the given IP address.
+        /// </param>
+        /// <returns>true if the port is available</returns>
         public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
@@ -258,17 +271,178 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 #endif
 
+        /// <summary>
+        /// Sets or gets whether the communication is unicast.
+        /// </summary>
+        /// <remarks>
+        /// If true the factory will create channels for unicast communication. 
+        /// The unicast is the communication between one sender and one receiver. It means the output channel
+        /// can send messages only to the input channel which listens to the specified IP address and port and then receive response messages
+        /// only from this input channel.<br/>
+        /// If false the factory will create channels for multicast or broadcast communication.
+        /// The multicast is the communication between one sender and multiple receivers and the broadcast 
+        /// is the communication between one sender and all receivers within the subnet.<br/>
+        /// The default value is true.
+        /// </remarks>
         public bool UnicastCommunication { get; set; }
 
+        /// <summary>
+        /// Sets or gets time to live value for UDP datagrams.
+        /// </summary>
+        /// <remarks>
+        /// When an UDP datagram is traveling across the network each router decreases its TTL value by one.
+        /// Once the value is decreased to 0 the datagram is discarded. Therefore the TTL value specifies
+        /// how many routers a datagram can traverse.<br/>
+        /// E.g. if the value is set to 1 the datagram will not leave the local network.<br/>
+        /// The default value is 128.
+        /// </remarks>
         public short Ttl { get; set; }
 
-        public string ReceivingFromMulticastGroup { get; set; }
+        /// <summary>
+        /// Sets or gets the multicast group to receive messages from.
+        /// </summary>
+        /// <remarks>
+        /// Multicast group (multicast address) is a an IP address which is from the range 224.0.0.0 - 239.255.255.255.
+        /// (The range from 224.0.0.0 to 224.0.0.255 is reserved for low-level routing protocols.)
+        /// Multicast group set in MulticastGroupToReceive will be effective only if UnicastCommunication is set to false.
+        /// <example>
+        /// Creating input and output channels which can receive multicast messages.
+        /// <code>
+        /// // Create UDP messaging factory using simple protocol formatter.
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter);
+        /// 
+        /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
+        /// aMessaging.UnicastCommunication = false;
+        /// 
+        /// // Set the multicast group from which will be "subscribed" for receiving messages.
+        /// aMessaging.MulticastGroupToReceive = "234.5.6.7";
+        /// 
+        /// // Create input channel which will listen to udp://192.168.30.1:8043/ and which will also
+        /// // receive messages from the multicast group udp://234.5.6.7:8043/.
+        /// IInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://192.168.30.1:8043/");
+        /// 
+        /// // Create output channel which can send messages to udp://192.168.30.1:8043/ and
+        /// // which can receive multicast messages from the multicast address 234.5.6.7 and random free port.
+        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://192.168.30.1:8043/");
+        /// 
+        /// // Create output channel which can send messages to udp://192.168.30.1:8043/ and
+        /// which can receive multicast messages from the multicast address udp://234.5.6.7:7075/.
+        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://192.168.30.1:8043/", "udp://0.0.0.0:7075/");
+        /// </code>
+        /// </example>
+        /// <example>
+        /// Creating output channel which can send multicast messages.
+        /// <code>
+        /// // Create UDP messaging factory using simple protocol formatter.
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter);
+        /// 
+        /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
+        /// aMessaging.UnicastCommunication = false;
+        /// 
+        /// // Create output channel which can send messages to the multicast address udp://234.5.6.7:8043/.
+        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.5.6.7:8043/");
+        /// </code>
+        /// </example>
+        /// </remarks>
+        public string MulticastGroupToReceive { get; set; }
 
 #if !SILVERLIGHT
+        
+        /// <summary>
+        /// Enables / disables receiving broadcast messages.
+        /// </summary>
+        /// <remarks>
+        /// Broadcast is a message which is routed to all devices within the sub-network.
+        /// Allowing broadcasts will be effective only if UnicastCommunication is set to false.
+        /// <example>
+        /// Creating input and output channels which can receive broadcast messages.
+        /// <code>
+        /// // Create UDP messaging factory using simple protocol formatter.
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter);
+        /// 
+        /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
+        /// aMessaging.UnicastCommunication = false;
+        /// 
+        /// // Enable receiving broadcasts.
+        /// aMessaging.AllowReceivingBroadcasts = true;
+        /// 
+        /// // Create input channel which will listen to udp://192.168.30.1:8043/ and which will also
+        /// // receive broadcast messages on sent to the port 8043.
+        /// IInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://192.168.30.1:8043/");
+        /// 
+        /// // Create output channel which can send messages to udp://192.168.30.1:8043/ and
+        /// // which can receive broadcast messages on the port 7075.
+        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://192.168.30.1:8043/", "udp://0.0.0.0:7075/");
+        /// </code>
+        /// </example>
+        /// 
+        /// <example>
+        /// Creating input and output channels which can send broadcast messages.
+        /// <code>
+        /// // Create UDP messaging factory using simple protocol formatter.
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter);
+        /// 
+        /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
+        /// aMessaging.UnicastCommunication = false;
+        /// 
+        /// // Create output channel which can send broadcast messages to the port 8043.
+        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8043/");
+        /// </code>
+        /// </example>
+        /// </remarks>
         public bool AllowReceivingBroadcasts { get; set; }
 
+        /// <summary>
+        /// Enables /disables receiving multicast messages by the same channel which sent them.
+        /// </summary>
+        /// <remarks>
+        /// <example>
+        /// Sending multicast message from the output channel and receiving it by the same channel which sent it.
+        /// <code>
+        ///  UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
+        ///  {
+        ///      UnicastCommunication = false,
+        ///      MulticastGroupToReceive = "234.1.2.3",
+        ///      MulticastLoopback = true
+        ///  };
+        /// 
+        ///  ManualResetEvent aMessageReceived = new ManualResetEvent(false);
+        ///  string aReceivedMessage = null;
+        ///  IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.1.2.3:8090/", "udp://0.0.0.0:8090/");
+        ///  anOutputChannel.ResponseMessageReceived += (x, y) =&gt;
+        ///  {
+        ///      aReceivedMessage = (string)y.Message;
+        ///      aMessageReceived.Set();
+        ///  };
+        /// 
+        ///  try
+        ///  {
+        ///      anOutputChannel.OpenConnection();
+        ///      anOutputChannel.SendMessage("Hello");
+        ///      aMessageReceived.WaitIfNotDebugging(1000);
+        ///  }
+        ///  finally
+        ///  {
+        ///      anOutputChannel.CloseConnection();
+        ///  }
+        /// 
+        ///  Assert.AreEqual("Hello", aReceivedMessage);
+        /// </code>
+        /// </example>
+        /// </remarks>
         public bool MulticastLoopback { get; set; }
 
+        /// <summary>
+        /// Sets or gets the port which shall be used for receiving response messages in output channels in case of unicast communication.
+        /// </summary>
+        /// <remarks>
+        /// When a client connect an IP address and port for the unicast communication a random free port is assigned for receiving messages.
+        /// This property allows to use a speciefied port instead of random one.
+        /// </remarks>
         public int ResponseReceiverPort { get; set; }
 #else
         private bool AllowReceivingBroadcasts { get; set; }

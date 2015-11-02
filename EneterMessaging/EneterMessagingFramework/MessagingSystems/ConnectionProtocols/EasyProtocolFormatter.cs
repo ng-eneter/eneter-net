@@ -13,22 +13,22 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
     /// <summary>
-    /// Simple and very fast encoding/decoding (only for TCP and WebSocket).
+    /// Simple and very fast encoding/decoding (only for TCP, WebSocket and multicast/broadcast UDP).
     /// </summary>
     /// <remarks>
-    /// This protocol can be used only for TCP or WebSocket communication.
+    /// This protocol encoding can be used only for TCP, WebSocket or multicast/broadcast UDP communication.
     /// The simplicity of this formatting provides a high performance and easy portability to various platforms allowing so
     /// to communicate with Eneter even without Eneter.<br/>
     /// However this formatting has certain limitations:
     /// <ul>
-    /// <li>It can be used only for TCP or WebSocket based communication.</li>
+    /// <li>It can be used only for TCP or WebSocket based communication or UDP multicasting and broadcasting.</li>
     /// <li>It cannot be used if the reconnect is needed. It means it cannot be used in buffered messaging.</li>
     /// </ul>
     /// <b>Encoding of open connection message:</b><br/>
     /// N.A. - the open connection message is not used. The connection is considered open when the socket is open.<br/>
     /// <br/>
     /// <b>Encoding of close connection message:</b><br/>
-    /// N.A. = the close connection message is not used. The connection is considered closed then the socket is closed.<br/>
+    /// N.A. = the close connection message is not used. The connection is considered closed when the socket is closed.<br/>
     /// <br/>
     /// <b>Encoding of data message:</b><br/>
     /// 1 byte - type of data: 10 string in UTF8, 40 bytes<br/>

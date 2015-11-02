@@ -219,6 +219,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         }
 
 #if !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81)
+        /// <summary>
+        /// Helper method returning IP addresses assigned to the device.
+        /// </summary>
+        /// <returns>array of available addresses</returns>
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
@@ -229,6 +233,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #endif
 
 #if !SILVERLIGHT
+        /// <summary>
+        /// Checks if the port is available for listening.
+        /// </summary>
+        /// <param name="ipAddressAndPort">IP address and port.
+        /// The IP address must be an address which is assigned to the local device. The method then checks whether the port
+        /// is available for listening for the given IP address.
+        /// </param>
+        /// <returns>true if the port is available</returns>
         public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
@@ -274,6 +286,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
+        /// <summary>
+        /// Sets or gets the port which shall be used for receiving response messages in output channels.
+        /// </summary>
+        /// <remarks>
+        /// When a client opens a connection a random free port is assigned for receiving messages.
+        /// This property allows to use a speciefied port instead of random one.
+        /// </remarks>
         public int ResponseReceiverPort { get; set; }
 
         /// <summary>

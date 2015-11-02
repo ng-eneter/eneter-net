@@ -230,6 +230,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </remarks>
         public IDictionary<string, string> HeaderFields { get; private set; }
 
+        /// <summary>
+        /// Sets or gets the port which shall be used for receiving response messages.
+        /// </summary>
+        /// <remarks>
+        /// When a client opens a connection a random free port is assigned for receiving messages.
+        /// This property allows to use a speciefied port instead of random one.
+        /// </remarks>
         public int ResponseReceivingPort { get; set; }
 
         /// <summary>

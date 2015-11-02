@@ -144,6 +144,12 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
+        /// <summary>
+        /// Sets or gets the flag indicating whether the socket can be bound to the address which is already used.
+        /// </summary>
+        /// <remarks>
+        /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
+        /// </remarks>
         public bool ReuseAddress { get; set; }
 
         private WebSocketListenerImpl myListenerImpl;

@@ -18,6 +18,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
+                UnicastCommunication = false,
                 AllowReceivingBroadcasts = true,
                 ReuseAddress = true
             };
@@ -71,6 +72,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
+                UnicastCommunication = false,
                 AllowReceivingBroadcasts = true,
                 ReuseAddress = true
             };
@@ -125,8 +127,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
+                UnicastCommunication = false,
                 ReuseAddress = true,
-                ReceivingMulticastGroup = "234.1.2.3",
+                MulticastGroupToReceive = "234.1.2.3",
                 MulticastLoopback = true
             };
 
@@ -181,8 +184,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
+                UnicastCommunication = false,
                 ReuseAddress = true,
-                ReceivingMulticastGroup = "234.1.2.3",
+                MulticastGroupToReceive = "234.1.2.3",
                 MulticastLoopback = true
             };
 
@@ -235,15 +239,14 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
-                AllowReceivingBroadcasts = true,
-                ReuseAddress = true,
-                ReceivingMulticastGroup = "234.1.2.3",
+                UnicastCommunication = false,
+                MulticastGroupToReceive = "234.1.2.3",
                 MulticastLoopback = true
             };
 
             ManualResetEvent aMessageReceived = new ManualResetEvent(false);
             string aReceivedMessage = null;
-            IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.1.2.3:8090/", "udp://127.0.0.1:8090/");
+            IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.1.2.3:8090/", "udp://0.0.0.0:8090/");
             anOutputChannel.ResponseMessageReceived += (x, y) =>
             {
                 aReceivedMessage = (string)y.Message;
@@ -253,9 +256,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
             try
             {
                 anOutputChannel.OpenConnection();
-
                 anOutputChannel.SendMessage("Hello");
-
                 aMessageReceived.WaitIfNotDebugging(1000);
             }
             finally
