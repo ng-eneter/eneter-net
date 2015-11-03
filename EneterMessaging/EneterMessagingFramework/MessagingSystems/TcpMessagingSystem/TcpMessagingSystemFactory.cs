@@ -286,7 +286,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-#if !NET35 && !SILVERLIGHT
+#if !MONO && !NET35 && !SILVERLIGHT
         /// <summary>
         /// Helper method returning IP addresses assigned to the device.
         /// </summary>
