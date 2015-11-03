@@ -25,6 +25,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     /// <remarks>
     /// It creates the communication channels using UDP for sending and receiving messages.
     /// The channel id must be a valid UDP URI address. E.g.: udp://127.0.0.1:6080/. <br/>
+    /// The messaging via UDP supports unicast, multicast and broadcast communication.
     /// </remarks>
     public class UdpMessagingSystemFactory : IMessagingSystemFactory
     {
