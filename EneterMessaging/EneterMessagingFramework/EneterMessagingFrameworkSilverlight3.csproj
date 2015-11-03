@@ -141,7 +141,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Diagnostic\ThreadLock.cs" />
-    <Compile Include="Diagnostic\ThreadLock_CompactFramework.cs" />
     <Compile Include="Diagnostic\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>

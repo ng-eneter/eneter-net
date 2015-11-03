@@ -49,6 +49,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         {
         }
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void TestPortAvailability()
         {
@@ -72,5 +73,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
                 anInputChannel2.StopListening();
             }
         }
+#endif
     }
 }

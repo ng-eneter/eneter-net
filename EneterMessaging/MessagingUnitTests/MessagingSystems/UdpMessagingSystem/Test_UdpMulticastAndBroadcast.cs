@@ -130,7 +130,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
                 UnicastCommunication = false,
                 ReuseAddress = true,
                 MulticastGroupToReceive = "234.1.2.3",
+#if !COMPACT_FRAMEWORK
                 MulticastLoopback = true
+#endif
             };
 
             ManualResetEvent aMessage1Received = new ManualResetEvent(false);
@@ -187,7 +189,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
                 UnicastCommunication = false,
                 ReuseAddress = true,
                 MulticastGroupToReceive = "234.1.2.3",
+#if !COMPACT_FRAMEWORK
                 MulticastLoopback = true
+#endif
             };
 
             ManualResetEvent aMessage1Received = new ManualResetEvent(false);
@@ -241,7 +245,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
             {
                 UnicastCommunication = false,
                 MulticastGroupToReceive = "234.1.2.3",
+#if !COMPACT_FRAMEWORK
                 MulticastLoopback = true
+#endif
             };
 
             ManualResetEvent aMessageReceived = new ManualResetEvent(false);

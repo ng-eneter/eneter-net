@@ -57,7 +57,6 @@
     <Compile Include="DataProcessing\Serializing\CallbackSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\GetSerializerCallback.cs" />
     <Compile Include="Diagnostic\ThreadLock.cs" />
-    <Compile Include="Diagnostic\ThreadLock_CompactFramework.cs" />
     <Compile Include="EndPoints\Rpc\RpcException.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
     <Compile Include="EndPoints\Rpc\ServiceStub.cs" />

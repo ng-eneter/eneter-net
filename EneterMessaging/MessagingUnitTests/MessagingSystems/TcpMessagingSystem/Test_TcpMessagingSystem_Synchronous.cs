@@ -160,6 +160,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
         }
 #endif
 
+#if !COMPACT_FRAMEWORK
         [Test]
         public void TestPortAvailability()
         {
@@ -183,6 +184,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
                 anInputChannel2.StopListening();
             }
         }
+#endif
 
     }
 }

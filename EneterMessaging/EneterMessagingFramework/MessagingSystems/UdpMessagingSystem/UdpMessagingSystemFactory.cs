@@ -290,7 +290,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </remarks>
         public bool UnicastCommunication { get; set; }
 
-#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Sets or gets time to live value for UDP datagrams.
         /// </summary>
@@ -302,9 +301,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// The default value is 128.
         /// </remarks>
         public short Ttl { get; set; }
-#else
-        private short Ttl { get; set; }
-#endif
+
         /// <summary>
         /// Sets or gets the multicast group to receive messages from.
         /// </summary>
