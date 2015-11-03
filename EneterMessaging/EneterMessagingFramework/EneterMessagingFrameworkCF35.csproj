@@ -63,6 +63,7 @@
     <Compile Include="DataProcessing\MessageQueueing\_NamespaceDoc.cs" />
     <Compile Include="DataProcessing\Serializing\AesSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\BinarySerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\CallbackSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\CryptoSerializerProvider.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractJsonStringSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractXmlStringSerializer.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeReceiver.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeSender.cs" />
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\EventWaitHandleExt.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryInputConnector.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\SharedMemoryOutputConnector.cs" />
@@ -269,10 +271,14 @@
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\ThreadPoolMessagingProvider.cs" />
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\ThreadPoolMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\IPAddressExt.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpInputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver_Silverlight.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessInputConnector.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\EFrameType.cs" />
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\IWebSocketClientContext.cs" />

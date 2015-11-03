@@ -218,7 +218,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81)
+#if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
         /// <summary>
         /// Helper method returning IP addresses assigned to the device.
         /// </summary>
@@ -232,7 +232,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         }
 #endif
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Checks if the port is available for listening.
         /// </summary>

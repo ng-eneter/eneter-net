@@ -31,7 +31,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
     internal class HttpHostListener : HostListenerBase
     {
         public HttpHostListener(IPEndPoint address, ISecurityFactory securityFactory)
-            : base(address, securityFactory)
+            : base(address, securityFactory, false)
         {
         }
 

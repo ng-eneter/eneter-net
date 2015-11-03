@@ -10,10 +10,6 @@
 using System;
 using System.IO;
 
-#if COMPACT_FRAMEWORK
-using System.Net;
-#endif
-
 using System.Net.Sockets;
 using System.Threading;
 

@@ -98,9 +98,9 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         }
 
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
+#if !COMPACT_FRAMEWORK
                         mySocket.Ttl = myTtl;
 
-#if !COMPACT_FRAMEWORK
                         // Note: bigger buffer increases the chance the datagram is not lost.
                         mySocket.ReceiveBufferSize = 1048576;
 #else
@@ -328,8 +328,9 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 if (myMulticastGroup != null)
                 {
+#if !COMPACT_FRAMEWORK
                     mySocket.MulticastLoopback = myMulticastLoopbackFlag;
-
+#endif
                     if (myMulticastGroup.AddressFamily == AddressFamily.InterNetwork)
                     {
                         MulticastOption aMulticastOption = new MulticastOption(myMulticastGroup, ((IPEndPoint) mySocket.LocalEndPoint).Address);

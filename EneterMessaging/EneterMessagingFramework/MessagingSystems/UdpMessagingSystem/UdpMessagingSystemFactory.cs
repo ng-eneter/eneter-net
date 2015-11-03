@@ -15,7 +15,10 @@ using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.Threading.Dispatching;
 using System;
 using System.Net;
+
+#if !COMPACT_FRAMEWORK
 using System.Net.NetworkInformation;
+#endif
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
@@ -224,7 +227,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-#if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81)
+#if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
         
         /// <summary>
         /// Helper method returning IP addresses assigned to the device.
@@ -239,7 +242,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 #endif
 
-#if !NET35 && !SILVERLIGHT
+#if !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Checks if the port is available for listening.
         /// </summary>
@@ -287,6 +290,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </remarks>
         public bool UnicastCommunication { get; set; }
 
+#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Sets or gets time to live value for UDP datagrams.
         /// </summary>
@@ -298,7 +302,9 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// The default value is 128.
         /// </remarks>
         public short Ttl { get; set; }
-
+#else
+        private short Ttl { get; set; }
+#endif
         /// <summary>
         /// Sets or gets the multicast group to receive messages from.
         /// </summary>
@@ -397,6 +403,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </remarks>
         public bool AllowReceivingBroadcasts { get; set; }
 
+#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Enables /disables receiving multicast messages by the same channel which sent them.
         /// </summary>
@@ -436,7 +443,9 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </example>
         /// </remarks>
         public bool MulticastLoopback { get; set; }
-
+#else
+        private bool MulticastLoopback { get; set; }
+#endif
         /// <summary>
         /// Sets or gets the port which shall be used for receiving response messages in output channels in case of unicast communication.
         /// </summary>

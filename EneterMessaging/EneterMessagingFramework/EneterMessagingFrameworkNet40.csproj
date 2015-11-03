@@ -300,7 +300,9 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\IPAddressExt.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\IPAddressExt.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpInputConnector.cs">
       <SubType>Code</SubType>
     </Compile>

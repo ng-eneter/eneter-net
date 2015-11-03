@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="DataProcessing\Serializing\AesSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\BinarySerializer.cs" />
+    <Compile Include="DataProcessing\Serializing\CallbackSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\CryptoSerializerProvider.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractJsonStringSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\DataContractXmlStringSerializer.cs">
@@ -504,10 +505,14 @@
     <Compile Include="MessagingSystems\ThreadPoolMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\UdpMessagingSystem\IPAddressExt.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpInputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver_Silverlight.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessInputConnector.cs" />
+    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\EFrameType.cs">
       <SubType>Code</SubType>

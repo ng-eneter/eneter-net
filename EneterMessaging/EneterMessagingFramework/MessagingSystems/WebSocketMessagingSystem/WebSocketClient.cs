@@ -332,7 +332,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         myTcpClient = new TcpClient(anAddressFamily);
                         myTcpClient.NoDelay = true;
 
-#if !NET35 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5
+#if !NET35 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71
                         if (ResponseReceivingPort > 0)
                         {
                             IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6None : IPAddress.None;

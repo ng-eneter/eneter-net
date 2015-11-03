@@ -5,6 +5,8 @@
  * Copyright © Ondrej Uzovic 2015
 */
 
+#if !WINDOWS_PHONE_70
+
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -17,10 +19,12 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             IPAddress aMulticastIpAddress = IPAddress.Parse(multicastGroup);
 
+#if !COMPACT_FRAMEWORK
             if (aMulticastIpAddress.IsIPv6Multicast)
             {
                 return aMulticastIpAddress;
             }
+#endif
 
             if (aMulticastIpAddress.AddressFamily == AddressFamily.InterNetwork)
             {
@@ -35,3 +39,5 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
     }
 }
+
+#endif

@@ -14,9 +14,12 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 using Eneter.Messaging.Threading.Dispatching;
-using System.Net.NetworkInformation;
 using System.Net;
 using System.Collections.Generic;
+
+#if !COMPACT_FRAMEWORK
+using System.Net.NetworkInformation;
+#endif
 
 #if WINDOWS_PHONE80 || WINDOWS_PHONE81
 using Windows.Networking.Connectivity;
@@ -286,7 +289,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-#if !MONO && !NET35 && !SILVERLIGHT
+#if !MONO && !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Helper method returning IP addresses assigned to the device.
         /// </summary>
@@ -323,7 +326,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 #endif
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Checks if the port is available for listening.
         /// </summary>
