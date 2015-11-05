@@ -16,16 +16,21 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         [Test]
         public void BroadcastFromClientToAllServices()
         {
-            UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
+            UdpMessagingSystemFactory anOutputChannelMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
                 UnicastCommunication = false,
-                AllowReceivingBroadcasts = true,
+                AllowSendingBroadcasts = true
+            };
+
+            UdpMessagingSystemFactory anInputChannelMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
+            {
+                UnicastCommunication = false,
                 ReuseAddress = true
             };
 
             ManualResetEvent aMessage1Received = new ManualResetEvent(false);
             string aReceivedMessage1 = null;
-            IDuplexInputChannel anInputChannel1 = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8095/");
+            IDuplexInputChannel anInputChannel1 = anInputChannelMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8095/");
             anInputChannel1.MessageReceived += (x, y) =>
                 {
                     aReceivedMessage1 = (string)y.Message;
@@ -34,14 +39,14 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
 
             ManualResetEvent aMessage2Received = new ManualResetEvent(false);
             string aReceivedMessage2 = null;
-            IDuplexInputChannel anInputChannel2 = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8095/");
+            IDuplexInputChannel anInputChannel2 = anInputChannelMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8095/");
             anInputChannel2.MessageReceived += (x, y) =>
                 {
                     aReceivedMessage2 = (string)y.Message;
                     aMessage2Received.Set();
                 };
 
-            IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8095/", "udp://127.0.0.1");
+            IDuplexOutputChannel anOutputChannel = anOutputChannelMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8095/", "udp://127.0.0.1");
 
             try
             {
@@ -73,7 +78,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
             UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
             {
                 UnicastCommunication = false,
-                AllowReceivingBroadcasts = true,
+                AllowSendingBroadcasts = true,
                 ReuseAddress = true
             };
 

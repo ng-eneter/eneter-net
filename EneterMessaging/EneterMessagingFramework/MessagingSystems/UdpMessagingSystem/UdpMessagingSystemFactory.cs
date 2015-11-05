@@ -158,7 +158,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
 
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowSendingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, aResponseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -191,7 +191,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             using (EneterTrace.Entering())
             {
                 IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
-                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowReceivingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
+                IOutputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, ResponseReceiverPort, UnicastCommunication, AllowSendingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
                 return new DefaultDuplexOutputChannel(channelId, responseReceiverId, aDispatcher, myDispatcherAfterMessageDecoded, aConnectorFactory);
             }
         }
@@ -220,7 +220,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
-                IInputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, UnicastCommunication, AllowReceivingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
+                IInputConnectorFactory aConnectorFactory = new UdpConnectorFactory(myProtocolFormatter, ReuseAddress, -1, UnicastCommunication, AllowSendingBroadcasts, Ttl, MulticastGroupToReceive, MulticastLoopback);
                 IInputConnector anInputConnector = aConnectorFactory.CreateInputConnector(channelId);
                 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -355,13 +355,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 #if !SILVERLIGHT
         
         /// <summary>
-        /// Enables / disables receiving broadcast messages.
+        /// Enables / disables sending broadcast messages.
         /// </summary>
         /// <remarks>
         /// Broadcast is a message which is routed to all devices within the sub-network.
-        /// Allowing broadcasts will be effective only if UnicastCommunication is set to false.
+        /// To be able to send broadcasts UnicastCommunication must be set to false.
         /// <example>
-        /// Creating input and output channels which can receive broadcast messages.
+        /// Output channel which can send broadcast messages to all input channels within the sub-network
+        /// which listen to the port 8055.
         /// <code>
         /// // Create UDP messaging factory using simple protocol formatter.
         /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
@@ -370,21 +371,28 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
         /// aMessaging.UnicastCommunication = false;
         /// 
-        /// // Enable receiving broadcasts.
-        /// aMessaging.AllowReceivingBroadcasts = true;
+        /// // Enable sending broadcasts.
+        /// aMessaging.AllowSendingBroadcasts = true;
         /// 
-        /// // Create input channel which will listen to udp://192.168.30.1:8043/ and which will also
-        /// // receive broadcast messages on sent to the port 8043.
-        /// IInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://192.168.30.1:8043/");
+        /// // Create output channel which will send broadcast messages to all devices within the sub-network
+        /// // which listen to the port 8055.
+        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8055/");
         /// 
-        /// // Create output channel which can send messages to udp://192.168.30.1:8043/ and
-        /// // which can receive broadcast messages on the port 7075.
-        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://192.168.30.1:8043/", "udp://0.0.0.0:7075/");
+        /// // Initialize output channel for sending broadcast messages and receiving responses.
+        /// anOutputChannel.OpenConnection();
+        /// 
+        /// // Send UDP broadcast.
+        /// anOutputChannel.SendMessage("Hello");
+        /// 
+        /// ...
+        /// 
+        /// // Close channel - it will release listening thread.
+        /// anOutputChannel.CloseConnection();
         /// </code>
         /// </example>
         /// 
         /// <example>
-        /// Creating input and output channels which can send broadcast messages.
+        /// Input channel which can receive messages
         /// <code>
         /// // Create UDP messaging factory using simple protocol formatter.
         /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
@@ -398,7 +406,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </code>
         /// </example>
         /// </remarks>
-        public bool AllowReceivingBroadcasts { get; set; }
+        public bool AllowSendingBroadcasts { get; set; }
 
 #if !COMPACT_FRAMEWORK
         /// <summary>
