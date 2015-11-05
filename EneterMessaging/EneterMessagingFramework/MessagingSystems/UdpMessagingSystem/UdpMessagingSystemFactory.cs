@@ -60,7 +60,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     IOutputConnector anOutputConnector;
                     if (!myIsUnicastFlag)
                     {
-                        anOutputConnector = new UdpSessionlessOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myTtl, true, myMulticastGroup, myMulticastLoopbackFlag);
+                        anOutputConnector = new UdpSessionlessOutputConnector(inputConnectorAddress, outputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myTtl, myAllowReceivingBroadcasts, myMulticastGroup, myMulticastLoopbackFlag);
                     }
                     else
                     {
@@ -78,7 +78,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     IInputConnector anInputConnector;
                     if (!myIsUnicastFlag)
                     {
-                        anInputConnector = new UdpSessionlessInputConnector(inputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myTtl, true, myMulticastGroup, myMulticastLoopbackFlag);
+                        anInputConnector = new UdpSessionlessInputConnector(inputConnectorAddress, myProtocolFormatter, myReuseAddressFlag, myTtl, myAllowReceivingBroadcasts, myMulticastGroup, myMulticastLoopbackFlag);
                     }
                     else
                     {

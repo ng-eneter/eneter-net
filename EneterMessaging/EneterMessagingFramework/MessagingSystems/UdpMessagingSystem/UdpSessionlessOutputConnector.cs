@@ -79,7 +79,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 #else
                     myResponseReceiver = UdpReceiver.CreateBoundReceiver(myClientEndPoint, myTtl, myMulticastGroup);
 #endif
-                    myResponseReceiver.StartListening(OnRequestMessageReceived);
+                    myResponseReceiver.StartListening(OnResponseMessageReceived);
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        private void OnRequestMessageReceived(byte[] datagram, EndPoint clientAddress)
+        private void OnResponseMessageReceived(byte[] datagram, EndPoint clientAddress)
         {
             using (EneterTrace.Entering())
             {

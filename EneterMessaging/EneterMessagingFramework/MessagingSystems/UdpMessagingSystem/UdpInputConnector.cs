@@ -312,8 +312,19 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
-                clientContext.SendResponseMessage(anEncodedMessage);
+                try
+                {
+                    object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
+                    if (anEncodedMessage != null)
+                    {
+                        clientContext.SendResponseMessage(anEncodedMessage);
+                    }
+                }
+                catch (Exception err)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
+                }
+
                 clientContext.CloseConnection();
             }
         }

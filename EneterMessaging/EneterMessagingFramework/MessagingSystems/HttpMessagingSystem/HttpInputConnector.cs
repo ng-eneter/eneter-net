@@ -230,8 +230,16 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     {
                         if (!aClientContext.IsDisposed)
                         {
-                            object anEncodedMessage = myProtocolFormatter.EncodeMessage(aClientContext.ResponseReceiverId, message);
-                            aClientContext.SendResponseMessage(anEncodedMessage);
+                            try
+                            {
+                                object anEncodedMessage = myProtocolFormatter.EncodeMessage(aClientContext.ResponseReceiverId, message);
+                                aClientContext.SendResponseMessage(anEncodedMessage);
+                            }
+                            catch (Exception err)
+                            {
+                                // This should never happen because it is not called when disposed.
+                                EneterTrace.Error(TracedObject + "failed to send the broadcast message.", err);
+                            }
                         }
                     }
                 }
