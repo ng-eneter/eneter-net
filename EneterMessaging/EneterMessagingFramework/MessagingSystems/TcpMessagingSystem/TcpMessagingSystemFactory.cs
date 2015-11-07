@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 #if !COMPACT_FRAMEWORK
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 #endif
 
 #if WINDOWS_PHONE80 || WINDOWS_PHONE81
@@ -294,18 +295,31 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// <summary>
         /// Helper method returning IP addresses assigned to the device.
         /// </summary>
+        /// <remarks>
+        /// The returned IP addresses can be used for the listening. E.g. duplex input channel can use it to start listening.
+        /// </remarks>
         /// <returns>array of available addresses</returns>
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())
             {
-                IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-                UnicastIPAddressInformationCollection aCollection = anIpGlobalProperties.GetUnicastAddresses();
                 List<string> anIpAddresses = new List<string>();
-                foreach (UnicastIPAddressInformation anIpAddressInfo in aCollection)
+                foreach (NetworkInterface aNetworkInterface in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    anIpAddresses.Add(anIpAddressInfo.Address.ToString());
+                    IPInterfaceProperties aProperties = aNetworkInterface.GetIPProperties();
+                    if (aProperties != null && aProperties.UnicastAddresses != null)
+                    {
+                        foreach (UnicastIPAddressInformation aUnicastIpAddress in aProperties.UnicastAddresses)
+                        {
+                            if (aUnicastIpAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 ||
+                                aUnicastIpAddress.Address.AddressFamily == AddressFamily.InterNetwork && aUnicastIpAddress.DuplicateAddressDetectionState == DuplicateAddressDetectionState.Preferred)
+                            {
+                                anIpAddresses.Add(aUnicastIpAddress.Address.ToString());
+                            }
+                        }
+                    }
                 }
+
                 return anIpAddresses.ToArray();
             }
         }
