@@ -14,6 +14,7 @@ using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.Threading.Dispatching;
 using System;
+using System.Linq;
 using System.Net;
 
 #if !COMPACT_FRAMEWORK
@@ -244,19 +245,34 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
 #if !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
-        /// Checks if the port is available for listening.
+        /// Checks if the port is available for UDP listening.
         /// </summary>
-        /// <param name="ipAddressAndPort">IP address and port.
-        /// The IP address must be an address which is assigned to the local device. The method then checks whether the port
-        /// is available for listening for the given IP address.
-        /// </param>
+        /// <remarks>
+        /// The method checks if the IP address and the port is available for UDP listenig.
+        /// </remarks>
+        /// <param name="ipAddressAndPort">IP address and port.</param>
+        /// <example>
+        /// Check if the application can start listening on the IP address 127.0.0.1 and the port 8099.
+        /// <code>
+        /// bool isPortAvailable = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("127.0.0.1:8099");
+        /// </code>
+        /// </example>
         /// <returns>true if the port is available</returns>
-        public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
+        public static bool IsPortAvailableForUdpListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
             {
-                Uri aVerifiedUri = new Uri(ipAddressAndPort, UriKind.Absolute);
-                IPEndPoint aVerifiedEndPoint = new IPEndPoint(IPAddress.Parse(aVerifiedUri.Host), aVerifiedUri.Port);
+                Uri aUri = new Uri(ipAddressAndPort, UriKind.Absolute);
+                IPAddress anIpAddress = IPAddress.Parse(aUri.Host);
+                if (!anIpAddress.Equals(IPAddress.Any))
+                {
+                    string[] anAvailableIpAddresses = GetAvailableIpAddresses();
+                    if (!anAvailableIpAddresses.Contains(aUri.Host))
+                    {
+                        throw new InvalidOperationException("The IP address '" + aUri.Host + "' is not assigned to this device.");
+                    }
+                }
+                IPEndPoint anEndPointToVerify = new IPEndPoint(anIpAddress, aUri.Port);
 
                 IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
 
@@ -264,7 +280,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 IPEndPoint[] aListeners = anIpGlobalProperties.GetActiveUdpListeners();
                 foreach (IPEndPoint aListener in aListeners)
                 {
-                    if (aVerifiedEndPoint.Equals(aListener))
+                    if (anEndPointToVerify.Equals(aListener))
                     {
                         return false;
                     }
@@ -359,7 +375,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </summary>
         /// <remarks>
         /// Broadcast is a message which is routed to all devices within the sub-network.
-        /// To be able to send broadcasts UnicastCommunication must be set to false.
+        /// To be able to send broadcasts also UnicastCommunication must be set to false.
         /// <example>
         /// Output channel which can send broadcast messages to all input channels within the sub-network
         /// which listen to the port 8055.
@@ -392,7 +408,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </example>
         /// 
         /// <example>
-        /// Input channel which can receive messages
+        /// Input channel which can receive broadcast messages.
         /// <code>
         /// // Create UDP messaging factory using simple protocol formatter.
         /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
@@ -401,8 +417,19 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
         /// aMessaging.UnicastCommunication = false;
         /// 
-        /// // Create output channel which can send broadcast messages to the port 8043.
-        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8043/");
+        /// // Create input channel which can receive broadcast messages to the port 8055.
+        /// IInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://0.0.0.0:8055/");
+        /// 
+        /// // Subscribe to receive messages.
+        /// anInputChannel.MessageReceived += OnMessageReceived;
+        /// 
+        /// // Start listening for messages.
+        /// anInputChannel.StartListening();
+        /// 
+        /// ...
+        /// 
+        /// // Stop listening.
+        /// anInputChannel.StopListening();
         /// </code>
         /// </example>
         /// </remarks>
@@ -410,11 +437,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
 #if !COMPACT_FRAMEWORK
         /// <summary>
-        /// Enables /disables receiving multicast messages by the same channel which sent them.
+        /// Enables /disables receiving multicast messages by the same application which sent them.
         /// </summary>
         /// <remarks>
         /// <example>
-        /// Sending multicast message from the output channel and receiving it by the same channel which sent it.
+        /// Sending multicast message from the output channel and receiving it by the same output channel.
         /// <code>
         ///  UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(new EasyProtocolFormatter())
         ///  {
@@ -452,11 +479,12 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private bool MulticastLoopback { get; set; }
 #endif
         /// <summary>
-        /// Sets or gets the port which shall be used for receiving response messages in output channels in case of unicast communication.
+        /// Sets or gets the port which shall be used for receiving response messages by output channel in case of unicast communication.
         /// </summary>
         /// <remarks>
-        /// When a client connect an IP address and port for the unicast communication a random free port is assigned for receiving messages.
-        /// This property allows to use a speciefied port instead of random one.
+        /// When a client connects an IP address and port for the unicast communication a random free port is assigned for receiving messages.
+        /// This property allows to use a specieficport instead of random one.
+        /// This property works only for the unicast communication.
         /// </remarks>
         public int ResponseReceiverPort { get; set; }
 #else

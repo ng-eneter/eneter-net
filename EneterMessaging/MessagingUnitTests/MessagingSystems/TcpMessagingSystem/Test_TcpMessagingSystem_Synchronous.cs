@@ -172,10 +172,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
                 anInputChannel1.StartListening();
                 anInputChannel2.StartListening();
 
-                bool aResult = TcpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://[::1]:8044/");
+                bool aResult = TcpMessagingSystemFactory.IsPortAvailableForListening("tcp://[::1]:8044/");
                 Assert.IsFalse(aResult);
 
-                aResult = TcpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://0.0.0.0:8044/");
+                aResult = TcpMessagingSystemFactory.IsPortAvailableForListening("tcp://0.0.0.0:8044/");
                 Assert.IsTrue(aResult);
             }
             finally

@@ -14,6 +14,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 using Eneter.Messaging.Threading.Dispatching;
+using System.Linq;
 using System.Net;
 using System.Collections.Generic;
 
@@ -328,19 +329,35 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 #if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
-        /// Checks if the port is available for listening.
+        /// Checks if the port is available for TCP listening.
         /// </summary>
-        /// <param name="ipAddressAndPort">IP address and port.
-        /// The IP address must be an address which is assigned to the local device. The method then checks whether the port
-        /// is available for listening for the given IP address.
-        /// </param>
+        /// <remarks>
+        /// The method checks if the IP address and the port is available for TCP listenig.
+        /// </remarks>
+        /// <param name="ipAddressAndPort">IP address and port.</param>
+        /// <example>
+        /// Check if the application can start listening on the IP address 127.0.0.1 and the port 8099.
+        /// <code>
+        /// bool isPortAvailable = TcpMessagingSystemFactory.IsPortAvailableForTcpListening("127.0.0.1:8099");
+        /// </code>
+        /// </example>
         /// <returns>true if the port is available</returns>
-        public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
+        public static bool IsPortAvailableForTcpListening(string ipAddressAndPort)
         {
             using (EneterTrace.Entering())
             {
-                Uri aVerifiedUri = new Uri(ipAddressAndPort, UriKind.Absolute);
-                IPEndPoint aVerifiedEndPoint = new IPEndPoint(IPAddress.Parse(aVerifiedUri.Host), aVerifiedUri.Port);
+                Uri aUri = new Uri(ipAddressAndPort, UriKind.Absolute);
+                IPAddress anIpAddress = IPAddress.Parse(aUri.Host);
+                if (!anIpAddress.Equals(IPAddress.Any))
+                {
+                    string[] anAvailableIpAddresses = GetAvailableIpAddresses();
+                    if (!anAvailableIpAddresses.Contains(aUri.Host))
+                    {
+                        throw new InvalidOperationException("The IP address '" + aUri.Host + "' is not assigned to this device.");
+                    }
+                }
+
+                IPEndPoint anEndPointToVerify = new IPEndPoint(anIpAddress, aUri.Port);
 
                 IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
 
@@ -348,7 +365,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IPEndPoint[] aListeners = anIpGlobalProperties.GetActiveTcpListeners();
                 foreach (IPEndPoint aListener in aListeners)
                 {
-                    if (aVerifiedEndPoint.Equals(aListener))
+                    if (anEndPointToVerify.Equals(aListener))
                     {
                         return false;
                     }
@@ -359,7 +376,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 foreach (TcpConnectionInformation aConnection in aConnections)
                 {
-                    if (aVerifiedEndPoint.Equals(aConnection.LocalEndPoint))
+                    if (anEndPointToVerify.Equals(aConnection.LocalEndPoint))
                     {
                         return false;
                     }

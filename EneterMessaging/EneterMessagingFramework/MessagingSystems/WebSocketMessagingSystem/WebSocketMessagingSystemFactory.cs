@@ -11,7 +11,6 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
-using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 using Eneter.Messaging.Threading.Dispatching;
 using System;
@@ -218,37 +217,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
-        /// <summary>
-        /// Helper method returning IP addresses assigned to the device.
-        /// </summary>
-        /// <returns>array of available addresses</returns>
-        public static string[] GetAvailableIpAddresses()
-        {
-            using (EneterTrace.Entering())
-            {
-                return TcpMessagingSystemFactory.GetAvailableIpAddresses();
-            }
-        }
-#endif
-
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
-        /// <summary>
-        /// Checks if the port is available for listening.
-        /// </summary>
-        /// <param name="ipAddressAndPort">IP address and port.
-        /// The IP address must be an address which is assigned to the local device. The method then checks whether the port
-        /// is available for listening for the given IP address.
-        /// </param>
-        /// <returns>true if the port is available</returns>
-        public static bool IsEndPointAvailableForListening(string ipAddressAndPort)
-        {
-            using (EneterTrace.Entering())
-            {
-                return TcpMessagingSystemFactory.IsEndPointAvailableForListening(ipAddressAndPort);
-            }
-        }
-#endif
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>

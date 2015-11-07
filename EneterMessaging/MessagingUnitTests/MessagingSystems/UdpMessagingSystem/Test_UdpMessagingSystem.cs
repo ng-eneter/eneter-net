@@ -61,10 +61,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
                 anInputChannel1.StartListening();
                 anInputChannel2.StartListening();
 
-                bool aResult = UdpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://[::1]:8044/");
+                bool aResult = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("tcp://[::1]:8044/");
                 Assert.IsFalse(aResult);
 
-                aResult = UdpMessagingSystemFactory.IsEndPointAvailableForListening("tcp://0.0.0.0:8044/");
+                aResult = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("tcp://0.0.0.0:8044/");
                 Assert.IsTrue(aResult);
             }
             finally
