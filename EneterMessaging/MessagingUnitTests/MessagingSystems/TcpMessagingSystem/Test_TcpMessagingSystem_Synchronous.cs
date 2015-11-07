@@ -172,10 +172,17 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
                 anInputChannel1.StartListening();
                 anInputChannel2.StartListening();
 
-                bool aResult = TcpMessagingSystemFactory.IsPortAvailableForListening("tcp://[::1]:8044/");
+                Console.WriteLine("Available IP addresses:");
+                string[] anAvailableIpAddresses = TcpMessagingSystemFactory.GetAvailableIpAddresses();
+                foreach (string anIpAddress in anAvailableIpAddresses)
+                {
+                    Console.WriteLine(anIpAddress);
+                }
+
+                bool aResult = TcpMessagingSystemFactory.IsPortAvailableForTcpListening("tcp://[::1]:8044/");
                 Assert.IsFalse(aResult);
 
-                aResult = TcpMessagingSystemFactory.IsPortAvailableForListening("tcp://0.0.0.0:8044/");
+                aResult = TcpMessagingSystemFactory.IsPortAvailableForTcpListening("tcp://0.0.0.0:8044/");
                 Assert.IsTrue(aResult);
             }
             finally

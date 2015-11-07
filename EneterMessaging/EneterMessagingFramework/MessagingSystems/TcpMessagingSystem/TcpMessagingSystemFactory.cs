@@ -351,9 +351,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 if (!anIpAddress.Equals(IPAddress.Any))
                 {
                     string[] anAvailableIpAddresses = GetAvailableIpAddresses();
-                    if (!anAvailableIpAddresses.Contains(aUri.Host))
+                    if (!anAvailableIpAddresses.Contains(anIpAddress.ToString()))
                     {
-                        throw new InvalidOperationException("The IP address '" + aUri.Host + "' is not assigned to this device.");
+                        throw new InvalidOperationException("The IP address '" + anIpAddress.ToString() + "' is not assigned to this device.");
                     }
                 }
 
