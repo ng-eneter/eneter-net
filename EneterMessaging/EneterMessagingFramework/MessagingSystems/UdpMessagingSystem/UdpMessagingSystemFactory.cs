@@ -29,7 +29,152 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
     /// <remarks>
     /// It creates the communication channels using UDP for sending and receiving messages.
     /// The channel id must be a valid UDP URI address. E.g.: udp://127.0.0.1:6080/. <br/>
-    /// The messaging via UDP supports unicast, multicast and broadcast communication.
+    /// The messaging via UDP supports unicast, multicast and broadcast communication.<br/>
+    /// The unicast communication is the routing of messages from one sender to one receiver.
+    /// (E.g. a client-service communication where a client sends messages to one service and the service 
+    /// can send response messages to one client.)<br/> 
+    /// The multicast communication is the routing of messages from one sender to multiple receivers
+    /// (the receivers which joined the specific multicast group and listen to the specific port).
+    /// The broadcast communication is the routing of messages from one sender to all receivers within the sub-net which listen
+    /// to the specific port.<br/>
+    /// <br/>
+    /// <example>
+    /// UDP unicast communication.
+    /// <code>
+    /// // Create UDP input channel.
+    /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory();
+    /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8043/");
+    /// 
+    /// // Subscribe for receiving messages.
+    /// anInputChannel.MessageReceived += OnMessageReceived;
+    /// 
+    /// // Start listening.
+    /// anInputChannel.StartListening();
+    /// 
+    /// ...
+    /// 
+    /// // Stop listening.
+    /// anInputChannel.StopListening();
+    /// 
+    /// 
+    /// // Handling of messages.
+    /// private void OnMessageReceived(object sender, DuplexChannelMessageEventArgs e)
+    /// {
+    ///     // Handle incoming message.
+    ///     ....
+    ///     
+    ///     // Send response message.
+    ///     IDuplexInputChannel anInputChannel = (IDuplexInputChannel)sender;
+    ///     anInputChannel.SendResponseMessage(e.ResponseReceiverId, "Hi");
+    /// }
+    /// </code>
+    /// 
+    /// <code>
+    /// // Create UDP output channel.
+    /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory();
+    /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8043/");
+    /// 
+    /// // Subscribe to receive messages.
+    /// anOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
+    /// 
+    /// // Open the connection.
+    /// anOutputChannel.OpenConnection();
+    /// 
+    /// ...
+    /// 
+    /// // Send a message.
+    /// anOutputChannel.SendMessage("Hello");
+    /// 
+    /// ...
+    /// // Close connection.
+    /// anOutputChannel.CloseConnection();
+    /// 
+    /// 
+    /// // Handling of received message.
+    /// private void OnResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e)
+    /// {
+    ///     string aMessage = (string)e.Message;
+    ///     ....
+    /// }
+    /// </code>
+    /// </example>
+    /// 
+    /// <exanple>
+    /// UDP multicast communication.
+    /// <code>
+    /// // Create UDP input channel.
+    /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory()
+    /// {
+    ///     // The communication will be multicast or broadcast.
+    ///     UnicastCommunication = false,
+    ///     
+    ///     // The multicast group which shall be joined.
+    ///     MulticastGroupToReceive = "234.5.6.7"
+    /// };
+    /// 
+    /// // This input channel will be able to receive messages sent to udp://127.0.0.1:8043/ or
+    /// // to the multicast group udp://234.5.6.7:8043/.
+    /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8043/")
+    /// 
+    /// 
+    /// // Subscribe for receiving messages.
+    /// anInputChannel.MessageReceived += OnMessageReceived;
+    /// 
+    /// // Start listening.
+    /// anInputChannel.StartListening();
+    /// 
+    /// ...
+    /// 
+    /// // Stop listening.
+    /// anInputChannel.StopListening();
+    /// 
+    /// 
+    /// // Handling of messages.
+    /// private void OnMessageReceived(object sender, DuplexChannelMessageEventArgs e)
+    /// {
+    ///     // Handle incoming message.
+    ///     ....
+    ///     
+    ///     // Send response message.
+    ///     IDuplexInputChannel anInputChannel = (IDuplexInputChannel)sender;
+    ///     anInputChannel.SendResponseMessage(e.ResponseReceiverId, "Hi");
+    /// }
+    /// </code>
+    /// 
+    /// <code>
+    /// // Create UDP output channel which will send messages to the multicast group udp://234.5.6.7:8043/.
+    /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory()
+    /// {
+    ///     // The communication will be multicast or broadcast.
+    ///     UnicastCommunication = false
+    /// };
+    /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.5.6.7:8043/");
+    /// 
+    /// // Subscribe to receive messages.
+    /// anOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
+    /// 
+    /// // Open the connection.
+    /// anOutputChannel.OpenConnection();
+    /// 
+    /// ...
+    /// 
+    /// // Send a message to all receivers which have joined
+    /// // the multicast group udp://234.5.6.7:8043/.
+    /// anOutputChannel.SendMessage("Hello");
+    /// 
+    /// ...
+    /// // Close connection.
+    /// anOutputChannel.CloseConnection();
+    /// 
+    /// 
+    /// // Handling of received message.
+    /// private void OnResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e)
+    /// {
+    ///     string aMessage = (string)e.Message;
+    ///     ....
+    /// }
+    /// </code>
+    /// </exanple>
     /// </remarks>
     public class UdpMessagingSystemFactory : IMessagingSystemFactory
     {
@@ -135,8 +280,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// <br/><br/>
         /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
         /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
         /// <example>
         /// Creating the duplex output channel.
         /// <code>
