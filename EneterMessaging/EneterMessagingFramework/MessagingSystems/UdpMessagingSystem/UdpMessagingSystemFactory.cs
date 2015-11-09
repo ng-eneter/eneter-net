@@ -268,6 +268,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 Ttl = 128;
                 ResponseReceiverPort = -1;
                 UnicastCommunication = true;
+                MulticastLoopback = true;
             }
         }
 
