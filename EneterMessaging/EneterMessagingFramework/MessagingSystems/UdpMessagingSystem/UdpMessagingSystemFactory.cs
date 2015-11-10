@@ -273,23 +273,54 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using UDP.
+        /// Creates duplex output channel which can send or receive messages from the duplex input channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
+        /// It can create duplex output channels for unicast, multicast or broadcast communication.
+        /// If the property UnicastCommunication is set to true then the created output channel is for the unicast communication.
+        /// It means it can send messages to one particular input channel and receive messages only from that input channel.
+        /// If the property UnicastCommunication is set to false then the created output channel is for mulitcast or broadcast communication.
+        /// It means it can send mulitcast or broadcast messages which can be received by multiple input channels.
         /// <example>
-        /// Creating the duplex output channel.
+        /// Creating the duplex output channel for unicast communication (e.g. for client-service communication).
         /// <code>
         /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory();
         /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8765/");
         /// </code>
         /// </example>
+        /// <example>
+        /// Creating the duplex output channel for sending mulitcast messages (e.g. for streaming video to multiple receivers).
+        /// <code>
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup the factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false
+        /// };
+        /// 
+        /// // Create output channel which will send messages to the mulitcast group 234.4.5.6 on the port 8765.
+        /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.4.5.6:8765/");
+        /// </code>
+        /// </example>
+        /// <example>
+        /// Creating the duplex output channel for broadcast messages.
+        /// <code>
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup the factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false,
+        ///     
+        ///     // Setup the factory to create chennels which are allowed to send broadcast messages.
+        ///     AllowSendingBroadcasts = true
+        /// };
+        /// 
+        /// // Create output channel which will send broadcast messages to the port 8765.
+        /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://255.255.255.255:8765/");
+        /// </code>
+        /// </example>
         /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. udp://127.0.0.1:8090/ </param>
+        /// <param name="channelId">UDP address in a valid URI format e.g. udp://127.0.0.1:8090/</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
@@ -309,27 +340,57 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using UDP.
+        /// Creates duplex output channel which can send or receive messages from the duplex input channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method allows to specified a desired response receiver id. Please notice, the response receiver
-        /// id is supposed to be unique.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
+        /// It can create duplex output channels for unicast, multicast or broadcast communication.
+        /// If the property UnicastCommunication is set to true then the created output channel is for the unicast communication.
+        /// It means it can send messages to one particular input channel and receive messages only from that input channel.
+        /// If the property UnicastCommunication is set to false then the created output channel is for mulitcast or broadcast communication.
+        /// It means it can send mulitcast or broadcast messages which can be received by multiple input channels.<br/>
+        /// <br/>
+        /// This method allows to specify the id of the created output channel.
         /// <example>
-        /// Creating the duplex output channel with specified client id.
+        /// Creating the duplex output channel for unicast communication (e.g. for client-service communication)
+        /// with a specific unique id.
         /// <code>
         /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory();
-        /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8765/", "MyUniqueClientId_1");
+        /// string aSessionId = Guid.NewGuid().ToString();
+        /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8765/", aSessionId);
+        /// </code>
+        /// </example>
+        /// <example>
+        /// Creating the duplex output channel which can send messages to a particular UDP address and
+        /// which can recieve messages on a specific UDP address and which can receive mulitcast messages.
+        /// <code>
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup the factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false,
+        ///     
+        ///     // Specify the mulitcast group to receive messages from.
+        ///     MulticastGroupToReceive = "234.4.5.6"
+        /// };
+        /// 
+        /// // Create output channel which can send messages to the input channel listening to udp://127.0.0.1:8095/
+        /// // and which is listening to udp://127.0.0.1:8099/ and which can also receive messages sent for the mulitcast
+        /// // group 234.4.5.6.
+        /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8095/", "udp://127.0.0.1:8099/");
         /// </code>
         /// </example>
         /// </remarks>
         /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. udp://127.0.0.1:8090/ </param>
-        /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
+        /// <param name="responseReceiverId">
+        /// Unique identifier of the output channel which shall be created.<br/>
+        /// In unicast communication the identifier can be a string e.g. GUID which represents the session between output and input channel.<br/>
+        /// In mulitcast or broadcast communication the identifier must be a valid URI address which will be used by the output channel
+        /// to receive messages from input channels.<br/>
+        /// <br/>
+        /// If the parameter is null then in case of unicast communication a unique id is generated automatically.
+        /// In case of multicast or broadcast communication the address udp://0.0.0.0:0/ is used which means the the output channel will
+        /// listen to random free port on all available IP addresses.
+        /// </param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
