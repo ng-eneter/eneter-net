@@ -174,7 +174,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 else if (messageContext.ProtocolMessage.MessageType == EProtocolMessageType.MessageReceived)
                 {
                     EneterTrace.Debug("RESPONSE MESSAGE RECEIVED");
-                    myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(messageContext.ProtocolMessage.Message)));
+                    myDispatchingAfterResponseReading.Invoke(() => Dispatcher.Invoke(() => NotifyResponseMessageReceived(messageContext.ProtocolMessage.Message, messageContext.SenderAddress)));
                 }
                 else
                 {
@@ -218,7 +218,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         }
 
 
-        private void NotifyResponseMessageReceived(object message)
+        private void NotifyResponseMessageReceived(object message, string senderAddress)
         {
             using (EneterTrace.Entering())
             {
@@ -226,7 +226,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     try
                     {
-                        ResponseMessageReceived(this, new DuplexChannelMessageEventArgs(ChannelId, message, ResponseReceiverId, ""));
+                        ResponseMessageReceived(this, new DuplexChannelMessageEventArgs(ChannelId, message, ResponseReceiverId, senderAddress));
                     }
                     catch (Exception err)
                     {

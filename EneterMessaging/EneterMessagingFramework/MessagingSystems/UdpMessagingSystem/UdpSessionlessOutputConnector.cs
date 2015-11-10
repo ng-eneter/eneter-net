@@ -120,25 +120,31 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-        private void OnResponseMessageReceived(byte[] datagram, EndPoint clientAddress)
+        private void OnResponseMessageReceived(byte[] datagram, EndPoint senderAddress)
         {
             using (EneterTrace.Entering())
             {
-                if (datagram == null && clientAddress == null)
+                if (datagram == null && senderAddress == null)
                 {
                     // The listening got interrupted so nothing to do.
                     return;
                 }
 
                 // Get the sender IP address.
-                string aClientIp = (clientAddress != null) ? ((IPEndPoint)clientAddress).ToString() : "";
+                string aSenderAddressStr = (senderAddress != null) ? ((IPEndPoint)senderAddress).ToString() : "";
 
                 ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(datagram);
 
                 if (aProtocolMessage != null)
                 {
-                    aProtocolMessage.ResponseReceiverId = "udp://" + aClientIp + "/";
-                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
+                    if (aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
+                    {
+                        // Note: this output connector is used for multicast or broadcast communication.
+                        //       Therefore the closing the connection by one of input channels has no sense in this context.
+                        return;
+                    }
+
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, aSenderAddressStr);
 
                     try
                     {

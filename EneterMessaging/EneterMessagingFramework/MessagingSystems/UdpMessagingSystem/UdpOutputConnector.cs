@@ -34,7 +34,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     throw;
                 }
                 myServiceEndpoint = new IPEndPoint(IPAddress.Parse(anServiceUri.Host), anServiceUri.Port);
-                myOutpuConnectorAddress = outpuConnectorAddress;
+                myOutputConnectorAddress = outpuConnectorAddress;
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddressFlag;
                 myResponseReceivingPort = responseReceivingPort;
@@ -63,7 +63,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 #endif
                         myResponseReceiver.StartListening(OnResponseMessageReceived);
 
-                        byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutpuConnectorAddress);
+                        byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
                         if (anEncodedMessage != null)
                         {
                             myResponseReceiver.SendTo(anEncodedMessage, myServiceEndpoint);
@@ -103,16 +103,25 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
-                    byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutpuConnectorAddress, message);
+                    byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeMessage(myOutputConnectorAddress, message);
                     myResponseReceiver.SendTo(anEncodedMessage, myServiceEndpoint);
                 }
             }
         }
 
-        private void OnResponseMessageReceived(byte[] datagram, EndPoint dummy)
+        private void OnResponseMessageReceived(byte[] datagram, EndPoint senderAddress)
         {
             using (EneterTrace.Entering())
             {
+                if (datagram == null && senderAddress == null)
+                {
+                    // The listening got interrupted so nothing to do.
+                    return;
+                }
+
+                // Get the sender IP address.
+                string aSenderAddressStr = (senderAddress != null) ? ((IPEndPoint)senderAddress).ToString() : "";
+
                 Action<MessageContext> aResponseHandler = myResponseMessageHandler;
 
                 ProtocolMessage aProtocolMessage = null;
@@ -122,7 +131,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 }
                 else
                 {
-                    aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutpuConnectorAddress, null);
+                    aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, myOutputConnectorAddress, null);
                 }
 
                 if (aProtocolMessage != null && aProtocolMessage.MessageType == EProtocolMessageType.CloseConnectionRequest)
@@ -134,7 +143,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 {
                     try
                     {
-                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+                        MessageContext aMessageContext = new MessageContext(aProtocolMessage, aSenderAddressStr);
                         aResponseHandler(aMessageContext);
                     }
                     catch (Exception err)
@@ -159,7 +168,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         {
                             try
                             {
-                                byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutpuConnectorAddress);
+                                byte[] anEncodedMessage = (byte[])myProtocolFormatter.EncodeCloseConnectionMessage(myOutputConnectorAddress);
                                 if (anEncodedMessage != null)
                                 {
                                     myResponseReceiver.SendTo(anEncodedMessage, myServiceEndpoint);
@@ -179,7 +188,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
         private IProtocolFormatter myProtocolFormatter;
-        private string myOutpuConnectorAddress;
+        private string myOutputConnectorAddress;
         private IPEndPoint myServiceEndpoint;
         private bool myReuseAddressFlag;
         private short myTtl;
