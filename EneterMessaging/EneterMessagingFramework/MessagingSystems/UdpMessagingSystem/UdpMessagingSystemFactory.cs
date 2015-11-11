@@ -273,14 +273,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
         /// <summary>
-        /// Creates duplex output channel which can send or receive messages from the duplex input channel using UDP.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using UDP.
         /// </summary>
         /// <remarks>
         /// It can create duplex output channels for unicast, multicast or broadcast communication.
-        /// If the property UnicastCommunication is set to true then the created output channel is for the unicast communication.
+        /// If the property UnicastCommunication is set to true then it creates the output channel for the unicast communication.
         /// It means it can send messages to one particular input channel and receive messages only from that input channel.
-        /// If the property UnicastCommunication is set to false then the created output channel is for mulitcast or broadcast communication.
+        /// If the property UnicastCommunication is set to false then it creates the output channel for mulitcast or broadcast communication.
         /// It means it can send mulitcast or broadcast messages which can be received by multiple input channels.
+        /// It can also receive multicast and broadcast messages.
         /// <example>
         /// Creating the duplex output channel for unicast communication (e.g. for client-service communication).
         /// <code>
@@ -340,14 +341,15 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
         /// <summary>
-        /// Creates duplex output channel which can send or receive messages from the duplex input channel using UDP.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using UDP.
         /// </summary>
         /// <remarks>
         /// It can create duplex output channels for unicast, multicast or broadcast communication.
-        /// If the property UnicastCommunication is set to true then the created output channel is for the unicast communication.
+        /// If the property UnicastCommunication is set to true then it creates the output channel for the unicast communication.
         /// It means it can send messages to one particular input channel and receive messages only from that input channel.
-        /// If the property UnicastCommunication is set to false then the created output channel is for mulitcast or broadcast communication.
-        /// It means it can send mulitcast or broadcast messages which can be received by multiple input channels.<br/>
+        /// If the property UnicastCommunication is set to false then it creates the output channel for mulitcast or broadcast communication.
+        /// It means it can send mulitcast or broadcast messages which can be received by multiple input channels.
+        /// It can also receive multicast and broadcast messages.<br/>
         /// <br/>
         /// This method allows to specify the id of the created output channel.
         /// <example>
@@ -382,7 +384,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </remarks>
         /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. udp://127.0.0.1:8090/ </param>
         /// <param name="responseReceiverId">
-        /// Unique identifier of the output channel which shall be created.<br/>
+        /// Unique identifier of the output channel.<br/>
         /// In unicast communication the identifier can be a string e.g. GUID which represents the session between output and input channel.<br/>
         /// In mulitcast or broadcast communication the identifier must be a valid URI address which will be used by the output channel
         /// to receive messages from input channels.<br/>
@@ -403,18 +405,80 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages by using UDP.
+        /// Creates the duplex input channel which can receive and send messages to the duplex output channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
+        /// It can create duplex input channels for unicast, multicast or broadcast communication.
+        /// If the property UnicastCommunication is set to true then it creates the input channel for the unicast communication.
+        /// It means, like a service it can receive connections and messages from multiple output channels but
+        /// send messages only to particular output channels which are connected.
+        /// If the property UnicastCommunication is set to false then it creates the output channel for mulitcast or broadcast communication.
+        /// It means it can send mulitcast or broadcast messages which can be received by multiple output channels.
+        /// It also can receive multicast and broadcast messages.
         /// <example>
-        /// Creating duplex input channel.
+        /// Creating the duplex input channel for unicast communication.
         /// <code>
         /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory();
-        /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:9876/");
+        /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8765/");
+        /// </code>
+        /// </example>
+        /// <example>
+        /// Creating the duplex input channel for multicast communication.
+        /// <code>
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup the factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false,
+        ///     
+        ///     // Specify the mulitcast group to receive messages from.
+        ///     MulticastGroupToReceive = "234.4.5.6"
+        /// }
+        /// 
+        /// // Create duplex input channel which is listening to udp://127.0.0.1:8095/ and can also receive multicast messages
+        /// // sent to udp://234.4.5.6:8095/.
+        /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8095/");
+        /// </code>
+        /// </example>
+        /// <example>
+        /// Sending mulitcast and broadcast messages from the duplex input channel.
+        /// <code>
+        /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
+        /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup the factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false,
+        ///     
+        ///     // Setup the factory to create chennels which are allowed to send broadcast messages.
+        ///     AllowSendingBroadcasts = true
+        /// }
+        /// 
+        /// // Create duplex input channel which is listening to udp://127.0.0.1:8095/.
+        /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8095/");
+        /// 
+        /// // Subscribe to handle messages.
+        /// anIputChannel.MessageReceived += OnMessageReceived;
+        /// 
+        /// // Start listening.
+        /// anIputChannel.StartListening();
+        /// 
+        /// ...
+        /// 
+        /// // Send a multicast message.
+        /// // Note: it will be received by all output and input channels which have joined the multicast group 234.4.5.6
+        /// // and are listening to the port 8095.
+        /// anInputChannel.SendResponseMessage("udp://234.4.5.6:8095/", "Hello");
+        /// 
+        /// ...
+        /// 
+        /// // Send a broadcast message.
+        /// // Note: it will be received by all output and input channels within the sub-network which are listening to the port 8095.
+        /// anInputChannel.SendResponseMessage("udp://255.255.255.255:8095/", "Hello");
+        /// 
+        /// ...
+        /// 
+        /// // Stop listening.
+        /// anInputChannel.StopListening();
         /// </code>
         /// </example>
         /// </remarks>
