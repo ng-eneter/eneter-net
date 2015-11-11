@@ -500,7 +500,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 #if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
         
         /// <summary>
-        /// Helper method returning IP addresses assigned to the device.
+        /// Returns IP addresses assigned to the device which can be used for listening.
         /// </summary>
         /// <returns>array of available addresses</returns>
         public static string[] GetAvailableIpAddresses()
@@ -516,9 +516,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// <summary>
         /// Checks if the port is available for UDP listening.
         /// </summary>
-        /// <remarks>
-        /// The method checks if the IP address and the port is available for UDP listenig.
-        /// </remarks>
         /// <param name="ipAddressAndPort">IP address and port.</param>
         /// <example>
         /// Check if the application can start listening on the IP address 127.0.0.1 and the port 8099.
@@ -565,13 +562,14 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </summary>
         /// <remarks>
         /// If true the factory will create channels for unicast communication. 
-        /// The unicast is the communication between one sender and one receiver. It means the output channel
-        /// can send messages only to the input channel which listens to the specified IP address and port and then receive response messages
-        /// only from this input channel.<br/>
-        /// If false the factory will create channels for multicast or broadcast communication.
-        /// The multicast is the communication between one sender and multiple receivers and the broadcast 
-        /// is the communication between one sender and all receivers within the subnet.<br/>
-        /// The default value is true.
+        /// The unicast is the communication between one sender and one receiver. It means if a sender sends a message it is
+        /// routed to one particular receiver. The client-service communication is an example of the unicast communication.
+        /// When the client sends a request message it is delivered to one service. Then when the service sends a response message
+        /// it is delivered to one client.<br/>
+        /// If false the factory will create channels for multicast or broadcast communication which is the communication between
+        /// one sender and several receivers. It means when a sender sends a mulitcast or a broadcast message the message may be
+        /// delivered to multiple receivers. E.g. in case of video streaming the sender does not send data packets individually to
+        /// each receiver but it sends it just ones and routers mulitply it and deliver it to all receivers.
         /// </remarks>
         public bool UnicastCommunication { get; set; }
 
@@ -592,32 +590,26 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </summary>
         /// <remarks>
         /// Multicast group (multicast address) is a an IP address which is from the range 224.0.0.0 - 239.255.255.255.
-        /// (The range from 224.0.0.0 to 224.0.0.255 is reserved for low-level routing protocols.)
-        /// Multicast group set in MulticastGroupToReceive will be effective only if UnicastCommunication is set to false.
+        /// (The range from 224.0.0.0 to 224.0.0.255 is reserved for low-level routing protocols and you should not use it in your applications.)
+        /// Rceiving messages from the mulitcast group means the communication is not unicast but mulitcast.
+        /// Therefore to use this property UnicastCommunication must be set to false.
         /// <example>
-        /// Creating input and output channels which can receive multicast messages.
+        /// Creating input channel which can receive multicast messages.
         /// <code>
         /// // Create UDP messaging factory using simple protocol formatter.
         /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
-        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter);
+        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup messaging factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false,
         /// 
-        /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
-        /// aMessaging.UnicastCommunication = false;
-        /// 
-        /// // Set the multicast group from which will be "subscribed" for receiving messages.
-        /// aMessaging.MulticastGroupToReceive = "234.5.6.7";
+        ///     // Set the multicast group which shall be joined for receiving messages.
+        ///     aMessaging.MulticastGroupToReceive = "234.5.6.7"
+        /// };
         /// 
         /// // Create input channel which will listen to udp://192.168.30.1:8043/ and which will also
         /// // receive messages from the multicast group udp://234.5.6.7:8043/.
         /// IInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://192.168.30.1:8043/");
-        /// 
-        /// // Create output channel which can send messages to udp://192.168.30.1:8043/ and
-        /// // which can receive multicast messages from the multicast address 234.5.6.7 and random free port.
-        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://192.168.30.1:8043/");
-        /// 
-        /// // Create output channel which can send messages to udp://192.168.30.1:8043/ and
-        /// which can receive multicast messages from the multicast address udp://234.5.6.7:7075/.
-        /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://192.168.30.1:8043/", "udp://0.0.0.0:7075/");
         /// </code>
         /// </example>
         /// <example>
@@ -625,10 +617,11 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// <code>
         /// // Create UDP messaging factory using simple protocol formatter.
         /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
-        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter);
-        /// 
-        /// // Setup messaging factory to create channels for mulitcast or broadcast communication.
-        /// aMessaging.UnicastCommunication = false;
+        /// UdpMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
+        /// {
+        ///     // Setup messaging factory to create channels for mulitcast or broadcast communication.
+        ///     UnicastCommunication = false
+        /// };
         /// 
         /// // Create output channel which can send messages to the multicast address udp://234.5.6.7:8043/.
         /// IOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("udp://234.5.6.7:8043/");
@@ -644,7 +637,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </summary>
         /// <remarks>
         /// Broadcast is a message which is routed to all devices within the sub-network.
-        /// To be able to send broadcasts also UnicastCommunication must be set to false.
+        /// To be able to send broadcasts UnicastCommunication must be set to false.
         /// <example>
         /// Output channel which can send broadcast messages to all input channels within the sub-network
         /// which listen to the port 8055.
@@ -706,7 +699,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
 #if !COMPACT_FRAMEWORK
         /// <summary>
-        /// Enables /disables receiving multicast messages by the same application which sent them.
+        /// Enables /disables receiving multicast messages from the same IP address from which they were sent.
         /// </summary>
         /// <remarks>
         /// <example>
@@ -787,7 +780,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// Sets or gets the flag indicating whether the socket can be bound to the address which is already used.
         /// </summary>
         /// <remarks>
-        /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
+        /// If the value is true then the input channel or output channel can start listening to the IP address and port which is already in use by other channel.
         /// </remarks>
         public bool ReuseAddress { get; set; }
 
