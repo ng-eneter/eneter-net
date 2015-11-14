@@ -314,7 +314,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-#if !MONO && !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Returns IP addresses assigned to the device.
         /// </summary>
@@ -385,6 +385,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 Uri aUri = new Uri(ipAddressAndPort, UriKind.Absolute);
                 IPAddress anIpAddress = IPAddress.Parse(aUri.Host);
+
                 if (!anIpAddress.Equals(IPAddress.Any))
                 {
                     string[] anAvailableIpAddresses = GetAvailableIpAddresses();

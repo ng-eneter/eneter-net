@@ -497,7 +497,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-#if !MONO && !NET35 && (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
+#if (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
         
         /// <summary>
         /// Returns IP addresses assigned to the device which can be used for listening.
@@ -512,7 +512,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 #endif
 
-#if !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
         /// Checks if the port is available for UDP listening.
         /// </summary>
@@ -530,6 +530,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 Uri aUri = new Uri(ipAddressAndPort, UriKind.Absolute);
                 IPAddress anIpAddress = IPAddress.Parse(aUri.Host);
+
                 if (!anIpAddress.Equals(IPAddress.Any))
                 {
                     string[] anAvailableIpAddresses = GetAvailableIpAddresses();
@@ -538,6 +539,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         throw new InvalidOperationException("The IP address '" + aUri.Host + "' is not assigned to this device.");
                     }
                 }
+
                 IPEndPoint anEndPointToVerify = new IPEndPoint(anIpAddress, aUri.Port);
 
                 IPGlobalProperties anIpGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();

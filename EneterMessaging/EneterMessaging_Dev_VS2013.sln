@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EneterMessagingFrameworkPho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingUnitTests", "MessagingUnitTests\MessagingUnitTests.csproj", "{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EneterMessagingFrameworkMono264", "EneterMessagingFramework\EneterMessagingFrameworkMono264.csproj", "{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,14 @@ Global
 		{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}.Release|ARM.ActiveCfg = Release|Any CPU
 		{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}.Release|x86.ActiveCfg = Release|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Release|ARM.ActiveCfg = Release|Any CPU
+		{48CA0CDF-C9BA-483F-85FA-2A89F02B97FC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
