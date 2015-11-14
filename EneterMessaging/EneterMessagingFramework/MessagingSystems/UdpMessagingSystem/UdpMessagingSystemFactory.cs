@@ -752,7 +752,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </remarks>
         public int ResponseReceiverPort { get; set; }
 #else
-        private bool AllowReceivingBroadcasts { get; set; }
+        private bool AllowSendingBroadcasts { get; set; }
 
         private bool MulticastLoopback { get; set; }
 
