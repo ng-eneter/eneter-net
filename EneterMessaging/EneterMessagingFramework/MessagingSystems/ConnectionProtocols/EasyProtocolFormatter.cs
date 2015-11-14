@@ -13,15 +13,27 @@ using Eneter.Messaging.Diagnostic;
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
     /// <summary>
-    /// Simple and very fast encoding/decoding (only for TCP, WebSocket and multicast/broadcast UDP).
+    /// Simple and very fast encoding/decoding for TCP, WebSocket and multicast/broadcast UDP.
     /// </summary>
     /// <remarks>
-    /// This protocol encoding can be used only for TCP, WebSocket or multicast/broadcast UDP communication.
+    /// This protocol encoding does not encode any message for openning and closing the connection.
+    /// It encodes only data messages sent between communicating parts.<br/>
+    /// Therefore in case of unicast communication this encoding can be used only for protocols which create, maintain and close the connection.
+    /// It means it can be used with TCP and WebSocket.<br/>
+    /// <br/>
+    /// It cannot be used e.g. with Shared Memory, Named Pipes, HTTP or unicast UDP because these do not provide an underlying mechanism to open
+    /// and close the connection. Instead they expect a message to open and close the connection.<br/>
+    /// <br/>
+    /// This encoding can also be used if the communication protocol supports multicast and broadcast communication. It means
+    /// it can be used with UDP.
+    /// Mulitcasting and broadcasting do not open or close the connection but the sender just send a message which is then routed to
+    /// multiple receivers.<br/>
+    /// <br/>
     /// The simplicity of this formatting provides a high performance and easy portability to various platforms allowing so
     /// to communicate with Eneter even without Eneter.<br/>
     /// However this formatting has certain limitations:
     /// <ul>
-    /// <li>It can be used only for TCP or WebSocket based communication or UDP multicasting and broadcasting.</li>
+    /// <li>It can be used only for TCP, WebSocket or UDP multicasting and broadcasting.</li>
     /// <li>It cannot be used if the reconnect is needed. It means it cannot be used in buffered messaging.</li>
     /// </ul>
     /// <b>Encoding of open connection message:</b><br/>

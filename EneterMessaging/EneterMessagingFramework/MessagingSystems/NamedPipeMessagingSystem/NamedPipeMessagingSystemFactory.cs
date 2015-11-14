@@ -18,10 +18,10 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
     /// <summary>
-    /// Implementats the messaging system delivering messages via named pipes.
+    /// Messaging system delivering messages via named pipes.
     /// </summary>
     /// <remarks>
-    /// It creates the communication channels for sending and receiving messages with using Named Pipes.
+    /// It creates the communication channels for sending and receiving messages using Named Pipes.
     /// The channel id must be a valid URI address. E.g.: net.pipe//127.0.0.1/SomeName/ . <br/>
     /// Notice, Silverlight and Windows Phone 7 do not support Named Pipes.
     /// Therefore, this functionality is not available for these platforms.
@@ -191,19 +191,10 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using Named Pipe.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using Named Pipes.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id represents the name of the pipe and must be a valid Uri address e.g. net.pipe//127.0.0.1/SomeName/ </param>
-        /// <returns></returns>
+        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. net.pipe://127.0.0.1/SomeName/ </param>
+        /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
             using (EneterTrace.Entering())
@@ -220,7 +211,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using Named Pipe.
+        ///  Creates duplex output channel which can send and receive messages from the duplex input channel using Named Pipes.
         /// </summary>
         /// <remarks>
         /// The duplex output channel is intended for the bidirectional communication.
@@ -232,9 +223,9 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         /// <br/><br/>
         /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
         /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id represents the name of the pipe and must be a valid Uri address e.g. net.pipe//127.0.0.1/SomeName/ </param>
-        /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel. The id cannot be an Uri address. It must be a plain srting.</param>
-        /// <returns></returns>
+        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. net.pipe://127.0.0.1/SomeName/ </param>
+        /// <param name="responseReceiverId">Unique identifier of the output channel. If null then the id is generated automatically.</param>
+        /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
@@ -245,15 +236,9 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages by using Named Pipe.
+        /// Creates the duplex input channel which can receive and send messages to the duplex output channel using Named Pipe.
         /// </summary>
-        /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
-        /// </remarks>
-        /// <param name="channelId">Identifies this duplex input channel. The channel id represents the name of the pipe and must be a valid Uri address e.g. net.pipe//127.0.0.1/SomeName/ </param>
+        /// <param name="channelId">Named pipe address which shall be used for the listening. E.g. net.pipe//127.0.0.1/SomeName/ </param>
         /// <returns></returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {

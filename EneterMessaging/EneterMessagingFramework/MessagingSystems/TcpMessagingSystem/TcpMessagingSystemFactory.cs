@@ -216,7 +216,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Creates duplex output channel which can send and receive messages from the duplex input channel using UDP.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using TCP.
         /// </summary>
         /// <remarks>
         /// <example>
@@ -245,7 +245,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Creates duplex output channel which can send and receive messages from the duplex input channel using UDP.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using TCP.
         /// </summary>
         /// <remarks>
         /// <example>
@@ -275,7 +275,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex input channel which can receive and send messages to the duplex output channel using UDP.
+        /// Creates the duplex input channel which can receive and send messages to the duplex output channel using TCP.
         /// </summary>
         /// <remarks>
         /// The method is not supported in Silverlight and Windows Phone.

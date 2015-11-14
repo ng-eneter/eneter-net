@@ -18,7 +18,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages via the shared memory.
+    /// Messaging system delivering messages via the shared memory.
     /// </summary>
     /// <remarks>
     /// It creates communication channels for sending and receiving messages via shared memory.<br/>
@@ -289,20 +289,10 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages
-        /// via shared memory.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using shared memory.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel.
-        /// The id is the name of the memory-mapped file that
+        /// <param name="channelId">Identifies the input channel which shall be connected.
+        /// The channel id is the name of the memory-mapped file that
         /// is used to send and receive messages.
         /// </param>
         /// <returns>duplex output channel</returns>
@@ -318,25 +308,17 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages
-        /// via shared memory.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using shared memory.
         /// </summary>
-        /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method allows to specified a desired response receiver id. Please notice, the response receiver
-        /// id is supposed to be unique.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
-        /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel.
-        /// The id is the name of the memory-mapped file that
+        /// <param name="channelId">Identifies the input channel which shall be connected.
+        /// The channel id is the name of the memory-mapped file that
         /// is used to send and receive messages.
         /// </param>
-        /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
-        /// <returns></returns>
+        /// <param name="responseReceiverId">Identifies the input channel which shall be connected.
+        /// The channel id is the name of the memory-mapped file that
+        /// is used to send and receive messages.
+        /// </param>
+        /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
@@ -349,17 +331,10 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages
-        /// via the shared memory.
+        ///  Creates the duplex input channel which can receive and send messages to the duplex output channel using shared memory.
         /// </summary>
-        /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
-        /// </remarks>
-        /// <param name="channelId">Identifier of the listening input channel. The id is the name of the memory-mapped file that
-        /// will be used to send and receive messages.
+        /// <param name="channelId">Address which shell be used for listening.
+        /// It is the name of the memory-mapped file that will be used to send and receive messages.
         /// </param>
         /// <returns>duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
