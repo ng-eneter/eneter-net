@@ -11,7 +11,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Duplex output channel that can send messages to the duplex input channel and receive response messages.
+    /// Duplex output channel which can send messages to the duplex input channel and receive response messages.
     /// </summary>
     public interface IDuplexOutputChannel
     {
@@ -31,8 +31,7 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         event EventHandler<DuplexChannelMessageEventArgs> ResponseMessageReceived;
 
         /// <summary>
-        /// Returns the id of the duplex input channel where messages are sent.
-        /// It represents the address where messages are sent.
+        /// Returns the address of the duplex input channel which shall be connected by this duplex output channel.
         /// </summary>
         /// <remarks>
         /// The channel id represents the communication address. The syntax of the channel id depends on the chosen
@@ -43,12 +42,8 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         string ChannelId { get; }
 
         /// <summary>
-        /// Returns response receiving id of the duplex output channel.
+        /// Returns response unique id of this duplex output channel.
         /// </summary>
-        /// <remarks>
-        /// The response receiver id is a unique identifier used by the duplex input channel to recognize
-        /// connected duplex output channels.
-        /// </remarks>
         string ResponseReceiverId { get; }
 
         /// <summary>

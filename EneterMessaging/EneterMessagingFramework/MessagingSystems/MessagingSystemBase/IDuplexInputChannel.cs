@@ -11,7 +11,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Duplex input channel that can receive messages from the duplex output channel and send response messages.
+    /// Duplex input channel which can receive messages from the duplex output channel and send response messages.
     /// </summary>
     public interface IDuplexInputChannel
     {
@@ -31,11 +31,8 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         event EventHandler<DuplexChannelMessageEventArgs> MessageReceived;
 
         /// <summary>
-        /// Returns id of this duplex input channel.
+        /// Returns address of this duplex input channel.
         /// </summary>
-        /// <remarks>
-        /// The id represents the 'address' the duplex input channel is listening to.
-        /// </remarks>
         string ChannelId { get; }
 
         /// <summary>
@@ -54,16 +51,24 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         bool IsListening { get; }
 
         /// <summary>
-        /// Sends the response message back to the connected IDuplexOutputChannel.
+        /// Sends a message back to a connected output channel.
         /// </summary>
-        /// <param name="responseReceiverId">Identifies the response receiver. The identifier comes with received messages.</param>
+        /// <param name="responseReceiverId">Identifies the connected output channel to which the message shall be sent.
+        /// If the value is * then the input channel sends the message to all connected output channels.
+        /// <example>
+        /// Sends message to all connected output channels.
+        /// <code>
+        /// anInputChannel.SendResponseMessage("*", "Hello");
+        /// </code>
+        /// </example>
+        /// </param>
         /// <param name="message">response message</param>
         void SendResponseMessage(string responseReceiverId, object message);
 
         /// <summary>
         /// Disconnects the response receiver.
         /// </summary>
-        /// <param name="responseReceiverId">identifies the response receiver</param>
+        /// <param name="responseReceiverId">Identifies outout channel which shall be disconnected.</param>
         void DisconnectResponseReceiver(string responseReceiverId);
 
         /// <summary>
