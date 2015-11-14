@@ -216,17 +216,10 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 #endif
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using HTTP.
-        /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using HTTP.
         /// </summary>
         /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
+        /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
         /// </remarks>
         /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid address of the receiver. e.g. 127.0.0.1:8090</param>
         /// <returns>duplex output channel</returns>
@@ -242,21 +235,13 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using HTTP.
-        /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using HTTP.
         /// </summary>
         /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method allows to specified a desired response receiver id. Please notice, the response receiver
-        /// id is supposed to be unique.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
+        /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
         /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid address of the receiver. e.g. 127.0.0.1:8090</param>
-        /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
+        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. http://127.0.0.1:8090/</param>
+        /// <param name="responseReceiverId">Unique identifier of the output channel. If null then the id is generated automatically.</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
@@ -271,15 +256,11 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages by using HTTP.
-        /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
-        /// The method is not supported in Silverlight and Windows Phone 7.
+        /// Creates the duplex input channel which can receive and send messages to the duplex output channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
+        /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
+        /// The method is not supported in Silverlight and Windows Phone 7.
         /// </remarks>
         /// <param name="channelId">channel id specifying the address the duplex input channel listens to.</param>
         /// <returns>duplex input channel</returns>
