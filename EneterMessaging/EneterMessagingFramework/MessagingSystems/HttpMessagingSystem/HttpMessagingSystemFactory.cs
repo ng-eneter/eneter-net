@@ -18,7 +18,7 @@ using System;
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
     /// <summary>
-    /// Implements the messaging system delivering messages via HTTP.
+    /// Messaging system delivering messages via HTTP.
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using HTTP for sending and receiving messages.
