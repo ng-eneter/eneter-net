@@ -32,7 +32,7 @@ using Windows.Networking;
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     /// <summary>
-    /// Creates output and input channels which use TCP.
+    /// Messaging system delivering messages via TCP.
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using TCP for sending and receiving messages.
