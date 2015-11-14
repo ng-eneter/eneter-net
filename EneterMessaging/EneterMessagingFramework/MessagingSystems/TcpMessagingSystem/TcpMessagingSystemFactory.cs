@@ -44,6 +44,44 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     /// Windows Phone 7.0 does not suport TCP at all. The TCP is supported from Windows Phone 7.1. TCP in Windows Phone 7.1
     /// does not require TcpPolicyServer and is not restricted to certain ports as in Silverlight.<br/>
     /// Windows Phone 8.0 and 8.1 supports also TCP listening and it does not requires the TCP policy server.
+    /// <example>
+    /// Creating output and input channel for TCP messaging.
+    /// <code>
+    /// IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
+    /// 
+    /// // Create duplex input channel which can receive messages on the address 127.0.0.1 and the port 9043
+    /// // and which can send response messages to connected output channels.
+    /// IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("tcp://127.0.0.1:9043/");
+    /// 
+    /// // Subscribe to handle messages.
+    /// anInputChannel.MessageReceived += OnMessageReceived;
+    /// 
+    /// // Start listening and be able to receive messages.
+    /// anInputChannel.StartListening();
+    /// 
+    /// ...
+    /// 
+    /// // Stop listening.
+    /// anInputChannel.StopListeing();
+    /// </code>
+    /// 
+    /// <code>
+    /// // Create duplex output channel which can send messages to 127.0.0.1 on the port 9043 and
+    /// // receive response messages.
+    /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:9043/");
+    /// 
+    /// // Subscribe to handle messages.
+    /// anOutputChannel.ResponseMessageReceived += OnMessageReceived;
+    /// 
+    /// // Open connection to the input channel which listens to tcp://127.0.0.1:9043/.
+    /// anOutputChannel.OpenConnection();
+    /// 
+    /// ...
+    /// 
+    /// // Close connection.
+    /// anOutputChannel.CloseConnection();
+    /// </code>
+    /// </example>
     /// </remarks>
     public class TcpMessagingSystemFactory : IMessagingSystemFactory
     {
@@ -178,16 +216,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using TCP.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method generates the unique response receiver id automatically.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
         /// <example>
         /// Creating the duplex output channel.
         /// <code>
@@ -196,7 +227,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </code>
         /// </example>
         /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. tcp://127.0.0.1:8090/ </param>
+        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. tcp://127.0.0.1:8090/ </param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
@@ -214,17 +245,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using TCP.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex output channel is intended for the bidirectional communication.
-        /// Therefore, it can send messages to the duplex input channel and receive response messages.
-        /// <br/><br/>
-        /// The duplex input channel distinguishes duplex output channels according to the response receiver id.
-        /// This method allows to specified a desired response receiver id. Please notice, the response receiver
-        /// id is supposed to be unique.
-        /// <br/><br/>
-        /// The duplex output channel can communicate only with the duplex input channel and not with the input channel.
         /// <example>
         /// Creating the duplex output channel with specified client id.
         /// <code>
@@ -233,8 +256,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </code>
         /// </example>
         /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. tcp://127.0.0.1:8090/ </param>
-        /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
+        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. tcp://127.0.0.1:8090/ </param>
+        /// <param name="responseReceiverId">Unique identifier of the output channel. If null then the id is generated automatically.</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
@@ -252,14 +275,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages by using TCP.
-        /// The method is not supported in Silverlight and Windows Phone.
+        /// Creates the duplex input channel which can receive and send messages to the duplex output channel using UDP.
         /// </summary>
         /// <remarks>
-        /// The duplex input channel is intended for the bidirectional communication.
-        /// It can receive messages from the duplex output channel and send back response messages.
-        /// <br/><br/>
-        /// The duplex input channel can communicate only with the duplex output channel and not with the output channel.
+        /// The method is not supported in Silverlight and Windows Phone.
         /// <example>
         /// Creating duplex input channel.
         /// <code>
@@ -268,7 +287,11 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </code>
         /// </example>
         /// </remarks>
-        /// <param name="channelId">Identifies this duplex input channel. The channel id must be a valid URI address (e.g. tcp://127.0.0.1:8090/) the input channel will listen to.</param>
+        /// <param name="channelId">The IP address and port which shall be used for listening.
+        /// The channel id must be a valid URI address (e.g. tcp://127.0.0.1:8090/).<br/>
+        /// If the IP address is 0.0.0.0 then it will listen to all available IP addresses.
+        /// E.g. if the address is tcp://0.0.0.0:8033/ then it will listen to all available IP addresses on the port 8033.
+        /// </param>
         /// <returns>duplex input channel</returns>
         public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
@@ -293,7 +316,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 #if !MONO && !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
-        /// Helper method returning IP addresses assigned to the device.
+        /// Returns IP addresses assigned to the device.
         /// </summary>
         /// <remarks>
         /// The returned IP addresses can be used for the listening. E.g. duplex input channel can use it to start listening.
@@ -352,7 +375,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// <example>
         /// Check if the application can start listening on the IP address 127.0.0.1 and the port 8099.
         /// <code>
-        /// bool isPortAvailable = TcpMessagingSystemFactory.IsPortAvailableForTcpListening("127.0.0.1:8099");
+        /// bool isPortAvailable = TcpMessagingSystemFactory.IsPortAvailableForTcpListening("tcp://127.0.0.1:8099/");
         /// </code>
         /// </example>
         /// <returns>true if the port is available</returns>
@@ -496,7 +519,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Sets or gets the flag indicating whether the socket can be bound to the address which is already used.
         /// </summary>
         /// <remarks>
-        /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
+        /// If the value is true then the input channels or output channels can start listening to the IP address and port which is already used by other channel.
         /// </remarks>
         public bool ReuseAddress { get; set; }
 #else
