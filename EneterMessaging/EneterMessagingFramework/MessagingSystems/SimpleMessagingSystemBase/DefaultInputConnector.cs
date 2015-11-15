@@ -203,6 +203,11 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
         {
             using (EneterTrace.Entering())
             {
+                using (ThreadLock.Lock(myConnectedClients))
+                {
+                    myConnectedClients.Remove(outputConnectorAddress);
+                }
+
                 try
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
