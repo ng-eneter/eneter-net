@@ -20,7 +20,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
             //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
-            IMessagingSystemFactory aMessagingSystem = new NamedPipeMessagingSystemFactory(1, 10000);
+            IMessagingSystemFactory aMessagingSystem = new NamedPipeMessagingSystemFactory(2, 10000);
 
             // Generate random number for the port.
             string aChannelId = "pipe.net://127.0.0.1/Service1";
@@ -28,6 +28,16 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
             ISerializer aSerializer = new BinarySerializer();
 
             Setup(aMessagingSystem, aChannelId, aSerializer);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (EneterTrace.TraceLog != null)
+            {
+                EneterTrace.TraceLog.Dispose();
+                EneterTrace.TraceLog = null;
+            }
         }
     }
 }

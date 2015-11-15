@@ -38,7 +38,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                     // Send the response
                     Responser.SendResponseMessage(y.ResponseReceiverId, 1000);
                 };
-            Responser.AttachDuplexInputChannel(DuplexInputChannel);
+            
 
             int aReceivedResponse = 0;
             Requester.ResponseReceived += (x, y) =>
@@ -48,10 +48,13 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                     // Signal that the response message was received -> the loop is closed.
                     aMessageReceivedEvent.Set();
                 };
-            Requester.AttachDuplexOutputChannel(DuplexOutputChannel);
+            
 
             try
             {
+                Responser.AttachDuplexInputChannel(DuplexInputChannel);
+                Requester.AttachDuplexOutputChannel(DuplexOutputChannel);
+
                 Requester.SendRequestMessage(2000);
 
                 // Wait for the signal that the message is received.
@@ -95,7 +98,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                 // Send the response
                 aReceiver.SendResponseMessage(y.ResponseReceiverId, 1000);
             };
-            aReceiver.AttachDuplexInputChannel(DuplexInputChannel);
 
             AutoResetEvent aSender1MessageReceivedEvent = new AutoResetEvent(false);
             int aSender1ReceivedResponse = 0;
@@ -106,7 +108,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                 // Signal that the response message was received -> the loop is closed.
                 aSender1MessageReceivedEvent.Set();
             };
-            aSender1.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+            
 
             AutoResetEvent aSender2MessageReceivedEvent = new AutoResetEvent(false);
             int aSender2ReceivedResponse = 0;
@@ -117,10 +119,13 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                 // Signal that the response message was received -> the loop is closed.
                 aSender2MessageReceivedEvent.Set();
             };
-            aSender2.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
 
             try
             {
+                aReceiver.AttachDuplexInputChannel(DuplexInputChannel);
+                aSender1.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+                aSender2.AttachDuplexOutputChannel(MessagingSystemFactory.CreateDuplexOutputChannel(DuplexInputChannel.ChannelId));
+
                 aSender1.SendRequestMessage(2000);
                 aSender2.SendRequestMessage(2000);
 
@@ -134,6 +139,9 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                 aSender1.DetachDuplexOutputChannel();
                 aSender2.DetachDuplexOutputChannel();
                 aReceiver.DetachDuplexInputChannel();
+
+                // Give some time to complete tracing.
+                Thread.Sleep(300);
             }
 
             // Check received values
@@ -159,7 +167,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                     // Send the response
                     Responser.SendResponseMessage(y.ResponseReceiverId, 1000);
                 };
-            Responser.AttachDuplexInputChannel(DuplexInputChannel);
+            
 
             List<int> aReceivedResponses = new List<int>();
             Requester.ResponseReceived += (x, y) =>
@@ -175,10 +183,13 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
                         }
                     }
                 };
-            Requester.AttachDuplexOutputChannel(DuplexOutputChannel);
+            
 
             try
             {
+                Responser.AttachDuplexInputChannel(DuplexInputChannel);
+                Requester.AttachDuplexOutputChannel(DuplexOutputChannel);
+
                 List<Thread> aThreads = new List<Thread>();
 
                 for (int i = 0; i < 10; ++i)
