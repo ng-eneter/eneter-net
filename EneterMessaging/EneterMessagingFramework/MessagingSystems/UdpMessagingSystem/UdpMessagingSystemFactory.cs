@@ -531,7 +531,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 Uri aUri = new Uri(ipAddressAndPort, UriKind.Absolute);
                 IPAddress anIpAddress = IPAddress.Parse(aUri.Host);
 
-                if (!anIpAddress.Equals(IPAddress.Any))
+                if (!anIpAddress.Equals(IPAddress.Any) &&
+                    !anIpAddress.Equals(IPAddress.IPv6Any) && !anIpAddress.Equals(IPAddress.IPv6Loopback))
                 {
                     string[] anAvailableIpAddresses = GetAvailableIpAddresses();
                     if (!anAvailableIpAddresses.Contains(aUri.Host))
