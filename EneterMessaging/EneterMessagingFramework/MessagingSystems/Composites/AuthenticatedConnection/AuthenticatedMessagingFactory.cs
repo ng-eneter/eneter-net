@@ -382,7 +382,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// The created authenticated output channel can throw following exceptions when opening the connection:
         /// <ul>
         /// <li>TimeOutException - if the authentication sequence exceeds the specified AuthenticationTimeout.</li>
-        /// <li>AuthenticationException - if the authentication fails and the conneciton is not granted.</li>
+        /// <li>InvalidOperationException - if the authentication fails and the conneciton is not granted.</li>
         /// <li>Other underlying messaging specific exception - if it fails to open the connection and start the authentication.</li>
         /// </ul>
         /// </remarks>
