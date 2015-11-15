@@ -19,7 +19,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
     /// method to process it.
     /// </remarks>
     /// <typeparam name="TMessage">type of the message processed by the thread</typeparam>
-    internal class WorkingThread<TMessage>
+    public class WorkingThread<TMessage>
     {
         /// <summary>
         /// Registers the handler processing messages.
