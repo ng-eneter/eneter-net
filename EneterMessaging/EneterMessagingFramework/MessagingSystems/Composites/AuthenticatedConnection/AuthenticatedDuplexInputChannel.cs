@@ -259,7 +259,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                                 aDisconnectFlag = false;
                                 aNewResponseReceiverAuthenticated = true;
 
-                                // Move the connection to authenticated connections.
+                                // Move the connection from not-yet-authenticated to authenticated connections.
                                 using (ThreadLock.Lock(myAuthenticatedConnections))
                                 {
                                     myAuthenticatedConnections.Add(e.ResponseReceiverId);
@@ -284,15 +284,14 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
                 }
                     
 
-                if (aDisconnectFlag)
-                {
-                    myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
-                }
-
                 // If the connection with the client shall be closed.
-                // Note: the disconnection runs outside the lock in order to reduce blocking.
                 if (aDisconnectFlag)
                 {
+                    using (ThreadLock.Lock(myNotYetAuthenticatedConnections))
+                    {
+                        myNotYetAuthenticatedConnections.Remove(e.ResponseReceiverId);
+                    }
+
                     try
                     {
                         myUnderlayingInputChannel.DisconnectResponseReceiver(e.ResponseReceiverId);
