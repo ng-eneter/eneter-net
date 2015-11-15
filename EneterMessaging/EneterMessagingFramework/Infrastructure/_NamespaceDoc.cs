@@ -5,15 +5,17 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
+using System;
 using System.Runtime.CompilerServices;
 
-namespace Eneter.Messaging.Diagnostic
+namespace Eneter.Messaging.Infrastructure
 {
     /// <summary>
-    /// Tracing of communication.
+    /// Attaching channels to communication components.
     /// </summary>
+    [Obsolete]
     [CompilerGeneratedAttribute()]
-    class NamespaceDoc
+    class NamespaceGroupDoc
     {
     }
 }

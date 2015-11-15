@@ -349,6 +349,13 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 #endif
 
 #if WINDOWS_PHONE80 || WINDOWS_PHONE81
+        /// <summary>
+        /// Returns IP addresses assigned to the device.
+        /// </summary>
+        /// <remarks>
+        /// The returned IP addresses can be used for the listening. E.g. duplex input channel can use it to start listening.
+        /// </remarks>
+        /// <returns>array of available addresses</returns>
         public static string[] GetAvailableIpAddresses()
         {
             using (EneterTrace.Entering())

@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages between silverlight applications.
+    /// Communication between silverlight applications.
     /// </summary>
     /// <remarks>
     /// This messaging system is applicable in the Silverlight environment only.

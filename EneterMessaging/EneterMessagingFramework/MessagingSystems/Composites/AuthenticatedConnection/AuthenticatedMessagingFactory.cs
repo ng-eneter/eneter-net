@@ -93,7 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     /// <remarks>
     /// Here is how the authentication procedure works:
     /// <ol>
-    /// <li>AuthenticatedDuplexOutputChannel calls getLoginMessage callback and sends the login message and
+    /// <li>AuthenticatedDuplexOutputChannel calls getLoginMessage callback and gets the login message. Then
     ///     sends it to AuthenticatedDuplexInputChannel.</li>
     /// <li>AuthenticatedDuplexInputChannel receives the login message and calls getHandshakeMessage callback.
     ///     The returned handshake message is sent to AuthenticatedDuplexOutputChannel.</li>

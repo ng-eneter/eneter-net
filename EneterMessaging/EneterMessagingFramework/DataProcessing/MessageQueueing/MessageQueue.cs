@@ -22,7 +22,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
     /// is put to the queue or the thread is unblocked.
     /// </remarks>
     /// <typeparam name="TMessage">Type of the message.</typeparam>
-    public class MessageQueue<TMessage>
+    internal class MessageQueue<TMessage>
     {
         /// <summary>
         /// Puts message to the queue.

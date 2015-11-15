@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages via Named Pipes.
+    /// Communication via Named Pipes.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

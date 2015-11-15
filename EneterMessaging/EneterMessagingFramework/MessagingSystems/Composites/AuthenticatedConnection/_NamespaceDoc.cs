@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
 {
     /// <summary>
-    /// Extension providing client authentication.
+    /// Extension for client authentication.
     /// </summary>
     /// <remarks>
     /// Provides extension to authenticate the connection.

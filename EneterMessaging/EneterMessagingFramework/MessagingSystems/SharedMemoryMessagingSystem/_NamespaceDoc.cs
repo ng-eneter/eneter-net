@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
 {
     /// <summary>
-    /// The messaging system transferring messages via shared memory. (Faster than Named Pipes.)
+    /// Communication via shared memory. (Faster than Named Pipes.)
     /// </summary>
     /// <remarks>
     /// It transfers messages between processes running on the same machine using shared memory.

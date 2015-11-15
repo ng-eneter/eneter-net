@@ -17,7 +17,7 @@ using Eneter.Messaging.Threading.Dispatching;
 namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 {
     /// <summary>
-    /// Factory creating duplex output channels for the communication with Android device via the USB cable.
+    /// Messaging system interacting with an Android device via the USB cable.
     /// </summary>
     /// <remarks>
     /// When Android device is connected to the computer via the USB cable the process adb (Android Debug Bridge) is started

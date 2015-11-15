@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
     /// <summary>
-    /// Extension for automatic reconnect and buffering of sent messages in case the connection is not available.
+    /// Extension for automatic reconnect and buffering of sent messages in case of a disconnection.
     /// </summary>
     /// <remarks>
     /// The buffered messaging is intended to temporarily store sent messages until the network connection is established.<br/>

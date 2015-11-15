@@ -7,13 +7,13 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Eneter.Messaging.Diagnostic
+namespace Eneter.Messaging.Nodes
 {
     /// <summary>
-    /// Tracing of communication.
+    /// Routing of messages.
     /// </summary>
     [CompilerGeneratedAttribute()]
-    class NamespaceDoc
+    class NamespaceGroupDoc
     {
     }
 }

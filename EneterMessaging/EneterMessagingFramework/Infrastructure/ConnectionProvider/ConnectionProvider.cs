@@ -8,9 +8,11 @@
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using System;
 
 namespace Eneter.Messaging.Infrastructure.ConnectionProvider
 {
+    [Obsolete]
     internal class ConnectionProvider : IConnectionProvider
     {
         public ConnectionProvider(IMessagingSystemFactory messagingSystemFactory)

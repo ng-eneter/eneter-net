@@ -56,6 +56,7 @@
     <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
     <Compile Include="DataProcessing\Serializing\CallbackSerializer.cs" />
     <Compile Include="DataProcessing\Serializing\GetSerializerCallback.cs" />
+    <Compile Include="DataProcessing\_NamespaceDoc.cs" />
     <Compile Include="Diagnostic\ThreadLock.cs" />
     <Compile Include="EndPoints\Rpc\RpcException.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessageSender.cs" />
     <Compile Include="EndPoints\TypedMessages\MultiTypedMessagesFactory.cs" />
     <Compile Include="EndPoints\TypedMessages\SyncMultiTypedMessageSender.cs" />
+    <Compile Include="Infrastructure\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbCableMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -366,6 +368,7 @@
     <Compile Include="Nodes\Broker\PublishInfoEventArgs.cs" />
     <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
     <Compile Include="System\ListExt.cs" />
+    <Compile Include="System\_NamespaceDoc.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />

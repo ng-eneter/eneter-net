@@ -7,10 +7,10 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Eneter.Messaging.Diagnostic
+namespace System
 {
     /// <summary>
-    /// Tracing of communication.
+    /// Missing functionality across various .NET platforms.
     /// </summary>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc
