@@ -219,6 +219,8 @@ namespace Eneter.MessagingUnitTests.MessagingSystems
             bool anIsConnected = false;
             aClient.DoOnConnectionClosed( (x, y) =>
                 {
+                    EneterTrace.Debug("DoOnConnectionClosed");
+
                     anIsConnected = aClient.OutputChannel.IsConnected;
 
 #if !COMPACT_FRAMEWORK

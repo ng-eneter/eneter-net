@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.ThreadMessagingSystem;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using System.Threading;
+using Eneter.Messaging.Diagnostic;
+using System.IO;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.ThreadMessagingSystem
 {
@@ -15,8 +17,23 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.ThreadMessagingSystem
         [SetUp]
         public void Setup()
         {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+
             MessagingSystemFactory = new ThreadMessagingSystemFactory();
         }
+
+        [TearDown]
+        public void TearDown()
+        {
+            EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Short;
+            if (EneterTrace.TraceLog != null)
+            {
+                EneterTrace.TraceLog.Dispose();
+                EneterTrace.TraceLog = null;
+            }
+        }
+
         /*
         [Test]
         public void SendMessage()

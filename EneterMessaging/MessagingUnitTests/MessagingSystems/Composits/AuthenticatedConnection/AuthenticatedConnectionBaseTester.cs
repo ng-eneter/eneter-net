@@ -1,14 +1,10 @@
 ﻿#if !COMPACT_FRAMEWORK
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using Eneter.Messaging.DataProcessing.Serializing;
 using System.Threading;
+using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using System.Security.Authentication;
+using NUnit.Framework;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConnection
 {
@@ -40,7 +36,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
         }
 
         [Test]
-        [ExpectedException(typeof(AuthenticationException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public virtual void ConnectionNotGranted()
         {
             IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
@@ -87,7 +83,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
                     anException = err;
                 }
 
-                Assert.IsInstanceOf<AuthenticationException>(anException);
+                Assert.IsInstanceOf<InvalidOperationException>(anException);
 
                 // Check that the AuthenticationCancelled calleback was called.
                 Assert.IsTrue(myAuthenticationCancelled);

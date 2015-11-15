@@ -97,7 +97,7 @@ namespace Eneter.MessagingUnitTests.Diagnostic
             }
             aThreads.ForEach(x => x.Start());
 
-            aThreads.ForEach(x => Assert.IsTrue(x.Join(300)));
+            aThreads.ForEach(x => Assert.IsTrue(x.Join(3000)));
         }
 
 #if !COMPACT_FRAMEWORK

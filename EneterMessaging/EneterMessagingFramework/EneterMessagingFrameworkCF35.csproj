@@ -80,6 +80,7 @@
     <Compile Include="DataProcessing\Streaming\DynamicStream.cs" />
     <Compile Include="DataProcessing\Streaming\StreamUtil.cs" />
     <Compile Include="DataProcessing\Streaming\_NamespaceDoc.cs" />
+    <Compile Include="DataProcessing\_NamespaceDoc.cs" />
     <Compile Include="Diagnostic\EneterTrace.cs" />
     <Compile Include="Diagnostic\ErrorHandler.cs" />
     <Compile Include="Diagnostic\ThreadLock.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="EndPoints\TypedMessages\TypedResponseReceivedEventArgs.cs" />
     <Compile Include="EndPoints\TypedMessages\VoidMessage.cs" />
     <Compile Include="EndPoints\TypedMessages\_NamespaceDoc.cs" />
+    <Compile Include="EndPoints\_NamespaceDoc.cs" />
     <Compile Include="Infrastructure\Attachable\AttachableDuplexInputChannelBase.cs" />
     <Compile Include="Infrastructure\Attachable\AttachableDuplexOutputChannelBase.cs" />
     <Compile Include="Infrastructure\Attachable\AttachableMultipleDuplexInputChannelsBase.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="Infrastructure\ConnectionProvider\IConnectionProvider.cs" />
     <Compile Include="Infrastructure\ConnectionProvider\IConnectionProviderFactory.cs" />
     <Compile Include="Infrastructure\ConnectionProvider\_NamespaceDoc.cs" />
+    <Compile Include="Infrastructure\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbCableMessagingFactory.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\_NamespaceDoc.cs" />
@@ -293,6 +296,7 @@
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketMessagingSystemFactory.cs" />
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\WebSocketOutputConnector.cs" />
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\_NamespaceDoc.cs" />
+    <Compile Include="MessagingSystems\_NamespaceDoc.cs" />
     <Compile Include="Nodes\BackupRouter\BackupConnectionRouter.cs" />
     <Compile Include="Nodes\BackupRouter\BackupConnectionRouterFactory.cs" />
     <Compile Include="Nodes\BackupRouter\IBackupConnectionRouter.cs" />
@@ -336,6 +340,7 @@
     <Compile Include="Nodes\Router\IDuplexRouter.cs" />
     <Compile Include="Nodes\Router\IDuplexRouterFactory.cs" />
     <Compile Include="Nodes\Router\_NamespaceDoc.cs" />
+    <Compile Include="Nodes\_NamespaceDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\HashSet.cs" />
     <Compile Include="System\LinqBridge.cs" />
@@ -343,6 +348,7 @@
     <Compile Include="System\ReadOnlyDictionary.cs" />
     <Compile Include="System\SystemAttributes.cs" />
     <Compile Include="System\WaitHandleExt.cs" />
+    <Compile Include="System\_NamespaceDoc.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcherProvider.cs" />
@@ -352,6 +358,8 @@
     <Compile Include="Threading\Dispatching\WindowsDispatching.cs" />
     <Compile Include="Threading\Dispatching\WinFormsDispatching.cs" />
     <Compile Include="Threading\Dispatching\_NamespaceDoc.cs" />
+    <Compile Include="Threading\_NamespaceDoc.cs" />
+    <Compile Include="_NamespaceDoc.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataProcessing" />

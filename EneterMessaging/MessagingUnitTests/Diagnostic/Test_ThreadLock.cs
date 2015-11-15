@@ -73,21 +73,5 @@ namespace Eneter.MessagingUnitTests.Diagnostic
         }
 
 
-        [Test]
-        public void HoldingLockLongTime()
-        {
-            EneterTrace.TraceLog = Console.Out;
-
-            object aLock = new object();
-            using(ThreadLock.Lock(aLock))
-            {
-                Thread.Sleep(1100);
-            }
-
-            Thread.Sleep(300);
-
-            EneterTrace.TraceLog = null;
-        }
-
     }
 }

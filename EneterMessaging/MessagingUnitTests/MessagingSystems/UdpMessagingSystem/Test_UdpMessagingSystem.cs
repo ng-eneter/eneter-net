@@ -53,18 +53,18 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         [Test]
         public void TestPortAvailability()
         {
-            IDuplexInputChannel anInputChannel1 = MessagingSystemFactory.CreateDuplexInputChannel("udp://[::1]:8044/");
-            IDuplexInputChannel anInputChannel2 = MessagingSystemFactory.CreateDuplexInputChannel("udp://127.0.0.1:8044/");
+            IDuplexInputChannel anInputChannel1 = MessagingSystemFactory.CreateDuplexInputChannel("udp://[::1]:8045/");
+            IDuplexInputChannel anInputChannel2 = MessagingSystemFactory.CreateDuplexInputChannel("udp://127.0.0.1:8045/");
 
             try
             {
                 anInputChannel1.StartListening();
                 anInputChannel2.StartListening();
 
-                bool aResult = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("tcp://[::1]:8044/");
+                bool aResult = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("tcp://[::1]:8045/");
                 Assert.IsFalse(aResult);
 
-                aResult = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("tcp://0.0.0.0:8044/");
+                aResult = UdpMessagingSystemFactory.IsPortAvailableForUdpListening("tcp://0.0.0.0:8046/");
                 Assert.IsTrue(aResult);
             }
             finally

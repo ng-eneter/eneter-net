@@ -25,11 +25,16 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.SynchronousMessagingSystem
             MessagingSystemFactory = new SynchronousMessagingSystemFactory();
         }
 
-        //[TearDown]
-        //public void Clean()
-        //{
-        //    EneterTrace.StopProfiler();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Short;
+            if (EneterTrace.TraceLog != null)
+            {
+                EneterTrace.TraceLog.Dispose();
+                EneterTrace.TraceLog = null;
+            }
+        }
     
     }
 }
