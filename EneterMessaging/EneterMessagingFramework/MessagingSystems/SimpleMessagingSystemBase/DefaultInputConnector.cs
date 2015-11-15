@@ -60,14 +60,7 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 {
                     foreach (string anOutputConnectorAddress in myConnectedClients)
                     {
-                        try
-                        {
-                            CloseConnection(anOutputConnectorAddress, false);
-                        }
-                        catch (Exception err)
-                        {
-                            EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
-                        }
+                        SendCloseConnection(anOutputConnectorAddress);
                     }
 
                     myConnectedClients.Clear();
@@ -208,6 +201,22 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                     myConnectedClients.Remove(outputConnectorAddress);
                 }
 
+                SendCloseConnection(outputConnectorAddress);
+
+                if (notifyFlag)
+                {
+                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
+
+                    NotifyMessageContext(aMessageContext);
+                }
+            }
+        }
+
+        private void SendCloseConnection(string outputConnectorAddress)
+        {
+            using (EneterTrace.Entering())
+            {
                 try
                 {
                     object anEncodedMessage = myProtocolFormatter.EncodeCloseConnectionMessage(outputConnectorAddress);
@@ -216,14 +225,6 @@ namespace Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase
                 catch (Exception err)
                 {
                     EneterTrace.Warning(TracedObject + ErrorHandler.FailedToCloseConnection, err);
-                }
-
-                if (notifyFlag)
-                {
-                    ProtocolMessage aProtocolMessage = new ProtocolMessage(EProtocolMessageType.CloseConnectionRequest, outputConnectorAddress, null);
-                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, "");
-
-                    NotifyMessageContext(aMessageContext);
                 }
             }
         }
