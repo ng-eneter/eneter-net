@@ -64,6 +64,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     /// Callback method to authenticate the connection.
     /// </summary>
     /// <remarks>
+    /// When AuthenticatedDuplexInputChannel receives the handshake response message it performs the authentication of the connection.<br/>
     /// If it returns true the connection will be established.
     /// If it returns false the connection will be closed.
     /// </remarks>
@@ -77,10 +78,11 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
     public delegate bool Authenticate(string channelId, string responseReceiverId, object loginMessage, object handshakeMessage, object handshakeResponseMessage);
 
     /// <summary>
-    /// Callback method to handle when the authentication is cancelled.
+    /// Callback method to handle when the output channel closes the connection during the authentication sequence.
     /// </summary>
     /// <remarks>
-    /// The callback method is used on the service side when the authentication sequence with the client is canceled.
+    /// The callback method is called by AuthenticatedDuplexInputChannel when the AuthenticatedDuplexOutputChannel closes the connection during the authentication sequence.
+    /// It allows the user code to detect a canceled authentication and clean resources.
     /// </remarks>
     /// <param name="channelId">service address</param>
     /// <param name="responseReceiverId">unique id representing the connection with the client</param>
@@ -329,7 +331,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.AuthenticatedConnection
         /// <param name="authenticateCallback">callback called by the input channe to perform the authentication.</param>
         /// <param name="handleAuthenticationCancelledCallback">callback called by the input channel to indicate the output channel closed the connection during the authentication procedure.
         /// Can be null if your authentication code does not need to handle it.
-        /// (E.g. if the authentication logic needs to clean if the authentication fails.)</param>
+        /// </param>
         public AuthenticatedMessagingFactory(IMessagingSystemFactory underlyingMessagingSystem,
             GetHanshakeMessage getHandshakeMessageCallback,
             Authenticate authenticateCallback,
