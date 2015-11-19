@@ -191,16 +191,23 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
     public class AndroidUsbCableMessagingFactory : IMessagingSystemFactory
     {
         /// <summary>
-        /// Constructs the Android messaging via the USB cable. It expects the adb service listens on default port 5037.
+        /// Constructs the messaging which communicates with Android via the USB cable.
         /// </summary>
+        /// <remarks>
+        /// It expects the adb service is running and listening on default port 5037.
+        /// The adb service typically starts automatically when you connect the Android device via the USB cable. 
+        /// </remarks>
         public AndroidUsbCableMessagingFactory()
             : this(5037, new EneterProtocolFormatter())
         {
         }
 
         /// <summary>
-        /// Constructs the Android messaging via the USB cable with specified parameters.
+        /// Constructs the messaging which communicates with Android via the USB cable.
         /// </summary>
+        /// <remarks>
+        /// The adb service typically starts automatically when you connect the Android device via the USB cable. 
+        /// </remarks>
         /// <param name="adbHostPort">Port where adb service is listening to commands. Default value is 5037.</param>
         /// <param name="protocolFormatter">Low level formatting used for encoding messages between channels.
         /// EneterProtocolFormatter() can be used by default.
@@ -215,7 +222,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages via the USB cable to the duplex input channel on Android device.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using Android USB cable.
         /// </summary>
         /// <remarks>
         /// <example>
@@ -224,7 +231,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         /// // Create messaging using Android USB cable.
         /// IMessagingSystemFactory aMessaging = new AndroidUsbCableMessagingFactory();
         /// 
-        /// // Create duplex output channel that will comunicate via the port 7634.
+        /// // Create duplex output channel that will communicate via the port 7634.
         /// IDuplexOutputChannel anOutputChannel = aMessaging.CreateDuplexOutputChannel("7634");
         /// 
         /// // Create message sender that will send messages.
@@ -285,7 +292,7 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
 
         /// <summary>
-        /// Creates the duplex output channel sending messages via the USB cable to the duplex input channel on Android device.
+        /// Creates duplex output channel which can send and receive messages from the duplex input channel using Android USB cable.
         /// </summary>
         /// <param name="channelId">Port number where the Android application is listening.</param>
         /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
@@ -340,8 +347,11 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
 
         /// <summary>
-        /// Sets or gets timeout to send a message. Default is 0 what it infinite time.
+        /// Sets or gets timeout to send a message.
         /// </summary>
+        /// <remarks>
+        /// Default is 0 which means infinite time.
+        /// </remarks>
         public TimeSpan SendTimeout
         {
             get
@@ -355,8 +365,11 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
 
         /// <summary>
-        /// Sets or gets timeout to receive a message. If not received within the time the connection is closed. Default is 0 what it infinite time.
+        /// Sets or gets timeout to receive a message.
         /// </summary>
+        /// <remarks>
+        /// If not received within the time the connection is closed. Default is 0 what it infinite time.
+        /// </remarks>
         public TimeSpan ReceiveTimeout
         {
             get
@@ -371,8 +384,11 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
 
 
         /// <summary>
-        /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.
+        /// Sets ot gets timeout to open the connection.
         /// </summary>
+        /// <remarks>
+        /// Default is 30000 miliseconds. Value 0 means infinite time.
+        /// </remarks>
         public TimeSpan ConnectTimeout
         {
             get
@@ -386,11 +402,10 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
 
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
-        /// desired threading strategy.
+        /// Sets or gets threading mode for output channels.
         /// </summary>
         /// <remarks>
-        /// Default setting is that received response messages are routed via one working thread.
+        /// Default setting is that received response messages are routed into one working thread.
         /// </remarks>
         public IThreadDispatcherProvider OutputChannelThreading
         {
