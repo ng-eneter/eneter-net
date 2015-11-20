@@ -16,22 +16,25 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
     public interface IDuplexOutputChannel
     {
         /// <summary>
-        /// The event is invoked when the connection with the duplex input channel was opened.
+        /// The event is raised when the connection with the duplex input channel was opened.
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
 
         /// <summary>
-        /// The event is invoked when the connection with the duplex input channel was closed.
+        /// The event is raised when the connection was closed from the input channel or the it was closed due to a broken connection.
         /// </summary>
+        /// <remarks>
+        /// The event is not raised if the connection was closed by the output channel by calling CloseConnection().
+        /// </remarks>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
         /// <summary>
-        /// The event is invoked when a response message was received.
+        /// The event is raised when a response message was received.
         /// </summary>
         event EventHandler<DuplexChannelMessageEventArgs> ResponseMessageReceived;
 
         /// <summary>
-        /// Returns the address of the duplex input channel which shall be connected by this duplex output channel.
+        /// Returns the address of the input channel.
         /// </summary>
         /// <remarks>
         /// The channel id represents the communication address. The syntax of the channel id depends on the chosen
@@ -42,18 +45,19 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         string ChannelId { get; }
 
         /// <summary>
-        /// Returns response unique id of this duplex output channel.
+        /// Returns the unique identifier of this output channel.
         /// </summary>
         string ResponseReceiverId { get; }
 
         /// <summary>
-        /// Sends the message to the duplex input channel.
+        /// Sends the message to the input channel.
         /// </summary>
         /// <remarks>
         /// Notice, there is a limitation for the Silverlight platform using HTTP.
         /// If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown.
         /// Therefore, it is recommended to execute this method in a different thread.
         /// </remarks>
+        /// <param name="message">message to be sent. It can be String or byte[] or some other type depending on used protocol formatter.</param>
         /// <exception cref="InvalidOperationException">If the connection is not open.</exception>
         /// <exception cref="Exception">Any exception thrown during sending of a message. E.g. if sending via TCP fails.</exception>
         void SendMessage(object message);

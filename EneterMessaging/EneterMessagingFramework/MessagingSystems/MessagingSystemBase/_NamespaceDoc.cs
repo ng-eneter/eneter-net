@@ -10,14 +10,14 @@ using System.Runtime.CompilerServices;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Interfaces declaring output and input channel.
+    /// Messaging system interfaces.
     /// </summary>
     /// <remarks>
-    /// The messaging system is responsible for delivering messages from a sender to a receiver through communication channels.<br/>
-    /// <br/>
-    /// The messaging system provides the duplex output channel and the duplex input channel.
-    /// The duplex output channel sends messages to the duplex input channel with the same channel id and can receive response messages.
-    /// The duplex input channel receives messages and can send back response messages.
+    /// The messaging system is responsible for transferring messages via channels.<br/>
+    /// The input channel represents the service which is identified by its address.
+    /// It can accept connections from multiple output channels and receive/send messages from/to connected output channels.<br/>
+    /// The output channel represents the client side. It can connect the input channel (by specifying the address).
+    /// Then it can send/receive messages to/from the connected input channel.
     /// </remarks>
     [CompilerGeneratedAttribute()]
     class NamespaceDoc

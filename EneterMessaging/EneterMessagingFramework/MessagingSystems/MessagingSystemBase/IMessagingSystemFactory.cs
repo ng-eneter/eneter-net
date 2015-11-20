@@ -12,7 +12,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
 {
     /// <summary>
-    /// Creates output and input channels.
+    /// Represents messaging providing output and input channels for the communication.
     /// </summary>
     /// <remarks>
     /// This factory interface is supposed to be implemented by all messaging systems.
@@ -22,14 +22,14 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
     public interface IMessagingSystemFactory
     {
         /// <summary>
-        /// Creates the duplex output channel that sends messages to the duplex input channel and receives response messages.
+        /// Creates the output channel which can sends and receive messages from the input channel.
         /// </summary>
         /// <param name="channelId">address of the input channel</param>
         /// <returns>duplex output channel</returns>
         IDuplexOutputChannel CreateDuplexOutputChannel(string channelId);
 
         /// <summary>
-        /// Creates the duplex output channel that sends messages to the duplex input channel and receives response messages.
+        /// Creates the output channel which can sends and receive messages from the input channel.
         /// </summary>
         /// <param name="channelId">address of the input channel</param>
         /// <param name="responseReceiverId">unique identifier of this duplex output channel. If the value is null then
@@ -38,7 +38,7 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId);
 
         /// <summary>
-        /// Creates the duplex input channel that receives messages from the duplex output channel and sends back response messages.
+        /// Creates the input channel which can receive and send messages to the output channel.
         /// </summary>
         /// <param name="channelId">address on which the duplex input channel shall listen</param>
         /// <returns>duplex input channel</returns>
