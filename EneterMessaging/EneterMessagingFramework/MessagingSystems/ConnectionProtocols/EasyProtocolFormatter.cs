@@ -5,10 +5,10 @@
  * Copyright © Ondrej Uzovic 2015
 */
 
-using System;
-using System.IO;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
+using System;
+using System.IO;
 
 namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
 {
@@ -16,26 +16,20 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     /// Simple and very fast encoding/decoding for TCP, WebSocket and multicast/broadcast UDP.
     /// </summary>
     /// <remarks>
-    /// This protocol encoding does not encode any message for openning and closing the connection.
-    /// It encodes only data messages sent between communicating parts.<br/>
-    /// Therefore in case of unicast communication this encoding can be used only for protocols which create, maintain and close the connection.
-    /// It means it can be used with TCP and WebSocket.<br/>
+    /// This protocol formatter is stripped to the bare minimum. It does not encode OpenConnection and CloseConnection
+    /// messages but it encodes only data messages.<br/>
+    /// Therefore it can be used only with communication protocols which have own mechanisms to open and close the
+    /// communication (TCP and WebSockets) or opening and closing the connection is not needed (multicast/broadcast UDP).<br/> 
     /// <br/>
-    /// It cannot be used e.g. with Shared Memory, Named Pipes, HTTP or unicast UDP because these do not provide an underlying mechanism to open
-    /// and close the connection. Instead they expect a message to open and close the connection.<br/>
-    /// <br/>
-    /// This encoding can also be used if the communication protocol supports multicast and broadcast communication. It means
-    /// it can be used with UDP.
-    /// Mulitcasting and broadcasting do not open or close the connection but the sender just send a message which is then routed to
-    /// multiple receivers.<br/>
-    /// <br/>
-    /// The simplicity of this formatting provides a high performance and easy portability to various platforms allowing so
-    /// to communicate with Eneter even without Eneter.<br/>
-    /// However this formatting has certain limitations:
+    /// The simplicity of this formatter provides a high performance and easy portability to various platforms allowing so
+    /// to communicate with Eneter even without having the Eneter framework.<br/>
+    /// Here is the list of limitation when using this protocol formatter:
     /// <ul>
-    /// <li>It can be used only for TCP, WebSocket or UDP multicasting and broadcasting.</li>
-    /// <li>It cannot be used if the reconnect is needed. It means it cannot be used in buffered messaging.</li>
+    /// <li>It can be used only with TCP, WebSockets or multicast/broadcast UDP.</li>
+    /// <li>It cannot be used if automatic reconnect is needed. It means it cannot be used in buffered messaging.</li>
     /// </ul>
+    /// <br/>
+    /// Here is how this formatter encodes messages between channels:
     /// <b>Encoding of open connection message:</b><br/>
     /// N.A. - the open connection message is not used. The connection is considered open when the socket is open.<br/>
     /// <br/>

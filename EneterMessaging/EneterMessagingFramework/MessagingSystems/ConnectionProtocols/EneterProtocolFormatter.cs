@@ -16,7 +16,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
     /// Default Eneter encoding/decoding.
     /// </summary>
     /// <remarks>
-    /// It is the default Eneter protocol formatter which can be used in all types of communication.<br/>
+    /// Here is how this formatter encodes messages between channels:<br/>
     /// <br/>
     /// <b>Encoding of open connection message:</b><br/>
     /// 6 bytes - header: ENETER<br/>

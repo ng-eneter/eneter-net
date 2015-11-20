@@ -22,17 +22,20 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// Encodes the open connection request message.
         /// </summary>
         /// <remarks>
-        /// The message is used by the duplex output channel to open the connection with the duplex input channel.
+        /// The message is used by the output channel to open the connection with the input channel.<br/>
+        /// If the open connection message is not used it shall return null. 
         /// </remarks>
         /// <param name="responseReceiverId">id of the client opening the connection.</param>
-        /// <returns>Open connecion message which is encoded in the type which is required by the messaging.
-        /// Typically the message is encoded in byte[] but
-        /// e.g. in Silverlight it is string.</returns>
+        /// <returns>encoded open connection message.</returns>
         object EncodeOpenConnectionMessage(string responseReceiverId);
 
         /// <summary>
         /// Encodes the open connection request message to the stream.
         /// </summary>
+        /// <remarks>
+        /// The message is used by the output channel to open the connection with the input channel.<br/>
+        /// If the open connection message is not used it shall just return without writing to the stream.
+        /// </remarks>
         /// <param name="responseReceiverId">id of the client opening the connection.</param>
         /// <param name="outputSream">output where the encoded message is written</param>
         void EncodeOpenConnectionMessage(string responseReceiverId, Stream outputSream);
@@ -41,38 +44,43 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// Encodes the close connecion request message.
         /// </summary>
         /// <remarks>
-        /// The message is used by the duplex output channel or duplex input channel to close the connection.
+        /// The message is used by the output channel to close the connection with the input channel.
+        /// It is also used by input channel when it disconnects the output channel.<br/>
+        /// If the close connection message is not used it shall return null.
         /// </remarks>
         /// <param name="responseReceiverId">id of the client that wants to disconnect or that will be disconnected</param>
-        /// <returns>Close connecion message which is encoded in the type which is required by the messaging.
-        /// Typically the message is encoded in byte[] but
-        /// e.g. in Silverlight it is string.</returns>
+        /// <return>sencoded close connection message</returns>
         object EncodeCloseConnectionMessage(string responseReceiverId);
 
         /// <summary>
         /// Encodes the close connecion request message to the stream.
         /// </summary>
+        /// <remarks>
+        /// The message is used by the output channel to close the connection with the input channel.
+        /// It is also used by input channel when it disconnects the output channel.<br/>
+        /// If the close connection message is not used it shall just return without writing to the stream.
+        /// </remarks>
         /// <param name="responseReceiverId">id of the client that wants to disconnect or that will be disconnected</param>
         /// <param name="outputSream">output where the encoded message is written</param>
         void EncodeCloseConnectionMessage(string responseReceiverId, Stream outputSream);
 
         /// <summary>
-        /// Encodes a message or a response message.
+        /// Encodes the data message.
         /// </summary>
         /// <remarks>
-        /// The message is used by output channel or duplex output channel to send messages or
-        /// by duplex input channel to send response messages.
+        /// The message is used by the output as well as input channel to send the data message.
         /// </remarks>
         /// <param name="responseReceiverId">client id. It is empty string in case of output channel.</param>
         /// <param name="message">message serialized message to be sent.</param>
-        /// <returns>Message which is encoded in the type which is required by the messaging.
-        /// Typically the message is encoded in byte[] but
-        /// e.g. in Silverlight it is string.</returns>
+        /// <return>sencoded data message</returns>
         object EncodeMessage(string responseReceiverId, object message);
 
         /// <summary>
-        /// Encodes a message or a response message to the stream.
+        /// Encodes the data message into the stream.
         /// </summary>
+        /// <remarks>
+        /// The message is used by the output as well as input channel to send the data message.
+        /// </remarks>
         /// <param name="responseReceiverId">id of the client that wants to send the message. It is empty string if the response message is sent.</param>
         /// <param name="message">serialized message to be sent.</param>
         /// <param name="outputSream">output where the encoded message is written</param>
