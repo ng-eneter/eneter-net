@@ -496,8 +496,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Sets or gets the port which shall be used for receiving response messages in output channels.
         /// </summary>
         /// <remarks>
-        /// When a client opens a connection a random free port is assigned for receiving messages.
-        /// This property allows to use a speciefied port instead of random one.
+        /// When a client connects an IP address and port a random free port is assigned for receiving messages.
+        /// This property allows to use a specific port instead of random one.<br/>
+        /// <br/>
+        /// Default value is -1 which means a random free port is chosen for receiving response messages.
         /// </remarks>
         public int ResponseReceiverPort { get; set; }
 

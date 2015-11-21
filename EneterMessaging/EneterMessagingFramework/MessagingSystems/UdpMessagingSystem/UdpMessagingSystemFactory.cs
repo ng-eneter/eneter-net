@@ -304,7 +304,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </code>
         /// </example>
         /// <example>
-        /// Creating the duplex output channel for broadcast messages.
+        /// Creating the duplex output channel for sending broadcast messages.
         /// <code>
         /// IProtocolFormatter aProtocolFormatter = new EasyProtocolFormatter();
         /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory(aProtocolFormatter)
@@ -354,7 +354,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// This method allows to specify the id of the created output channel.
         /// <example>
         /// Creating the duplex output channel for unicast communication (e.g. for client-service communication)
-        /// with a specific unique id.
+        /// with a specific output channel id.
         /// <code>
         /// IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory();
         /// string aSessionId = Guid.NewGuid().ToString();
@@ -382,7 +382,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </code>
         /// </example>
         /// </remarks>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. udp://127.0.0.1:8090/ </param>
+        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. udp://127.0.0.1:8090/</param>
         /// <param name="responseReceiverId">
         /// Unique identifier of the output channel.<br/>
         /// In unicast communication the identifier can be a string e.g. GUID which represents the session between output and input channel.<br/>
@@ -572,7 +572,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// If false the factory will create channels for multicast or broadcast communication which is the communication between
         /// one sender and several receivers. It means when a sender sends a mulitcast or a broadcast message the message may be
         /// delivered to multiple receivers. E.g. in case of video streaming the sender does not send data packets individually to
-        /// each receiver but it sends it just ones and routers mulitply it and deliver it to all receivers.
+        /// each receiver but it sends it just ones and routers multiply it and deliver it to all receivers.
         /// </remarks>
         public bool UnicastCommunication { get; set; }
 
@@ -594,7 +594,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// <remarks>
         /// Multicast group (multicast address) is a an IP address which is from the range 224.0.0.0 - 239.255.255.255.
         /// (The range from 224.0.0.0 to 224.0.0.255 is reserved for low-level routing protocols and you should not use it in your applications.)
-        /// Rceiving messages from the mulitcast group means the communication is not unicast but mulitcast.
+        /// Receiving messages from the mulitcast group means the communication is not unicast but mulitcast.
         /// Therefore to use this property UnicastCommunication must be set to false.
         /// <example>
         /// Creating input channel which can receive multicast messages.
@@ -607,7 +607,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         ///     UnicastCommunication = false,
         /// 
         ///     // Set the multicast group which shall be joined for receiving messages.
-        ///     aMessaging.MulticastGroupToReceive = "234.5.6.7"
+        ///     MulticastGroupToReceive = "234.5.6.7"
         /// };
         /// 
         /// // Create input channel which will listen to udp://192.168.30.1:8043/ and which will also
@@ -705,6 +705,10 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// Enables /disables receiving multicast messages from the same IP address from which they were sent.
         /// </summary>
         /// <remarks>
+        /// In case the sender sends a message to the same multicast group and port as itself has joined this value
+        /// specifies whether it shall also receive the message or not. It means if it shall send the message to itself.
+        /// If the value is true then yes the message will be delivered to sender too.
+        /// Default value is true.
         /// <example>
         /// Sending multicast message from the output channel and receiving it by the same output channel.
         /// <code>
@@ -748,8 +752,10 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </summary>
         /// <remarks>
         /// When a client connects an IP address and port for the unicast communication a random free port is assigned for receiving messages.
-        /// This property allows to use a specieficport instead of random one.
-        /// This property works only for the unicast communication.
+        /// This property allows to use a specific port instead of random one.
+        /// This property works only for the unicast communication.<br/>
+        /// <br/>
+        /// Default value is -1 which means a random free port is chosen for receiving response messages.
         /// </remarks>
         public int ResponseReceiverPort { get; set; }
 #else
