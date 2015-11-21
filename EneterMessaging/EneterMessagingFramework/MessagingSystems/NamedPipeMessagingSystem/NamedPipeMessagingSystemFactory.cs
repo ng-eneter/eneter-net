@@ -252,8 +252,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 
 
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex input channel according to
-        /// desired threading strategy.
+        /// Sets or gets the threading mode for input channels.
         /// </summary>
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
@@ -261,8 +260,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
         public IThreadDispatcherProvider InputChannelThreading { get; set; }
 
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
-        /// desired threading strategy.
+        /// Sets or gets the threading mode for output channels.
         /// </summary>
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.

@@ -256,7 +256,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </code>
         /// </example>
         /// </remarks>
-        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. tcp://127.0.0.1:8090/ </param>
+        /// <param name="channelId">Identifies the input channel which shall be connected. The channel id must be a valid URI address e.g. tcp://127.0.0.1:8090/</param>
         /// <param name="responseReceiverId">Unique identifier of the output channel. If null then the id is generated automatically.</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
@@ -316,11 +316,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 #if !SILVERLIGHT && !COMPACT_FRAMEWORK
         /// <summary>
-        /// Returns IP addresses assigned to the device.
+        /// Returns IP addresses assigned to the device which can be used for the listening.
         /// </summary>
-        /// <remarks>
-        /// The returned IP addresses can be used for the listening. E.g. duplex input channel can use it to start listening.
-        /// </remarks>
         /// <returns>array of available addresses</returns>
         public static string[] GetAvailableIpAddresses()
         {
@@ -526,7 +523,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         public TimeSpan ReceiveTimeout { get; set; }
 
         /// <summary>
-        /// Sets or gets the flag indicating whether the socket can be bound to the address which is already used.
+        /// Sets or gets the flag indicating whether the socket can be bound to the address which is already in use.
         /// </summary>
         /// <remarks>
         /// If the value is true then the input channels or output channels can start listening to the IP address and port which is already used by other channel.
@@ -548,8 +545,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
-        /// Provides thread dispatcher responsible for routing events from duplex input channel according to
-        /// desired threading model.
+        /// Sets or gets the threading mode for input channels.
         /// </summary>
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed one by one via a working thread.
@@ -558,8 +554,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 #endif
 
         /// <summary>
-        /// Provides thread dispatcher responsible for routing events from duplex output channel according to
-        /// desired threading strategy.
+        /// Sets or gets the threading mode for output channels.
         /// </summary>
         /// <remarks>
         /// Default setting is that received response messages are routed one by one via a working thread.

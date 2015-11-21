@@ -157,7 +157,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <summary>
         /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using WebSocket.
         /// </summary>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. ws://127.0.0.1:8090/MyService/ </param>
+        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. ws://127.0.0.1:8090/MyService/</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
@@ -176,7 +176,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <summary>
         /// Creates the duplex output channel sending messages to the duplex input channel and receiving response messages by using WebSocket.
         /// </summary>
-        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. ws://127.0.0.1:8090/ </param>
+        /// <param name="channelId">Identifies the receiving duplex input channel. The channel id must be a valid URI address e.g. ws://127.0.0.1:8090/</param>
         /// <param name="responseReceiverId">Identifies the response receiver of this duplex output channel.</param>
         /// <returns>duplex output channel</returns>
         public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
@@ -297,8 +297,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex input channel according to
-        /// desired threading strategy.
+        /// Sets or gets the threading mode for input channels.
         /// </summary>
         /// <remarks>
         /// Default setting is that all messages from all connected clients are routed by one working thread.
@@ -307,8 +306,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 #endif
 
         /// <summary>
-        /// Factory that will create dispatchers responsible for routing events from duplex output channel according to
-        /// desired threading strategy.
+        /// Sets or gets the threading mode for output channels.
         /// </summary>
         /// <remarks>
         /// Default setting is that received response messages are routed via one working thread.
