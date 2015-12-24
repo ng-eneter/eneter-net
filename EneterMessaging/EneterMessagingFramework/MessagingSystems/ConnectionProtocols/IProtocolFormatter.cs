@@ -49,7 +49,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// If the close connection message is not used it shall return null.
         /// </remarks>
         /// <param name="responseReceiverId">id of the client that wants to disconnect or that will be disconnected</param>
-        /// <return>sencoded close connection message</returns>
+        /// <returns>encoded close connection message</returns>
         object EncodeCloseConnectionMessage(string responseReceiverId);
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Eneter.Messaging.MessagingSystems.ConnectionProtocols
         /// </remarks>
         /// <param name="responseReceiverId">client id. It is empty string in case of output channel.</param>
         /// <param name="message">message serialized message to be sent.</param>
-        /// <return>sencoded data message</returns>
+        /// <returns>encoded data message</returns>
         object EncodeMessage(string responseReceiverId, object message);
 
         /// <summary>
