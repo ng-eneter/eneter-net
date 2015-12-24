@@ -295,8 +295,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                 EneterTrace.Error(anErrorMessage, err);
 
                                 aResponseMessage.ErrorType = err.GetType().Name;
-                                aRequestMessage.ErrorMessage = anErrorMessage;
-                                aRequestMessage.ErrorDetails = err.ToString();
+                                aResponseMessage.ErrorMessage = anErrorMessage;
+                                aResponseMessage.ErrorDetails = err.ToString();
                             }
 
                             if (string.IsNullOrEmpty(aResponseMessage.ErrorType))
@@ -316,8 +316,8 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                                     // The exception will be responded to the client.
                                     aResponseMessage.ErrorType = ex.GetType().Name;
-                                    aRequestMessage.ErrorMessage = ex.Message;
-                                    aRequestMessage.ErrorDetails = ex.ToString();
+                                    aResponseMessage.ErrorMessage = ex.Message;
+                                    aResponseMessage.ErrorDetails = ex.ToString();
                                 }
 
                                 if (string.IsNullOrEmpty(aResponseMessage.ErrorType))
@@ -337,22 +337,22 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                         EneterTrace.Error(anErrorMessage, err);
 
                                         aResponseMessage.ErrorType = err.GetType().Name;
-                                        aRequestMessage.ErrorMessage = anErrorMessage;
-                                        aRequestMessage.ErrorDetails = err.ToString();
+                                        aResponseMessage.ErrorMessage = anErrorMessage;
+                                        aResponseMessage.ErrorDetails = err.ToString();
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            aRequestMessage.ErrorType = typeof(InvalidOperationException).Name;
-                            aRequestMessage.ErrorMessage = TracedObject + "failed to process '" + aRequestMessage.OperationName + "' because it has incorrect number of input parameters.";
-                            EneterTrace.Error(aRequestMessage.ErrorMessage);
+                            aResponseMessage.ErrorType = typeof(InvalidOperationException).Name;
+                            aResponseMessage.ErrorMessage = TracedObject + "failed to process '" + aRequestMessage.OperationName + "' because it has incorrect number of input parameters.";
+                            EneterTrace.Error(aResponseMessage.ErrorMessage);
                         }
                     }
                     else
                     {
-                        aRequestMessage.ErrorType = typeof(InvalidOperationException).Name;
+                        aResponseMessage.ErrorType = typeof(InvalidOperationException).Name;
                         aResponseMessage.ErrorMessage = "Method '" + aRequestMessage.OperationName + "' does not exist in the service.";
                         EneterTrace.Error(aResponseMessage.ErrorMessage);
                     }
@@ -385,14 +385,14 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                     if (anEventContext == null)
                     {
-                        aRequestMessage.ErrorType = typeof(InvalidOperationException).Name;
+                        aResponseMessage.ErrorType = typeof(InvalidOperationException).Name;
                         aResponseMessage.ErrorMessage = TracedObject + "Event '" + aRequestMessage.OperationName + "' does not exist in the service.";
                         EneterTrace.Error(aResponseMessage.ErrorMessage);
                     }
                 }
                 else
                 {
-                    aRequestMessage.ErrorType = typeof(InvalidOperationException).Name;
+                    aResponseMessage.ErrorType = typeof(InvalidOperationException).Name;
                     aResponseMessage.ErrorMessage = TracedObject + "could not recognize the incoming request. If it is RPC, Subscribing or Unsubscribfing.";
                     EneterTrace.Error(aResponseMessage.ErrorMessage);
                 }
