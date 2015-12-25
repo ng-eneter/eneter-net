@@ -267,6 +267,13 @@ namespace Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem
                                 EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                             }
 
+                            // In case the message handler thread invoked CloseConnection the connection can be already closed now
+                            // and mySharedMemoryReady can be null.
+                            if (myStopListeningRequested)
+                            {
+                                break;
+                            }
+
                             // Indicate the shared memory is ready for new data.
                             mySharedMemoryReady.Set();
                         }
