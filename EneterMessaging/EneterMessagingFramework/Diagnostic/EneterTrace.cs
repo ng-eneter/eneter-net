@@ -336,6 +336,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             lock (myProfilerData)
             {
+                WriteToTrace("Profiler is running...");
                 myProfilerIsRunning = true;
             }
         }
@@ -367,6 +368,8 @@ namespace Eneter.Messaging.Diagnostic
                 }
 
                 myProfilerData.Clear();
+
+                WriteToTrace("Profiler has ended.");
             }
         }
 #endif
