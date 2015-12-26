@@ -173,7 +173,7 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 }
                 else
                 {
-                    throw new InvalidOperationException("Unknnown data encoding " + aDataType);
+                    throw new InvalidOperationException("Unknnown string encoding " + aDataType);
                 }
 
                 aResult = ReadPlainString(reader, anEncoding, isLittleEndian);
