@@ -29,7 +29,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// Identifies the type of the request/response message.
         /// </summary>
         /// <remarks>
-        /// e.g. if it is InvokeMethod, MethodResponse, SubscribeEvent, UnsubscribeEvent, RaiseEvent.
+        /// e.g. if it is InvokeMethod, SubscribeEvent, UnsubscribeEvent, RaiseEvent or Response.
         /// </remarks>
         [DataMember]
         public ERpcRequest Request { get; set; }
