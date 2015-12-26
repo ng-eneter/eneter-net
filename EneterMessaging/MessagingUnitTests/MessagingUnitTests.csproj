@@ -103,6 +103,7 @@
     <Compile Include="EndPoints\Rpc\Test_Rpc_SharedMemory_Bin.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EndPoints\Rpc\Test_Rpc_SharedMemory_CustomBin.cs" />
     <Compile Include="EndPoints\Rpc\Test_Rpc_Sync_Xml.cs">
       <SubType>Code</SubType>
     </Compile>
