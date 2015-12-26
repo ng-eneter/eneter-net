@@ -203,7 +203,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
 
                 // If it is a response for a call.
-                if (aMessage.Flag == RpcFlags.MethodResponse)
+                if (aMessage.Request == ERpcRequest.Response)
                 {
                     EneterTrace.Debug("RETURN FROM RPC RECEIVED");
 
@@ -218,14 +218,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     {
                         if (string.IsNullOrEmpty(aMessage.ErrorType))
                         {
-                            if (aMessage.SerializedData != null && aMessage.SerializedData.Length > 0)
-                            {
-                                anRpcContext.SerializedReturnValue = aMessage.SerializedData[0];
-                            }
-                            else
-                            {
-                                anRpcContext.SerializedReturnValue = null;
-                            }
+                            anRpcContext.SerializedReturnValue = aMessage.SerializedReturn;
                         }
                         else
                         {
@@ -237,11 +230,11 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         anRpcContext.RpcCompleted.Set();
                     }
                 }
-                else if (aMessage.Flag == RpcFlags.RaiseEvent)
+                else if (aMessage.Request == ERpcRequest.RaiseEvent)
                 {
                     EneterTrace.Debug("EVENT FROM SERVICE RECEIVED");
 
-                    if (aMessage.SerializedData != null && aMessage.SerializedData.Length > 0)
+                    if (aMessage.SerializedParams != null && aMessage.SerializedParams.Length > 0)
                     {
                         // Try to raise an event.
                         // The event is raised in its own thread so that the receiving thread is not blocked.
@@ -250,7 +243,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         //       And if this waiting caller thread is a thread where events are routed and if the routing
                         //       of these events is 'blocking' then a deadlock can occur.
                         //       Therefore ThreadPool is used.
-                        ThreadPool.QueueUserWorkItem(x => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, aMessage.SerializedData[0])));
+                        ThreadPool.QueueUserWorkItem(x => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, aMessage.SerializedParams[0])));
                     }
                     else
                     {
@@ -303,9 +296,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 // Create message asking the service to execute the method.
                 RpcMessage aRequestMessage = new RpcMessage();
                 aRequestMessage.Id = Interlocked.Increment(ref myCounter);
-                aRequestMessage.Flag = RpcFlags.InvokeMethod;
+                aRequestMessage.Request = ERpcRequest.InvokeMethod;
                 aRequestMessage.OperationName = methodName;
-                aRequestMessage.SerializedData = aSerialzedMethodParameters;
+                aRequestMessage.SerializedParams = aSerialzedMethodParameters;
 
                 object aSerializedReturnValue = CallService(aRequestMessage);
 
@@ -398,7 +391,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         // Create message asking the service to unsubscribe from the event.
                         RpcMessage aRequestMessage = new RpcMessage();
                         aRequestMessage.Id = Interlocked.Increment(ref myCounter);
-                        aRequestMessage.Flag = RpcFlags.UnsubscribeEvent;
+                        aRequestMessage.Request = ERpcRequest.UnsubscribeEvent;
                         aRequestMessage.OperationName = eventName;
 
                         try
@@ -423,7 +416,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     // Create message asking the service to subscribe for the event.
                     RpcMessage aSubscribeMessage = new RpcMessage();
                     aSubscribeMessage.Id = Interlocked.Increment(ref myCounter);
-                    aSubscribeMessage.Flag = RpcFlags.SubscribeEvent;
+                    aSubscribeMessage.Request = ERpcRequest.SubscribeEvent;
                     aSubscribeMessage.OperationName = eventName;
 
                     // Send the subscribing request to the service.

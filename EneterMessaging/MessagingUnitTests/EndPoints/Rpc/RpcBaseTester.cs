@@ -31,6 +31,8 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             int Sum(int a, int b);
             string CreateString(string src);
             string GetInstanceId();
+            void HelloVoid();
+
             void Fail();
             void Timeout();
         }
@@ -68,6 +70,11 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
 
                 return myInstanceId;
+            }
+
+            public void HelloVoid()
+            {
+                // this is just a void method - to test null input and null return.
             }
 
             public void Fail()
@@ -132,6 +139,8 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 int k = aServiceProxy.Sum(1, 2);
 
                 Assert.AreEqual(3, k);
+
+                anRpcClient.Proxy.HelloVoid();
             }
             finally
             {

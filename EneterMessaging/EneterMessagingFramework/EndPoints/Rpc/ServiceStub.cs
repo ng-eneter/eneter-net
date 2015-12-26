@@ -127,9 +127,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                         RpcMessage anEventMessage = new RpcMessage()
                                             {
                                                 Id = 0, // dummy - because we do not need to track it.
-                                                Flag = RpcFlags.RaiseEvent,
+                                                Request = ERpcRequest.RaiseEvent,
                                                 OperationName = aTmpEventInfo.Name,
-                                                SerializedData = (anEventArgsType == typeof(EventArgs)) ?
+                                                SerializedParams = (anEventArgsType == typeof(EventArgs)) ?
                                                     null : // EventArgs is a known type without parameters - we do not need to serialize it.
                                                     new object[] { mySerializer.Serialize(anEventArgsType, e) }
                                             };
@@ -157,9 +157,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                             RpcMessage anEventMessage = new RpcMessage()
                                                 {
                                                     Id = 0, // dummy - because we do not need to track it.
-                                                    Flag = RpcFlags.RaiseEvent,
+                                                    Request = ERpcRequest.RaiseEvent,
                                                     OperationName = aTmpEventInfo.Name,
-                                                    SerializedData = (anEventArgsType == typeof(EventArgs)) ?
+                                                    SerializedParams = (anEventArgsType == typeof(EventArgs)) ?
                                                         null : // EventArgs is a known type without parameters - we do not need to serialize it.
                                                         new object[] { aSerializer.Serialize(anEventArgsType, e) }
                                                 };
@@ -265,11 +265,11 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 RpcMessage aResponseMessage = new RpcMessage()
                 {
                     Id = aRequestMessage.Id,
-                    Flag = RpcFlags.MethodResponse
+                    Request = ERpcRequest.Response
                 };
 
                 // If it is a remote call of a method/function.
-                if (aRequestMessage.Flag == RpcFlags.InvokeMethod)
+                if (aRequestMessage.Request == ERpcRequest.InvokeMethod)
                 {
                     EneterTrace.Debug("RPC RECEIVED");
 
@@ -278,7 +278,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     myServiceMethods.TryGetValue(aRequestMessage.OperationName, out aServiceMethod);
                     if (aServiceMethod != null)
                     {
-                        if (aRequestMessage.SerializedData != null && aRequestMessage.SerializedData.Length == aServiceMethod.InputParameterTypes.Length)
+                        if (aRequestMessage.SerializedParams != null && aRequestMessage.SerializedParams.Length == aServiceMethod.InputParameterTypes.Length)
                         {
                             // Deserialize input parameters.
                             object[] aDeserializedInputParameters = new object[aServiceMethod.InputParameterTypes.Length];
@@ -286,7 +286,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                             {
                                 for (int i = 0; i < aServiceMethod.InputParameterTypes.Length; ++i)
                                 {
-                                    aDeserializedInputParameters[i] = aSerializer.Deserialize(aServiceMethod.InputParameterTypes[i], aRequestMessage.SerializedData[i]);
+                                    aDeserializedInputParameters[i] = aSerializer.Deserialize(aServiceMethod.InputParameterTypes[i], aRequestMessage.SerializedParams[i]);
                                 }
                             }
                             catch (Exception err)
@@ -325,11 +325,14 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                     try
                                     {
                                         // Serialize the result.
-                                        object aSerializedReturnValue = (aServiceMethod.Method.ReturnType != typeof(void)) ?
-                                            aSerializer.Serialize(aServiceMethod.Method.ReturnType, aResult) :
-                                            null;
-
-                                        aResponseMessage.SerializedData = new object[] { aSerializedReturnValue };
+                                        if (aServiceMethod.Method.ReturnType != typeof(void))
+                                        {
+                                            aResponseMessage.SerializedReturn= aSerializer.Serialize(aServiceMethod.Method.ReturnType, aResult);
+                                        }
+                                        else
+                                        {
+                                            aResponseMessage.SerializedReturn = null;
+                                        }
                                     }
                                     catch (Exception err)
                                     {
@@ -358,7 +361,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     }
                 }
                 // If it is a request to subscribe/unsubcribe an event.
-                else if (aRequestMessage.Flag == RpcFlags.SubscribeEvent || aRequestMessage.Flag == RpcFlags.UnsubscribeEvent)
+                else if (aRequestMessage.Request == ERpcRequest.SubscribeEvent || aRequestMessage.Request == ERpcRequest.UnsubscribeEvent)
                 {
                     EventContext anEventContext = null;
                     using (ThreadLock.Lock(myServiceEvents))
@@ -366,7 +369,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         anEventContext = myServiceEvents.FirstOrDefault(x => x.EventInfo.Name == aRequestMessage.OperationName);
                         if (anEventContext != null)
                         {
-                            if (aRequestMessage.Flag == RpcFlags.SubscribeEvent)
+                            if (aRequestMessage.Request == ERpcRequest.SubscribeEvent)
                             {
                                 EneterTrace.Debug("SUBSCRIBE REMOTE EVENT RECEIVED");
 

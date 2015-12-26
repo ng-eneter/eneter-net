@@ -32,10 +32,10 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// e.g. if it is InvokeMethod, MethodResponse, SubscribeEvent, UnsubscribeEvent, RaiseEvent.
         /// </remarks>
         [DataMember]
-        public int Flag { get; set; }
+        public ERpcRequest Request { get; set; }
 
         /// <summary>
-        /// The name of the operation that shall be performed.
+        /// The name of the method or event which shall be performed.
         /// </summary>
         /// <remarks>
         /// e.g. in case of InvokeMethod it specifies which method shall be invoked.
@@ -44,13 +44,19 @@ namespace Eneter.Messaging.EndPoints.Rpc
         public string OperationName { get; set; }
 
         /// <summary>
-        /// Message data.
+        /// Serialized input parameters.
+        /// </summary>
+        [DataMember]
+        public object[] SerializedParams { get; set; }
+
+        /// <summary>
+        /// Serialized return value.
         /// </summary>
         /// <remarks>
-        /// e.g. in case of InvokeMethod it contains input parameters data.
+        /// If it is method returning void then the return value is null.
         /// </remarks>
         [DataMember]
-        public object[] SerializedData { get; set; }
+        public object SerializedReturn { get; set; }
 
         /// <summary>
         /// If an error occurred in the service.
