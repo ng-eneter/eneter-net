@@ -17,8 +17,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
     /// Serializer optimized for RPC.
     /// </summary>
     /// <remarks>
-    /// Peroformance of this serializer is optimized for RPC. You can specified an underlying serializer to serialize/deserialize
-    /// input parameters but then the overall RpcMessage is serialized/deserialized by this custom serializer.
+    /// Performance of this serializer is optimized for RPC.
+    /// To increase the performance it serializes RpcMessage (which is internaly used for RPC interaction) into a special byte sequence.
+    /// It uses underlying serializer to serialize method inrput paramters.
     /// </remarks>
     public class RpcCustomSerializer : ISerializer
     {
