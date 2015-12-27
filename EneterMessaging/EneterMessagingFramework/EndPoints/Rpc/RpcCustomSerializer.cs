@@ -68,13 +68,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-                if (serializedData is byte[] == false)
-                {
-                    throw new ArgumentException("Input parameter 'serializedData' is not byte[].");
-                }
-
                 if (typeof(_T) == typeof(RpcMessage))
                 {
+                    if (serializedData is byte[] == false)
+                    {
+                        throw new InvalidOperationException("Failed to deserialize RpcMessage because the input parameter 'serializedData' is not byte[].");
+                    }
+
                     return (_T)(object)DeserializeRpcMessage((byte[])serializedData);
                 }
                 else
