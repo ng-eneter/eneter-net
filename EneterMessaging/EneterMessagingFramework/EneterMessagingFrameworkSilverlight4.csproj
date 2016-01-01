@@ -126,14 +126,15 @@
     <Compile Include="Diagnostic\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EndPoints\Rpc\ERpcRequest.cs" />
     <Compile Include="EndPoints\Rpc\IRpcClient.cs" />
     <Compile Include="EndPoints\Rpc\IRpcFactory.cs" />
     <Compile Include="EndPoints\Rpc\IRpcService.cs" />
     <Compile Include="EndPoints\Rpc\ProxyProvider.cs" />
     <Compile Include="EndPoints\Rpc\RpcClient.cs" />
+    <Compile Include="EndPoints\Rpc\RpcCustomSerializer.cs" />
     <Compile Include="EndPoints\Rpc\RpcException.cs" />
     <Compile Include="EndPoints\Rpc\RpcFactory.cs" />
-    <Compile Include="EndPoints\Rpc\RpcFlags.cs" />
     <Compile Include="EndPoints\Rpc\RpcMessage.cs" />
     <Compile Include="EndPoints\Rpc\RpcService.cs" />
     <Compile Include="EndPoints\Rpc\ServiceInterfaceChecker.cs" />
