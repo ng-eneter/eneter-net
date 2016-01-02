@@ -11,7 +11,7 @@
       <para>
       <markup>
       This license is a legal agreement between Ondrej Uzovic and you
-      for the software product <b>'Eneter.Messaging.Framework version 6.5'.</b>
+      for the software product <b>'Eneter.Messaging.Framework version 7.0'.</b>
       </markup>
       </para>
       <para>
@@ -21,13 +21,13 @@
     <!-- Add one or more top-level section elements.  These are collapsible.
          If using <autoOutline />, add an address attribute to identify it
          and specify a title so that it can be jumped to with a hyperlink. -->
-    <section address="EneterFreeBinaryLicense">
-      <title>Eneter Free Binary License</title>
+    <section address="NonCommercialLicense">
+      <title>Non-Commercial License</title>
       <content>
         <!-- Uncomment this to create a sub-section outline
         <autoOutline /> -->
         <para>
-        This license is royalty–free, and you can obtain it by downloading, installing or using the product if you agree to be bound by the following terms and conditions:
+        This license is royalty–free, and you can obtain it by downloading, installing or using the product if you agree to be bound by the following terms and conditions.
         </para>
         <para>
         <markup>
@@ -35,17 +35,31 @@
         </markup>
         </para>
         <para>
+        <legacyBold>Defintions:</legacyBold>
+        </para>
+        <para>
+        Non-commercial software product is a software product that does not produce any direct or indirect financial profit.
+        </para>
+        <para>
+        Non-commercial organization is an organization that is not intended to create any financial profit.
+        </para>
+        <para>
         </para>
         <para>
 			<list class="ordered">
 			  <listItem> <legacyBold>Grant of License</legacyBold>
 				<list class="bullet">
-				  <listItem>You may use Eneter binary files in your commercial or non-commercial software applications.</listItem>
-				  <listItem>You may make as many copies of Eneter binary files as needed and distribute them in accordance with terms of this license.</listItem>
+				  <listItem>You may use the product for evaluation purposes to test its functionality.</listItem>
+				  <listItem>Non-commercial organizations or individual persons may integrate the product binary files into non-commercial software products.</listItem>
+				  <listItem>Non-commercial organizations or individual persons may distribute the necessary product binary files to end users as an integrated part of their non-commercial software products in accordance with terms of this license.</listItem>
 				</list>
 			  </listItem>
 			  <listItem> <legacyBold>License Limitations</legacyBold>
 				<list class="bullet">
+				  <listItem>Commercial organizations CANNOT use this product other than for evaluation purposes.</listItem>
+				  <listItem>You CANNOT use this product for any commercial purposes. All commercial use is forbidden.</listItem>
+				  <listItem>You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.</listItem>
+				  <listItem>You CANNOT provide the product binary files to any third party, unless they are integrated with your non-commercial software solution.</listItem>
 				  <listItem>You are not allowed to reverse engineer, disassemble or attempt to get any source files.</listItem>
 				</list>
 			  </listItem>
@@ -70,8 +84,8 @@
     </section>
     
     
-    <section address="EneterSourceCodeLicense">
-      <title>Eneter Source Code License</title>
+    <section address="CommercialLicense">
+      <title>Commercial License</title>
       <content>
         <!-- Uncomment this to create a sub-section outline
         <autoOutline /> -->
@@ -82,9 +96,7 @@
         By purchasing this license you agree to be bound by the following terms and conditions:
         </para>
         <para>
-          <markup>
-            <font style="color:#FF0000">DO NOT purchase this license, if you do not agree with the terms.</font>
-          </markup>
+        (DO NOT purchase this license, if you do not agree with the terms.)
         </para>
         <para>
         </para>
@@ -92,16 +104,17 @@
 			<list class="ordered">
 			  <listItem> <legacyBold>Grant of License</legacyBold>
 				<list class="bullet">
-				  <listItem>You may use Eneter binary files in your commercial or non-commercial software applications.</listItem>
-				  <listItem>You may make as many copies of Eneter binary files as needed and distribute them in accordance with terms of this license.</listItem>
-          <listItem>You may use Eneter source codes for debugging and investigation purposes.</listItem>
-          <listItem>You may modify and compile Eneter source code in order to adjust the behavior.</listItem>
+				  <listItem>You may integrate the product binary files into your software products.</listItem>
+				  <listItem>You may distribute the necessary product binary files to your end users as an integrated part of your software products in accordance with terms of this license.</listItem>
+				  <listItem>You may use the product source codes for debugging or investigation purposes during development and maintainance of your own software product.</listItem>
+				  <listItem>You may modify the product source code in order to adjust the behavior of the product.</listItem>
 				</list>
 			  </listItem>
 			  <listItem> <legacyBold>License Limitations</legacyBold>
 				<list class="bullet">
-				  <listItem>You CANNOT use Eneter source files as a basis for development of a derivative product or as a basis for development of another communication framework.</listItem>
-				  <listItem>You CANNOT provide Eneter source code or a part of the source code or a modified version of the source code to any third party.</listItem>
+				  <listItem>You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.</listItem>
+				  <listItem>You CANNOT provide the product source code or a part of the source code or a modified version of the source code to any third party.</listItem>
+				  <listItem>You CANNOT provide the product binary files to any third party, unless they are integrated with your software solution.</listItem>
 				</list>
 			  </listItem>
 			  <listItem> <legacyBold>Copyright</legacyBold>
@@ -123,6 +136,7 @@
         </para>
       </content>
     </section>
+    
     
     <relatedTopics>
       <!-- One or more of the following:

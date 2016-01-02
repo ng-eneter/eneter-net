@@ -14,6 +14,90 @@
       <autoOutline />
     </introduction>
 
+
+    <section address="Eneter70">
+      <title>Eneter 7.0</title>
+      <content>
+        <para>Release Date: 2016-01-02</para>
+        <para>
+          Supported Platforms:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Java 6 and Android 2.3.3 (or later)</para>
+          </listItem>
+          <listItem>
+            <para>.Net 3.5, 4.0, 4.5</para>
+          </listItem>
+          <listItem>
+            <para>Silverlight 3, 4, 5</para>
+          </listItem>
+          <listItem>
+            <para>Windows Phone 7, 7.1, 8.0, 8.1</para>
+          </listItem>
+          <listItem>
+            <para>Compact Framework 2.0, 3.5</para>
+          </listItem>
+          <listItem>
+            <para>HTML5 Javascript</para>
+          </listItem>
+        </list>
+        <para>
+          New Features:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>Eneter for Javascript supports Authenticated Messaging.</para>
+          </listItem>
+          <listItem>
+            <para>Eneter for Javascript supports connecting sertvices via Message Bus.</para>
+          </listItem>
+          <listItem>
+            <para>Eneter for Javascript supports MultiTypedMessages.</para>
+          </listItem>
+          <listItem>
+            <para>Multicast and broadcast UDP messaging supported.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to set port number for receiving response messages when using UDP, TCP or WebSocket.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to get the list IP addresses assigned to the computer which can be used for listening.</para>
+          </listItem>
+          <listItem>
+            <para>Possibility to check whether a port is available for listening.</para>
+          </listItem>
+          <listItem>
+            <para>MessageBus API extended to control connecting and disconnecting of services.</para>
+          </listItem>
+          <listItem>
+            <para>Broker API extended to control control publishing and subscribing of messages.</para>
+          </listItem>
+        </list>
+        <para>
+          Changes in Behavior:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              Eneter for Android is available for Android 2.3.3 (or later) instead of Android 2.1 (or later).
+            </para>
+          </listItem>
+        </list>
+        <para>
+          Fixed Bugs:
+        </para>
+        <list class="bullet">
+          <listItem>
+            <para>0000025 - A thread blocks shutdown of application in Java</para>
+            <para>0000029 -  IDuplexBroker.sendMessage() threads stuck forever</para>
+            <para>0000030 -  RsaSerializer in Android is not compatible with RsaSerializer in .NET</para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+
     <section address="Eneter65">
       <title>Eneter 6.5</title>
       <content>
