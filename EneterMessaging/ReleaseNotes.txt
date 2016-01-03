@@ -1,5 +1,38 @@
 Release Notes
 
+Version 7.0
+
+Release Date: 2016-01-02
+
+Supported Platforms:
+
+    Java 6 and Android 2.3.3 (or later)
+    .Net 3.5, 4.0, 4.5, Silverlight 3, 4, 5, Windows Phone 7, 7.1, 8.0, 8.1 Mono 2.6.4, Compact Framework 2.0, 3.5
+    HTML 5 (Javascript)
+
+New Features:
+
+    Eneter for Javascript supports Authenticated Messaging.
+    Eneter for Javascript supports connecting sertvices via Message Bus.
+    Eneter for Javascript supports MultiTypedMessages.
+    Multicast and broadcast UDP messaging supported.
+    Possibility to set port number for receiving response messages when using UDP, TCP or WebSocket.
+    Possibility to get the list IP addresses assigned to the computer which can be used for listening.
+    Possibility to check whether a port is available for listening.
+    MessageBus API extended to control connecting and disconnecting of services.
+    Broker API extended to control control publishing and subscribing of messages.
+
+Changes in behavior:
+
+    Eneter for Android is available for Android 2.3.3 (or later) instead of Android 2.1 (or later).
+
+Fixed bugs:
+    0000025 - A thread blocks shutdown of application in Java
+    0000029 - IDuplexBroker.sendMessage() threads stuck forever
+    0000030 - RsaSerializer in Android is not compatible with RsaSerializer in .NET
+
+
+
 Version 6.5
 
 Release Date: 2015-05-03
