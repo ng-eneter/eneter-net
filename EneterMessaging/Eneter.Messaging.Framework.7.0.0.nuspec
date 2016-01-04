@@ -5,7 +5,7 @@
         <version>7.0.0</version>
         <title>Eneter Messaging Framework</title>
         <authors>Ondrej Uzovic</authors>
-        <licenseUrl>http://www.eneter.net/LicenseAgreement.htm</licenseUrl>
+        <licenseUrl>http://www.eneter.net/LicenseAgreement.htm#EneterNonCommercialLicense</licenseUrl>
         <projectUrl>http://www.eneter.net/ProductInfo.htm</projectUrl>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <description>Lightweight but comprehensive library for interprocess communication. Easy to use and works on multiple platforms (.NET, Windows Phone, Android, Java and Javascript).</description>
