@@ -179,6 +179,22 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
+                // Release all pending RPC calls.
+                RemoteCallContext[] aPendingCalls;
+                using (ThreadLock.Lock(myPendingRemoteCalls))
+                {
+                    aPendingCalls = myPendingRemoteCalls.Values.ToArray();
+                }
+                if (aPendingCalls != null)
+                {
+                    RpcException anException = new RpcException("Connection was broken or closed.", "", "");
+                    foreach (RemoteCallContext aRemoteCallContext in aPendingCalls)
+                    {
+                        aRemoteCallContext.Error = anException;
+                        aRemoteCallContext.RpcCompleted.Set();
+                    }
+                }
+
                 // Forward the event.
                 myThreadDispatcher.Invoke(() => Notify(ConnectionClosed, e));
             }

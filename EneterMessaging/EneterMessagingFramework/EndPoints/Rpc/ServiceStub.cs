@@ -178,7 +178,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                                     }
                                     catch (Exception err)
                                     {
-                                        EneterTrace.Error(TracedObject + "failed to send event to the client.", err);
+                                        EneterTrace.Error(TracedObject + "failed to send event '" + aTmpEventInfo.Name + "' to the client.", err);
 
                                         // Suppose the client is disconnected so unsubscribe it from all events.
                                         UnsubscribeClientFromEvents(aClient);
@@ -409,7 +409,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage, err);
+                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage + " for '" + aRequestMessage.OperationName + "'", err);
                 }
             }
         }
