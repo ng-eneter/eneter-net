@@ -13,6 +13,7 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
@@ -43,7 +44,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
         public MonitoredDuplexInputChannel(IDuplexInputChannel underlyingInputChannel, ISerializer serializer,
             int pingFrequency,
-            int receiveTimeout)
+            int receiveTimeout,
+            IThreadDispatcher dispatcher)
         {
             using (EneterTrace.Entering())
             {
@@ -52,7 +54,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 myPingFrequency = pingFrequency;
                 myReceiveTimeout = receiveTimeout;
-                myCheckTimer = new Timer(OnCheckerTick, null, -1, -1);
+                Dispatcher = dispatcher;
+
+                myCheckTimer = new EneterTimer(OnCheckerTick);
 
                 MonitorChannelMessage aPingMessage = new MonitorChannelMessage(MonitorChannelMessageType.Ping, null);
                 myPreserializedPingMessage = mySerializer.Serialize<MonitorChannelMessage>(aPingMessage);
@@ -68,7 +72,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             }
         }
 
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingInputChannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get; private set; }
 
         public void StartListening()
         {
@@ -195,17 +199,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     }
                 }
 
-                if (ResponseReceiverConnected != null)
-                {
-                    try
-                    {
-                        ResponseReceiverConnected(this, e);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                    }
-                }
+                // Notify response receiver connected.
+                Dispatcher.Invoke(() => NotifyGeneric(ResponseReceiverConnected, e, false));
             }
         }
 
@@ -221,7 +216,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 if (aNumberOfRemoved > 0)
                 {
-                    NotifyResponseReceiverDisconnected(e);
+                    // Notify response receiver disconnected.
+                    Dispatcher.Invoke(() => NotifyGeneric(ResponseReceiverDisconnected, e, false));
                 }
             }
         }
@@ -251,19 +247,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     if (aMessage.MessageType == MonitorChannelMessageType.Message)
                     {
                         // Notify the incoming message.
-                        if (MessageReceived != null)
-                        {
-                            DuplexChannelMessageEventArgs aMsg = new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress);
-
-                            try
-                            {
-                                MessageReceived(this, aMsg);
-                            }
-                            catch (Exception err)
-                            {
-                                EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
-                            }
-                        }
+                        DuplexChannelMessageEventArgs aMsg = new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress);
+                        Dispatcher.Invoke(() => NotifyGeneric(MessageReceived, aMsg, true));
                     }
                 }
                 catch (Exception err)
@@ -338,13 +323,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                     // Notify that the response receiver was disconected.
                     ResponseReceiverEventArgs e = new ResponseReceiverEventArgs(aResponseReceiver.ResponseReceiverId, aResponseReceiver.ClientAddress);
-                    Dispatcher.Invoke(() => NotifyResponseReceiverDisconnected(e));
+                    Dispatcher.Invoke(() => NotifyGeneric(ResponseReceiverDisconnected, e, false));
                 }
 
                 // If the timer chall continue.
                 if (aContinueTimerFlag)
                 {
-                    myCheckTimer.Change(myPingFrequency, -1);
+                    myCheckTimer.Change(myPingFrequency);
                 }
             }
         }
@@ -367,31 +352,35 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 if (myResponseReceiverContexts.Count == 1)
                 {
-                    myCheckTimer.Change(myPingFrequency, -1);
+                    myCheckTimer.Change(myPingFrequency);
                 }
 
                 return aResponseReceiver;
             }
         }
 
-        private void NotifyResponseReceiverDisconnected(ResponseReceiverEventArgs e)
+        private void NotifyGeneric<T>(EventHandler<T> handler, T eventArgs, bool isNobodySubscribedWarning)
+            where T : EventArgs
         {
             using (EneterTrace.Entering())
             {
-                if (ResponseReceiverDisconnected != null)
+                if (handler != null)
                 {
                     try
                     {
-                        ResponseReceiverDisconnected(this, e);
+                        handler(this, eventArgs);
                     }
                     catch (Exception err)
                     {
                         EneterTrace.Warning(TracedObject + ErrorHandler.DetectedException, err);
                     }
                 }
+                else if (isNobodySubscribedWarning)
+                {
+                    EneterTrace.Warning(TracedObject + ErrorHandler.NobodySubscribedForMessage);
+                }
             }
         }
-
 
 
         private object myListeningManipulatorLock = new object();
@@ -400,7 +389,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
         private int myPingFrequency;
         private int myReceiveTimeout;
-        private Timer myCheckTimer;
+        private EneterTimer myCheckTimer;
         private HashSet<TResponseReceiverContext> myResponseReceiverContexts = new HashSet<TResponseReceiverContext>();
 
         private object myPreserializedPingMessage;

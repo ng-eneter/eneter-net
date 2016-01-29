@@ -9,6 +9,7 @@ using System;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
@@ -95,6 +96,9 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 PingFrequency = pingFrequency;
                 ReceiveTimeout = pingReceiveTimeout;
                 Serializer = new MonitoredMessagingCustomSerializer();
+
+                InputChannelThreading = new SyncDispatching();
+                OutputChannelThreading = InputChannelThreading;
             }
         }
 
@@ -112,7 +116,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexOutputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId);
-                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, aDispatcher);
             }
         }
 
@@ -131,7 +136,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexOutputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexOutputChannel(channelId, responseReceiverId);
-                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                IThreadDispatcher aDispatcher = OutputChannelThreading.GetDispatcher();
+                return new MonitoredDuplexOutputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, aDispatcher);
             }
         }
 
@@ -149,7 +155,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
             using (EneterTrace.Entering())
             {
                 IDuplexInputChannel anUnderlyingChannel = myUnderlyingMessaging.CreateDuplexInputChannel(channelId);
-                return new MonitoredDuplexInputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds);
+                IThreadDispatcher aThreadDispatcher = InputChannelThreading.GetDispatcher();
+                return new MonitoredDuplexInputChannel(anUnderlyingChannel, Serializer, (int)PingFrequency.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, aThreadDispatcher);
             }
         }
 
@@ -162,6 +169,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         /// Time within it the ping message must be received.
         /// </summary>
         public TimeSpan ReceiveTimeout { get; set; }
+
+        /// <summary>
+        /// Sets or gets the threading mode for input channels.
+        /// </summary>
+        /// <remarks>
+        /// Default setting is that all messages from all connected clients are routed by one working thread.
+        /// </remarks>
+        public IThreadDispatcherProvider InputChannelThreading { get; set; }
+
+        /// <summary>
+        /// Sets or gets the threading mode for output channels.
+        /// </summary>
+        /// <remarks>
+        /// Default setting is that received response messages are routed via one working thread.
+        /// </remarks>
+        public IThreadDispatcherProvider OutputChannelThreading { get; set; }
 
         /// <summary>
         /// Serializer which shall be used to serialize MonitorChannelMessage.

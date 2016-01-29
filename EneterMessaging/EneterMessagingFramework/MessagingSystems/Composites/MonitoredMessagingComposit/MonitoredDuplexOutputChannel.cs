@@ -11,6 +11,7 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
@@ -23,7 +24,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
         public MonitoredDuplexOutputChannel(IDuplexOutputChannel underlyingOutputChannel, ISerializer serializer,
             int pingFrequency,
-            int receiveTimeout)
+            int receiveTimeout,
+            IThreadDispatcher dispatcher)
         {
             using (EneterTrace.Entering())
             {
@@ -32,12 +34,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 mySerializer = serializer;
                 myPingFrequency = pingFrequency;
                 myReceiveTimeout = receiveTimeout;
+                Dispatcher = dispatcher;
 
                 MonitorChannelMessage aPingMessage = new MonitorChannelMessage(MonitorChannelMessageType.Ping, null);
                 myPreserializedPingMessage = mySerializer.Serialize<MonitorChannelMessage>(aPingMessage);
 
-                myPingingTimer = new Timer(OnPingingTimerTick, null, -1, -1);
-                myReceiveTimer = new Timer(OnResponseTimerTick, null, -1, -1);
+                myPingingTimer = new EneterTimer(OnPingingTimerTick);
+                myReceiveTimer = new EneterTimer(OnResponseTimerTick);
 
                 myUnderlyingOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
                 myUnderlyingOutputChannel.ConnectionOpened += OnConnectionOpened;
@@ -49,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
         public string ResponseReceiverId { get { return myUnderlyingOutputChannel.ResponseReceiverId; } }
 
-        public IThreadDispatcher Dispatcher { get { return myUnderlyingOutputChannel.Dispatcher; } }
+        public IThreadDispatcher Dispatcher { get; private set; }
 
         public void OpenConnection()
         {
@@ -67,8 +70,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     try
                     {
                         // Start timers.
-                        myPingingTimer.Change(myPingFrequency, -1);
-                        myReceiveTimer.Change(myReceiveTimeout, -1);
+                        myPingingTimer.Change(myPingFrequency);
+                        myReceiveTimer.Change(myReceiveTimeout);
 
                         // Open connection in the underlying channel.
                         myUnderlyingOutputChannel.OpenConnection();
@@ -128,7 +131,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         myUnderlyingOutputChannel.SendMessage(aSerializedMessage);
 
                         // Reschedule the ping.
-                        myPingingTimer.Change(myPingFrequency, -1);
+                        myPingingTimer.Change(myPingFrequency);
                     }
                     catch (Exception err)
                     {
@@ -157,13 +160,13 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     using (ThreadLock.Lock(myConnectionManipulatorLock))
                     {
                         // Cancel the current response timeout and set the new one.
-                        myReceiveTimer.Change(myReceiveTimeout, -1);
+                        myReceiveTimer.Change(myReceiveTimeout);
                     }
 
                     // If it is a message.
                     if (aMessage.MessageType == MonitorChannelMessageType.Message)
                     {
-                        Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress), true);
+                        Dispatcher.Invoke(() => Notify<DuplexChannelMessageEventArgs>(ResponseMessageReceived, new DuplexChannelMessageEventArgs(e.ChannelId, aMessage.MessageContent, e.ResponseReceiverId, e.SenderAddress), true));
                     }
                 }
                 catch (Exception err)
@@ -177,7 +180,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         {
             using (EneterTrace.Entering())
             {
-                Notify<DuplexChannelEventArgs>(ConnectionOpened, e, false);
+                Dispatcher.Invoke(() => Notify<DuplexChannelEventArgs>(ConnectionOpened, e, false));
             }
         }
 
@@ -203,7 +206,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                         myUnderlyingOutputChannel.SendMessage(myPreserializedPingMessage);
 
                         // Schedule the next ping.
-                        myPingingTimer.Change(myPingFrequency, -1);
+                        myPingingTimer.Change(myPingFrequency);
                     }
                 }
                 catch
@@ -230,8 +233,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                 using (ThreadLock.Lock(myConnectionManipulatorLock))
                 {
                     // Stop timers.
-                    myPingingTimer.Change(-1, -1);
-                    myReceiveTimer.Change(-1, -1);
+                    myPingingTimer.Change(-1);
+                    myReceiveTimer.Change(-1);
 
                     if (sendCloseMessageFlag)
                     {
@@ -272,10 +275,10 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         private IDuplexOutputChannel myUnderlyingOutputChannel;
         private object myConnectionManipulatorLock = new object();
         
-        private Timer myPingingTimer;
+        private EneterTimer myPingingTimer;
         private int myPingFrequency;
 
-        private Timer myReceiveTimer;
+        private EneterTimer myReceiveTimer;
         private int myReceiveTimeout;
 
         private ISerializer mySerializer;
