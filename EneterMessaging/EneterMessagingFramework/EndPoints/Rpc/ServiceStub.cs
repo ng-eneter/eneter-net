@@ -409,7 +409,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendResponseMessage + " for '" + aRequestMessage.OperationName + "'", err);
+                    EneterTrace.Error(TracedObject + "." + aRequestMessage.OperationName + " " + ErrorHandler.FailedToSendResponseMessage, err);
                 }
             }
         }
@@ -435,7 +435,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private Dictionary<string, ServiceMethod> myServiceMethods = new Dictionary<string, ServiceMethod>();
         private IDuplexInputChannel myInputChannel;
 
-        private string TracedObject { get { return GetType().Name + " "; } }
+        private string TracedObject { get { return GetType().Name + "<" + typeof(TServiceInterface).Name + "> "; } }
     }
 }
 

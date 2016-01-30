@@ -472,7 +472,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     // Wait for the response.
                     if (!anRpcSyncContext.RpcCompleted.WaitOne((int)myRpcTimeout.TotalMilliseconds))
                     {
-                        throw new TimeoutException("Remote call to '" + rpcRequest.OperationName + "' has not returned within the specified timeout " + myRpcTimeout + ".");
+                        throw new TimeoutException("Remote call to has not returned within the specified timeout " + myRpcTimeout + ".");
                     }
 
                     if (anRpcSyncContext.Error != null)
@@ -484,7 +484,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 }
                 catch (Exception err)
                 {
-                    EneterTrace.Error(TracedObject + ErrorHandler.FailedToSendMessage, err);
+                    EneterTrace.Error(TracedObject + "." + rpcRequest.OperationName + "(..) " + ErrorHandler.FailedToSendMessage, err);
                     throw;
                 }
                 finally
@@ -570,6 +570,6 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private Dictionary<string, RemoteMethod> myRemoteMethods = new Dictionary<string, RemoteMethod>();
         private Dictionary<string, RemoteEvent> myRemoteEvents = new Dictionary<string, RemoteEvent>();
         
-        protected override string TracedObject { get { return GetType().Name + " "; } }
+        protected override string TracedObject { get { return GetType().Name + "<" + typeof(TServiceInterface).Name + "> "; } }
     }
 }
