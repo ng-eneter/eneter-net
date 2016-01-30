@@ -83,7 +83,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         throw;
                     }
 
-                    myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aUri.Port, reuseAddressFlag);
+                    int aPort = (aUri.Port < 0) ? 0 : aUri.Port;
+                    myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aPort, reuseAddressFlag);
                     myProtocolFormatter = protocolFormatter;
                     mySecurityStreamFactory = securityFactory;
                     mySendTimeout = sendTimeout;
