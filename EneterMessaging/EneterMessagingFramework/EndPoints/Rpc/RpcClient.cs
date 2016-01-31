@@ -472,7 +472,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                     // Wait for the response.
                     if (!anRpcSyncContext.RpcCompleted.WaitOne((int)myRpcTimeout.TotalMilliseconds))
                     {
-                        throw new TimeoutException("Remote call to has not returned within the specified timeout " + myRpcTimeout + ".");
+                        throw new TimeoutException("Remote call has not returned within the specified timeout " + myRpcTimeout + ".");
                     }
 
                     if (anRpcSyncContext.Error != null)
