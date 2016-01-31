@@ -5,13 +5,12 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-using System;
-using System.Threading;
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.Threading.Dispatching;
 using Eneter.Messaging.Threading;
+using Eneter.Messaging.Threading.Dispatching;
+using System;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
