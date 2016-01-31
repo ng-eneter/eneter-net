@@ -365,6 +365,7 @@
     <Compile Include="MessagingSystems\WebSocketMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\_NamespaceDoc.cs" />
     <Compile Include="Nodes\Broker\BrokerCustomSerializer.cs" />
     <Compile Include="Nodes\Broker\PublishInfoEventArgs.cs" />
     <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
