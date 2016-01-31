@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Eneter.Messaging.Framework_NonCommercial</id>
+        <version>7.0.1</version>
+        <title>Eneter Messaging Framework</title>
+        <authors>Ondrej Uzovic</authors>
+        <licenseUrl>http://www.eneter.net/LicenseAgreement.htm</licenseUrl>
+        <projectUrl>http://www.eneter.net/ProductInfo.htm</projectUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>Lightweight but comprehensive library for interprocess communication. Easy to use and works on multiple platforms (.NET, Windows Phone, Android, Java and Javascript).</description>
+        <summary>Cross-platform framework for interprocess communication.</summary>
+        <copyright>© Ondrej Uzovic 2016</copyright>
+        <tags>interprocess communication crossplatform messages network tcp udp WebSocket sharedmemory rpc request-response publish-subscribe middleware</tags>
+    </metadata>
+    <files>
+        <file src="EneterMessagingFramework\bin\CompactFramework20\Release\Eneter.Messaging.Framework.CF.dll" target="Eneter.Messaging.Framework\v7.0.1\CompactFramework20\Eneter.Messaging.Framework.CF.dll" />
+        <file src="EneterMessagingFramework\bin\CompactFramework20\Release\Eneter.Messaging.Framework.CF.pdb" target="Eneter.Messaging.Framework\v7.0.1\CompactFramework20\Eneter.Messaging.Framework.CF.pdb" />
+        <file src="EneterMessagingFramework\bin\CompactFramework20\Release\Eneter.Messaging.Framework.CF.xml" target="Eneter.Messaging.Framework\v7.0.1\CompactFramework20\Eneter.Messaging.Framework.CF.xml" />
+        <file src="EneterMessagingFramework\bin\CompactFramework35\Release\Eneter.Messaging.Framework.CF.dll" target="Eneter.Messaging.Framework\v7.0.1\CompactFramework35\Eneter.Messaging.Framework.CF.dll" />
+        <file src="EneterMessagingFramework\bin\CompactFramework35\Release\Eneter.Messaging.Framework.CF.pdb" target="Eneter.Messaging.Framework\v7.0.1\CompactFramework35\Eneter.Messaging.Framework.CF.pdb" />
+        <file src="EneterMessagingFramework\bin\CompactFramework35\Release\Eneter.Messaging.Framework.CF.xml" target="Eneter.Messaging.Framework\v7.0.1\CompactFramework35\Eneter.Messaging.Framework.CF.xml" />
+        <file src="EneterMessagingFramework\bin\Mono264\Release\Eneter.Messaging.Framework.Mono.dll" target="Eneter.Messaging.Framework\v7.0.1\Mono264\Eneter.Messaging.Framework.Mono.dll" />
+        <file src="EneterMessagingFramework\bin\Mono264\Release\Eneter.Messaging.Framework.Mono.pdb" target="Eneter.Messaging.Framework\v7.0.1\Mono264\Eneter.Messaging.Framework.Mono.pdb" />
+        <file src="EneterMessagingFramework\bin\Mono264\Release\Eneter.Messaging.Framework.Mono.xml" target="Eneter.Messaging.Framework\v7.0.1\Mono264\Eneter.Messaging.Framework.Mono.xml" />
+        <file src="EneterMessagingFramework\bin\Net35\Release\Eneter.Messaging.Framework.dll" target="Eneter.Messaging.Framework\v7.0.1\Net35\Eneter.Messaging.Framework.dll" />
+        <file src="EneterMessagingFramework\bin\Net35\Release\Eneter.Messaging.Framework.pdb" target="Eneter.Messaging.Framework\v7.0.1\Net35\Eneter.Messaging.Framework.pdb" />
+        <file src="EneterMessagingFramework\bin\Net35\Release\Eneter.Messaging.Framework.XML" target="Eneter.Messaging.Framework\v7.0.1\Net35\Eneter.Messaging.Framework.XML" />
+        <file src="EneterMessagingFramework\bin\Net40\Release\Eneter.Messaging.Framework.dll" target="Eneter.Messaging.Framework\v7.0.1\Net40\Eneter.Messaging.Framework.dll" />
+        <file src="EneterMessagingFramework\bin\Net40\Release\Eneter.Messaging.Framework.pdb" target="Eneter.Messaging.Framework\v7.0.1\Net40\Eneter.Messaging.Framework.pdb" />
+        <file src="EneterMessagingFramework\bin\Net40\Release\Eneter.Messaging.Framework.XML" target="Eneter.Messaging.Framework\v7.0.1\Net40\Eneter.Messaging.Framework.XML" />
+        <file src="EneterMessagingFramework\bin\Net45\Release\Eneter.Messaging.Framework.dll" target="Eneter.Messaging.Framework\v7.0.1\Net45\Eneter.Messaging.Framework.dll" />
+        <file src="EneterMessagingFramework\bin\Net45\Release\Eneter.Messaging.Framework.pdb" target="Eneter.Messaging.Framework\v7.0.1\Net45\Eneter.Messaging.Framework.pdb" />
+        <file src="EneterMessagingFramework\bin\Net45\Release\Eneter.Messaging.Framework.XML" target="Eneter.Messaging.Framework\v7.0.1\Net45\Eneter.Messaging.Framework.XML" />
+        <file src="EneterMessagingFramework\bin\Phone7\Release\Eneter.Messaging.Framework.Phone.dll" target="Eneter.Messaging.Framework\v7.0.1\Phone7\Eneter.Messaging.Framework.Phone.dll" />
+        <file src="EneterMessagingFramework\bin\Phone7\Release\Eneter.Messaging.Framework.Phone.pdb" target="Eneter.Messaging.Framework\v7.0.1\Phone7\Eneter.Messaging.Framework.Phone.pdb" />
+        <file src="EneterMessagingFramework\bin\Phone7\Release\Eneter.Messaging.Framework.Phone.xml" target="Eneter.Messaging.Framework\v7.0.1\Phone7\Eneter.Messaging.Framework.Phone.xml" />
+        <file src="EneterMessagingFramework\bin\Phone71\Release\Eneter.Messaging.Framework.Phone.dll" target="Eneter.Messaging.Framework\v7.0.1\Phone71\Eneter.Messaging.Framework.Phone.dll" />
+        <file src="EneterMessagingFramework\bin\Phone71\Release\Eneter.Messaging.Framework.Phone.pdb" target="Eneter.Messaging.Framework\v7.0.1\Phone71\Eneter.Messaging.Framework.Phone.pdb" />
+        <file src="EneterMessagingFramework\bin\Phone71\Release\Eneter.Messaging.Framework.Phone.XML" target="Eneter.Messaging.Framework\v7.0.1\Phone71\Eneter.Messaging.Framework.Phone.XML" />
+        <file src="EneterMessagingFramework\bin\Phone80\Release\Eneter.Messaging.Framework.PhoneSilverlight.dll" target="Eneter.Messaging.Framework\v7.0.1\Phone80\Eneter.Messaging.Framework.PhoneSilverlight.dll" />
+        <file src="EneterMessagingFramework\bin\Phone80\Release\Eneter.Messaging.Framework.PhoneSilverlight.pdb" target="Eneter.Messaging.Framework\v7.0.1\Phone80\Eneter.Messaging.Framework.PhoneSilverlight.pdb" />
+        <file src="EneterMessagingFramework\bin\Phone80\Release\Eneter.Messaging.Framework.PhoneSilverlight.xml" target="Eneter.Messaging.Framework\v7.0.1\Phone80\Eneter.Messaging.Framework.PhoneSilverlight.xml" />
+        <file src="EneterMessagingFramework\bin\Phone81\Release\Eneter.Messaging.Framework.PhoneSilverlight.dll" target="Eneter.Messaging.Framework\v7.0.1\Phone81\Eneter.Messaging.Framework.PhoneSilverlight.dll" />
+        <file src="EneterMessagingFramework\bin\Phone81\Release\Eneter.Messaging.Framework.PhoneSilverlight.pdb" target="Eneter.Messaging.Framework\v7.0.1\Phone81\Eneter.Messaging.Framework.PhoneSilverlight.pdb" />
+        <file src="EneterMessagingFramework\bin\Phone81\Release\Eneter.Messaging.Framework.PhoneSilverlight.xml" target="Eneter.Messaging.Framework\v7.0.1\Phone81\Eneter.Messaging.Framework.PhoneSilverlight.xml" />
+        <file src="EneterMessagingFramework\bin\Silverlight3\Release\Eneter.Messaging.Framework.Silverlight.dll" target="Eneter.Messaging.Framework\v7.0.1\Silverlight3\Eneter.Messaging.Framework.Silverlight.dll" />
+        <file src="EneterMessagingFramework\bin\Silverlight3\Release\Eneter.Messaging.Framework.Silverlight.pdb" target="Eneter.Messaging.Framework\v7.0.1\Silverlight3\Eneter.Messaging.Framework.Silverlight.pdb" />
+        <file src="EneterMessagingFramework\bin\Silverlight3\Release\Eneter.Messaging.Framework.Silverlight.XML" target="Eneter.Messaging.Framework\v7.0.1\Silverlight3\Eneter.Messaging.Framework.Silverlight.XML" />
+        <file src="EneterMessagingFramework\bin\Silverlight4\Release\Eneter.Messaging.Framework.Silverlight.dll" target="Eneter.Messaging.Framework\v7.0.1\Silverlight4\Eneter.Messaging.Framework.Silverlight.dll" />
+        <file src="EneterMessagingFramework\bin\Silverlight4\Release\Eneter.Messaging.Framework.Silverlight.pdb" target="Eneter.Messaging.Framework\v7.0.1\Silverlight4\Eneter.Messaging.Framework.Silverlight.pdb" />
+        <file src="EneterMessagingFramework\bin\Silverlight4\Release\Eneter.Messaging.Framework.Silverlight.XML" target="Eneter.Messaging.Framework\v7.0.1\Silverlight4\Eneter.Messaging.Framework.Silverlight.XML" />
+        <file src="EneterMessagingFramework\bin\Silverlight5\Release\Eneter.Messaging.Framework.Silverlight.dll" target="Eneter.Messaging.Framework\v7.0.1\Silverlight5\Eneter.Messaging.Framework.Silverlight.dll" />
+        <file src="EneterMessagingFramework\bin\Silverlight5\Release\Eneter.Messaging.Framework.Silverlight.pdb" target="Eneter.Messaging.Framework\v7.0.1\Silverlight5\Eneter.Messaging.Framework.Silverlight.pdb" />
+        <file src="EneterMessagingFramework\bin\Silverlight5\Release\Eneter.Messaging.Framework.Silverlight.XML" target="Eneter.Messaging.Framework\v7.0.1\Silverlight5\Eneter.Messaging.Framework.Silverlight.XML" />
+        <file src="EneterDocumentation\Help\Eneter.Messaging.Framework701.Doc.chm" target="Eneter.Messaging.Framework\v7.0.1\Eneter.Messaging.Framework701.Doc.chm" />
+        <file src="LicenseAgreement.rtf" target="Eneter.Messaging.Framework\v7.0.1\LicenseAgreement.rtf" />
+        <file src="ReleaseNotes.txt" target="Eneter.Messaging.Framework\v7.0.1\ReleaseNotes.txt" />
+    </files>
+</package>

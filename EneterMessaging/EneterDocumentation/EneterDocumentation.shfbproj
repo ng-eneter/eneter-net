@@ -16,7 +16,7 @@
     <Name>EneterDocumentation</Name>
     <!-- SHFB properties -->
     <OutputPath>.\Help\</OutputPath>
-    <HtmlHelpName>Eneter.Messaging.Framework700.Doc</HtmlHelpName>
+    <HtmlHelpName>Eneter.Messaging.Framework701.Doc</HtmlHelpName>
     <Language>en-US</Language>
     <ApiFilter />
     <ComponentConfigurations>

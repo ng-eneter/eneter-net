@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Eneter.Messaging.Framework</id>
-        <version>7.0.0</version>
+        <version>7.0.1</version>
         <title>Eneter Messaging Framework</title>
         <authors>Ondrej Uzovic</authors>
         <licenseUrl>http://www.eneter.net/LicenseAgreement.htm#EneterNonCommercialLicense</licenseUrl>
@@ -10,6 +10,8 @@
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <description>Lightweight but comprehensive library for interprocess communication. Easy to use and works on multiple platforms (.NET, Windows Phone, Android, Java and Javascript).</description>
         <summary>Cross-platform framework for interprocess communication.</summary>
+        <releaseNotes>• MonitoredMessaging improved.
+• RPC error handling improved.</releaseNotes>
         <copyright>© Ondrej Uzovic 2016</copyright>
         <tags>interprocess communication crossplatform messages network tcp udp WebSocket sharedmemory rpc request-response publish-subscribe middleware</tags>
     </metadata>
