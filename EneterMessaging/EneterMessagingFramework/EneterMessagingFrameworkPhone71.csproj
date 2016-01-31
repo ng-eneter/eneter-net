@@ -486,6 +486,8 @@
     <Compile Include="Threading\Dispatching\WindowsDispatching.cs" />
     <Compile Include="Threading\Dispatching\WinFormsDispatching.cs" />
     <Compile Include="Threading\Dispatching\_NamespaceDoc.cs" />
+    <Compile Include="Threading\EneterTimer.cs" />
+    <Compile Include="Threading\ScalableThreadPool.cs" />
     <Compile Include="Threading\_NamespaceDoc.cs" />
     <Compile Include="_NamespaceDoc.cs" />
   </ItemGroup>
