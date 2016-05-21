@@ -6,7 +6,7 @@
 */
 
 
-#if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK && !XAMARIN
 
 using System;
 using System.Collections.Generic;

@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT && !COMPACT_FRAMEWORK && !XAMARIN_IOS
 
 using System;
 using System.Collections.Generic;

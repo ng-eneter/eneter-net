@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK && !XAMARIN
 
 using System;
 using System.IO.Pipes;
