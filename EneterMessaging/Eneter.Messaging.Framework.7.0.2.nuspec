@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Eneter.Messaging.Framework</id>
-        <version>7.0.1</version>
+        <version>7.0.2</version>
         <title>Eneter Messaging Framework</title>
         <authors>Ondrej Uzovic</authors>
         <licenseUrl>http://www.eneter.net/LicenseAgreement.htm#EneterNonCommercialLicense</licenseUrl>
@@ -16,6 +16,9 @@
         <tags>interprocess communication crossplatform messages network tcp udp WebSocket sharedmemory rpc request-response publish-subscribe middleware</tags>
     </metadata>
     <files>
+        <file src="EneterMessagingFramework\bin\XamarinAndroid\Release\Eneter.Messaging.Framework.AndroidXamarin.dll" target="lib\MonoAndroid\Eneter.Messaging.Framework.AndroidXamarin.dll" />
+        <file src="EneterMessagingFramework\bin\XamarinAndroid\Release\Eneter.Messaging.Framework.AndroidXamarin.pdb" target="lib\MonoAndroid\Eneter.Messaging.Framework.AndroidXamarin.pdb" />
+        <file src="EneterMessagingFramework\bin\XamarinAndroid\Release\Eneter.Messaging.Framework.XamarinAndroid.XML" target="lib\MonoAndroid\Eneter.Messaging.Framework.XamarinAndroid.XML" />
         <file src="EneterMessagingFramework\bin\Net35\Release\Eneter.Messaging.Framework.dll" target="lib\net35\Eneter.Messaging.Framework.dll" />
         <file src="EneterMessagingFramework\bin\Net35\Release\Eneter.Messaging.Framework.pdb" target="lib\net35\Eneter.Messaging.Framework.pdb" />
         <file src="EneterMessagingFramework\bin\Net35\Release\Eneter.Messaging.Framework.XML" target="lib\net35\Eneter.Messaging.Framework.XML" />
@@ -40,5 +43,9 @@
         <file src="EneterMessagingFramework\bin\Phone81\Release\Eneter.Messaging.Framework.PhoneSilverlight.dll" target="lib\wp81\Eneter.Messaging.Framework.PhoneSilverlight.dll" />
         <file src="EneterMessagingFramework\bin\Phone81\Release\Eneter.Messaging.Framework.PhoneSilverlight.pdb" target="lib\wp81\Eneter.Messaging.Framework.PhoneSilverlight.pdb" />
         <file src="EneterMessagingFramework\bin\Phone81\Release\Eneter.Messaging.Framework.PhoneSilverlight.xml" target="lib\wp81\Eneter.Messaging.Framework.PhoneSilverlight.xml" />
+        <file src="EneterMessagingFramework\bin\XamariniOS\Release\Eneter.Messaging.Framework.XamariniOS.dll" target="lib\Xamarin.iOS10\Eneter.Messaging.Framework.XamariniOS.dll" />
+        <file src="EneterMessagingFramework\bin\XamariniOS\Release\Eneter.Messaging.Framework.XamariniOS.dll.mdb" target="lib\Xamarin.iOS10\Eneter.Messaging.Framework.XamariniOS.dll.mdb" />
+        <file src="EneterMessagingFramework\bin\XamariniOS\Release\Eneter.Messaging.Framework.XamariniOS.pdb" target="lib\Xamarin.iOS10\Eneter.Messaging.Framework.XamariniOS.pdb" />
+        <file src="EneterMessagingFramework\bin\XamariniOS\Release\Eneter.Messaging.Framework.XamariniOS.XML" target="lib\Xamarin.iOS10\Eneter.Messaging.Framework.XamariniOS.XML" />
     </files>
 </package>
