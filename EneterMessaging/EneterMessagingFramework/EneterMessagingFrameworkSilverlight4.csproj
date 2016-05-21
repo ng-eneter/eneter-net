@@ -625,6 +625,7 @@
     <Compile Include="System\SystemAttributes.cs" />
     <Compile Include="System\WaitHandleExt.cs" />
     <Compile Include="System\_NamespaceDoc.cs" />
+    <Compile Include="Threading\Dispatching\AndroidDispatching.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcherProvider.cs" />
