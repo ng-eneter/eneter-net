@@ -371,6 +371,7 @@
     <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
     <Compile Include="System\ListExt.cs" />
     <Compile Include="System\_NamespaceDoc.cs" />
+    <Compile Include="Threading\Dispatching\AndroidDispatching.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
     <Compile Include="Threading\Dispatching\NoDispatching.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcher.cs" />
