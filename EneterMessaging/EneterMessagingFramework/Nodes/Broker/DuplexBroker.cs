@@ -135,7 +135,7 @@ namespace Eneter.Messaging.Nodes.Broker
             {
                 using (ThreadLock.Lock(mySubscribtions))
                 {
-                    string[] aResult = mySubscribtions.Where(x => x.MessageTypeId == messageTypeId).Select(y => y.MessageTypeId).ToArray();
+                    string[] aResult = mySubscribtions.Where(x => x.MessageTypeId == messageTypeId).Select(y => y.ReceiverId).ToArray();
                     return aResult;
                 }
             }
