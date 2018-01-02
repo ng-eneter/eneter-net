@@ -66,35 +66,33 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             int receiveTimeout,
             int sendBuffer,
             int receiveBuffer,
-            bool reuseAddressFlag)
+            bool reuseAddressFlag,
+            int maxAmountOfConnections)
         {
             using (EneterTrace.Entering())
             {
-                using (EneterTrace.Entering())
+                Uri aUri;
+                try
                 {
-                    Uri aUri;
-                    try
-                    {
-                        aUri = new Uri(ipAddressAndPort);
-                    }
-                    catch (Exception err)
-                    {
-                        EneterTrace.Error(ipAddressAndPort + ErrorHandler.InvalidUriAddress, err);
-                        throw;
-                    }
-
-                    int aPort = (aUri.Port < 0) ? 0 : aUri.Port;
-                    myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aPort, reuseAddressFlag);
-                    myProtocolFormatter = protocolFormatter;
-                    mySecurityStreamFactory = securityFactory;
-                    mySendTimeout = sendTimeout;
-                    myReceiveTimeout = receiveTimeout;
-                    mySendBuffer = sendBuffer;
-                    myReceiveBuffer = receiveBuffer;
-
-                    // Check if protocol encodes open and close messages.
-                    myProtocolUsesOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage("test") != null;
+                    aUri = new Uri(ipAddressAndPort);
                 }
+                catch (Exception err)
+                {
+                    EneterTrace.Error(ipAddressAndPort + ErrorHandler.InvalidUriAddress, err);
+                    throw;
+                }
+
+                int aPort = (aUri.Port < 0) ? 0 : aUri.Port;
+                myTcpListenerProvider = new TcpListenerProvider(IPAddress.Parse(aUri.Host), aPort, reuseAddressFlag, maxAmountOfConnections);
+                myProtocolFormatter = protocolFormatter;
+                mySecurityStreamFactory = securityFactory;
+                mySendTimeout = sendTimeout;
+                myReceiveTimeout = receiveTimeout;
+                mySendBuffer = sendBuffer;
+                myReceiveBuffer = receiveBuffer;
+
+                // Check if protocol encodes open and close messages.
+                myProtocolUsesOpenConnectionMessage = myProtocolFormatter.EncodeOpenConnectionMessage("test") != null;
             }
         }
 

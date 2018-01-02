@@ -53,7 +53,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         }
 
         public WebSocketInputConnector(string wsUriAddress, IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory, int sendTimeout, int receiveTimeout,
-            bool reuseAddressFlag)
+            bool reuseAddressFlag,
+            int maxAmountOfConnections)
         {
             using (EneterTrace.Entering())
             {
@@ -71,6 +72,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 myProtocolFormatter = protocolFormatter;
                 myListener = new WebSocketListener(aUri, securityFactory);
                 myListener.ReuseAddress = reuseAddressFlag;
+                myListener.MaxAmountOfClients = maxAmountOfConnections;
 
                 mySendTimeout = sendTimeout;
                 myReceiveTimeout = receiveTimeout;

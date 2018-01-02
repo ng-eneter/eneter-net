@@ -12,23 +12,23 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
-using System.IO;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
     internal class TcpListenerProvider
     {
-        public TcpListenerProvider(IPAddress ipAddress, int port, bool reuseAddressFlag)
-            : this(new IPEndPoint(ipAddress, port), reuseAddressFlag)
+        public TcpListenerProvider(IPAddress ipAddress, int port, bool reuseAddressFlag, int maxAmountOfConnections)
+            : this(new IPEndPoint(ipAddress, port), reuseAddressFlag, maxAmountOfConnections)
         {
         }
 
-        public TcpListenerProvider(IPEndPoint address, bool reuseAddressFlag)
+        public TcpListenerProvider(IPEndPoint address, bool reuseAddressFlag, int maxAmountOfConnections)
         {
             using (EneterTrace.Entering())
             {
                 myAddress = address;
                 myReuseAddressFlag = reuseAddressFlag;
+                myMaxAmountOfConnections = maxAmountOfConnections;
             }
         }
 
@@ -53,6 +53,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     try
                     {
                         myStopListeningRequested = false;
+                        myAmountOfConnections = 0;
 
                         myConnectionHandler = connectionHandler;
 
@@ -166,19 +167,44 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             // Execute handler in another thread.
                             WaitCallback aHandler = x =>
                             {
-                                try
+                                bool aHandleConnectionFlag = false;
+
+                                // Check maximum amount of connections.
+                                if (myMaxAmountOfConnections > -1)
                                 {
-                                    myConnectionHandler(aTcpClient);
+                                    int aAmountOfConnections = Interlocked.Increment(ref myAmountOfConnections);
+                                    if (myAmountOfConnections <= myMaxAmountOfConnections)
+                                    {
+                                        aHandleConnectionFlag = true;
+                                    }
                                 }
-                                catch (Exception err)
+                                else
                                 {
-                                    EneterTrace.Error(TracedObject + ErrorHandler.ProcessingTcpConnectionFailure, err);
+                                    aHandleConnectionFlag = true;
+                                }
+
+                                if (aHandleConnectionFlag)
+                                {
+                                    try
+                                    {
+                                        myConnectionHandler(aTcpClient);
+                                    }
+                                    catch (Exception err)
+                                    {
+                                        EneterTrace.Error(TracedObject + ErrorHandler.ProcessingTcpConnectionFailure, err);
+                                    }
+                                }
+                                else
+                                {
+                                    EneterTrace.Warning(TracedObject + "could not open the connection because the number of maximum connections '" + myMaxAmountOfConnections + "' was excedded.");
                                 }
 
                                 if (aTcpClient != null)
                                 {
                                     aTcpClient.Close();
                                 }
+
+                                Interlocked.Decrement(ref myAmountOfConnections);
                             };
                             ThreadPool.QueueUserWorkItem(aHandler);
                         }
@@ -208,6 +234,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private TcpListener myListener;
         private Thread myListeningThread;
         private volatile bool myStopListeningRequested;
+
+        private int myAmountOfConnections;
+        private readonly int myMaxAmountOfConnections;
 
         private object myListeningManipulatorLock = new object();
 

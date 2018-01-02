@@ -404,6 +404,40 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
             }
 
         }
+
+        [Test]
+        [ExpectedException(typeof(IOException))]
+        public void MaxAmountOfClients()
+        {
+            Uri anAddress = new Uri("ws://127.0.0.1:8087/MyService/");
+            WebSocketListener aService = new WebSocketListener(anAddress);
+            aService.MaxAmountOfClients = 2;
+
+            // Client will connect with the query.
+            WebSocketClient aClient1 = new WebSocketClient(anAddress);
+            WebSocketClient aClient2 = new WebSocketClient(anAddress);
+            WebSocketClient aClient3 = new WebSocketClient(anAddress);
+
+            try
+            {
+                // Start listening.
+                aService.StartListening(clientContext => { });
+
+                aClient1.OpenConnection();
+                aClient2.OpenConnection();
+
+                // This opening shall fail with the exception.
+                aClient3.OpenConnection();
+            }
+            finally
+            {
+                aClient1.CloseConnection();
+                aClient2.CloseConnection();
+                aClient3.CloseConnection();
+                aService.StopListening();
+            }
+
+        }
     }
 }
 

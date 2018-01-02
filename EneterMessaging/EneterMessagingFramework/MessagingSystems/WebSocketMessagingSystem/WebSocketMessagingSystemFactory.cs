@@ -36,7 +36,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private class WebSocketInputConnectorFactory : IInputConnectorFactory
         {
             public WebSocketInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory serverSecurityFactory, int sendTimeout, int receiveTimeout,
-                bool reuseAddressFlag)
+                bool reuseAddressFlag,
+                int maxAmountOfConnections)
             {
                 using (EneterTrace.Entering())
                 {
@@ -45,6 +46,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     mySendTimeout = sendTimeout;
                     myReceiveTimeout = receiveTimeout;
                     myReuseAddressFlag = reuseAddressFlag;
+                    myMaxAmountOfConnections = maxAmountOfConnections;
                 }
             }
 
@@ -52,7 +54,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new WebSocketInputConnector(inputConnectorAddress, myProtocolFormatter, myServerSecurityFactory, mySendTimeout, myReceiveTimeout, myReuseAddressFlag);
+                    return new WebSocketInputConnector(inputConnectorAddress, myProtocolFormatter, myServerSecurityFactory, mySendTimeout, myReceiveTimeout, myReuseAddressFlag, myMaxAmountOfConnections);
                 }
             }
 
@@ -61,6 +63,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             private int mySendTimeout;
             private int myReceiveTimeout;
             private bool myReuseAddressFlag;
+            private int myMaxAmountOfConnections;
         }
 #endif
 
@@ -134,6 +137,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 ReceiveTimeout = TimeSpan.FromMilliseconds(0);
 
                 ResponseReceiverPort = -1;
+                MaxAmountOfConnections = -1;
 
 #if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
@@ -202,7 +206,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory anInputConnectorFactory = new WebSocketInputConnectorFactory(myProtocolFormatter, ServerSecurityStreamFactory,
-                    (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, ReuseAddress);
+                    (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds,
+                    ReuseAddress, MaxAmountOfConnections);
                 IInputConnector anInputConnector = anInputConnectorFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -282,6 +287,14 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
         /// </remarks>
         public bool ReuseAddress { get; set; }
+
+        /// <summary>
+        /// Sets or gets the maximum amount of connections the input channel can handle.
+        /// </summary>
+        /// <remarks>
+        /// The default value is -1 which means the amount of connections is not restrected.
+        /// </remarks>
+        public int MaxAmountOfConnections { get; set; }
 
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81

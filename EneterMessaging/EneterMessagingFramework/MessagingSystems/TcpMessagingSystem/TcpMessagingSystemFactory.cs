@@ -85,7 +85,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             public TcpInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory,
                 int sendTimeout, int receiveTimeout, int sendBuffer, int receiveBuffer,
-                bool reuseAddressFlag)
+                bool reuseAddressFlag,
+                int maxAmountOfConnections)
             {
                 using (EneterTrace.Entering())
                 {
@@ -96,6 +97,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     mySendBuffer = sendBuffer;
                     myReceiveBuffer = receiveBuffer;
                     myReuseAddressFlag = reuseAddressFlag;
+                    myMaxAmountOfConnections = maxAmountOfConnections;
                 }
             }
 
@@ -103,7 +105,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 using (EneterTrace.Entering())
                 {
-                    return new TcpInputConnector(inputConnectorAddress, myProtocolFormatter, mySecurityFactory, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer, myReuseAddressFlag);
+                    return new TcpInputConnector(inputConnectorAddress, myProtocolFormatter, mySecurityFactory, mySendTimeout, myReceiveTimeout, mySendBuffer, myReceiveBuffer, myReuseAddressFlag, myMaxAmountOfConnections);
                 }
             }
 
@@ -114,6 +116,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private int mySendBuffer;
             private int myReceiveBuffer;
             private bool myReuseAddressFlag;
+            private int myMaxAmountOfConnections;
         }
 #endif
 
@@ -193,6 +196,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 ReceiveBufferSize = 8192;
 
                 ResponseReceiverPort = -1;
+
+                MaxAmountOfConnections = -1;
 
 #if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
@@ -296,7 +301,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                     myProtocolFormatter,
                     ServerSecurityStreamFactory,
                     (int)SendTimeout.TotalMilliseconds, (int)ReceiveTimeout.TotalMilliseconds, SendBufferSize, ReceiveBufferSize,
-                    ReuseAddress);
+                    ReuseAddress,
+                    MaxAmountOfConnections);
                 IInputConnector anInputConnector = aFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
@@ -526,6 +532,16 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.
         /// </summary>
         public TimeSpan ConnectTimeout { get; set; }
+
+        /// <summary>
+        /// Sets or gets the maximum amount of connections the input channel can accept.
+        /// </summary>
+        /// <remarks>
+        /// The default value is -1 which means the amount of connections is not restricted.<br/>
+        /// If the maximum amount of connections is reached and some other client opens the TCP connection its
+        /// socket is automatically closed.
+        /// </remarks>
+        public int MaxAmountOfConnections { get; set; }
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>

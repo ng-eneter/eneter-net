@@ -146,6 +146,52 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
                 anInputChannel.StopListening();
             }
         }
+
+        [Test]
+        [ExpectedException(typeof(IOException))]
+        public void MaxAmountOfConnections()
+        {
+            IMessagingSystemFactory aMessaging = new WebSocketMessagingSystemFactory()
+            {
+                MaxAmountOfConnections = 2
+            };
+            IDuplexOutputChannel anOutputChannel1 = aMessaging.CreateDuplexOutputChannel("ws://127.0.0.1:8049/");
+            IDuplexOutputChannel anOutputChannel2 = aMessaging.CreateDuplexOutputChannel("ws://127.0.0.1:8049/");
+            IDuplexOutputChannel anOutputChannel3 = aMessaging.CreateDuplexOutputChannel("ws://127.0.0.1:8049/");
+            IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("ws://127.0.0.1:8049/");
+
+            try
+            {
+                ManualResetEvent aConnectionClosed = new ManualResetEvent(false);
+                anOutputChannel3.ConnectionClosed += (x, y) =>
+                {
+                    EneterTrace.Info("Connection closed.");
+                    aConnectionClosed.Set();
+                };
+
+
+                anInputChannel.StartListening();
+                anOutputChannel1.OpenConnection();
+                anOutputChannel2.OpenConnection();
+                anOutputChannel3.OpenConnection();
+
+                if (!aConnectionClosed.WaitOne(1000))
+                {
+                    Assert.Fail("Third connection was not closed.");
+                }
+
+                Assert.IsTrue(anOutputChannel1.IsConnected);
+                Assert.IsTrue(anOutputChannel2.IsConnected);
+                Assert.IsFalse(anOutputChannel3.IsConnected);
+            }
+            finally
+            {
+                anOutputChannel1.CloseConnection();
+                anOutputChannel2.CloseConnection();
+                anOutputChannel3.CloseConnection();
+                anInputChannel.StopListening();
+            }
+        }
     }
 }
 

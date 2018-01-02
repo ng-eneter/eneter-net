@@ -30,10 +30,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
     /// </remarks>
     internal abstract class HostListenerBase
     {
-        public HostListenerBase(IPEndPoint address, ISecurityFactory securityFactory, bool reuseAddressFlag)
+        public HostListenerBase(IPEndPoint address, ISecurityFactory securityFactory, bool reuseAddressFlag, int maxAmountOfConnections)
         {
             Address = address;
-            myTcpListener = new TcpListenerProvider(address, reuseAddressFlag);
+            myTcpListener = new TcpListenerProvider(address, reuseAddressFlag, maxAmountOfConnections);
             SecurityFactory = securityFactory;
         }
 

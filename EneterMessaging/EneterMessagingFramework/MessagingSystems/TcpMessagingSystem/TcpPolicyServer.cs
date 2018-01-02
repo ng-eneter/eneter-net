@@ -50,7 +50,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             {
                 PolicyXml = GetSilverlightDefaultPolicyXml();
 
-                myTcpListenerProvider = new TcpListenerProvider(ipAddress, 943, false);
+                myTcpListenerProvider = new TcpListenerProvider(ipAddress, 943, false, -1);
             }
         }
 

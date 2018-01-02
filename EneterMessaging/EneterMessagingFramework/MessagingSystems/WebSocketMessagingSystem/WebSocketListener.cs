@@ -71,18 +71,18 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </summary>
         private class WebSocketListenerImpl : PathListenerProviderBase<IWebSocketClientContext>
         {
-            public WebSocketListenerImpl(string absoluteUri, bool reuseAddressFlag)
-                : base(new WebSocketHostListenerFactory(reuseAddressFlag), new Uri(absoluteUri, UriKind.Absolute))
+            public WebSocketListenerImpl(string absoluteUri, bool reuseAddressFlag, int maxAmountOfConnections)
+                : base(new WebSocketHostListenerFactory(reuseAddressFlag, maxAmountOfConnections), new Uri(absoluteUri, UriKind.Absolute))
             {
             }
 
-            public WebSocketListenerImpl(Uri uri, bool reuseAddressFlag)
-                : base(new WebSocketHostListenerFactory(reuseAddressFlag), uri)
+            public WebSocketListenerImpl(Uri uri, bool reuseAddressFlag, int maxAmountOfConnections)
+                : base(new WebSocketHostListenerFactory(reuseAddressFlag, maxAmountOfConnections), uri)
             {
             }
 
-            public WebSocketListenerImpl(Uri uri, ISecurityFactory securityFactory, bool reuseAddressFlag)
-                : base(new WebSocketHostListenerFactory(reuseAddressFlag), uri, securityFactory)
+            public WebSocketListenerImpl(Uri uri, ISecurityFactory securityFactory, bool reuseAddressFlag, int maxAmountOfConnections)
+                : base(new WebSocketHostListenerFactory(reuseAddressFlag, maxAmountOfConnections), uri, securityFactory)
             {
             }
 
@@ -96,7 +96,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// <param name="webSocketUri">service address. Provide port number too.</param>
         public WebSocketListener(Uri webSocketUri)
         {
-            myListenerImpl = new WebSocketListenerImpl(webSocketUri, ReuseAddress);
+            MaxAmountOfClients = -1;
+            myListenerFactoryMethod = () => new WebSocketListenerImpl(webSocketUri, ReuseAddress, MaxAmountOfClients);
         }
 
         /// <summary>
@@ -108,7 +109,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </param>
         public WebSocketListener(Uri webSocketUri, ISecurityFactory securityFactory)
         {
-            myListenerImpl = new WebSocketListenerImpl(webSocketUri, securityFactory, ReuseAddress);
+            MaxAmountOfClients = -1;
+            myListenerFactoryMethod = () => new WebSocketListenerImpl(webSocketUri, securityFactory, ReuseAddress, MaxAmountOfClients);
         }
 
         /// <summary>
@@ -122,6 +124,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// from multiple threads.</param>
         public void StartListening(Action<IWebSocketClientContext> connectionHandler)
         {
+            if (myListenerImpl == null)
+            {
+                myListenerImpl = myListenerFactoryMethod();
+            }
             myListenerImpl.StartListening(connectionHandler);
         }
 
@@ -130,7 +136,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </summary>
         public void StopListening()
         {
-            myListenerImpl.StopListening();
+            if (myListenerImpl != null)
+            {
+                myListenerImpl.StopListening();
+            }
         }
 
         /// <summary>
@@ -140,7 +149,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             get
             {
-                return myListenerImpl.IsListening;
+                return myListenerImpl != null && myListenerImpl.IsListening;
             }
         }
 
@@ -152,6 +161,16 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </remarks>
         public bool ReuseAddress { get; set; }
 
+        /// <summary>
+        /// Sets or gets the maximum amount of clients which can connect the the listener.
+        /// </summary>
+        /// <remarks>
+        /// The default value is -1 which means the amount of connected clients is not restrected.<br/>
+        /// If the connecting client exceeds the maximum amount the client is not connected and its TCP socket is closed.
+        /// </remarks>
+        public int MaxAmountOfClients { get; set; }
+
+        private Func<WebSocketListenerImpl> myListenerFactoryMethod;
         private WebSocketListenerImpl myListenerImpl;
     }
 }

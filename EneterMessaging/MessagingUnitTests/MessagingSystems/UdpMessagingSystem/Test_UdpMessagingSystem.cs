@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Eneter.Messaging.MessagingSystems.UdpMessagingSystem;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using System.Threading;
+using System.IO;
 
 namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
 {
@@ -16,7 +18,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         public void Setup()
         {
             //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
-            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+            //EneterTrace.TraceLog = new StreamWriter("c:/tmp/tracefile.txt");
 
             // Generate random number for the port.
             Random aRnd = new Random();
@@ -70,6 +72,51 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
             {
                 anInputChannel1.StopListening();
                 anInputChannel2.StopListening();
+            }
+        }
+
+        [Test]
+        public void MaxAmountOfConnections()
+        {
+            IMessagingSystemFactory aMessaging = new UdpMessagingSystemFactory()
+            {
+                MaxAmountOfConnections = 2
+            };
+            IDuplexOutputChannel anOutputChannel1 = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8049/");
+            IDuplexOutputChannel anOutputChannel2 = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8049/");
+            IDuplexOutputChannel anOutputChannel3 = aMessaging.CreateDuplexOutputChannel("udp://127.0.0.1:8049/");
+            IDuplexInputChannel anInputChannel = aMessaging.CreateDuplexInputChannel("udp://127.0.0.1:8049/");
+
+            try
+            {
+                ManualResetEvent aConnectionClosed = new ManualResetEvent(false);
+                anOutputChannel3.ConnectionClosed += (x, y) =>
+                {
+                    EneterTrace.Info("Connection closed.");
+                    aConnectionClosed.Set();
+                };
+
+
+                anInputChannel.StartListening();
+                anOutputChannel1.OpenConnection();
+                anOutputChannel2.OpenConnection();
+                anOutputChannel3.OpenConnection();
+
+                if (!aConnectionClosed.WaitOne(1000))
+                {
+                    Assert.Fail("Third connection was not closed.");
+                }
+
+                Assert.IsTrue(anOutputChannel1.IsConnected);
+                Assert.IsTrue(anOutputChannel2.IsConnected);
+                Assert.IsFalse(anOutputChannel3.IsConnected);
+            }
+            finally
+            {
+                anOutputChannel1.CloseConnection();
+                anOutputChannel2.CloseConnection();
+                anOutputChannel3.CloseConnection();
+                anInputChannel.StopListening();
             }
         }
     }

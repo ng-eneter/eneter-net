@@ -17,9 +17,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     internal class WebSocketHostListenerFactory : IHostListenerFactory
     {
-        public WebSocketHostListenerFactory(bool reuseAddressFlag)
+        public WebSocketHostListenerFactory(bool reuseAddressFlag, int maxAmountOfConnections)
         {
             myReuseAddressFlag = reuseAddressFlag;
+            myMaxAmountOfConnections = maxAmountOfConnections;
         }
 
         public Type ListenerType
@@ -31,12 +32,13 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                WebSocketHostListener aPathListener = new WebSocketHostListener(address, securityFactory, myReuseAddressFlag);
+                WebSocketHostListener aPathListener = new WebSocketHostListener(address, securityFactory, myReuseAddressFlag, myMaxAmountOfConnections);
                 return aPathListener;
             }
         }
 
         private bool myReuseAddressFlag;
+        private int myMaxAmountOfConnections;
     }
 }
 

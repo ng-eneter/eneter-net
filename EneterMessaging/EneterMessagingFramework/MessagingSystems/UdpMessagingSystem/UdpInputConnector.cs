@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
@@ -51,7 +50,8 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             private IPEndPoint myClientEndPoint;
         }
 
-        public UdpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter, bool reuseAddress, short ttl)
+        public UdpInputConnector(string ipAddressAndPort, IProtocolFormatter protocolFormatter, bool reuseAddress, short ttl,
+            int maxAmountOfConnections)
         {
             using (EneterTrace.Entering())
             {
@@ -77,6 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 myProtocolFormatter = protocolFormatter;
                 myReuseAddressFlag = reuseAddress;
                 myTtl = ttl;
+                myMaxAmountOfConnections = maxAmountOfConnections;
             }
         }
 
@@ -241,14 +242,21 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
                 if (aProtocolMessage != null)
                 {
-                    MessageContext aMessageContext = null;
-
                     if (aProtocolMessage.MessageType == EProtocolMessageType.OpenConnectionRequest)
                     {
                         if (!string.IsNullOrEmpty(aProtocolMessage.ResponseReceiverId))
                         {
                             using (ThreadLock.Lock(myConnectedClients))
                             {
+                                if (myMaxAmountOfConnections > -1 && myConnectedClients.Count >= myMaxAmountOfConnections)
+                                {
+                                    TClientContext aClientContext = new TClientContext(myReceiver, (IPEndPoint)clientAddress);
+                                    CloseConnection(aProtocolMessage.ResponseReceiverId, aClientContext);
+
+                                    EneterTrace.Warning(TracedObject + "could not open connection for client '" + aProtocolMessage.ResponseReceiverId + "' because the maximum number of connections = '" + myMaxAmountOfConnections + "' was exceeded.");
+                                    return;
+                                }
+
                                 if (!myConnectedClients.ContainsKey(aProtocolMessage.ResponseReceiverId))
                                 {
                                     TClientContext aClientContext = new TClientContext(myReceiver, (IPEndPoint)clientAddress);
@@ -276,7 +284,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         }
                     }
 
-                    aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
+                    MessageContext aMessageContext = new MessageContext(aProtocolMessage, aClientIp);
                     NotifyMessageContext(aMessageContext);
                 }
             }
@@ -352,6 +360,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private IPEndPoint myServiceEndpoint;
         private bool myReuseAddressFlag;
         private short myTtl;
+        private int myMaxAmountOfConnections;
         private UdpReceiver myReceiver;
         private object myListenerManipulatorLock = new object();
         private Action<MessageContext> myMessageHandler;
