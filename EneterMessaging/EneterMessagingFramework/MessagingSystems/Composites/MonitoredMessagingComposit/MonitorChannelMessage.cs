@@ -29,9 +29,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
     /// <summary>
     /// Internal message used for the communication between output and input channels in monitored messaging.
     /// </summary>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class MonitorChannelMessage
     {

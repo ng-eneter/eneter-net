@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !SILVERLIGHT && !XAMARIN
+#if !XAMARIN
 
 using System;
 using System.IO.Pipes;
@@ -22,9 +22,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
     /// </summary>
     /// <remarks>
     /// It creates the communication channels for sending and receiving messages using Named Pipes.
-    /// The channel id must be a valid URI address. E.g.: net.pipe//127.0.0.1/SomeName/ . <br/>
-    /// Notice, Silverlight and Windows Phone 7 do not support Named Pipes.
-    /// Therefore, this functionality is not available for these platforms.
+    /// The channel id must be a valid URI address. E.g.: net.pipe//127.0.0.1/SomeName/ .
     /// <br/><br/>
     /// The input channel creates the pipe for the reading and waits for connections. To handle more connections
     /// in parallel there are more threads serving them (by default 10 threads). Every such thread waits

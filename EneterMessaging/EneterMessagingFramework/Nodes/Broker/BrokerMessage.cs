@@ -44,9 +44,7 @@ namespace Eneter.Messaging.Nodes.Broker
     /// <summary>
     /// Internal message used between DuplexBroker and DuplexBrokerClient.
     /// </summary>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class BrokerMessage
     {

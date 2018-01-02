@@ -13,9 +13,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
     /// <summary>
     /// Internal message used for the communication between RpcClient and RpcService.
     /// </summary>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class RpcMessage
     {

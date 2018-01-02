@@ -6,8 +6,6 @@
 */
 
 
-#if !SILVERLIGHT
-
 using Eneter.Messaging.Diagnostic;
 using System;
 using System.ComponentModel;
@@ -67,5 +65,3 @@ namespace Eneter.Messaging.Threading.Dispatching
     }
 
 }
-
-#endif

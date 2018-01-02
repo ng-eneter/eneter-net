@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -96,11 +94,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
-#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, myTtl, false, null, false);
-#else
-                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myTtl, null);
-#endif
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
@@ -369,5 +363,3 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-#endif

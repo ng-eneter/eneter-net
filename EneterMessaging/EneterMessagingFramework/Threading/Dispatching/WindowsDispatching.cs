@@ -6,7 +6,7 @@
 */
 
 
-#if !NET35 && !SILVERLIGHT && !XAMARIN
+#if !NET35 && !XAMARIN
 
 using System;
 using System.Threading;

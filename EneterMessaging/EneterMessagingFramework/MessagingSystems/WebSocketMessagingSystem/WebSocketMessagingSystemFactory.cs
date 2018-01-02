@@ -22,17 +22,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using WebSockets for sending and receiving messages.
-    /// The channel id must be a valid URI address. E.g.: ws://127.0.0.1:6080/MyService/. <br/>
-    /// Notice, Silverlight and Windows Phone do not support TCP listeners and therefore WebSocket listeners are not suported too.
-    /// Therefore, only sending messages (and receiving response messages) is possible on these platforms.<br/>
-    /// More details:<br/>
-    /// TCP in Silverlight is restricted to ports 4502 - 4532 and requires the TcpPolicyServer running on the service side.<br/>
-    /// Windows Phone 7.0 does not suport TCP at all. The TCP is supported from Windows Phone 7.1. TCP in Windows Phone 7.1
-    /// does not require TcpPolicyServer and is not restricted to certain ports as in Silverlight. 
+    /// The channel id must be a valid URI address. E.g.: ws://127.0.0.1:6080/MyService/.
     /// </remarks>
     public class WebSocketMessagingSystemFactory : IMessagingSystemFactory
     {
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private class WebSocketInputConnectorFactory : IInputConnectorFactory
         {
             public WebSocketInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory serverSecurityFactory, int sendTimeout, int receiveTimeout,
@@ -65,7 +58,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             private bool myReuseAddressFlag;
             private int myMaxAmountOfConnections;
         }
-#endif
 
         private class WebSocketOutputConnectorFactory : IOutputConnectorFactory
         {
@@ -139,15 +131,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 ResponseReceiverPort = -1;
                 MaxAmountOfConnections = -1;
 
-#if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
-#endif
-
-#if  WINDOWS_PHONE80 || WINDOWS_PHONE81
-                InputChannelThreading = new SilverlightDispatching();
-                OutputChannelThreading = InputChannelThreading;
-#endif
 
                 PingFrequency = TimeSpan.FromMilliseconds(300000);
             }
@@ -194,7 +179,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
         /// <summary>
         /// Creates the duplex input channel receiving messages from the duplex output channel and sending back response messages by using WebSocket.
-        /// The method is not supported in Silverlight and Windows Phone.
         /// </summary>
         /// <param name="channelId">Identifies this duplex input channel. The channel id must be a valid URI address (e.g. ws://127.0.0.1:8090/MyService/) the input channel will listen to.</param>
         /// <returns>duplex input channel</returns>
@@ -202,7 +186,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory anInputConnectorFactory = new WebSocketInputConnectorFactory(myProtocolFormatter, ServerSecurityStreamFactory,
@@ -211,14 +194,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 IInputConnector anInputConnector = anInputConnectorFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
-#else
-                throw new NotSupportedException("The WebSocket duplex input channel is not supported in Silverlight.");
-#endif
             }
         }
 
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
         /// Sets or gets the security stream factory for the server.
         /// If the factory is set, then the input channel and the duplex input channel use it to establish
@@ -235,7 +214,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 myServerSecurityStreamFactory = (value != null) ? value : new NonSecurityFactory();
             }
         }
-#endif
 
         /// <summary>
         /// Sets and gets the security stream factory for the client.
@@ -297,7 +275,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         public int MaxAmountOfConnections { get; set; }
 
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
         /// Sets or gets the threading mode for input channels.
         /// </summary>
@@ -305,7 +282,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
         public IThreadDispatcherProvider InputChannelThreading { get; set; }
-#endif
 
         /// <summary>
         /// Sets or gets the threading mode for output channels.
@@ -325,9 +301,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         public TimeSpan PingFrequency { get; set; }
 
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private ISecurityFactory myServerSecurityStreamFactory = new NonSecurityFactory();
-#endif
 
         private ISecurityFactory myClientSecurityStreamFactory = new NonSecurityFactory();
 

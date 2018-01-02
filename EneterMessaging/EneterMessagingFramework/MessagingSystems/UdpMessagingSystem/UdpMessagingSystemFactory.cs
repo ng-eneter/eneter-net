@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
@@ -499,8 +497,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
         /// <summary>
         /// Returns IP addresses assigned to the device which can be used for listening.
         /// </summary>
@@ -512,9 +508,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 return TcpMessagingSystemFactory.GetAvailableIpAddresses();
             }
         }
-#endif
 
-#if !SILVERLIGHT
         /// <summary>
         /// Checks if the port is available for UDP listening.
         /// </summary>
@@ -560,7 +554,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                 return true;
             }
         }
-#endif
 
         /// <summary>
         /// Sets or gets whether the communication is unicast.
@@ -634,8 +627,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </example>
         /// </remarks>
         public string MulticastGroupToReceive { get; set; }
-
-#if !SILVERLIGHT
 
         /// <summary>
         /// Enables / disables sending broadcast messages.
@@ -757,13 +748,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// Default value is -1 which means a random free port is chosen for receiving response messages.
         /// </remarks>
         public int ResponseReceiverPort { get; set; }
-#else
-        private bool AllowSendingBroadcasts { get; set; }
-
-        private bool MulticastLoopback { get; set; }
-
-        private int ResponseReceiverPort { get; set; }
-#endif
 
         /// <summary>
         /// Sets or gets the maximum number of connections the input channel can accept.
@@ -803,5 +787,3 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }
-
-#endif

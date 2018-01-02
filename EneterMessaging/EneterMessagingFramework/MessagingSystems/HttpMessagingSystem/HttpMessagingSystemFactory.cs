@@ -11,9 +11,6 @@ using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
 
-#if SILVERLIGHT
-using System;
-#endif
 
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
@@ -28,14 +25,11 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
     /// The duplex output channel regularly polls for response messages and the duplex input channel constantly measures the inactivity time
     /// to recognize whether the duplex output channel is still connected.<br/><br/>
     /// Notice, to start listening via input channel (or duplex input channel), the application must be executed with sufficient rights.
-    /// Otherwise the exception will be thrown.<br/>
-    /// Also notice, Silverlight and Windows Phone 7 do not support listening to HTTP requests.
-    /// Therefore, only sending of messages (and receiving response messages) is possible in these platforms.
+    /// Otherwise the exception will be thrown.
     /// </remarks>
     public class HttpMessagingSystemFactory : IMessagingSystemFactory
     {
 
-#if !SILVERLIGHT
         private class HttpInputConnectorFactory : IInputConnectorFactory
         {
             public HttpInputConnectorFactory(IProtocolFormatter protocolFormatter, int responseReceiverInactivityTimeout)
@@ -58,7 +52,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             private IProtocolFormatter myProtocolFormatter;
             private int myOutputConnectorInactivityTimeout;
         }
-#endif
+
 
         private class HttpOutputConnectorFactory : IOutputConnectorFactory
         {
@@ -83,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             private int myPollingFrequency;
         }
 
-#if !SILVERLIGHT
+
         /// <summary>
         /// Constructs the factory that will create channels with default settings. The polling
         /// frequency will be 500 ms and the inactivity timeout will be 10 minutes.
@@ -94,8 +88,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// The inactivity time is measured by the duplex input channel and specifies the maximum time, the duplex output channel
         /// does not have to poll for messages.
         /// If the inactivity time is exceeded, considers the duplex output channel as disconnected.
-        /// <br/><br/>
-        /// In case of Silverlight or Windows Phone 7, the response messages are recieved in the main Silverlight thread.
         /// </remarks>
         public HttpMessagingSystemFactory()
             : this(500, 600000, new EneterProtocolFormatter())
@@ -148,72 +140,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 myInputConnectorFactory = new HttpInputConnectorFactory(protocolFormatter, inactivityTimeout);
             }
         }
-#else
-
-        /// <summary>
-        /// Constructs the factory that will create channels with default settings. The polling
-        /// frequency will be 500 ms and the inactivity timeout will be 10 minutes.
-        /// </summary>
-        /// <remarks>
-        /// The polling frequency and the inactivity time are used only by duplex channels.
-        /// The polling frequency specifies how often the duplex output channel checks if there are pending response messages.
-        /// The inactivity time is measured by the duplex input channel and specifies the maximum time, the duplex output channel
-        /// does not have to poll for messages.
-        /// If the inactivity time is exceeded, considers the duplex output channel as disconnected.
-        /// <br/><br/>
-        /// In case of Silverlight or Windows Phone 7, the response messages are recieved in the main Silverlight thread.
-        /// </remarks>
-        public HttpMessagingSystemFactory()
-            : this(500, true, new EneterProtocolFormatter())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the factory that will create channel with specified settings.
-        /// The response messages are received in the main silverlight thread.
-        /// </summary>
-        /// <param name="pollingFrequency">how often the duplex output channel polls for the pending response messages</param>
-        public HttpMessagingSystemFactory(int pollingFrequency)
-            : this(pollingFrequency, true, new EneterProtocolFormatter())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the factory that will create channel with specified settings.
-        /// </summary>
-        /// <param name="pollingFrequency">how often the duplex output channel polls for the pending response messages</param>
-        /// <param name="receiveInSilverlightThread">true if the response messages shall be received in the main silverlight thread</param>
-        public HttpMessagingSystemFactory(int pollingFrequency, bool receiveInSilverlightThread)
-            : this(pollingFrequency, receiveInSilverlightThread, new EneterProtocolFormatter())
-        {
-        }
-
-        /// <summary>
-        /// Constructs the factory that will create channel with specified settings.
-        /// </summary>
-        /// <remarks>
-        /// </remarks>
-        /// <param name="pollingFrequency">how often the duplex output channel polls for the pending response messages</param>
-        /// <param name="receiveInSilverlightThread">true if the response messages shall be received in the main silverlight thread</param>
-        /// <param name="protocolFormatter">formatter for low-level messages between duplex output channel and duplex input channel</param>
-        public HttpMessagingSystemFactory(int pollingFrequency, bool receiveInSilverlightThread, IProtocolFormatter protocolFormatter)
-        {
-            using (EneterTrace.Entering())
-            {
-                myPollingFrequency = pollingFrequency;
-                myProtocolFormatter = protocolFormatter;
-
-                if (receiveInSilverlightThread)
-                {
-                    OutputChannelThreading = new SilverlightDispatching();
-                }
-                else
-                {
-                    OutputChannelThreading = new NoDispatching();
-                }
-            }
-        }
-#endif
 
         /// <summary>
         /// Creates duplex output channel which can send and receive messages from the duplex input channel using HTTP.
@@ -260,7 +186,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// </summary>
         /// <remarks>
         /// The channel id must be a valid URI address e.g. http://127.0.0.1:8090/something/
-        /// The method is not supported in Silverlight and Windows Phone 7.
         /// </remarks>
         /// <param name="channelId">channel id specifying the address the duplex input channel listens to.</param>
         /// <returns>duplex input channel</returns>
@@ -268,18 +193,13 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-#if !SILVERLIGHT
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
                 IInputConnector anInputConnector = myInputConnectorFactory.CreateInputConnector(channelId);
                 IThreadDispatcher aDispatcherAfterMessageDecoded = myDispatchingAfterMessageDecoded.GetDispatcher();
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, aDispatcherAfterMessageDecoded, anInputConnector);
-#else
-                throw new NotSupportedException("Http duplex input channel is not supported in Silverlight.");
-#endif
             }
         }
 
-#if !SILVERLIGHT
         /// <summary>
         /// Sets or gets the threading mode for input channels.
         /// </summary>
@@ -287,7 +207,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// Default setting is that all messages from all connected clients are routed by one working thread.
         /// </remarks>
         public IThreadDispatcherProvider InputChannelThreading { get; set; }
-#endif
 
         /// <summary>
         /// Sets or gets the threading mode for output channels.
@@ -304,9 +223,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
         private IProtocolFormatter myProtocolFormatter;
 
-#if !SILVERLIGHT
         private IInputConnectorFactory myInputConnectorFactory;
-#endif
 
         private IThreadDispatcherProvider myDispatchingAfterMessageDecoded = new SyncDispatching();
     }

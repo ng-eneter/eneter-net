@@ -116,7 +116,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
                         }
 
                         // Wait auntil the response is received or the waiting was interrupted or timeout.
-                        // Note: use int instead of TimeSpan due to compatibility reasons. E.g. Compact Framework does not support TimeSpan in WaitOne().
+                        // Note: use int instead of TimeSpan due to compatibility reasons.
                         if (!myResponseAvailableEvent.WaitOne((int)myResponseReceiveTimeout.TotalMilliseconds))
                         {
                             string anErrorMessage = TracedObject + "failed to receive the response within the timeout. " + myResponseReceiveTimeout;

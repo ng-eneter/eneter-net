@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT
-
 using System;
 using System.IO;
 using System.Net.Security;
@@ -46,5 +44,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-#endif

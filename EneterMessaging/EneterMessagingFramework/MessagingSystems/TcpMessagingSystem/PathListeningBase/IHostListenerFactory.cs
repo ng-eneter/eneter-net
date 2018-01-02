@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using System;
 using System.Net;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
@@ -36,6 +34,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         HostListenerBase CreateHostListener(IPEndPoint address, ISecurityFactory securityFactory);
     }
 }
-
-
-#endif

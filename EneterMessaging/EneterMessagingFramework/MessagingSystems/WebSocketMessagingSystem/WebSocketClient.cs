@@ -183,11 +183,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 mySecurityFactory = clientSecurityFactory;
 
                 HeaderFields = new Dictionary<string, string>();
-#if !SILVERLIGHT
                 HeaderFields["Host"] = Uri.Authority;
-#else
-                HeaderFields["Host"] = Uri.Host + ":" + Uri.Port;
-#endif
                 HeaderFields["Upgrade"] = "websocket";
                 HeaderFields["Connection"] = "Upgrade";
                 HeaderFields["Sec-WebSocket-Version"] = "13";
@@ -255,7 +251,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT
         /// <summary>
         /// Returns the IP address of the client used for the communication with the server.
         /// </summary>
@@ -277,7 +272,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 }
             }
         }
-#endif
 
         /// <summary>
         /// Opens connection to the websocket server.
@@ -321,12 +315,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         // Send HTTP request to open the websocket communication.
                         byte[] anOpenRequest = WebSocketFormatter.EncodeOpenConnectionHttpRequest(Uri.AbsolutePath + Uri.Query, HeaderFields);
 
-#if !SILVERLIGHT
                         // Open TCP connection.
                         AddressFamily anAddressFamily = (Uri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-#else
-                        AddressFamily anAddressFamily = AddressFamily.InterNetwork;
-#endif
+
                         myTcpClient = new TcpClient(anAddressFamily);
                         myTcpClient.NoDelay = true;
 
@@ -338,16 +329,10 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         }
 #endif
 
-#if SILVERLIGHT
-                        // Note: Silverlight has connection timeout too.
-                        myTcpClient.ConnectTimeout = ConnectTimeout;
-#endif
-
-                        // Note: Compact framework does not support these timeouts. - it throws exception.
                         myTcpClient.SendTimeout = SendTimeout;
                         myTcpClient.ReceiveTimeout = ReceiveTimeout;
 
-#if !SILVERLIGHT
+
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
                         //       There it must be workerounded a little bit.
                         Exception anException = null;
@@ -373,11 +358,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         {
                             throw anException;
                         }
-#else // SILVERLIGHT
-                        // This call also resolves the host name.
-                        // Note: Silverlight has also the connection timeout.
-                        myTcpClient.Connect(Uri.Host, Uri.Port);
-#endif
 
                         // If SSL then authentication is performed and security stream is provided.
                         myClientStream = mySecurityFactory.CreateSecurityStreamAndAuthenticate(myTcpClient.GetStream());

@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT
 
 using System;
 using System.IO;
@@ -23,18 +22,10 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-#if COMPACT_FRAMEWORK
-                using (ThreadLock.Lock(myLock))
-#endif
-                {
-                    HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(uri);
-#if COMPACT_FRAMEWORK
-                    aRequest.AllowWriteStreamBuffering = true;
-#endif
-                    WebResponse aResponse = aRequest.GetResponse();
+                HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(uri);
+                WebResponse aResponse = aRequest.GetResponse();
 
-                    return aResponse;
-                }
+                return aResponse;
             }
         }
 
@@ -42,39 +33,23 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-#if COMPACT_FRAMEWORK
-                using (ThreadLock.Lock(myLock))
-#endif
-            	{
-                    HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(uri);
-                    aRequest.Method = "POST";
+                HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(uri);
+                aRequest.Method = "POST";
 
-#if COMPACT_FRAMEWORK
-                    aRequest.AllowWriteStreamBuffering = true;
-#endif
+                Stream aRequestStream = aRequest.GetRequestStream();
 
-                    Stream aRequestStream = aRequest.GetRequestStream();
+                // Send the message.
+                // Note: The message is sent by calling GetResponse().
+                aRequestStream.Write(data, 0, data.Length);
 
-                    // Send the message.
-                    // Note: The message is sent by calling GetResponse().
-                    aRequestStream.Write(data, 0, data.Length);
-                    
-                    // Note: The communication in Compact Framework does not work
-                    //       if the stream is not closed.
-                    aRequestStream.Close();
+                // Note: The communication in Compact Framework does not work
+                //       if the stream is not closed.
+                aRequestStream.Close();
 
-                    WebResponse aResponse = aRequest.GetResponse();
+                WebResponse aResponse = aRequest.GetResponse();
 
-                    return aResponse;
-            	}
+                return aResponse;
             }
         }
-        
-#if COMPACT_FRAMEWORK
-        private static object myLock = new object();
-#endif
     }
 }
-
-
-#endif

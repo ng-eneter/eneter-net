@@ -6,8 +6,6 @@
 */
 
 
-#if !SILVERLIGHT
-
 using System;
 using System.IO;
 using System.Net;
@@ -99,5 +97,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-#endif

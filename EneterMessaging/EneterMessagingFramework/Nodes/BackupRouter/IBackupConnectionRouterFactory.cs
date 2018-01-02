@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 namespace Eneter.Messaging.Nodes.BackupRouter
 {
     /// <summary>
@@ -21,5 +19,3 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         IBackupConnectionRouter CreateBackupConnectionRouter();
     }
 }
-
-#endif

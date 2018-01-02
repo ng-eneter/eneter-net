@@ -5,9 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT
-
-using System;
 using System.IO;
 using System.IO.Compression;
 using Eneter.Messaging.Diagnostic;
@@ -125,6 +122,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
-
-
-#endif

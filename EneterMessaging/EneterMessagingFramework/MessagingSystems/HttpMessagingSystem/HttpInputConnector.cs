@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -505,5 +503,3 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
-
-#endif

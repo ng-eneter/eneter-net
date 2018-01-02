@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 
 using System;
 using System.IO;
@@ -14,7 +12,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Eneter.Messaging.Diagnostic;
-using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
 
@@ -215,5 +212,3 @@ namespace Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem
         }
     }
 }
-
-#endif

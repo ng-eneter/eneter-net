@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using System;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase;
@@ -174,6 +173,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private WebSocketListenerImpl myListenerImpl;
     }
 }
-
-
-#endif

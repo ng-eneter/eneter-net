@@ -6,9 +6,6 @@
 */
 
 
-// Note: It is possible to compile for Silverlight but it probably does not have too much sense
-//       therefore in order to keep dll smaller it is not included in Silverlight platforms.
-#if !SILVERLIGHT
 
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
@@ -714,5 +711,3 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-#endif

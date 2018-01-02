@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT
-
 using System;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
@@ -56,5 +54,3 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         void RemoveAllDuplexOutputChannels();
     }
 }
-
-#endif

@@ -38,7 +38,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         public static byte[] EncodeOpenConnectionHttpResponse(string webSocketKey)
         {
             using (EneterTrace.Entering())
@@ -55,7 +54,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 return aMessageBytes;
             }
         }
-#endif
 
         public static byte[] EncodeBinaryMessageFrame(bool isFinal, byte[] maskingKey, byte[] message)
         {
@@ -182,7 +180,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         public static Match DecodeOpenConnectionHttpRequest(Stream inputStream)
         {
             using (EneterTrace.Entering())
@@ -196,7 +193,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 return aMatch;
             }
         }
-#endif
 
         public static Match DecodeOpenConnectionHttpResponse(Stream inputStream)
         {
@@ -329,12 +325,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             string anEncryptedKey = webSocketKeyBase64 + myWebSocketId;
 
-#if !SILVERLIGHT
             byte[] anEncodedResponseKey = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(anEncryptedKey));
-#else
-            SHA1 aSHA1 = new SHA1Managed();
-            byte[] anEncodedResponseKey = aSHA1.ComputeHash(Encoding.UTF8.GetBytes(anEncryptedKey));
-#endif
             string anEncryptedKeyBase64 = Convert.ToBase64String(anEncodedResponseKey);
 
             return anEncryptedKeyBase64;
@@ -399,13 +390,11 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private static readonly Regex myHttpOpenConnectionRequest = new Regex(
                            @"^GET\s(?<path>[^\s\?]+)(?<query>\?[^\s]+)?\sHTTP\/1\.1\r\n" +
                            @"((?<headerKey>[^:\r\n]+):\s(?<headerValue>[^\r\n]+)\r\n)+" +
                            @"\r\n",
                            RegexOptions.IgnoreCase);
-#endif
 
         private static readonly Regex myHttpOpenConnectionResponse = new Regex(
                            @"HTTP/1\.1\s(?<code>[\d]+)\s.*\r\n" +

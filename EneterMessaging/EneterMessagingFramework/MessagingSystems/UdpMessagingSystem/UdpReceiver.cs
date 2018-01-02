@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
 
 using System;
 using System.Net;
@@ -358,5 +357,3 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
     }
 }
-
-#endif

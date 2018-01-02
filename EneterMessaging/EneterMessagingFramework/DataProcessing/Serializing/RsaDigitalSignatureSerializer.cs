@@ -6,8 +6,6 @@
 */
 
 
-#if !SILVERLIGHT
-
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -198,6 +196,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
-
-
-#endif

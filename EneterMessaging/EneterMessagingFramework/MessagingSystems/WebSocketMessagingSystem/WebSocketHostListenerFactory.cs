@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using System;
 using System.Net;
 using Eneter.Messaging.Diagnostic;
@@ -41,6 +39,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private int myMaxAmountOfConnections;
     }
 }
-
-
-#endif

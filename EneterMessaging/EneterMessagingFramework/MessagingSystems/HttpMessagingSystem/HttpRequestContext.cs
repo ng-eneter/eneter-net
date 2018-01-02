@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT
 
 using System.Net;
 using Eneter.Messaging.DataProcessing.Streaming;
@@ -70,6 +69,3 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         private HttpListenerContext myHttpListenerContext;
     }
 }
-
-
-#endif

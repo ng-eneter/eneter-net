@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 
@@ -45,5 +43,3 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         private IMessagingSystemFactory myOutputMessagingFactory;
     }
 }
-
-#endif

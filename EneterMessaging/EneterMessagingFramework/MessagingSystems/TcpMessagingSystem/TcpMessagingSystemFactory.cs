@@ -18,11 +18,6 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-#if WINDOWS_PHONE80 || WINDOWS_PHONE81
-using Windows.Networking.Connectivity;
-using Windows.Networking;
-#endif
-
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -31,14 +26,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     /// </summary>
     /// <remarks>
     /// It creates the communication channels using TCP for sending and receiving messages.
-    /// The channel id must be a valid URI address. E.g.: tcp://127.0.0.1:6080/. <br/>
-    /// Notice, Silverlight and Windows Phone 7.1 do not support TCP listeners.
-    /// Therefore, only sending of messages (and receiving response messages) is possible on these platforms.<br/>
-    /// More details:<br/>
-    /// TCP in Silverlight is restricted to ports 4502 - 4532 and requires the TcpPolicyServer running on the service side.<br/>
-    /// Windows Phone 7.0 does not suport TCP at all. The TCP is supported from Windows Phone 7.1. TCP in Windows Phone 7.1
-    /// does not require TcpPolicyServer and is not restricted to certain ports as in Silverlight.<br/>
-    /// Windows Phone 8.0 and 8.1 supports also TCP listening and it does not requires the TCP policy server.
+    /// The channel id must be a valid URI address. E.g.: tcp://127.0.0.1:6080/.
     /// <example>
     /// Creating output and input channel for TCP messaging.
     /// <code>
@@ -80,7 +68,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     /// </remarks>
     public class TcpMessagingSystemFactory : IMessagingSystemFactory
     {
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         private class TcpInputConnectorFactory : IInputConnectorFactory
         {
             public TcpInputConnectorFactory(IProtocolFormatter protocolFormatter, ISecurityFactory securityFactory,
@@ -118,7 +105,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             private bool myReuseAddressFlag;
             private int myMaxAmountOfConnections;
         }
-#endif
 
         private class TcpOutputConnectorFactory : IOutputConnectorFactory
         {
@@ -199,16 +185,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 MaxAmountOfConnections = -1;
 
-#if !SILVERLIGHT
                 InputChannelThreading = new SyncDispatching();
                 OutputChannelThreading = InputChannelThreading;
-#endif
-
-#if  WINDOWS_PHONE80 || WINDOWS_PHONE81
-                InputChannelThreading = new SilverlightDispatching();
-                OutputChannelThreading = InputChannelThreading;
-#endif
-
             }
         }
 
@@ -275,7 +253,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Creates the duplex input channel which can receive and send messages to the duplex output channel using TCP.
         /// </summary>
         /// <remarks>
-        /// The method is not supported in Silverlight and Windows Phone.
         /// <example>
         /// Creating duplex input channel.
         /// <code>
@@ -294,7 +271,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
                 IThreadDispatcher aDispatcher = InputChannelThreading.GetDispatcher();
 
                 IInputConnectorFactory aFactory = new TcpInputConnectorFactory(
@@ -306,13 +282,9 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 IInputConnector anInputConnector = aFactory.CreateInputConnector(channelId);
 
                 return new DefaultDuplexInputChannel(channelId, aDispatcher, myDispatcherAfterMessageDecoded, anInputConnector);
-#else
-                throw new NotSupportedException("The Tcp duplex input channel is not supported.");
-#endif
             }
         }
 
-#if !SILVERLIGHT
         /// <summary>
         /// Returns IP addresses assigned to the device which can be used for the listening.
         /// </summary>
@@ -341,32 +313,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 return anIpAddresses.ToArray();
             }
         }
-#endif
 
-#if WINDOWS_PHONE80 || WINDOWS_PHONE81
-        /// <summary>
-        /// Returns IP addresses assigned to the device.
-        /// </summary>
-        /// <remarks>
-        /// The returned IP addresses can be used for the listening. E.g. duplex input channel can use it to start listening.
-        /// </remarks>
-        /// <returns>array of available addresses</returns>
-        public static string[] GetAvailableIpAddresses()
-        {
-            using (EneterTrace.Entering())
-            {
-                List<string> anIpAddresses = new List<string>();
-                IReadOnlyList<HostName> aHostNames = NetworkInformation.GetHostNames();
-                foreach (HostName aHostName in aHostNames)
-                {
-                    anIpAddresses.Add(aHostName.DisplayName);
-                }
-                return anIpAddresses.ToArray();
-            }
-        }
-#endif
-
-#if !SILVERLIGHT
         /// <summary>
         /// Checks if the port is available for TCP listening.
         /// </summary>
@@ -425,7 +372,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 return true;
             }
         }
-#endif
 
         /// <summary>
         /// Sets or gets the security stream factory for the server.
@@ -543,7 +489,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// </remarks>
         public int MaxAmountOfConnections { get; set; }
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
         /// Sets or gets the threading mode for input channels.
         /// </summary>
@@ -551,7 +496,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// Default setting is that all messages from all connected clients are routed one by one via a working thread.
         /// </remarks>
         public IThreadDispatcherProvider InputChannelThreading { get; set; }
-#endif
 
         /// <summary>
         /// Sets or gets the threading mode for output channels.

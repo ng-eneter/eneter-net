@@ -174,17 +174,12 @@
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputConnector.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpPolicyServer.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker_Silverlight.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\ServerUri_Silverlight.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -230,20 +225,6 @@
     <Compile Include="MessagingSystems\SharedMemoryMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\Fragment.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentDataFactory.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentFinalizer.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\FragmentSequencer.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\IFragmentProcessor.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\IMultiInstanceFragmentProcessor.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\Sequencing\MultiInstanceFragmentProcessor.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightFragmentMessage.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightInputConnector.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightMessagingSystemFactory.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightOutputConnector.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightReceiver.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\SilverlightSender.cs" />
-    <Compile Include="MessagingSystems\SilverlightMessagingSystem\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\PathListeningBase\HostListenerBase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -277,21 +258,16 @@
     <Compile Include="MessagingSystems\TcpMessagingSystem\Security\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpClient_Silverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpInputConnector.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListenerProvider.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpListener_WindowsPhoneSilverlight.cs" />
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpMessagingSystemFactory.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\TcpOutputConnector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\TcpMessagingSystem\TcpPolicyServer.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\TcpMessagingSystem\_NamespaceDoc.cs">
@@ -312,7 +288,6 @@
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\UdpMessagingSystem\UdpReceiver_Silverlight.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessInputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\UdpSessionlessOutputConnector.cs" />
     <Compile Include="MessagingSystems\UdpMessagingSystem\_NamespaceDoc.cs">
@@ -364,7 +339,6 @@
     <Compile Include="Nodes\Broker\BrokerCustomSerializer.cs" />
     <Compile Include="Nodes\Broker\PublishInfoEventArgs.cs" />
     <Compile Include="Nodes\Broker\SubscribeInfoEventArgs.cs" />
-    <Compile Include="System\ListExt.cs" />
     <Compile Include="System\_NamespaceDoc.cs" />
     <Compile Include="Threading\Dispatching\AndroidDispatching.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />
@@ -375,7 +349,6 @@
     </Compile>
     <Compile Include="DataProcessing\MessageQueueing\WorkingThread.cs" />
     <Compile Include="Threading\Dispatching\IThreadDispatcherProvider.cs" />
-    <Compile Include="Threading\Dispatching\SilverlightDispatching.cs" />
     <Compile Include="DataProcessing\MessageQueueing\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>

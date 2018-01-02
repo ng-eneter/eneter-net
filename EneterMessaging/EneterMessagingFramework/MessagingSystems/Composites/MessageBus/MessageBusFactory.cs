@@ -6,8 +6,6 @@
 */
 
 
-#if !SILVERLIGHT
-
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 
@@ -56,5 +54,3 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
         private ISerializer mySerializer;
     }
 }
-
-#endif

@@ -64,11 +64,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 {
                     try
                     {
-#if !SILVERLIGHT
                         AddressFamily anAddressFamily = (myUri.HostNameType == UriHostNameType.IPv6) ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-#else
-                        AddressFamily anAddressFamily = AddressFamily.InterNetwork;
-#endif
                         myTcpClient = new TcpClient(anAddressFamily);
 
                         
@@ -79,7 +75,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myTcpClient.SendBufferSize = mySendBuffer;
                         myTcpClient.ReceiveBufferSize = myReceiveBuffer;
 
-#if !SILVERLIGHT
                         myTcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 
                         if (myResponseReceivingPort > 0)
@@ -87,7 +82,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any;
                             myTcpClient.Client.Bind(new IPEndPoint(aDummyIpAddress, myResponseReceivingPort));
                         }
-#endif
 
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
                         //       Therefore it must be workerounded a little bit.
@@ -115,11 +109,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             throw anException;
                         }
 
-#if !SILVERLIGHT
                         myIpAddress = (myTcpClient.Client.LocalEndPoint != null) ? myTcpClient.Client.LocalEndPoint.ToString() : "";
-#else
-                        myIpAddress = "";
-#endif
+
                         myClientStream = myClientSecurityFactory.CreateSecurityStreamAndAuthenticate(myTcpClient.GetStream());
 
                         // If it shall listen to response messages.

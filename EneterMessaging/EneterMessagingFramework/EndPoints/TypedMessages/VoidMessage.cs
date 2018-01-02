@@ -26,9 +26,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     /// </code>
     /// </example>
     /// </remarks>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class VoidMessage
     {

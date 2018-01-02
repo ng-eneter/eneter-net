@@ -13,9 +13,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
     /// <summary>
     /// The data structure representing the wrapped data.
     /// </summary>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class WrappedData
     {

@@ -13,9 +13,7 @@ namespace Eneter.Messaging.EndPoints.TypedMessages
     /// <summary>
     /// Internal message used for the communication between multi-typed message sender and receiver.
     /// </summary>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class MultiTypedMessage
     {

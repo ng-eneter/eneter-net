@@ -14,10 +14,6 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 
-#if SILVERLIGHT
-using System.Windows;
-#endif
-
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
@@ -76,11 +72,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
                         myClient.OpenConnection();
 
-#if !SILVERLIGHT
                         myIpAddress = (myClient.LocalEndPoint != null) ? myClient.LocalEndPoint.ToString() : "";
-#else
-                        myIpAddress = "";
-#endif
 
                         object anEncodedMessage = myProtocolFormatter.EncodeOpenConnectionMessage(myOutputConnectorAddress);
                         if (anEncodedMessage != null)

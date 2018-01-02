@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -58,11 +56,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myConnectionHandler = connectionHandler;
 
                         myListener = new TcpListener(myAddress);
-
-#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
                         myListener.Server.LingerState = new LingerOption(true, 0);
-#endif
                         myListener.Start();
 
                         // Listen in another thread
@@ -147,8 +142,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-        // Implementation of the listening loop for the Compact Framework platform.
-        // Note: Socket in Compact Framework does not have BeginAcceptTcpClient() method.
         // Note: BeginAcceptTcpClient() hangs in stress tests. Using QueueUserWorkItem has the same performance and is stable.
         private void DoTcpListening()
         {
@@ -243,6 +236,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-
-#endif

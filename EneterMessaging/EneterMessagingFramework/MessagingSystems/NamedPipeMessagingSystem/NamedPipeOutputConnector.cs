@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT && !XAMARIN
+#if !XAMARIN
 
 using System;
 using System.IO;

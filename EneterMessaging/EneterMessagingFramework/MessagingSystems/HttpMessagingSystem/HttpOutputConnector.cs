@@ -106,12 +106,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
                 byte[] aMessage = (byte[])message;
-#if !SILVERLIGHT
                 HttpRequestInvoker.InvokePostRequest(myUri, aMessage);
-#else
-                // In case of Silverlight the request must be sent outside the main Silverlight thread.
-                HttpRequestInvoker.InvokeNotInSilverlightThread(() => HttpRequestInvoker.InvokePostRequest(myUri, aMessage));
-#endif
             }
         }
 

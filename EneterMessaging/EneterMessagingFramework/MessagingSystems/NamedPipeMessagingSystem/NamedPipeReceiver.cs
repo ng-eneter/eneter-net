@@ -6,7 +6,7 @@
 */
 
 
-#if !SILVERLIGHT && !XAMARIN
+#if !XAMARIN
 
 using System;
 using System.Collections.Generic;

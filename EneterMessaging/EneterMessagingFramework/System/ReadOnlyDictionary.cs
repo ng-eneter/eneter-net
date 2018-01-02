@@ -1,6 +1,4 @@
-﻿#if !SILVERLIGHT
-
-
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -363,5 +361,3 @@ internal sealed class ReadOnlyDictionaryDebugView<TKey, TValue>
         }
     }
 }
-
-#endif

@@ -5,16 +5,11 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !SILVERLIGHT
-
+using Eneter.Messaging.Diagnostic;
 using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using Eneter.Messaging.Diagnostic;
-using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization;
-using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Eneter.Messaging.DataProcessing.Serializing
 {
@@ -24,9 +19,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     /// <remarks>
     /// The serializer internally uses BinaryFormatter provided by .Net.
     /// The data is serialized in the binary format.
-    /// <br/><br/>
-    /// This serializer is not supported in Silverlight and Windows Phone 7 platforms.
-    /// <br/>
     /// <example>
     /// Serialization and deserialization example.
     /// <code>
@@ -184,5 +176,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private static byte[] myNull = { };
     }
 }
-
-#endif //!SILVERLIGHT

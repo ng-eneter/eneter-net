@@ -81,7 +81,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 mySerializer = serializer;
                 myRpcTimeout = rpcTimeout;
 
-#if !SILVERLIGHT && !XAMARIN_IOS
+#if !XAMARIN_IOS
                 ServiceInterfaceChecker.CheckForClient<TServiceInterface>();
 
                 // Dynamically implement and instantiate the given interface as the proxy.
@@ -116,9 +116,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
-#if !SILVERLIGHT
         public TServiceInterface Proxy { get; private set; }
-#endif
 
         public void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler)
             where TEventArgs : EventArgs

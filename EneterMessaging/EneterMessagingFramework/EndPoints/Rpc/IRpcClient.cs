@@ -31,12 +31,10 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-#if !SILVERLIGHT
         /// <summary>
         /// Returns service proxy instance.
         /// </summary>
         TServiceInterface Proxy { get; }
-#endif
 
         /// <summary>
         /// Subscribes to an event from the service.

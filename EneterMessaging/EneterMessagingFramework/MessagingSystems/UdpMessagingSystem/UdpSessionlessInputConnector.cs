@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
@@ -68,11 +66,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                     try
                     {
                         myMessageHandler = messageHandler;
-#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myReuseAddressFlag, myTtl, myAllowBroadcastFlag, myMulticastGroup, myMulticastLoopbackFlag);
-#else
-                        myReceiver = UdpReceiver.CreateBoundReceiver(myServiceEndpoint, myTtl, myMulticastGroup);
-#endif
                         myReceiver.StartListening(OnRequestMessageReceived);
                     }
                     catch
@@ -189,5 +183,3 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-#endif

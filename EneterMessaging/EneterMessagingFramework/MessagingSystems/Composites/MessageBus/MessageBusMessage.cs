@@ -69,9 +69,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
     /// <summary>
     /// Internal message for interaction with the message bus.
     /// </summary>
-#if !SILVERLIGHT
     [Serializable]
-#endif
     [DataContract]
     public class MessageBusMessage
     {

@@ -5,10 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT
-
-using System;
-using System.IO;
 using System.Security.Cryptography;
 using Eneter.Messaging.Diagnostic;
 
@@ -20,8 +16,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     /// <remarks>
     /// The serializer internally uses some other serializer to serialize and deserialize data.
     /// Then it uses Rijndael to encrypt and decrypt the data.
-    /// <br/><br/>
-    /// Notice, the Rijndael encryption is not available in Silverlight platform.
     /// <example>
     /// Encrypted serialization with <see cref="XmlStringSerializer"/>
     /// <code>
@@ -130,5 +124,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private CryptoSerializerProvider myCryptoSerializer;
     }
 }
-
-#endif

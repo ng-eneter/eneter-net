@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
 
 using System;
 
@@ -45,5 +44,3 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         public string ToAddress { get; private set; }
     }
 }
-
-#endif

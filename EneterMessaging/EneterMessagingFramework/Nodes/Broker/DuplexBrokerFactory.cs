@@ -55,7 +55,7 @@ namespace Eneter.Messaging.Nodes.Broker
     /// <code>
     /// Subscribing for the notification messages.
     /// 
-    /// // Create Tcp based messaging for the silverlight client.
+    /// // Create Tcp based messaging.
     /// IMessagingSystemFactory aTcpMessagingFactory = new TcpMessagingSystemFactory();
     /// 
     /// // Create duplex output channel to send and receive messages.

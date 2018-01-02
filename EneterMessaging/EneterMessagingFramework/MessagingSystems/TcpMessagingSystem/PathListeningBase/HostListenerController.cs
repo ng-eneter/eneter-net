@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -185,12 +183,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
 
         private static IEnumerable<IPEndPoint> GetEndPoints(Uri address)
         {
-#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
             IPAddress[] anIpAddresses = Dns.GetHostAddresses(address.Host);
-#else
-            IPAddress[] anIpAddresses = { IPAddress.Parse(address.Host) };
-#endif
-
             IPEndPoint[] anEndPoints = new IPEndPoint[anIpAddresses.Length];
             for (int i = 0; i < anEndPoints.Length; ++i)
             {
@@ -207,6 +200,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         private static string TracedObject { get { return "HostListenerController "; } }
     }
 }
-
-
-#endif

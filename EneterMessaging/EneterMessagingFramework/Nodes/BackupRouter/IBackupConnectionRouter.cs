@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 using System;
 using System.Collections.Generic;
 using Eneter.Messaging.Infrastructure.Attachable;
@@ -62,5 +60,3 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         void RemoveAllReceivers();
     }
 }
-
-#endif

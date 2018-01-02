@@ -6,8 +6,6 @@
 */
 
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,9 +18,6 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 
-#if WINDOWS_PHONE80 || WINDOWS_PHONE81
-using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
-#endif
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
@@ -157,6 +152,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         }
     }
 }
-
-
-#endif

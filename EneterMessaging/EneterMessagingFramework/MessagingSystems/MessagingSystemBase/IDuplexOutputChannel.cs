@@ -52,11 +52,6 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         /// <summary>
         /// Sends the message to the input channel.
         /// </summary>
-        /// <remarks>
-        /// Notice, there is a limitation for the Silverlight platform using HTTP.
-        /// If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown.
-        /// Therefore, it is recommended to execute this method in a different thread.
-        /// </remarks>
         /// <param name="message">message to be sent. It can be String or byte[] or some other type depending on used protocol formatter.</param>
         /// <exception cref="InvalidOperationException">If the connection is not open.</exception>
         /// <exception cref="Exception">Any exception thrown during sending of a message. E.g. if sending via TCP fails.</exception>
@@ -65,22 +60,12 @@ namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase
         /// <summary>
         /// Opens the connection with the duplex input channel.
         /// </summary>
-        /// <remarks>
-        /// Notice, there is a limitation for the Silverlight platform using HTTP.
-        /// If the message is sent via HTTP from the main Silverlight thread, then in case of a failure, the exception is not thrown.
-        /// Therefore, it is recommended to execute this method in a different thread.
-        /// </remarks>
         /// <exception cref="InvalidOperationException">If the connection is already open.</exception>
         void OpenConnection();
 
         /// <summary>
         /// Closes the connection with the duplex input channel.
         /// </summary>
-        /// <remarks>
-        /// Notice, there is a limitation for the Silverlight platform.
-        /// If this method is executed in the main Silverlight thread, then in case of a failure the exception will not be propagated.
-        /// It is recommended to execute this method in a different thread.
-        /// </remarks>
         void CloseConnection();
 
         /// <summary>

@@ -6,14 +6,11 @@
 */
 
 
-#if !SILVERLIGHT
-
 using System;
 using System.Net;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
-using System.Collections.Generic;
-using System.IO;
+
 
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
@@ -240,5 +237,3 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         private string TracedObject { get { return GetType().Name + " "; } }
     }
 }
-
-#endif

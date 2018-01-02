@@ -1,4 +1,4 @@
-﻿#if !SILVERLIGHT
+﻿
 
 using System;
 using System.Collections.Generic;
@@ -194,5 +194,3 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
         }
     }
 }
-
-#endif

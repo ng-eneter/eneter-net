@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT
-
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
     /// <summary>
@@ -24,5 +22,3 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         ILoadBalancer CreateLoadBalancer();
     }
 }
-
-#endif

@@ -220,9 +220,6 @@
     <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpMessagingSystem_Synchronous.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpPolicyServer.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>

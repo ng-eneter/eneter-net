@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 using System.Runtime.CompilerServices;
 
 namespace Eneter.Messaging.Nodes.BackupRouter
@@ -19,5 +17,3 @@ namespace Eneter.Messaging.Nodes.BackupRouter
     {
     }
 }
-
-#endif

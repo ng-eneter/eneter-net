@@ -6,10 +6,8 @@
 */
 
 
-#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
 
 using System;
-using System.Net;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 
@@ -115,6 +113,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         protected abstract string TracedObject { get; }
     }
 }
-
-
-#endif

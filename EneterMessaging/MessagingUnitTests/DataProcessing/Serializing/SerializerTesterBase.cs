@@ -11,9 +11,7 @@ namespace Eneter.MessagingUnitTests.DataProcessing.Serializing
 {
     public abstract class SerializerTesterBase
     {
-#if !SILVERLIGHT
         [Serializable]
-#endif
         [DataContract]
         public class T1
         {
@@ -24,9 +22,7 @@ namespace Eneter.MessagingUnitTests.DataProcessing.Serializing
             public int y;
         }
 
-#if !SILVERLIGHT
         [Serializable]
-#endif
         [DataContract]
         public class T2
         {

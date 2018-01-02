@@ -36,8 +36,6 @@ namespace Eneter.Messaging.Diagnostic
     /// EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
     /// </code>
     /// </example>
-    /// <br/>
-    /// Notice: The trace does not display namespaces and method names in Compact Framework platform.
     /// <example>
     /// Example showing how you can trace entering/leaving methods:
     /// <code>
@@ -468,9 +466,6 @@ namespace Eneter.Messaging.Diagnostic
 
                 // Get the calling method
                 // Note: We must skip two methods to get the calling method.
-                // Note: Be careful which constructor of StackFrame is used because of 'SecurityCriticalAttribute' in Silverlight.
-                //       If the attribute is set, then only trusted Silverlight applications can use the functionality.
-                //       The current constructor does not have that attribute.
                 StackFrame aCallStack = new StackFrame(2 + skipFrames);
 
                 int aThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -504,9 +499,7 @@ namespace Eneter.Messaging.Diagnostic
                             bool aStartTimerFlag = myTraceBuffer.Length == 0;
 
                             // Add the message to the buffer.
-                            // Note: compact framework does not support AppendLine therefore the plain Append(...) is used.
-                            myTraceBuffer.Append(aMessage);
-                            myTraceBuffer.Append("\r\n");
+                            myTraceBuffer.AppendLine(aMessage);
 
                             if (aStartTimerFlag)
                             {
@@ -636,7 +629,7 @@ namespace Eneter.Messaging.Diagnostic
 
                 if (myTraceBuffer.Capacity <= myTraceBufferCapacity)
                 {
-                    // Note: compact framework does not support Clear().
+                    // Note: NET35 does not support Clear().
                     myTraceBuffer.Length = 0;
                 }
                 else
@@ -664,12 +657,8 @@ namespace Eneter.Messaging.Diagnostic
                     }
                     else
                     {
-#if !SILVERLIGHT
                         // Otherwise write to the debug port.
                         System.Diagnostics.Debug.Write(message);
-#else
-                        System.Diagnostics.Debug.WriteLine(message);
-#endif
                     }
                 }
             }

@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !SILVERLIGHT
-
 using System;
 
 namespace Eneter.Messaging.Nodes.LoadBalancer
@@ -34,5 +32,3 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         public string ChannelId { get; private set; }
     }
 }
-
-#endif
