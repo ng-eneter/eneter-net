@@ -6,7 +6,7 @@
 */
 
 
-#if !MONO && !NET35 && !SILVERLIGHT && !COMPACT_FRAMEWORK && !XAMARIN
+#if !NET35 && !SILVERLIGHT && !XAMARIN
 
 using System;
 using System.Threading;

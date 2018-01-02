@@ -121,7 +121,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcCall()
         {
@@ -155,9 +154,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcCall_NullArgument()
         {
@@ -189,7 +186,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
         [Test]
         public void DynamicRpcCall()
@@ -222,7 +218,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         [ExpectedException(typeof(RpcException))]
         public void RpcCallError()
@@ -253,9 +248,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
 
         // Note: This test is not applicable for the synchronous messaging
         //       because synchronous messaging is a sequence within one thread and so the remote call
@@ -292,9 +285,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcNonGenericEvent()
         {
@@ -345,7 +336,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
         [Test]
         public void DynamicRpcNonGenericEvent()
@@ -397,7 +387,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         }
 
         
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcGenericEvent()
         {
@@ -453,7 +442,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
         
         [Test]
         public void DynamicRpcGenericEvent()
@@ -512,7 +500,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcGenericEvent_SerializerPerClient()
         {
@@ -592,9 +579,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void SubscribeBeforeAttachOutputChannel()
         {
@@ -655,9 +640,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcNonGenericEvent_10000()
         {
@@ -717,7 +700,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
         [Test]
         public void DynamicRpcNonGenericEvent_10000()
@@ -777,7 +759,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void RpcCall_10000()
         {
@@ -834,9 +815,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void MultipleClients_RemoteCall_10()
         {
@@ -868,6 +847,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 // Clients communicate with the service in parallel.
                 AutoResetEvent aDone = new AutoResetEvent(false);
                 int aCounter = 0;
+                object aCounterLock = new object();
                 foreach (IRpcClient<IHello> aClient in aClients)
                 {
                     ThreadPool.QueueUserWorkItem(x =>
@@ -875,10 +855,14 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                             try
                             {
                                 aClient.Proxy.Sum(10, 20);
-                                ++aCounter;
-                                if (aCounter == aClients.Length)
+
+                                lock (aCounterLock)
                                 {
-                                    aDone.Set();
+                                    ++aCounter;
+                                    if (aCounter == aClients.Length)
+                                    {
+                                        aDone.Set();
+                                    }
                                 }
                                 Thread.Sleep(1);
                             }
@@ -909,9 +893,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
         
-#if !COMPACT_FRAMEWORK
         [Test]
         public void MultipleClients_RemoteEvent_10()
         {
@@ -945,6 +927,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 int anOpenCounter = 0;
                 int aCloseCounter = 0;
                 int aSubscribedClientCounter = 0;
+                object aCounterLock = new object();
                 foreach (IRpcClient<IHello> aClient in aClients)
                 {
                     IRpcClient<IHello> aClientTmp = aClient;
@@ -952,26 +935,35 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                         {
                             aClientTmp.Proxy.Open += (x, y) =>
                                 {
-                                    ++anOpenCounter;
-                                    if (anOpenCounter == aClients.Length)
+                                    lock (aCounterLock)
                                     {
-                                        anOpenReceived.Set();
+                                        ++anOpenCounter;
+                                        if (anOpenCounter == aClients.Length)
+                                        {
+                                            anOpenReceived.Set();
+                                        }
                                     }
                                 };
 
                             aClientTmp.Proxy.Close += (x, y) =>
                                 {
-                                    ++aCloseCounter;
-                                    if (aCloseCounter == aClients.Length)
+                                    lock (aCounterLock)
                                     {
-                                        aCloseReceived.Set();
+                                        ++aCloseCounter;
+                                        if (aCloseCounter == aClients.Length)
+                                        {
+                                            aCloseReceived.Set();
+                                        }
                                     }
                                 };
 
-                            ++aSubscribedClientCounter;
-                            if (aSubscribedClientCounter == aClients.Length)
+                            lock (aCounterLock)
                             {
-                                anAllCleintsSubscribed.Set();
+                                ++aSubscribedClientCounter;
+                                if (aSubscribedClientCounter == aClients.Length)
+                                {
+                                    anAllCleintsSubscribed.Set();
+                                }
                             }
 
                             Thread.Sleep(1);
@@ -1007,9 +999,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void NoInterfaceTypeProvided()
@@ -1017,9 +1007,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
             RpcFactory anRpcFactory = new RpcFactory();
             anRpcFactory.CreateClient<OpenArgs>();
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void PerClientInstanceService()
         {
@@ -1031,6 +1019,8 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
             try
             {
+                ManualResetEvent aClient2Connected = new ManualResetEvent(false);
+
                 string aService1IdFromEvent = null;
                 anRpcClient1.Proxy.Open += (x, y) =>
                     {
@@ -1041,12 +1031,14 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 anRpcClient2.Proxy.Open += (x, y) =>
                     {
                         aService2IdFromEvent = y.InstanceId;
+                        aClient2Connected.Set();
                     };
 
                 anRpcService.AttachDuplexInputChannel(myMessaging.CreateDuplexInputChannel(myChannelId));
                 anRpcClient1.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
                 anRpcClient2.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
 
+                aClient2Connected.WaitOne(1000);
 
                 string aServiceId1 = anRpcClient1.Proxy.GetInstanceId();
                 string aServiceId2 = anRpcClient2.Proxy.GetInstanceId();
@@ -1076,7 +1068,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 }
             }
         }
-#endif
 
         protected IMessagingSystemFactory myMessaging;
         protected string myChannelId;

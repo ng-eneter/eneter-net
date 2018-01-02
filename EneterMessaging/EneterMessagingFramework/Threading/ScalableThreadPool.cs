@@ -9,10 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-#if COMPACT_FRAMEWORK
-using Eneter.Messaging.DataProcessing.MessageQueueing;
-#endif
-
 namespace Eneter.Messaging.Threading
 {
     class ScalableThreadPool
@@ -33,12 +29,8 @@ namespace Eneter.Messaging.Threading
                         // Check if there is a thread(s) waiting until a new task is entered.
                         bool anIdleThreadExist = myNumberOfIdleThreads > 0;
 
-#if COMPACT_FRAMEWORK
-                        MonitorExt.Pulse(myTasks);
-#else
                         // Release the lock and signal the new task was entered.
                         Monitor.Pulse(myTasks);
-#endif
                         return anIdleThreadExist;
                     }
                 //}
@@ -60,12 +52,9 @@ namespace Eneter.Messaging.Threading
                         // The queue with tasks is empty so return the lock and wait until
                         // a task is entered and the lock is acquired again or until timeout.
                         ++myNumberOfIdleThreads;
-#if COMPACT_FRAMEWORK
-                        if (!MonitorExt.Wait(myTasks, timeout))
-#else
+
                         // Release the lock and signal the new task was entered.
                         if (!Monitor.Wait(myTasks, timeout))
-#endif
                         {
                             // If the lock is not reacquired.
                             --myNumberOfIdleThreads;
@@ -73,8 +62,18 @@ namespace Eneter.Messaging.Threading
                         }
 
                         // The lock is reacquired. It means something is in the queue.
+                        // Note: but it happened the queue was empty and the exception was thrown
+                        //       so the check if the queue is empty is still needed.
                         --myNumberOfIdleThreads;
-                        return myTasks.Dequeue();
+                        if (myTasks.Count > 0)
+                        {
+
+                            return myTasks.Dequeue();
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 //}
             }

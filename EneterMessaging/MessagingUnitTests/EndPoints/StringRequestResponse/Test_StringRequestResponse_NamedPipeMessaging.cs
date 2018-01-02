@@ -1,5 +1,5 @@
 ﻿
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT
 
 using System;
 using System.Collections.Generic;

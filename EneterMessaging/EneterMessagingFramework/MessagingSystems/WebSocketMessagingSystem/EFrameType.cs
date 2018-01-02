@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !WINDOWS_PHONE_70
-
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     /// <summary>
@@ -46,5 +44,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         Pong = 0xA
     }
 }
-
-#endif

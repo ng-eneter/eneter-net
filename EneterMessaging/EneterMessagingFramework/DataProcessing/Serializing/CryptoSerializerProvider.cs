@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !COMPACT_FRAMEWORK
-
 using System.IO;
 using System.Security.Cryptography;
 using Eneter.Messaging.Diagnostic;
@@ -111,5 +109,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
-
-#endif

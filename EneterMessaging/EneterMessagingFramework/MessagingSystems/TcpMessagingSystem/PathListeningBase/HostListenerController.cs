@@ -185,7 +185,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
 
         private static IEnumerable<IPEndPoint> GetEndPoints(Uri address)
         {
-#if !COMPACT_FRAMEWORK && !WINDOWS_PHONE80 && !WINDOWS_PHONE81
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
             IPAddress[] anIpAddresses = Dns.GetHostAddresses(address.Host);
 #else
             IPAddress[] anIpAddresses = { IPAddress.Parse(address.Host) };

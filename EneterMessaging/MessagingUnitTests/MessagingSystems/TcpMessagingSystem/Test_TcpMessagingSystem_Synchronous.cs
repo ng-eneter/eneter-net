@@ -83,7 +83,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void ClientReceiveTimeout()
         {
@@ -158,9 +157,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
                 anInputChannel.StopListening();
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void TestPortAvailability()
         {
@@ -191,7 +188,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
                 anInputChannel2.StopListening();
             }
         }
-#endif
 
     }
 }

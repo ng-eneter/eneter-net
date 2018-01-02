@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !WINDOWS_PHONE_70
-
 using System;
 using System.IO;
 
@@ -76,7 +74,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         
 
                         myTcpClient.NoDelay = true;
-#if !COMPACT_FRAMEWORK
                         myTcpClient.SendTimeout = mySendTimeout;
                         myTcpClient.ReceiveTimeout = myReceiveTimeout;
                         myTcpClient.SendBufferSize = mySendBuffer;
@@ -91,7 +88,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             myTcpClient.Client.Bind(new IPEndPoint(aDummyIpAddress, myResponseReceivingPort));
                         }
 #endif
-#endif
 
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
                         //       Therefore it must be workerounded a little bit.
@@ -101,14 +97,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             {
                                 try
                                 {
-#if !COMPACT_FRAMEWORK
                                     // This call also resolves host names.
                                     myTcpClient.Connect(myUri.Host, myUri.Port);
-#else
-                                    // Compact framework has problems with resolving host names.
-                                    // Therefore directly IPAddress is used.
-                                    myTcpClient.Connect(IPAddress.Parse(myUri.Host), myUri.Port);
-#endif
                                 }
                                 catch (Exception err)
                                 {
@@ -182,11 +172,8 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                     if (myResponseReceiverThread != null && Thread.CurrentThread.ManagedThreadId != myResponseReceiverThread.ManagedThreadId)
                     {
-#if COMPACT_FRAMEWORK
-                        // N.A.
-#else
+
                         if (myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
-#endif
                         {
                             if (!myResponseReceiverThread.Join(3000))
                             {
@@ -325,5 +312,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
-
-#endif

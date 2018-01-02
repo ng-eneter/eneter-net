@@ -1,5 +1,4 @@
-﻿#if !COMPACT_FRAMEWORK
-
+﻿
 using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.EndPoints.Rpc;
 using Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem;
@@ -23,5 +22,3 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         }
     }
 }
-
-#endif

@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !WINDOWS_PHONE_70
-
 using System.Runtime.CompilerServices;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
@@ -19,5 +17,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
     {
     }
 }
-
-#endif

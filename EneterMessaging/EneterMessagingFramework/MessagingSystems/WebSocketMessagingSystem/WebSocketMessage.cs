@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !WINDOWS_PHONE_70
 
 using System;
 using System.IO;
@@ -90,6 +89,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         public Stream InputStream { get; private set; }
     }
 }
-
-
-#endif

@@ -31,7 +31,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT
         /// <summary>
         /// Returns service proxy instance.
         /// </summary>

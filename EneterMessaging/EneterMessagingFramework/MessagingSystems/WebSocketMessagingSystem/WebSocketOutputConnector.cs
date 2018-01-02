@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !WINDOWS_PHONE_70
 
 using System;
 using System.IO;
@@ -214,5 +213,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
 }
-
-#endif

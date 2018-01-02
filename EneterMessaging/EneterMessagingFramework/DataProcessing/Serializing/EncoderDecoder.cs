@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-//#if !COMPACT_FRAMEWORK20
-
 using System;
 using System.IO;    
 using System.Text;
@@ -254,5 +252,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private readonly byte BYTES_ID = 40;
     }
 }
-
-//#endif

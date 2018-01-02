@@ -250,12 +250,10 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                 try
                 {
-#if !COMPACT_FRAMEWORK
                     tcpClient.SendTimeout = mySendTimeout;
                     tcpClient.ReceiveTimeout = myReceiveTimeout;
                     tcpClient.SendBufferSize = mySendBuffer;
                     tcpClient.ReceiveBufferSize = myReceiveBuffer;
-#endif
 
                     // If the security communication is required, then wrap the network stream into the security stream.
                     anInputOutputStream = mySecurityStreamFactory.CreateSecurityStreamAndAuthenticate(tcpClient.GetStream());

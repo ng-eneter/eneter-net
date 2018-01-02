@@ -16,10 +16,8 @@ using Eneter.Messaging.Threading.Dispatching;
 using System;
 using System.Linq;
 using System.Net;
-
-#if !COMPACT_FRAMEWORK
 using System.Net.NetworkInformation;
-#endif
+
 
 namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 {
@@ -497,7 +495,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             }
         }
 
-#if (!SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81) && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         
         /// <summary>
         /// Returns IP addresses assigned to the device which can be used for listening.
@@ -512,7 +510,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         }
 #endif
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT
         /// <summary>
         /// Checks if the port is available for UDP listening.
         /// </summary>
@@ -700,7 +698,6 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </remarks>
         public bool AllowSendingBroadcasts { get; set; }
 
-#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Enables /disables receiving multicast messages from the same IP address from which they were sent.
         /// </summary>
@@ -744,9 +741,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// </example>
         /// </remarks>
         public bool MulticastLoopback { get; set; }
-#else
-        private bool MulticastLoopback { get; set; }
-#endif
+
         /// <summary>
         /// Sets or gets the port which shall be used for receiving response messages by output channel in case of unicast communication.
         /// </summary>

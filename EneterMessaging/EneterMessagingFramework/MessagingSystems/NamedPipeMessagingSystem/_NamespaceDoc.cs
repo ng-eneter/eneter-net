@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK && !XAMARIN
+#if !SILVERLIGHT && !XAMARIN
 
 using System.Runtime.CompilerServices;
 

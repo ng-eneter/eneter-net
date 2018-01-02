@@ -1,5 +1,4 @@
-﻿#if !COMPACT_FRAMEWORK
-
+﻿
 using System;
 using System.Threading;
 using Eneter.Messaging.DataProcessing.Serializing;
@@ -151,5 +150,3 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
         protected bool myConnectionNotGranted;
     }
 }
-
-#endif

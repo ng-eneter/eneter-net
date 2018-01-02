@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !MONO && !NET35 && !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK
+#if !NET35
 
 using System;
 using System.IO;

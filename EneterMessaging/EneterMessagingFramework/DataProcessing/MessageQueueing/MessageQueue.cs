@@ -35,15 +35,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                 lock (myMessageQueue)
                 {
                     myMessageQueue.Enqueue(message);
-
-                    // Release the lock and signal that a message was added to the queue.
-                    // Note: The signal causes that if there is a blocked thread waitng for a message it is unblocked
-                    //       and the thread can read and process the message.
-#if COMPACT_FRAMEWORK
-                    MonitorExt.Pulse(myMessageQueue);
-#else
                     Monitor.Pulse(myMessageQueue);
-#endif
                 }
             }
         }
@@ -136,11 +128,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                 lock (myMessageQueue)
                 {
                     myIsBlockingMode = false;
-#if COMPACT_FRAMEWORK
-                    MonitorExt.PulseAll(myMessageQueue);
-#else
                     Monitor.PulseAll(myMessageQueue);
-#endif
                 }
             }
         }
@@ -205,14 +193,10 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                 {
                     while (myIsBlockingMode && myMessageQueue.Count == 0)
                     {
-                        // Release the lock and wait for a signal that something is in the queue.
-                        // Note: To unblock threads waiting here use UnblockProcesseingThreads().
-#if COMPACT_FRAMEWORK
-                        MonitorExt.Wait(myMessageQueue);
-#else
-                        Monitor.Wait(myMessageQueue);
-#endif
-                    }
+                    // Release the lock and wait for a signal that something is in the queue.
+                    // Note: To unblock threads waiting here use UnblockProcesseingThreads().
+                    Monitor.Wait(myMessageQueue);
+                }
 
                     if (myMessageQueue.Count == 0)
                     {
@@ -234,11 +218,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                     {
                         // Release the lock and wait for a signal that something is in the queue.
                         // Note: To unblock threads waiting here use UnblockProcesseingThreads().
-#if COMPACT_FRAMEWORK
-                        if (!MonitorExt.Wait(myMessageQueue, millisecondsTimeout))
-#else
                         if (!Monitor.Wait(myMessageQueue, millisecondsTimeout))
-#endif
                         {
                             throw new TimeoutException("The thread waiting for a message from the message queue exceeded " + millisecondsTimeout.ToString() + " ms.");
                         }

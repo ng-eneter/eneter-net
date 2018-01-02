@@ -264,12 +264,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
         public void Query()
         {
             //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
-
-#if !COMPACT_FRAMEWORK
             Uri anAddress = new Uri("ws://localhost:8087/MyService/");
-#else
-            Uri anAddress = new Uri("ws://127.0.0.1:8087/MyService/");
-#endif
 
 
             WebSocketListener aService = new WebSocketListener(anAddress);

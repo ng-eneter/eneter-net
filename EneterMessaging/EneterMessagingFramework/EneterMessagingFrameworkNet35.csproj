@@ -84,7 +84,6 @@
     <Compile Include="DataProcessing\MessageQueueing\MessageQueue.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataProcessing\MessageQueueing\MonitorExt.cs" />
     <Compile Include="DataProcessing\MessageQueueing\SingleThreadExecutor.cs" />
     <Compile Include="DataProcessing\MessageQueueing\WorkingThread.cs">
       <SubType>Code</SubType>
@@ -247,9 +246,6 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\ConnectionProtocols\EneterStringProtocolFormatter.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\IProtocolFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -262,14 +258,10 @@
     <Compile Include="MessagingSystems\ConnectionProtocols\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpFormatter_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListenerFactory_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpHostListener_CompactFramework.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpInputConnector.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider_CompactFramework.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -280,10 +272,7 @@
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext_CompactFramework.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker_Silverlight.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\ServerUri_Silverlight.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
@@ -576,12 +565,8 @@
     <Compile Include="Nodes\Router\_NamespaceDoc.cs" />
     <Compile Include="Nodes\_NamespaceDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="System\HashSet.cs" />
-    <Compile Include="System\LinqBridge.cs" />
     <Compile Include="System\ListExt.cs" />
     <Compile Include="System\ReadOnlyDictionary.cs" />
-    <Compile Include="System\SystemAttributes.cs" />
-    <Compile Include="System\WaitHandleExt.cs" />
     <Compile Include="System\_NamespaceDoc.cs" />
     <Compile Include="Threading\Dispatching\AndroidDispatching.cs" />
     <Compile Include="Threading\Dispatching\AsyncDispatching.cs" />

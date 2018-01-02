@@ -5,7 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !WINDOWS_PHONE_70
 
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
@@ -146,10 +145,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 OutputChannelThreading = InputChannelThreading;
 #endif
 
-#if SILVERLIGHT3 || SILVERLIGHT4 || SILVERLIGHT5
-                OutputChannelThreading = new SilverlightDispatching();
-#endif
-
                 PingFrequency = TimeSpan.FromMilliseconds(300000);
             }
         }
@@ -270,7 +265,6 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// </summary>
         public TimeSpan ConnectTimeout { get; set; }
 
-#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Sets or gets timeout to send a message. Default is 0 what it infinite time.
         /// </summary>
@@ -288,12 +282,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         /// If the value is true then the duplex input channel can start listening to the IP address and port which is already used by other channel.
         /// </remarks>
         public bool ReuseAddress { get; set; }
-#else
-        // Dummy timeouts - Compact Framework does not support timeouts.
-        private TimeSpan SendTimeout { get; set; }
-        private TimeSpan ReceiveTimeout { get; set; }
-        private bool ReuseAddress { get; set; }
-#endif
+
 
 #if !SILVERLIGHT || WINDOWS_PHONE80 || WINDOWS_PHONE81
         /// <summary>
@@ -333,6 +322,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }
-
-
-#endif

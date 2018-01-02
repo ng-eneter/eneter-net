@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if SILVERLIGHT && !WINDOWS_PHONE_70
+#if SILVERLIGHT
 
 using System;
 using System.IO;

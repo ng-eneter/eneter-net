@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !WINDOWS_PHONE_70
-
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
     internal class WebSocketFrame
@@ -25,5 +23,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         public bool IsFinal { get; private set; }
     }
 }
-
-#endif

@@ -6,7 +6,7 @@
 */
 
 
-#if !SILVERLIGHT && !MONO && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT
 
 using System;
 using System.IO;

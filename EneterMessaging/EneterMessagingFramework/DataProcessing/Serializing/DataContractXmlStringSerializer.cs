@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !MONO && !COMPACT_FRAMEWORK
-
 using System;
 using System.IO;
 using System.Runtime.Serialization;
@@ -122,5 +120,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private Func<Type, XmlObjectSerializer> myDataContractFactoryMethod;
     }
 }
-
-#endif

@@ -56,17 +56,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     /// </remarks>
     public class XmlStringSerializer : ISerializer
     {
-#if COMPACT_FRAMEWORK
-        /// <summary>
-        /// Declaration of the factory method for the Compact Framework platform.
-        /// </summary>
-        /// <remarks>
-        /// Compact Framework does not have delegates Func and Action.
-        /// Therefore we need to declare the delegate for the factory method explicitly.
-        /// </remarks>
-        public delegate XmlSerializer XmlSerializerFactoryMethod(Type typeToSerialize);
-#endif
-
         /// <summary>
         /// Creates the serializer based on XmlSerializer with default settings.
         /// </summary>
@@ -85,15 +74,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         /// The factory method can be called from more threads at the same time, so be sure, your factory method
         /// is thread safe.
         /// </param>
-#if COMPACT_FRAMEWORK
-        public XmlStringSerializer(XmlSerializerFactoryMethod xmlSerializerFactoryMethod)
-        {
-            using (EneterTrace.Entering())
-            {
-                myXmlSerializerFactoryMethod = (x) => xmlSerializerFactoryMethod(x);
-            }
-        }
-#else
         public XmlStringSerializer(Func<Type, XmlSerializer> xmlSerializerFactoryMethod)
         {
             using (EneterTrace.Entering())
@@ -101,7 +81,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 myXmlSerializerFactoryMethod = xmlSerializerFactoryMethod;
             }
         }
-#endif
         
         /// <summary>
         /// Serializes data to the xml string.

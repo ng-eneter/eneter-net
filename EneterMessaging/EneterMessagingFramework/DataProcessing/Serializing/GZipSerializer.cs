@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK20
+#if !SILVERLIGHT
 
 using System;
 using System.IO;

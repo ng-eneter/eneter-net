@@ -211,7 +211,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterConnectionProtocol.cs" />
-    <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterStringConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\BaseTester.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !WINDOWS_PHONE_70
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -332,7 +330,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         myTcpClient = new TcpClient(anAddressFamily);
                         myTcpClient.NoDelay = true;
 
-#if !NET35 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71
+#if !NET35
                         if (ResponseReceivingPort > 0)
                         {
                             IPAddress aDummyIpAddress = anAddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6None : IPAddress.None;
@@ -345,11 +343,9 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         myTcpClient.ConnectTimeout = ConnectTimeout;
 #endif
 
-#if !COMPACT_FRAMEWORK
                         // Note: Compact framework does not support these timeouts. - it throws exception.
                         myTcpClient.SendTimeout = SendTimeout;
                         myTcpClient.ReceiveTimeout = ReceiveTimeout;
-#endif
 
 #if !SILVERLIGHT
                         // Note: TcpClient and Socket do not have a possibility to set the connection timeout.
@@ -360,14 +356,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                             {
                                 try
                                 {
-#if !COMPACT_FRAMEWORK
                                     // This call also resolves the host name.
                                     myTcpClient.Connect(Uri.Host, Uri.Port);
-#else
-                                    // Compact framework has problems with resolving host names.
-                                    // Therefore directly IPAddress is used.
-                                    myTcpClient.Connect(IPAddress.Parse(Uri.Host), Uri.Port);
-#endif
                                 }
                                 catch (Exception err)
                                 {
@@ -884,11 +874,8 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         myTcpClient = null;
                     }
 
-#if COMPACT_FRAMEWORK
-                    if (myResponseReceiverThread != null)
-#else
+
                     if (myResponseReceiverThread != null && myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
-#endif
                     {
                         if (!myResponseReceiverThread.Join(3000))
                         {
@@ -1022,6 +1009,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         }
     }
 }
-
-
-#endif

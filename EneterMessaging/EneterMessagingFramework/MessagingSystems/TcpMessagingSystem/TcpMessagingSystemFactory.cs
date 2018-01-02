@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !WINDOWS_PHONE_70
-
 using System;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
@@ -17,11 +15,8 @@ using Eneter.Messaging.Threading.Dispatching;
 using System.Linq;
 using System.Net;
 using System.Collections.Generic;
-
-#if !COMPACT_FRAMEWORK
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-#endif
 
 #if WINDOWS_PHONE80 || WINDOWS_PHONE81
 using Windows.Networking.Connectivity;
@@ -209,9 +204,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                 OutputChannelThreading = InputChannelThreading;
 #endif
 
-#if SILVERLIGHT3 || SILVERLIGHT4 || SILVERLIGHT5
-                OutputChannelThreading = new SilverlightDispatching();
-#endif
             }
         }
 
@@ -314,7 +306,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
             }
         }
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT
         /// <summary>
         /// Returns IP addresses assigned to the device which can be used for the listening.
         /// </summary>
@@ -368,7 +360,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         }
 #endif
 
-#if !SILVERLIGHT && !COMPACT_FRAMEWORK
+#if !SILVERLIGHT
         /// <summary>
         /// Checks if the port is available for TCP listening.
         /// </summary>
@@ -501,7 +493,6 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         public int ResponseReceiverPort { get; set; }
 
 
-#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Size of the buffer in bytes for sending messages. Default value is 8192 bytes.
         /// </summary>
@@ -529,14 +520,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         /// If the value is true then the input channels or output channels can start listening to the IP address and port which is already used by other channel.
         /// </remarks>
         public bool ReuseAddress { get; set; }
-#else
-        // Note: Compact framework does not support these settings in Sockets. - it throws exception.
-        private int SendBufferSize { get; set; }
-        private int ReceiveBufferSize { get; set; }
-        private TimeSpan SendTimeout { get; set; }
-        private TimeSpan ReceiveTimeout { get; set; }
-        private bool ReuseAddress { get; set; }
-#endif
+
 
         /// <summary>
         /// Sets ot gets timeout to open the connection. Default is 30000 miliseconds. Value 0 is infinite time.
@@ -568,5 +552,3 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
         private IThreadDispatcher myDispatcherAfterMessageDecoded = new NoDispatching().GetDispatcher();
     }
 }
-
-#endif

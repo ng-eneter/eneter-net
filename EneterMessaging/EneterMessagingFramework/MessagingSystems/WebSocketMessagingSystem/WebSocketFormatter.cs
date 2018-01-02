@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !WINDOWS_PHONE_70
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -418,6 +416,3 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         private const string myWebSocketId = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     }
 }
-
-
-#endif

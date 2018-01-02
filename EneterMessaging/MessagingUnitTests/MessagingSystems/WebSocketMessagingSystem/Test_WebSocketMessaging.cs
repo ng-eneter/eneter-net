@@ -72,7 +72,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void ClientReceiveTimeout()
         {
@@ -147,7 +146,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
                 anInputChannel.StopListening();
             }
         }
-#endif
     }
 }
 

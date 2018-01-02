@@ -100,7 +100,6 @@ namespace Eneter.MessagingUnitTests.Diagnostic
             aThreads.ForEach(x => Assert.IsTrue(x.Join(3000)));
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void FilterTest()
         {
@@ -135,9 +134,6 @@ namespace Eneter.MessagingUnitTests.Diagnostic
                 EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Short;
             }
         }
-#endif
-
-#if !COMPACT_FRAMEWORK
 
         [Test]
 	    public void performanceTest()
@@ -175,8 +171,6 @@ namespace Eneter.MessagingUnitTests.Diagnostic
                 EneterTrace.TraceLog = aStoredTraceLog;
 	        }
 	    }
-#endif
-
         
         private void TestMethod1()
         {

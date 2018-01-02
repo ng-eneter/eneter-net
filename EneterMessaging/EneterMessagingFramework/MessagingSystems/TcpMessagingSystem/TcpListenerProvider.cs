@@ -58,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                         myListener = new TcpListener(myAddress);
 
-#if !COMPACT_FRAMEWORK && !WINDOWS_PHONE80 && !WINDOWS_PHONE81
+#if !WINDOWS_PHONE80 && !WINDOWS_PHONE81
                         myListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
                         myListener.Server.LingerState = new LingerOption(true, 0);
 #endif
@@ -109,11 +109,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         myListener = null;
                     }
 
-#if COMPACT_FRAMEWORK
-                    if (myListeningThread != null)
-#else
                     if (myListeningThread != null && myListeningThread.ThreadState != ThreadState.Unstarted)
-#endif
                     {
                         if (!myListeningThread.Join(1000))
                         {

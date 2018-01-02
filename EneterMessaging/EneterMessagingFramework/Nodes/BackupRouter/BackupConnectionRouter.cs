@@ -94,23 +94,6 @@ namespace Eneter.Messaging.Nodes.BackupRouter
                     // Find all open connections with this receiver then close them and remove from the list.
                     List<string> aClientsToBeRedirected = new List<string>();
 
-#if SILVERLIGHT3 || SILVERLIGHT4 || WINDOWS_PHONE_70 || WINDOWS_PHONE_71
-                    myOpenConnections.Where(x =>
-                    {
-                        if (x.DuplexOutputChannel.ChannelId == channelId)
-                        {
-                            aClientsToBeRedirected.Add(x.ResponseReceiverId);
-
-                            CloseConnection(x);
-
-                            // Indicate it can be removed from the list.
-                            return true;
-                        }
-
-                        return false;
-                    }).ToList().ForEach(y => myOpenConnections.Remove(y));
-#else
-
                     myOpenConnections.RemoveAll(x =>
                     {
                         if (x.DuplexOutputChannel.ChannelId == channelId)
@@ -125,7 +108,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
 
                         return false;
                     });
-#endif
+
                     // Remove the receiver from the list of available receivers.
                     myAvailableReceivers.Remove(channelId);
 

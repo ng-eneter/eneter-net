@@ -152,11 +152,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-#if !COMPACT_FRAMEWORK20
                 return new RpcService<TServiceInterface>(service, Serializer);
-#else
-                throw new NotSupportedException("RPC service is not supported in Compact Framework 2.0.");
-#endif
             }
         }
 
@@ -174,11 +170,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         {
             using (EneterTrace.Entering())
             {
-#if !COMPACT_FRAMEWORK20
                 return new RpcService<TServiceInterface>(serviceFactoryMethod, Serializer);
-#else
-                throw new NotSupportedException("RPC service is not supported in Compact Framework 2.0.");
-#endif
             }
         }
 

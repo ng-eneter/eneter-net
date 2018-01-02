@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2011
 */
 
-#if !COMPACT_FRAMEWORK
-
 using System.Security.Cryptography;
 using Eneter.Messaging.Diagnostic;
 using System.IO;
@@ -140,5 +138,3 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         private CryptoSerializerProvider myCryptoSerializer;
     }
 }
-
-#endif

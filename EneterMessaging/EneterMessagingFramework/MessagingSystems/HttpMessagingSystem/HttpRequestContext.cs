@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2012
 */
 
-#if !COMPACT_FRAMEWORK && !SILVERLIGHT
+#if !SILVERLIGHT
 
 using System.Net;
 using Eneter.Messaging.DataProcessing.Streaming;

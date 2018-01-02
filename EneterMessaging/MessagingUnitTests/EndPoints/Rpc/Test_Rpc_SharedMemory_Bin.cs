@@ -1,5 +1,4 @@
-﻿#if !COMPACT_FRAMEWORK
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +21,3 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         }
     }
 }
-
-#endif

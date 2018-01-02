@@ -102,7 +102,6 @@ namespace Eneter.Messaging.Diagnostic
         {
             EneterTrace aTraceObject = null;
 
-#if !COMPACT_FRAMEWORK
             if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
             {
             	aTraceObject = new EneterTrace();
@@ -111,19 +110,9 @@ namespace Eneter.Messaging.Diagnostic
                 {
                     WriteMessage(0, ENTERING, null);
                 }
-#else
-            if (DetailLevel == EDetailLevel.Debug)
-            {
-            	aTraceObject = new EneterTrace();
-            	WriteMessage(0, ENTERING, null);
-#endif
 
 
-#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
                 aTraceObject.myStopWatch.Start();
-#else
-                aTraceObject.myEnteringTime = DateTime.Now;
-#endif
             }
 
             return aTraceObject;
@@ -136,7 +125,6 @@ namespace Eneter.Messaging.Diagnostic
         {
             try
             {
-#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
                 if (myStopWatch.IsRunning)
                 {
                     myStopWatch.Stop();
@@ -153,25 +141,10 @@ namespace Eneter.Messaging.Diagnostic
                             myStopWatch.Elapsed.Milliseconds,
                             aMicroseconds));
                 }
-#if !COMPACT_FRAMEWORK
                 else if (myProfilerIsRunning)
                 {
                     UpdateProfiler(myStopWatch.Elapsed.Ticks);
                 }
-#endif
-#else
-                if (myEnteringTime != DateTime.MinValue)
-                {
-                    DateTime aCurrentTime = DateTime.Now;
-                    TimeSpan aDuration = aCurrentTime - myEnteringTime;
-
-                    WriteMessage(0, "LEAVING", string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms]",
-                        aDuration.Hours,
-                        aDuration.Minutes,
-                        aDuration.Seconds,
-                        aDuration.Milliseconds));
-                }
-#endif
             }
             catch
             {
@@ -328,7 +301,6 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Starts the profiler measurement.
         /// </summary>
@@ -340,9 +312,7 @@ namespace Eneter.Messaging.Diagnostic
                 myProfilerIsRunning = true;
             }
         }
-#endif
 
-#if !COMPACT_FRAMEWORK
         /// <summary>
         /// Stops the profiler measurement and writes results to the trace.
         /// </summary>
@@ -358,7 +328,7 @@ namespace Eneter.Messaging.Diagnostic
                 foreach (KeyValuePair<MethodBase, ProfilerData> anItem in myProfilerData.OrderByDescending(x => x.Value.Ticks))
                 {
                     TimeSpan aTimeSpan = TimeSpan.FromTicks(anItem.Value.Ticks);
-#if !SILVERLIGHT3 && !WINDOWS_PHONE_70 && !NET35 && !MONO
+#if !NET35
                     string aMessage = string.Join("", aTimeSpan.ToString(), " ", anItem.Value.Calls, "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name, "\r\n");
 #else
                     string[] aJoinBuf = { aTimeSpan.ToString(), " ", anItem.Value.Calls.ToString(), "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name };
@@ -372,7 +342,7 @@ namespace Eneter.Messaging.Diagnostic
                 WriteToTrace("Profiler has ended.");
             }
         }
-#endif
+
         
         /// <summary>
         /// Sets or gets the user defined trace.
@@ -409,8 +379,6 @@ namespace Eneter.Messaging.Diagnostic
         /// </remarks>
         public static EDetailLevel DetailLevel { get { return myDetailLevel; } set { myDetailLevel = value; } }
 
-
-#if !COMPACT_FRAMEWORK
 
         /// <summary>
         /// Sets or gets the regular expression that will be applied to the namespace to filter traced messages.
@@ -457,7 +425,6 @@ namespace Eneter.Messaging.Diagnostic
                 }
             }
         }
-#endif
 
         private static string GetDetailsFromException(Exception err)
         {
@@ -504,13 +471,11 @@ namespace Eneter.Messaging.Diagnostic
                 // Note: Be careful which constructor of StackFrame is used because of 'SecurityCriticalAttribute' in Silverlight.
                 //       If the attribute is set, then only trusted Silverlight applications can use the functionality.
                 //       The current constructor does not have that attribute.
-#if !COMPACT_FRAMEWORK
                 StackFrame aCallStack = new StackFrame(2 + skipFrames);
-#endif
+
                 int aThreadId = Thread.CurrentThread.ManagedThreadId;
                 Action aTraceJob = () =>
                     {
-#if !COMPACT_FRAMEWORK
                         MethodBase aMethod = aCallStack.GetMethod();
                         string[] aJoinBuf = { aMethod.ReflectedType.FullName, aMethod.Name };
                         string aMethodName = string.Join(".", aJoinBuf);
@@ -528,20 +493,6 @@ namespace Eneter.Messaging.Diagnostic
                         aMessageBuilder.AppendFormat("{0:D3}", aTime.Millisecond);
                         aMessageBuilder.AppendFormat(" ~{0:D3}", aThreadId);
                         aJoinBuf = new string[] { aMessageBuilder.ToString(), prefix, aMethodName, message };
-#endif
-
-#if COMPACT_FRAMEWORK
-                        // Compact framework does not support retrieving the stack :-(.
-                        // So the method name is not available but at least the message is traced.
-                        StringBuilder aMessageBuilder = new StringBuilder();
-                        aMessageBuilder.AppendFormat((IFormatProvider)null,"{0:D2}:", aTime.Hour);
-                        aMessageBuilder.AppendFormat((IFormatProvider)null,"{0:D2}:", aTime.Minute);
-                        aMessageBuilder.AppendFormat((IFormatProvider)null,"{0:D2}.", aTime.Second);
-                        aMessageBuilder.AppendFormat((IFormatProvider)null,"{0:D3}", aTime.Millisecond);
-                        aMessageBuilder.AppendFormat((IFormatProvider)null," ~{0:D3}", aThreadId);
-
-                        string[] aJoinBuf = { aMessageBuilder.ToString(), prefix, message };
-#endif
 
                         // Joinn string arrays with ' ' delimiter.
                         string aMessage = string.Join(" ", aJoinBuf);
@@ -576,7 +527,6 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-#if !COMPACT_FRAMEWORK
         private static void UpdateProfiler(long ticks)
         {
             StackFrame aCallStack = new StackFrame(2);
@@ -601,7 +551,6 @@ namespace Eneter.Messaging.Diagnostic
 
             EnqueueJob(aProfilerJob);
         }
-#endif
 
         /// <summary>
         /// Enqueues a job to the queue.
@@ -741,21 +690,14 @@ namespace Eneter.Messaging.Diagnostic
         {
         }
 
-#if !WINDOWS_PHONE_70 && !WINDOWS_PHONE_71 && !SILVERLIGHT3 && !SILVERLIGHT4 && !SILVERLIGHT5 && !COMPACT_FRAMEWORK20
         private Stopwatch myStopWatch = new Stopwatch();
-#else
-        private DateTime myEnteringTime = DateTime.MinValue;
-#endif
 
         // Trace Info, Warning and Error by default.
         private static EDetailLevel myDetailLevel = EDetailLevel.Short;
 
         private static object myTraceLogLock = new object();
         private static TextWriter myTraceLog;
-        
-#if !COMPACT_FRAMEWORK        
         private static Regex myNameSpaceFilter;
-#endif
 
         private static ManualResetEvent myQueueThreadEndedEvent = new ManualResetEvent(true);
         private static bool myProcessingIsRunning;
@@ -766,7 +708,6 @@ namespace Eneter.Messaging.Diagnostic
         private static StringBuilder myTraceBuffer = new StringBuilder();
         private static Timer myTraceBufferFlushTimer = new Timer(OnFlushTraceBufferTick, null, -1, -1);
 
-#if !COMPACT_FRAMEWORK
         private class ProfilerData
         {
             public long Calls;
@@ -775,7 +716,6 @@ namespace Eneter.Messaging.Diagnostic
 
         private static Dictionary<MethodBase, ProfilerData> myProfilerData = new Dictionary<MethodBase, ProfilerData>();
         private static volatile bool myProfilerIsRunning;
-#endif
 
         private const string ENTERING = "-->";
         private const string LEAVING = "<--";

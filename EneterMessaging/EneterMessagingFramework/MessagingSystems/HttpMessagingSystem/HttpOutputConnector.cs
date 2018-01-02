@@ -233,11 +233,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
                     if (myResponseReceiverThread != null && Thread.CurrentThread.ManagedThreadId != myResponseReceiverThread.ManagedThreadId)
                     {
-#if COMPACT_FRAMEWORK
-                        if (myResponseReceiverThread != null)
-#else
                         if (myResponseReceiverThread.ThreadState != ThreadState.Unstarted)
-#endif
                         {
                             if (!myResponseReceiverThread.Join(3000))
                             {

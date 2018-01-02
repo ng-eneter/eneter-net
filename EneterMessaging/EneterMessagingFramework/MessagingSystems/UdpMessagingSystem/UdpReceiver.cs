@@ -91,25 +91,18 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
                         mySocket = new Socket(anAddressFamily, SocketType.Dgram, ProtocolType.Udp);
 
-#if !COMPACT_FRAMEWORK     
                         // If IPv6 then still allow IPv4 
                         if (anAddressFamily == AddressFamily.InterNetworkV6)
                         {
                             mySocket.SetSocketOption(SocketOptionLevel.IPv6, (SocketOptionName)27, false);
                         }
-#endif
 
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, myAllowBroadcastFlag);
 
-#if !COMPACT_FRAMEWORK
                         mySocket.Ttl = myTtl;
 
                         // Note: bigger buffer increases the chance the datagram is not lost.
                         mySocket.ReceiveBufferSize = 1048576;
-#else
-                        mySocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, (int)myTtl);
-                        mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1048576);
-#endif
                         mySocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, myReuseAddressFlag);
 
                         if (myEndPointToBind != null)
@@ -183,11 +176,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         mySocket = null;
                     }
 
-#if !COMPACT_FRAMEWORK
                     if (myListeningThread != null && myListeningThread.ThreadState != ThreadState.Unstarted)
-#else
-                    if (myListeningThread != null)
-#endif               	
                     {
                         if (!myListeningThread.Join(3000))
                         {
@@ -257,11 +246,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
                         {
                             // If this is service then continue in the loop if the exception
                             // occured because one of clients got disconnected.
-#if !COMPACT_FRAMEWORK
                             if (myEndPointToBind != null && err.SocketErrorCode == SocketError.Interrupted)
-#else
-                            if (myEndPointToBind != null && err.ErrorCode == 10004)
-#endif
                             {
                                 continue;
                             }
@@ -330,9 +315,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
             {
                 if (myMulticastGroup != null)
                 {
-#if !COMPACT_FRAMEWORK
                     mySocket.MulticastLoopback = myMulticastLoopbackFlag;
-#endif
                     if (myMulticastGroup.AddressFamily == AddressFamily.InterNetwork)
                     {
                         MulticastOption aMulticastOption = new MulticastOption(myMulticastGroup, ((IPEndPoint) mySocket.LocalEndPoint).Address);

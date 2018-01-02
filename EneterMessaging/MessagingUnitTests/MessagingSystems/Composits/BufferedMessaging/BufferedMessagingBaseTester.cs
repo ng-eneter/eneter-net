@@ -239,7 +239,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             Assert.AreEqual(aDuplexOutputChannel.ResponseReceiverId, anOpenConnections[1]);
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void A16_RequestResponse_100_ConstantlyInterrupted()
         {
@@ -350,7 +349,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 Assert.AreEqual(i + 1000, aReceivedResponseMessages[i]);
             }
         }
-#endif
 
 
         private void SendMessageReceiveResponse(string channelId, object message, object responseMessage,

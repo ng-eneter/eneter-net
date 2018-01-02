@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Threading;
-
-#if !COMPACT_FRAMEWORK
 using System.Windows.Threading;
-#endif
-
 using Eneter.Messaging.EndPoints.TypedMessages;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
@@ -141,7 +137,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
             }
         }
 
-#if !COMPACT_FRAMEWORK
         [Test]
         public void ThreadDispatching()
         {
@@ -197,7 +192,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
                 }
             }
         }
-#endif
         
         protected IDuplexInputChannel InputChannel { get; set; }
         protected IDuplexOutputChannel OutputChannel { get; set; }

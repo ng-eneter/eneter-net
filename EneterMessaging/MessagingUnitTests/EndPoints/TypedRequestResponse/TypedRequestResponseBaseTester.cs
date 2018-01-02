@@ -71,7 +71,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
             Assert.AreEqual(2000, aReceivedMessage);
             Assert.AreEqual(1000, aReceivedResponse);
         }
-#if !COMPACT_FRAMEWORK
+
         [Test]
         public void SendReceive_1Message_PerClientSerializer()
         {
@@ -149,7 +149,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.TypedRequestResponse
             Assert.AreEqual(1000, aSender1ReceivedResponse);
             Assert.AreEqual(1000, aSender2ReceivedResponse);
         }
-#endif
+
         [Test]
         public void SendReceive_MultiThreadAccess_1000Messages()
         {

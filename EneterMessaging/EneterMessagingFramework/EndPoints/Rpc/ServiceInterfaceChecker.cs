@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2014
 */
 
-#if !COMPACT_FRAMEWORK20
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -58,5 +56,3 @@ namespace Eneter.Messaging.EndPoints.Rpc
         }
     }
 }
-
-#endif
