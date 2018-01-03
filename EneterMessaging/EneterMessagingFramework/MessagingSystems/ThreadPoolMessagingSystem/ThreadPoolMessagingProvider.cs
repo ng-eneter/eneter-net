@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.ThreadPoolMessagingSystem
 {
@@ -30,12 +31,12 @@ namespace Eneter.Messaging.MessagingSystems.ThreadPoolMessagingSystem
                 // If the message handler was found then send the message
                 if (aMessageHandler != null)
                 {
-                    Action<object> aHelperCallback = x =>
+                    Action aHelperCallback = () =>
                         {
                             aMessageHandler(message);
                         };
 
-                    ThreadPool.QueueUserWorkItem(aHelperCallback.Invoke);
+                    EneterThreadPool.QueueUserWorkItem(aHelperCallback.Invoke);
                 }
                 else
                 {

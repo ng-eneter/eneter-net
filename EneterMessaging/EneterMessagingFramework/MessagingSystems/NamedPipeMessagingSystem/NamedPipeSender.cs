@@ -11,6 +11,7 @@ using System;
 using System.IO.Pipes;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
@@ -57,7 +58,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
             if (myClientStream != null)
             {
                 AutoResetEvent anAllDataRead = new AutoResetEvent(false);
-                ThreadPool.QueueUserWorkItem(x =>
+                EneterThreadPool.QueueUserWorkItem(() =>
                     {
                         try
                         {

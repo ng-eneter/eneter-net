@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Eneter.Messaging.Threading
 {
-    class ScalableThreadPool
+    internal class ScalableThreadPool
     {
         // Synchronized queue for tasks.
         private class TaskQueue

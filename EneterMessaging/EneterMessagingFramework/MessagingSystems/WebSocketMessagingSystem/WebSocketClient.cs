@@ -18,7 +18,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.DataProcessing.MessageQueueing;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
@@ -337,7 +337,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                         //       There it must be workerounded a little bit.
                         Exception anException = null;
                         ManualResetEvent aConnectionCompletedEvent = new ManualResetEvent(false);
-                        ThreadPool.QueueUserWorkItem(x =>
+                        EneterThreadPool.QueueUserWorkItem(() =>
                             {
                                 try
                                 {
@@ -644,7 +644,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                     myMessageProcessingThread.RegisterMessageHandler(MessageHandler);
 
                     // Start listening to frames responded by websocket server.
-                    //ThreadPool.QueueUserWorkItem(x => DoResponseListening());
+                    //EneterThreadPool.QueueUserWorkItem(DoResponseListening);
                     myResponseReceiverThread = new Thread(DoResponseListening);
                     myResponseReceiverThread.Start();
 
@@ -921,7 +921,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                WaitCallback aConnectionOpenedInvoker = x =>
+                Action aConnectionOpenedInvoker = () =>
                 {
                     using (EneterTrace.Entering())
                     {
@@ -940,7 +940,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 };
 
                 // Invoke the event in a different thread.
-                ThreadPool.QueueUserWorkItem(aConnectionOpenedInvoker);
+                EneterThreadPool.QueueUserWorkItem(aConnectionOpenedInvoker);
             }
         }
 

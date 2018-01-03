@@ -9,6 +9,7 @@ using System;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposit
 {
@@ -139,8 +140,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                 // In order not to block the thread processing this event handler
                 // start the reconnection loop in a different thread.
-                WaitCallback aDoReconnect = x => DoReconnect();
-                ThreadPool.QueueUserWorkItem(aDoReconnect);
+                EneterThreadPool.QueueUserWorkItem(DoReconnect);
             }
         }
 

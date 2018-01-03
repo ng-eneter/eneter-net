@@ -15,6 +15,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.EndPoints.Rpc
 {
@@ -151,7 +152,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             {
                 // Note: Following subscribing cannot block the thread processing events from duplex output channel
                 //       because a deadlock can occur. Because if the lock would stop this thread other messages could not be processed.
-                ThreadPool.QueueUserWorkItem(x =>
+                EneterThreadPool.QueueUserWorkItem(() =>
                     {
                         // Recover remote subscriptions at service.
                         foreach (KeyValuePair<string, RemoteEvent> aRemoteEvent in myRemoteEvents)
@@ -257,13 +258,13 @@ namespace Eneter.Messaging.EndPoints.Rpc
                         //       And if this waiting caller thread is a thread where events are routed and if the routing
                         //       of these events is 'blocking' then a deadlock can occur.
                         //       Therefore ThreadPool is used.
-                        ThreadPool.QueueUserWorkItem(x => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, aMessage.SerializedParams[0])));
+                        EneterThreadPool.QueueUserWorkItem(() => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, aMessage.SerializedParams[0])));
                     }
                     else
                     {
                          // Note: this happens if the event is of type EventErgs.
                         // The event is raised in its own thread so that the receiving thread is not blocked.
-                        ThreadPool.QueueUserWorkItem(x => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, null)));
+                        EneterThreadPool.QueueUserWorkItem(() => myThreadDispatcher.Invoke(() => RaiseEvent(aMessage.OperationName, null)));
                     }
                 }
                 else

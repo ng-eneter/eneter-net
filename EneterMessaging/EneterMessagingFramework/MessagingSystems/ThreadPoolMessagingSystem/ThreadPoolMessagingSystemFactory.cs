@@ -9,7 +9,6 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
-using Eneter.Messaging.DataProcessing.MessageQueueing;
 using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.ThreadPoolMessagingSystem

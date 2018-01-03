@@ -17,7 +17,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
-
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
@@ -120,7 +120,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 
 
                     // Call path handler in a another thread.
-                    ThreadPool.QueueUserWorkItem(x =>
+                    EneterThreadPool.QueueUserWorkItem(() =>
                         {
                             try
                             {

@@ -11,6 +11,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
@@ -76,7 +77,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 
                     // Try open connection in a different thread.
                     myConnectionOpeningActiveFlag = true;
-                    ThreadPool.QueueUserWorkItem(DoOpenConnection);
+                    EneterThreadPool.QueueUserWorkItem(DoOpenConnection);
 
                     // Indicate the ConnectionOpened evnt shall be raised when the connection is really open.
                     myIsConnectionOpenEventPendingFlag = true;
@@ -164,7 +165,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                         myConnectionOpeningActiveFlag = true;
 
                         // Start openning in another thread.
-                        ThreadPool.QueueUserWorkItem(DoOpenConnection);
+                        EneterThreadPool.QueueUserWorkItem(DoOpenConnection);
                     }
                 }
 
@@ -206,7 +207,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
             }
         }
 
-        private void DoOpenConnection(object x)
+        private void DoOpenConnection()
         {
             using (EneterTrace.Entering())
             {

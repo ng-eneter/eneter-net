@@ -19,7 +19,7 @@ namespace Eneter.Messaging.Threading.Dispatching
         {
             public void Invoke(Action workItem)
             {
-                ThreadPool.QueueUserWorkItem(x => workItem());
+                EneterThreadPool.QueueUserWorkItem(workItem);
             }
         }
 

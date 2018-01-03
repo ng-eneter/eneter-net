@@ -12,6 +12,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.Nodes.BackupRouter
 {
@@ -430,7 +431,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                WaitCallback aWaitCallback = x =>
+                Action aWaitCallback = () =>
                     {
                         using (EneterTrace.Entering())
                         {
@@ -448,7 +449,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
                             }
                         }
                     };
-                ThreadPool.QueueUserWorkItem(aWaitCallback);
+                EneterThreadPool.QueueUserWorkItem(aWaitCallback);
             }
         }
 
@@ -456,7 +457,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
         {
             using (EneterTrace.Entering())
             {
-                WaitCallback aWaitCallback = x =>
+                Action aWaitCallback = () =>
                     {
                         using (EneterTrace.Entering())
                         {
@@ -473,7 +474,7 @@ namespace Eneter.Messaging.Nodes.BackupRouter
                             }
                         }
                     };
-                ThreadPool.QueueUserWorkItem(aWaitCallback);
+                EneterThreadPool.QueueUserWorkItem(aWaitCallback);
             }
         }
 

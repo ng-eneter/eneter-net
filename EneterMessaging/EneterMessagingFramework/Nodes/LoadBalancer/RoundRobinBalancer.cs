@@ -12,6 +12,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using System.Threading;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
@@ -315,7 +316,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
                                     return false;
                                 });
 
-                            ThreadPool.QueueUserWorkItem(x => Notify(ResponseReceiverDisconnected, new ResponseReceiverEventArgs(aConnection.ResponseReceiverId, aConnection.SenderAddress)));
+                            EneterThreadPool.QueueUserWorkItem(() => Notify(ResponseReceiverDisconnected, new ResponseReceiverEventArgs(aConnection.ResponseReceiverId, aConnection.SenderAddress)));
                         }
                     }
                     else
@@ -388,7 +389,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         {
             using (EneterTrace.Entering())
             {
-                ThreadPool.QueueUserWorkItem(x =>
+                EneterThreadPool.QueueUserWorkItem(() =>
                     {
                         if (RequestReceiverRemoved != null)
                         {

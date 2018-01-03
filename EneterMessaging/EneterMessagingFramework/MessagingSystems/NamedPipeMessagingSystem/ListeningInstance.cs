@@ -14,6 +14,7 @@ using System.IO.Pipes;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.DataProcessing.Streaming;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
 {
@@ -179,7 +180,7 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
                             aDynamicStream = new DynamicStream();
 
                             // Start thread for reading received messages.
-                            ThreadPool.QueueUserWorkItem(x =>
+                            EneterThreadPool.QueueUserWorkItem(() =>
                                 {
                                     while (!myStopListeningRequestFlag && myPipeServer.IsConnected)
                                     {

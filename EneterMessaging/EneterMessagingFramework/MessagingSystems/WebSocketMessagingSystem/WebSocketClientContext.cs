@@ -11,10 +11,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using Eneter.Messaging.DataProcessing.MessageQueueing;
 using Eneter.Messaging.DataProcessing.Streaming;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
 {
@@ -414,7 +414,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
         {
             using (EneterTrace.Entering())
             {
-                WaitCallback aConnectionOpenedInvoker = x =>
+                Action aConnectionOpenedInvoker = () =>
                 {
                     using (EneterTrace.Entering())
                     {
@@ -433,7 +433,7 @@ namespace Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem
                 };
 
                 // Invoke the event in a different thread.
-                ThreadPool.QueueUserWorkItem(aConnectionOpenedInvoker);
+                EneterThreadPool.QueueUserWorkItem(aConnectionOpenedInvoker);
             }
         }
 

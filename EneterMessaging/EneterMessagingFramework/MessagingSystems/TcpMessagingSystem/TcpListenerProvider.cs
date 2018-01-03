@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -158,7 +159,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                             TcpClient aTcpClient = myListener.AcceptTcpClient();
 
                             // Execute handler in another thread.
-                            WaitCallback aHandler = x =>
+                            Action aHandler = () =>
                             {
                                 bool aHandleConnectionFlag = false;
 
@@ -199,7 +200,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 
                                 Interlocked.Decrement(ref myAmountOfConnections);
                             };
-                            ThreadPool.QueueUserWorkItem(aHandler);
+                            EneterThreadPool.QueueUserWorkItem(aHandler);
                         }
                         catch (Exception err)
                         {

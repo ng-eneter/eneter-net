@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Eneter.Messaging.Diagnostic;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.DataProcessing.MessageQueueing
 {
@@ -21,7 +22,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
                 if (!myIsWorkingThreadRunning)
                 {
                     myIsWorkingThreadRunning = true;
-                    ThreadPool.QueueUserWorkItem(DoJobs);
+                    EneterThreadPool.QueueUserWorkItem(DoJobs);
 
                     // If we are tracing then wait until the message about the working thread is ready.
                     if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
@@ -37,7 +38,7 @@ namespace Eneter.Messaging.DataProcessing.MessageQueueing
             }
         }
 
-        private void DoJobs(object x)
+        private void DoJobs()
         {
             if (EneterTrace.DetailLevel == EneterTrace.EDetailLevel.Debug)
             {

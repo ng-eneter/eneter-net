@@ -16,6 +16,7 @@ using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
 using System.Net;
+using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
 {
@@ -87,7 +88,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                         //       Therefore it must be workerounded a little bit.
                         Exception anException = null;
                         ManualResetEvent aConnectionCompletedEvent = new ManualResetEvent(false);
-                        ThreadPool.QueueUserWorkItem(x =>
+                        EneterThreadPool.QueueUserWorkItem(() =>
                             {
                                 try
                                 {
