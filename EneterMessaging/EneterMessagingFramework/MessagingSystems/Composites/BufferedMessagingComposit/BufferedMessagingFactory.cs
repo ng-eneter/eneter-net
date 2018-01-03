@@ -95,7 +95,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <returns>buffered duplex output channel</returns>
-        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
+        public IBufferedDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
             using (EneterTrace.Entering())
             {
@@ -116,7 +116,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">response receiver id of this duplex output channel</param>
         /// <returns>buffered duplex output channel</returns>
-        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
+        public IBufferedDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -136,7 +136,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <returns>buffered duplex input channel</returns>
-        public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
+        public IBufferedDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
             using (EneterTrace.Entering())
             {
@@ -144,6 +144,22 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 return new BufferedDuplexInputChannel(anUnderlyingDuplexInputChannel, myMaxOfflineTime);
             }
         }
+
+        IDuplexOutputChannel IMessagingSystemFactory.CreateDuplexOutputChannel(string channelId)
+        {
+            return CreateDuplexOutputChannel(channelId);
+        }
+
+        IDuplexOutputChannel IMessagingSystemFactory.CreateDuplexOutputChannel(string channelId, string responseReceiverId)
+        {
+            return CreateDuplexOutputChannel(channelId, responseReceiverId);
+        }
+
+        IDuplexInputChannel IMessagingSystemFactory.CreateDuplexInputChannel(string channelId)
+        {
+            return CreateDuplexInputChannel(channelId);
+        }
+
 
         private IMessagingSystemFactory myUnderlyingMessaging;
         private TimeSpan myMaxOfflineTime;

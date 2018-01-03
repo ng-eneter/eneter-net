@@ -350,6 +350,127 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             }
         }
 
+        [Test]
+        public void A17_Online_Offline_Events()
+        {
+            // Duplex output channel without queue - it will not try to reconnect.
+            IBufferedDuplexOutputChannel aDuplexOutputChannel = (IBufferedDuplexOutputChannel)MessagingSystem.CreateDuplexOutputChannel(ChannelId);
+            IBufferedDuplexInputChannel aDuplexInputChannel = (IBufferedDuplexInputChannel)MessagingSystem.CreateDuplexInputChannel(ChannelId);
+
+            AutoResetEvent aConnectionsCompletedEvent = new AutoResetEvent(false);
+            aDuplexInputChannel.ResponseReceiverConnected += (x, y) =>
+            {
+                aConnectionsCompletedEvent.Set();
+            };
+
+            AutoResetEvent aResponseReceiverOnline = new AutoResetEvent(false);
+            aDuplexInputChannel.ResponseReceiverOnline += (x, y) =>
+            {
+                aResponseReceiverOnline.Set();
+            };
+
+            AutoResetEvent aResponseReceiverOffline = new AutoResetEvent(false);
+            aDuplexInputChannel.ResponseReceiverOffline += (x, y) =>
+            {
+                aResponseReceiverOffline.Set();
+            };
+
+            AutoResetEvent aOnlineIsRaised = new AutoResetEvent(false);
+            aDuplexOutputChannel.ConnectionOnline += (x, y) =>
+            {
+                aOnlineIsRaised.Set();
+            };
+
+            AutoResetEvent aOfflineIsRaised = new AutoResetEvent(false);
+            aDuplexOutputChannel.ConnectionOffline += (x, y) =>
+            {
+                aOfflineIsRaised.Set();
+            };
+
+            try
+            {
+                aDuplexOutputChannel.OpenConnection();
+
+                if (!aOfflineIsRaised.WaitOne(1000))
+                {
+                    Assert.Fail("Offline event was not raised.");
+                }
+
+                Assert.IsFalse(aDuplexOutputChannel.IsOnline);
+
+                // start listening
+                aDuplexInputChannel.StartListening();
+
+                if (!aOnlineIsRaised.WaitOne(1000))
+                {
+                    Assert.Fail("Online event was not raised.");
+                }
+                Assert.IsTrue(aDuplexOutputChannel.IsOnline);
+
+                if (!aResponseReceiverOnline.WaitOne(1000))
+                {
+                    Assert.Fail("ResponseReceiverOnline event was not raised.");
+                }
+
+                // Wait until the connection is open.
+                if (!aConnectionsCompletedEvent.WaitOne(1000))
+                {
+                    Assert.Fail("Connection was not open.");
+                }
+
+                // Disconnect the response receiver.
+                aDuplexInputChannel.DisconnectResponseReceiver(aDuplexOutputChannel.ResponseReceiverId);
+
+                if (!aOfflineIsRaised.WaitOne(1000))
+                {
+                    Assert.Fail("Offline event was not raised after disconnection.");
+                }
+                Assert.IsFalse(aDuplexOutputChannel.IsOnline);
+
+                if (aResponseReceiverOffline.WaitOne(500))
+                {
+                    Assert.Fail("ResponseReceiverOffline event shall NOT be raised if DisconnectResponseReceiver was called.");
+                }
+
+
+                // The duplex output channel will try to connect again, therefore wait until connected.
+                aConnectionsCompletedEvent.WaitOne();
+
+
+                if (!aOnlineIsRaised.WaitOne(1000))
+                {
+                    Assert.Fail("Online event was not raised after reconnection.");
+                }
+                Assert.IsTrue(aDuplexOutputChannel.IsOnline);
+
+                if (!aResponseReceiverOnline.WaitOne(1000))
+                {
+                    Assert.Fail("ResponseReceiverOnline event was not raised.");
+                }
+
+                // duplex output channel closes the connection.
+                aDuplexOutputChannel.CloseConnection();
+
+
+                if (!aResponseReceiverOffline.WaitOne(1000))
+                {
+                    Assert.Fail("ResponseReceiverOffline event was not raised.");
+                }
+
+                if (aOfflineIsRaised.WaitOne(500))
+                {
+                    Assert.Fail("Offline event shall NOT be raised after CloseConnection().");
+                }
+                Assert.IsFalse(aDuplexOutputChannel.IsOnline);
+
+            }
+            finally
+            {
+                aDuplexOutputChannel.CloseConnection();
+                aDuplexInputChannel.StopListening();
+            }
+        }
+
 
         private void SendMessageReceiveResponse(string channelId, object message, object responseMessage,
                                                 int numberOfClients, int numberOfMessages,

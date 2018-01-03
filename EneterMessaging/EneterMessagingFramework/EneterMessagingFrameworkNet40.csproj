@@ -102,6 +102,8 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\IBufferedDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\IBufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>

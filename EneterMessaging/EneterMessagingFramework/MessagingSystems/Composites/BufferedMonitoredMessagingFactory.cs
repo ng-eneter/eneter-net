@@ -104,7 +104,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// </remarks>
         /// <param name="channelId">input channel address. The syntax must comply to underlying messaging</param>
         /// <returns>buffered and monitored duplex output channel</returns>
-        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
+        public IBufferedDuplexOutputChannel CreateDuplexOutputChannel(string channelId)
         {
             using (EneterTrace.Entering())
             {
@@ -127,7 +127,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <param name="responseReceiverId">the unique id of this response receiver</param>
         /// <returns>buffered and monitored duplex output channel</returns>
-        public IDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
+        public IBufferedDuplexOutputChannel CreateDuplexOutputChannel(string channelId, string responseReceiverId)
         {
             using (EneterTrace.Entering())
             {
@@ -150,7 +150,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// </remarks>
         /// <param name="channelId">channel id, the syntax of the channel id must comply to underlying messaging</param>
         /// <returns>buffered and monitored duplex input channel</returns>
-        public IDuplexInputChannel CreateDuplexInputChannel(string channelId)
+        public IBufferedDuplexInputChannel CreateDuplexInputChannel(string channelId)
         {
             using (EneterTrace.Entering())
             {
@@ -167,6 +167,23 @@ namespace Eneter.Messaging.MessagingSystems.Composites
         /// Returns underlying monitored messaging.
         /// </summary>
         public MonitoredMessagingFactory MonitoredMessaging { get { return myMonitoredMessaging; } }
+
+
+        IDuplexOutputChannel IMessagingSystemFactory.CreateDuplexOutputChannel(string channelId)
+        {
+            return CreateDuplexOutputChannel(channelId);
+        }
+
+        IDuplexOutputChannel IMessagingSystemFactory.CreateDuplexOutputChannel(string channelId, string responseReceiverId)
+        {
+            return CreateDuplexOutputChannel(channelId, responseReceiverId);
+        }
+
+        IDuplexInputChannel IMessagingSystemFactory.CreateDuplexInputChannel(string channelId)
+        {
+            return CreateDuplexInputChannel(channelId);
+        }
+
 
         private BufferedMessagingFactory myBufferedMessaging;
         private MonitoredMessagingFactory myMonitoredMessaging;

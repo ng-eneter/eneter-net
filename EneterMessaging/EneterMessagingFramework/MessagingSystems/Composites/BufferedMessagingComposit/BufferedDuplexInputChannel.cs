@@ -15,7 +15,7 @@ using Eneter.Messaging.Threading.Dispatching;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
-    internal class BufferedDuplexInputChannel : IDuplexInputChannel
+    internal class BufferedDuplexInputChannel : IBufferedDuplexInputChannel
     {
         private class TBufferedResponseReceiver
         {

@@ -15,7 +15,7 @@ using Eneter.Messaging.Threading;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
-    internal class BufferedDuplexOutputChannel : IDuplexOutputChannel
+    internal class BufferedDuplexOutputChannel : IBufferedDuplexOutputChannel
     {
         public event EventHandler<DuplexChannelEventArgs> ConnectionOpened;
         public event EventHandler<DuplexChannelMessageEventArgs> ResponseMessageReceived;
@@ -54,7 +54,18 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                 }
             }
         }
-        
+
+        public bool IsOnline
+        {
+            get
+            {
+                using (EneterTrace.Entering())
+                {
+                    return myOutputChannel.IsConnected;
+                }
+            }
+        }
+
         public void OpenConnection()
         {
             using (EneterTrace.Entering())
@@ -79,7 +90,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
                     myConnectionOpeningActiveFlag = true;
                     EneterThreadPool.QueueUserWorkItem(DoOpenConnection);
 
-                    // Indicate the ConnectionOpened evnt shall be raised when the connection is really open.
+                    // Indicate the ConnectionOpened event shall be raised when the connection is really open.
                     myIsConnectionOpenEventPendingFlag = true;
 
                     // Indicate the connection is open.

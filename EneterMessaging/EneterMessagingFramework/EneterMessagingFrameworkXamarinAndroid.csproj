@@ -144,6 +144,8 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\IBufferedDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\IBufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />

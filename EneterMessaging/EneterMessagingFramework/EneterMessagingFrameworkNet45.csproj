@@ -144,6 +144,8 @@
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexInputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\BufferedMessagingFactory.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\IBufferedDuplexInputChannel.cs" />
+    <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\IBufferedDuplexOutputChannel.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMessagingComposit\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\Composites\BufferedMonitoredMessagingFactory.cs" />
     <Compile Include="MessagingSystems\Composites\MessageBus\IMessageBus.cs" />
@@ -328,6 +330,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Eneter.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="EneterMessagingFrameworkNet40.csproj">
+      <Project>{8884B886-FCFA-44EA-BE93-F884CCFB7AF2}</Project>
+      <Name>EneterMessagingFrameworkNet40</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
