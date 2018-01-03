@@ -167,7 +167,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem
                                 if (myMaxAmountOfConnections > -1)
                                 {
                                     int aAmountOfConnections = Interlocked.Increment(ref myAmountOfConnections);
-                                    if (myAmountOfConnections <= myMaxAmountOfConnections)
+                                    if (aAmountOfConnections <= myMaxAmountOfConnections)
                                     {
                                         aHandleConnectionFlag = true;
                                     }
