@@ -96,21 +96,24 @@ namespace Eneter.Messaging.Diagnostic
         /// and the measuring of the time starts.
         /// In order to trace entering-leaving, the detail level must be set to 'Debug'.
         /// </remarks>
-        public static IDisposable Entering()
+        public static IDisposable Entering(string additionalInfo = null)
         {
             EneterTrace aTraceObject = null;
 
-            if (DetailLevel == EDetailLevel.Debug || myProfilerIsRunning)
+            if (DetailLevel > EDetailLevel.Short || myProfilerIsRunning)
             {
-            	aTraceObject = new EneterTrace();
+                aTraceObject = new EneterTrace();
+                aTraceObject.myCallStack = new StackFrame(1);
+                aTraceObject.myEnteringTicks = Stopwatch.GetTimestamp();
 
-            	if (!myProfilerIsRunning)
+                if (myProfilerIsRunning)
                 {
-                    WriteMessage(0, ENTERING, null);
+                    UpdateProfilerForEntering(aTraceObject);
                 }
-
-
-                aTraceObject.myStopWatch.Start();
+                else
+                {
+                    WriteMessage(aTraceObject.myCallStack, aTraceObject.myEnteringTicks, ENTERING, additionalInfo);
+                }
             }
 
             return aTraceObject;
@@ -123,25 +126,19 @@ namespace Eneter.Messaging.Diagnostic
         {
             try
             {
-                if (myStopWatch.IsRunning)
+                if (myEnteringTicks != 0)
                 {
-                    myStopWatch.Stop();
-                }
+                    long aLeavingTicks = Stopwatch.GetTimestamp();
+                    long aElapsedTicks = aLeavingTicks - myEnteringTicks;
 
-                if (DetailLevel == EDetailLevel.Debug)
-                {
-                    double aMicroseconds = (myStopWatch.Elapsed.TotalMilliseconds - myStopWatch.ElapsedMilliseconds) * 1000;
-
-                    WriteMessage(0, LEAVING, string.Format(CultureInfo.InvariantCulture, "[{0:D2}:{1:D2}:{2:D2} {3:D3}ms {4:000.0}us]",
-                            myStopWatch.Elapsed.Hours,
-                            myStopWatch.Elapsed.Minutes,
-                            myStopWatch.Elapsed.Seconds,
-                            myStopWatch.Elapsed.Milliseconds,
-                            aMicroseconds));
-                }
-                else if (myProfilerIsRunning)
-                {
-                    UpdateProfiler(myStopWatch.Elapsed.Ticks);
+                    if (myProfilerIsRunning)
+                    {
+                        UpdateProfilerForLeaving(this, aElapsedTicks);
+                    }
+                    else if (DetailLevel > EDetailLevel.Short)
+                    {
+                        WriteMessage(myCallStack, aLeavingTicks, LEAVING, null, aElapsedTicks);
+                    }
                 }
             }
             catch
@@ -159,22 +156,13 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(0, INFO, message);
+                StackFrame aCallStack = new StackFrame(1);
+
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, INFO, message);
             }
         }
 
-        /// <summary>
-        /// Traces the information message.
-        /// </summary>
-        /// <param name="message">info message</param>
-        /// <param name="details">additional details</param>
-        public static void Info(string message, string details)
-        {
-            if (DetailLevel != EDetailLevel.None)
-            {
-                WriteMessage(0, INFO, message + DETAILS + details);
-            }
-        }
 
         /// <summary>
         /// Traces the info message.
@@ -185,8 +173,11 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
+                StackFrame aCallStack = new StackFrame(1);
+
                 string aDetails = GetDetailsFromException(err);
-                WriteMessage(0, INFO, message + NEXTLINE + aDetails);
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, INFO, message + NEXTLINE + aDetails);
             }
         }
 
@@ -198,30 +189,13 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(0, WARNING, message);
+                StackFrame aCallStack = new StackFrame(1);
+
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, WARNING, message);
             }
         }
 
-        internal static void Warning(int skipCallstackFrames, string message)
-        {
-            if (DetailLevel != EDetailLevel.None)
-            {
-                WriteMessage(skipCallstackFrames, WARNING, message);
-            }
-        }
-
-        /// <summary>
-        /// Traces the warning message.
-        /// </summary>
-        /// <param name="message">warning message</param>
-        /// <param name="details">additional details</param>
-        public static void Warning(string message, string details)
-        {
-            if (DetailLevel != EDetailLevel.None)
-            {
-                WriteMessage(0, WARNING, message + DETAILS + details);
-            }
-        }
 
         /// <summary>
         /// Traces the warning message.
@@ -232,8 +206,11 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
+                StackFrame aCallStack = new StackFrame(1);
+
                 string aDetails = GetDetailsFromException(err);
-                WriteMessage(0, WARNING, message + NEXTLINE + aDetails);
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, WARNING, message + NEXTLINE + aDetails);
             }
         }
 
@@ -245,22 +222,13 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
-                WriteMessage(0, ERROR, message);
+                StackFrame aCallStack = new StackFrame(1);
+
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, ERROR, message);
             }
         }
 
-        /// <summary>
-        /// Traces the error message and details for the error.
-        /// </summary>
-        /// <param name="message">error message</param>
-        /// <param name="errorDetails">error details</param>
-        public static void Error(string message, string errorDetails)
-        {
-            if (DetailLevel != EDetailLevel.None)
-            {
-                WriteMessage(0, ERROR, message + DETAILS + errorDetails);
-            }
-        }
 
         /// <summary>
         /// Traces the error message.
@@ -271,8 +239,11 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel != EDetailLevel.None)
             {
+                StackFrame aCallStack = new StackFrame(1);
+
                 string aDetails = GetDetailsFromException(err);
-                WriteMessage(0, ERROR, message + NEXTLINE + aDetails);
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, ERROR, message + NEXTLINE + aDetails);
             }
         }
 
@@ -287,15 +258,10 @@ namespace Eneter.Messaging.Diagnostic
         {
             if (DetailLevel == EDetailLevel.Debug)
             {
-                WriteMessage(0, DEBUG, message);
-            }
-        }
+                StackFrame aCallStack = new StackFrame(1);
 
-        internal static void Debug(int skipCallstackFrames, string message)
-        {
-            if (DetailLevel == EDetailLevel.Debug)
-            {
-                WriteMessage(skipCallstackFrames, DEBUG, message);
+                long aTimeTicks = Stopwatch.GetTimestamp();
+                WriteMessage(aCallStack, aTimeTicks, DEBUG, message);
             }
         }
 
@@ -306,7 +272,7 @@ namespace Eneter.Messaging.Diagnostic
         {
             lock (myProfilerData)
             {
-                WriteToTrace("Profiler is running...");
+                WriteToTrace("Profiler is running...\r\n");
                 myProfilerIsRunning = true;
             }
         }
@@ -325,19 +291,19 @@ namespace Eneter.Messaging.Diagnostic
 
                 foreach (KeyValuePair<MethodBase, ProfilerData> anItem in myProfilerData.OrderByDescending(x => x.Value.Ticks))
                 {
-                    TimeSpan aTimeSpan = TimeSpan.FromTicks(anItem.Value.Ticks);
-#if !NET35
-                    string aMessage = string.Join("", aTimeSpan.ToString(), " ", anItem.Value.Calls, "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name, "\r\n");
-#else
-                    string[] aJoinBuf = { aTimeSpan.ToString(), " ", anItem.Value.Calls.ToString(), "x ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name };
-                    string aMessage = string.Join("", aJoinBuf);
-#endif
+                    string aElapsedTime = TimeTicksToString(anItem.Value.Ticks);
+                    string aTimePerCall = TimeTicksToString((long)Math.Round(((double)anItem.Value.Ticks) / anItem.Value.Calls));
+
+                    // Note: .NET35 does not support string.Join with variable arguments.
+                    string[] aJoinArgs = { aElapsedTime, " ", anItem.Value.Calls.ToString(), "x |", anItem.Value.MaxConcurency.ToString(), "| #", anItem.Value.MaxRecursion.ToString(), " ", aTimePerCall, anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name, "\r\n" };
+                    string aMessage = string.Join("", aJoinArgs);
+
                     WriteToTrace(aMessage);
                 }
 
                 myProfilerData.Clear();
 
-                WriteToTrace("Profiler has ended.");
+                WriteToTrace("Profiler has ended.\r\n");
             }
         }
 
@@ -458,56 +424,56 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-        private static void WriteMessage(int skipFrames, string prefix, string message)
+        private static void WriteMessage(StackFrame stack, long timeTicks, string prefix, string message, long elapsedTicks = -1)
         {
             try
             {
-                DateTime aTime = DateTime.Now;
-
-                // Get the calling method
-                // Note: We must skip two methods to get the calling method.
-                StackFrame aCallStack = new StackFrame(2 + skipFrames);
-
                 int aThreadId = Thread.CurrentThread.ManagedThreadId;
+
                 Action aTraceJob = () =>
+                {
+                    MethodBase aMethod = stack.GetMethod();
+
+                    // Check the filter.
+                    if (myNameSpaceFilter != null && !myNameSpaceFilter.IsMatch(aMethod.ReflectedType.FullName))
                     {
-                        MethodBase aMethod = aCallStack.GetMethod();
-                        string[] aJoinBuf = { aMethod.ReflectedType.FullName, aMethod.Name };
-                        string aMethodName = string.Join(".", aJoinBuf);
+                        return;
+                    }
 
-                        // Check the filter.
-                        if (myNameSpaceFilter != null && !myNameSpaceFilter.IsMatch(aMethodName))
+                    string aTimeStr = timeTicks > -1 ? TimeTicksToString(timeTicks) : null;
+                    string aElapsedTicksStr = (elapsedTicks > -1) ? TimeTicksToString(elapsedTicks) : null;
+
+                    string aMessage;
+
+                    // If it is a method leaving.
+                    string[] aJoinArgs;
+                    if (aElapsedTicksStr != null)
+                    {
+                        aJoinArgs = new string[] { aTimeStr, " ~", aThreadId.ToString(), " ", prefix, " ", aMethod.ReflectedType.FullName, ".", aMethod.Name, " [", aElapsedTicksStr, "]" };
+                    }
+                    else
+                    {
+                        aJoinArgs = new string[] { aTimeStr, " ~", aThreadId.ToString(), " ", prefix, " ", aMethod.ReflectedType.FullName, ".", aMethod.Name, " ", message };
+                    }
+                    // Note: .NET35 does not support string.Join with variable arguments.
+                    aMessage = string.Join("", aJoinArgs);
+
+                    // Write the trace message to the buffer.
+                    lock (myTraceBufferLock)
+                    {
+                        // If the buffer was empty also start the timer processing the buffer.
+                        bool aStartTimerFlag = myTraceBuffer.Length == 0;
+
+                        // Add the message to the buffer.
+                        myTraceBuffer.AppendLine(aMessage);
+
+                        if (aStartTimerFlag)
                         {
-                            return;
+                            // Flush the buffer in the specified time.
+                            myTraceBufferFlushTimer.Change(100, -1);
                         }
-
-                        StringBuilder aMessageBuilder = new StringBuilder();
-                        aMessageBuilder.AppendFormat("{0:D2}:", aTime.Hour);
-                        aMessageBuilder.AppendFormat("{0:D2}:", aTime.Minute);
-                        aMessageBuilder.AppendFormat("{0:D2}.", aTime.Second);
-                        aMessageBuilder.AppendFormat("{0:D3}", aTime.Millisecond);
-                        aMessageBuilder.AppendFormat(" ~{0:D3}", aThreadId);
-                        aJoinBuf = new string[] { aMessageBuilder.ToString(), prefix, aMethodName, message };
-
-                        // Joinn string arrays with ' ' delimiter.
-                        string aMessage = string.Join(" ", aJoinBuf);
-
-                        // Write the trace message to the buffer.
-                        lock (myTraceBufferLock)
-                        {
-                            // If the buffer was empty also start the timer processing the buffer.
-                            bool aStartTimerFlag = myTraceBuffer.Length == 0;
-
-                            // Add the message to the buffer.
-                            myTraceBuffer.AppendLine(aMessage);
-
-                            if (aStartTimerFlag)
-                            {
-                                // Flush the buffer in the specified time.
-                                myTraceBufferFlushTimer.Change(50, -1);
-                            }
-                        }
-                    };
+                    }
+                };
 
                 EnqueueJob(aTraceJob);
             }
@@ -520,29 +486,87 @@ namespace Eneter.Messaging.Diagnostic
             }
         }
 
-        private static void UpdateProfiler(long ticks)
+        private static void UpdateProfilerForEntering(EneterTrace trace)
         {
-            StackFrame aCallStack = new StackFrame(2);
-            MethodBase aMethod = aCallStack.GetMethod();
+            int aThreadId = Thread.CurrentThread.ManagedThreadId;
 
             Action aProfilerJob = () =>
-                {
-                    lock (myProfilerData)
-                    {
-                        ProfilerData aProfileData;
-                        myProfilerData.TryGetValue(aMethod, out aProfileData);
-                        if (aProfileData == null)
-                        {
-                            aProfileData = new ProfilerData();
-                            myProfilerData[aMethod] = aProfileData;
-                        }
+            {
+                MethodBase aMethod = trace.myCallStack.GetMethod();
 
-                        ++aProfileData.Calls;
-                        aProfileData.Ticks += ticks;
+                lock (myProfilerData)
+                {
+                    ProfilerData aProfileData;
+                    myProfilerData.TryGetValue(aMethod, out aProfileData);
+                    if (aProfileData == null)
+                    {
+                        aProfileData = new ProfilerData();
+                        aProfileData.Calls = 1;
+                        aProfileData.MaxConcurency = 1;
+                        aProfileData.MaxRecursion = 1;
+                        aProfileData.Threads[aThreadId] = 1;
+
+                        myProfilerData[aMethod] = aProfileData;
                     }
-                };
+                    else
+                    {
+                        ++aProfileData.Calls;
+
+                        // If this thread is already inside then it is a recursion.
+                        if (aProfileData.Threads.ContainsKey(aThreadId))
+                        {
+                            int aRecursion = ++aProfileData.Threads[aThreadId];
+                            if (aRecursion > aProfileData.MaxRecursion)
+                            {
+                                aProfileData.MaxRecursion = aRecursion;
+                            }
+                        }
+                        // ... else it is another thread wich is parallel inside.
+                        else
+                        {
+                            aProfileData.Threads[aThreadId] = 1;
+                            if (aProfileData.Threads.Count > aProfileData.MaxConcurency)
+                            {
+                                aProfileData.MaxConcurency = aProfileData.Threads.Count;
+                            }
+                        }
+                    }
+
+                    trace.myBufferedProfileData = aProfileData;
+                }
+            };
 
             EnqueueJob(aProfilerJob);
+        }
+
+        private static void UpdateProfilerForLeaving(EneterTrace trace, long ticks)
+        {
+            int aThreadId = Thread.CurrentThread.ManagedThreadId;
+
+            Action aProfilerJob = () =>
+            {
+                lock (myProfilerData)
+                {
+                    trace.myBufferedProfileData.Ticks += ticks;
+                    int aRecursion = --trace.myBufferedProfileData.Threads[aThreadId];
+
+                    if (aRecursion < 1)
+                    {
+                        MethodBase aMethod = trace.myCallStack.GetMethod();
+                        ProfilerData aProfileData = myProfilerData[aMethod];
+                        aProfileData.Threads.Remove(aThreadId);
+                    }
+                }
+            };
+
+            EnqueueJob(aProfilerJob);
+        }
+
+        private static string TimeTicksToString(long timeTicks)
+        {
+            DateTime aElapsedTime = DateTime.FromFileTimeUtc(timeTicks);
+            string aResult = aElapsedTime.ToString("HH:mm:ss.ffffff");
+            return aResult;
         }
 
         /// <summary>
@@ -621,23 +645,17 @@ namespace Eneter.Messaging.Diagnostic
         // Traces are written to the StringBuilder. StringBuilder is flushed once per 50ms.
         private static void OnFlushTraceBufferTick(object x)
         {
-            string aBufferedTraceMessages;
+            StringBuilder aNewBuffer = new StringBuilder(myTraceBufferCapacity);
+            StringBuilder aBufferToFlush;
 
+            // Keep the lock for the shortest possible time.
             lock (myTraceBufferLock)
             {
-                aBufferedTraceMessages = myTraceBuffer.ToString();
-
-                if (myTraceBuffer.Capacity <= myTraceBufferCapacity)
-                {
-                    // Note: NET35 does not support Clear().
-                    myTraceBuffer.Length = 0;
-                }
-                else
-                {
-                    // The allocated capacity is too big. So instantiate the new buffer and the old one can be garbage collected.
-                    myTraceBuffer = new StringBuilder();
-                }
+                aBufferToFlush = myTraceBuffer;
+                myTraceBuffer = aNewBuffer;
             }
+
+            string aBufferedTraceMessages = aBufferToFlush.ToString();
 
             // Flush buffered messages to the trace.
             WriteToTrace(aBufferedTraceMessages);
@@ -679,13 +697,17 @@ namespace Eneter.Messaging.Diagnostic
         {
         }
 
-        private Stopwatch myStopWatch = new Stopwatch();
+        private long myEnteringTicks;
+        private StackFrame myCallStack;
+        private ProfilerData myBufferedProfileData;
+
 
         // Trace Info, Warning and Error by default.
         private static EDetailLevel myDetailLevel = EDetailLevel.Short;
 
         private static object myTraceLogLock = new object();
         private static TextWriter myTraceLog;
+
         private static Regex myNameSpaceFilter;
 
         private static ManualResetEvent myQueueThreadEndedEvent = new ManualResetEvent(true);
@@ -693,7 +715,7 @@ namespace Eneter.Messaging.Diagnostic
         private static Queue<Action> myTraceQueue = new Queue<Action>();
 
         private static object myTraceBufferLock = new object();
-        private static int myTraceBufferCapacity = 16384;
+        private static int myTraceBufferCapacity = 10000000;
         private static StringBuilder myTraceBuffer = new StringBuilder();
         private static Timer myTraceBufferFlushTimer = new Timer(OnFlushTraceBufferTick, null, -1, -1);
 
@@ -701,6 +723,10 @@ namespace Eneter.Messaging.Diagnostic
         {
             public long Calls;
             public long Ticks;
+            public int MaxConcurency;
+            public int MaxRecursion;
+
+            public Dictionary<int, int> Threads = new Dictionary<int, int>();
         }
 
         private static Dictionary<MethodBase, ProfilerData> myProfilerData = new Dictionary<MethodBase, ProfilerData>();

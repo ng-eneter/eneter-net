@@ -19,7 +19,6 @@ namespace Eneter.MessagingUnitTests.Diagnostic
             EneterTrace.Info("This is info.");
             EneterTrace.Warning("This is warning.");
             EneterTrace.Error("This is error.");
-            EneterTrace.Error("This is error.", "detail error info");
 
             // Trace exception
             try
@@ -113,7 +112,7 @@ namespace Eneter.MessagingUnitTests.Diagnostic
                 // Eneter trace.
                 EneterTrace.NameSpaceFilter = new Regex("^Eneter");
                 EneterTrace.Debug("This message shall be traced.");
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                 string aMessage = EneterTrace.TraceLog.ToString();
                 Assert.IsTrue(aMessage.Contains("This message shall be traced."));
 
@@ -124,7 +123,7 @@ namespace Eneter.MessagingUnitTests.Diagnostic
                 // Eneter trace shall be filtered out.
                 EneterTrace.NameSpaceFilter = new Regex(@"^(?!\bEneter\b)");
                 EneterTrace.Debug("This message shall not be traced.");
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                 Assert.AreEqual("", EneterTrace.TraceLog.ToString());
             }
             finally
@@ -154,7 +153,7 @@ namespace Eneter.MessagingUnitTests.Diagnostic
     	    
     	        // With traceing.
     	        EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
-                EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+                EneterTrace.TraceLog = new StreamWriter("/tmp/tracefile.txt");
     	    
                 Stopwatch aStopWatch2 = new Stopwatch();
                 aStopWatch2.Start();

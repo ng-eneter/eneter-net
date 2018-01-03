@@ -173,7 +173,7 @@ namespace Eneter.Messaging.Threading
         private int myMaxIdleTime;
 		private string myThreadsName;
 
-        private Object myNumberOfThreadsManipulator = new Object();
+        private object myNumberOfThreadsManipulator = new object();
         private int myNumberOfThreads;
 
         private TaskQueue myTaskQueue = new TaskQueue();
