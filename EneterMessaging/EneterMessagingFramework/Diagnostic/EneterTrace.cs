@@ -104,6 +104,8 @@ namespace Eneter.Messaging.Diagnostic
             {
                 aTraceObject = new EneterTrace();
                 aTraceObject.myCallStack = new StackFrame(1);
+
+                long aEnteringTimeTicks = !myProfilerIsRunning ? DateTime.Now.Ticks : 0;
                 aTraceObject.myEnteringTicks = Stopwatch.GetTimestamp();
 
                 if (myProfilerIsRunning)
@@ -112,7 +114,7 @@ namespace Eneter.Messaging.Diagnostic
                 }
                 else
                 {
-                    WriteMessage(aTraceObject.myCallStack, aTraceObject.myEnteringTicks, ENTERING, additionalInfo);
+                    WriteMessage(aTraceObject.myCallStack, aEnteringTimeTicks, ENTERING, additionalInfo);
                 }
             }
 
@@ -129,6 +131,8 @@ namespace Eneter.Messaging.Diagnostic
                 if (myEnteringTicks != 0)
                 {
                     long aLeavingTicks = Stopwatch.GetTimestamp();
+                    long aLeavingTimeTicks = !myProfilerIsRunning ? DateTime.Now.Ticks : 0;
+                    
                     long aElapsedTicks = aLeavingTicks - myEnteringTicks;
 
                     if (myProfilerIsRunning)
@@ -137,7 +141,7 @@ namespace Eneter.Messaging.Diagnostic
                     }
                     else if (DetailLevel > EDetailLevel.Short)
                     {
-                        WriteMessage(myCallStack, aLeavingTicks, LEAVING, null, aElapsedTicks);
+                        WriteMessage(myCallStack, aLeavingTimeTicks, LEAVING, null, aElapsedTicks);
                     }
                 }
             }
@@ -158,7 +162,7 @@ namespace Eneter.Messaging.Diagnostic
             {
                 StackFrame aCallStack = new StackFrame(1);
 
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, INFO, message);
             }
         }
@@ -176,7 +180,7 @@ namespace Eneter.Messaging.Diagnostic
                 StackFrame aCallStack = new StackFrame(1);
 
                 string aDetails = GetDetailsFromException(err);
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, INFO, message + NEXTLINE + aDetails);
             }
         }
@@ -191,7 +195,7 @@ namespace Eneter.Messaging.Diagnostic
             {
                 StackFrame aCallStack = new StackFrame(1);
 
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, WARNING, message);
             }
         }
@@ -209,7 +213,7 @@ namespace Eneter.Messaging.Diagnostic
                 StackFrame aCallStack = new StackFrame(1);
 
                 string aDetails = GetDetailsFromException(err);
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, WARNING, message + NEXTLINE + aDetails);
             }
         }
@@ -224,7 +228,7 @@ namespace Eneter.Messaging.Diagnostic
             {
                 StackFrame aCallStack = new StackFrame(1);
 
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, ERROR, message);
             }
         }
@@ -242,7 +246,7 @@ namespace Eneter.Messaging.Diagnostic
                 StackFrame aCallStack = new StackFrame(1);
 
                 string aDetails = GetDetailsFromException(err);
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, ERROR, message + NEXTLINE + aDetails);
             }
         }
@@ -260,7 +264,7 @@ namespace Eneter.Messaging.Diagnostic
             {
                 StackFrame aCallStack = new StackFrame(1);
 
-                long aTimeTicks = Stopwatch.GetTimestamp();
+                long aTimeTicks = DateTime.Now.Ticks;
                 WriteMessage(aCallStack, aTimeTicks, DEBUG, message);
             }
         }
@@ -295,7 +299,7 @@ namespace Eneter.Messaging.Diagnostic
                     string aTimePerCall = TimeTicksToString((long)Math.Round(((double)anItem.Value.Ticks) / anItem.Value.Calls));
 
                     // Note: .NET35 does not support string.Join with variable arguments.
-                    string[] aJoinArgs = { aElapsedTime, " ", anItem.Value.Calls.ToString(), "x |", anItem.Value.MaxConcurency.ToString(), "| #", anItem.Value.MaxRecursion.ToString(), " ", aTimePerCall, anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name, "\r\n" };
+                    string[] aJoinArgs = { aElapsedTime, " ", anItem.Value.Calls.ToString(), "x |", anItem.Value.MaxConcurency.ToString(), "| #", anItem.Value.MaxRecursion.ToString(), " ", aTimePerCall, " ", anItem.Key.ReflectedType.FullName, ".", anItem.Key.Name, "\r\n" };
                     string aMessage = string.Join("", aJoinArgs);
 
                     WriteToTrace(aMessage);
