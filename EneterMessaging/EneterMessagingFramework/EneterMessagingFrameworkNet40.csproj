@@ -510,21 +510,6 @@
     <Compile Include="Infrastructure\Attachable\_NamespaceDoc.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Infrastructure\ConnectionProvider\ConnectionProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastructure\ConnectionProvider\ConnectionProviderFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastructure\ConnectionProvider\IConnectionProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastructure\ConnectionProvider\IConnectionProviderFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastructure\ConnectionProvider\_NamespaceDoc.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\EneterProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\IProtocolFormatter.cs" />
     <Compile Include="MessagingSystems\ConnectionProtocols\ProtocolMessage.cs" />

@@ -6,10 +6,6 @@
 */
 
 using Eneter.Messaging.DataProcessing.Serializing;
-using Eneter.Messaging.EndPoints.TypedMessages;
-using Eneter.Messaging.Infrastructure.ConnectionProvider;
-using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
-using Eneter.Messaging.Nodes.ChannelWrapper;
 using Eneter.Messaging.Diagnostic;
 
 namespace Eneter.Messaging.Nodes.Broker

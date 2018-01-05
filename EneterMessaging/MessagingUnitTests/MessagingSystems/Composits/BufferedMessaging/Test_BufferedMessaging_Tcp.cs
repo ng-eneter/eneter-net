@@ -22,7 +22,10 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
 
             ChannelId = "tcp://127.0.0.1:6070/";
-            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory();
+            IMessagingSystemFactory anUnderlyingMessaging = new TcpMessagingSystemFactory()
+            {
+                ConnectTimeout = TimeSpan.FromMilliseconds(200)
+            };
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
             MessagingSystem = new BufferedMessagingFactory(anUnderlyingMessaging, aMaxOfflineTime);
             ConnectionInterruptionFrequency = 80;

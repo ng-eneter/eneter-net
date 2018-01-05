@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Eneter.Messaging.Nodes.ChannelWrapper;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
-using Eneter.Messaging.Infrastructure.ConnectionProvider;
 using Eneter.Messaging.EndPoints.StringMessages;
 
 namespace Eneter.MessagingUnitTests.Nodes.ChannelWrapper
@@ -21,13 +20,12 @@ namespace Eneter.MessagingUnitTests.Nodes.ChannelWrapper
             myDuplexGlobalOutputChannel = aGlobalChannelFactory.CreateDuplexOutputChannel("MainChannel");
             myDuplexGlobalInputChannel = aGlobalChannelFactory.CreateDuplexInputChannel("MainChannel");
 
-            IConnectionProviderFactory aConnectionProviderFactory = new ConnectionProviderFactory();
-            myConnectionProviderForWrapper = aConnectionProviderFactory.CreateConnectionProvider(new SynchronousMessagingSystemFactory());
-            myConnectionProviderForUnwrapper = aConnectionProviderFactory.CreateConnectionProvider(new SynchronousMessagingSystemFactory());
+            myMessagingForWrapper = new SynchronousMessagingSystemFactory();
+            myMessagingForUnwrapper = new SynchronousMessagingSystemFactory();
 
             IChannelWrapperFactory aFactory = new ChannelWrapperFactory();
             myDuplexChannelWrapper = aFactory.CreateDuplexChannelWrapper();
-            myDuplexChannelUnwrapper = aFactory.CreateDuplexChannelUnwrapper(myConnectionProviderForUnwrapper.MessagingSystem);
+            myDuplexChannelUnwrapper = aFactory.CreateDuplexChannelUnwrapper(myMessagingForUnwrapper);
         }
 
         [Test]
@@ -46,12 +44,14 @@ namespace Eneter.MessagingUnitTests.Nodes.ChannelWrapper
             IDuplexStringMessageSender aStringMessageSender2 = aStringMessagesFactory.CreateDuplexStringMessageSender();
 
             // Attach input channels to string receivers.
-            myConnectionProviderForUnwrapper.Attach(aStringMessageReceiver1, aChannel1Id);
-            myConnectionProviderForUnwrapper.Attach(aStringMessageReceiver2, aChannel2Id);
+            aStringMessageReceiver1.AttachDuplexInputChannel(myMessagingForUnwrapper.CreateDuplexInputChannel(aChannel1Id));
+            aStringMessageReceiver2.AttachDuplexInputChannel(myMessagingForUnwrapper.CreateDuplexInputChannel(aChannel2Id));
 
             // Connect string senders with the channel wrapper.
-            myConnectionProviderForWrapper.Connect(myDuplexChannelWrapper, aStringMessageSender1, aChannel1Id);
-            myConnectionProviderForWrapper.Connect(myDuplexChannelWrapper, aStringMessageSender2, aChannel2Id);
+            myDuplexChannelWrapper.AttachDuplexInputChannel(myMessagingForWrapper.CreateDuplexInputChannel(aChannel1Id));
+            myDuplexChannelWrapper.AttachDuplexInputChannel(myMessagingForWrapper.CreateDuplexInputChannel(aChannel2Id));
+            aStringMessageSender1.AttachDuplexOutputChannel(myMessagingForWrapper.CreateDuplexOutputChannel(aChannel1Id));
+            aStringMessageSender2.AttachDuplexOutputChannel(myMessagingForWrapper.CreateDuplexOutputChannel(aChannel2Id));
 
             // Connect wrapper and unwrapper to global channels.
             myDuplexChannelUnwrapper.AttachDuplexInputChannel(myDuplexGlobalInputChannel);
@@ -123,12 +123,14 @@ namespace Eneter.MessagingUnitTests.Nodes.ChannelWrapper
             IDuplexStringMessageSender aStringMessageSender2 = aStringMessagesFactory.CreateDuplexStringMessageSender();
 
             // Attach input channels to string receivers.
-            myConnectionProviderForUnwrapper.Attach(aStringMessageReceiver1, aChannel1Id);
-            myConnectionProviderForUnwrapper.Attach(aStringMessageReceiver2, aChannel2Id);
+            aStringMessageReceiver1.AttachDuplexInputChannel(myMessagingForUnwrapper.CreateDuplexInputChannel(aChannel1Id));
+            aStringMessageReceiver2.AttachDuplexInputChannel(myMessagingForUnwrapper.CreateDuplexInputChannel(aChannel2Id));
 
             // Connect string senders with the channel wrapper.
-            myConnectionProviderForWrapper.Connect(myDuplexChannelWrapper, aStringMessageSender1, aChannel1Id);
-            myConnectionProviderForWrapper.Connect(myDuplexChannelWrapper, aStringMessageSender2, aChannel2Id);
+            myDuplexChannelWrapper.AttachDuplexInputChannel(myMessagingForWrapper.CreateDuplexInputChannel(aChannel1Id));
+            myDuplexChannelWrapper.AttachDuplexInputChannel(myMessagingForWrapper.CreateDuplexInputChannel(aChannel2Id));
+            aStringMessageSender1.AttachDuplexOutputChannel(myMessagingForWrapper.CreateDuplexOutputChannel(aChannel1Id));
+            aStringMessageSender2.AttachDuplexOutputChannel(myMessagingForWrapper.CreateDuplexOutputChannel(aChannel2Id));
 
             try
             {
@@ -180,8 +182,8 @@ namespace Eneter.MessagingUnitTests.Nodes.ChannelWrapper
         }
 
 
-        private IConnectionProvider myConnectionProviderForWrapper;
-        private IConnectionProvider myConnectionProviderForUnwrapper;
+        private IMessagingSystemFactory myMessagingForWrapper;
+        private IMessagingSystemFactory myMessagingForUnwrapper;
 
         private IDuplexChannelWrapper myDuplexChannelWrapper;
         private IDuplexChannelUnwrapper myDuplexChannelUnwrapper;

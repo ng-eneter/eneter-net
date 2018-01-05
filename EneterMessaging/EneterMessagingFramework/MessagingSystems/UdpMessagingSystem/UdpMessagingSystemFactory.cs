@@ -753,7 +753,7 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
         /// Sets or gets the maximum number of connections the input channel can accept.
         /// </summary>
         /// <remarks>
-        /// This property is meaningfull only for the unicast UDP communication. I.e. for the communication between one sender
+        /// This property is meaningful only for the unicast UDP communication. I.e. for the communication between one sender
         /// and one receiver.<br/>
         /// The default value is -1 and it means the amount of connections is not restricted.
         /// </remarks>

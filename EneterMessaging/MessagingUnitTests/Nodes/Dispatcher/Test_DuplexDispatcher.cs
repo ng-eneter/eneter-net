@@ -7,7 +7,7 @@ using Eneter.Messaging.Nodes.Dispatcher;
 using Eneter.Messaging.EndPoints.StringMessages;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.MessagingSystems.SynchronousMessagingSystem;
-using Eneter.Messaging.Infrastructure.ConnectionProvider;
+
 
 namespace Eneter.MessagingUnitTests.Nodes.Dispatcher
 {
@@ -35,22 +35,19 @@ namespace Eneter.MessagingUnitTests.Nodes.Dispatcher
         [Test]
         public void SendAndReceive()
         {
-            IConnectionProviderFactory aConnectionProviderFactory = new ConnectionProviderFactory();
-            IConnectionProvider aConnectionProvider = aConnectionProviderFactory.CreateConnectionProvider(myMessagingSystemFactory);
+            myDuplexDispatcher.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelA_1"));
+            myDuplexDispatcher.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelA_2"));
+            myDuplexDispatcher.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelA_3"));
 
-            aConnectionProvider.Attach(myDuplexDispatcher, "ChannelA_1");
-            aConnectionProvider.Attach(myDuplexDispatcher, "ChannelA_2");
-            aConnectionProvider.Attach(myDuplexDispatcher, "ChannelA_3");
+            myStringMessageSender11.AttachDuplexOutputChannel(myMessagingSystemFactory.CreateDuplexOutputChannel("ChannelA_1"));
+            myStringMessageSender12.AttachDuplexOutputChannel(myMessagingSystemFactory.CreateDuplexOutputChannel("ChannelA_2"));
+            myStringMessageSender13.AttachDuplexOutputChannel(myMessagingSystemFactory.CreateDuplexOutputChannel("ChannelA_3"));
 
-            aConnectionProvider.Attach(myStringMessageSender11, "ChannelA_1");
-            aConnectionProvider.Attach(myStringMessageSender12, "ChannelA_2");
-            aConnectionProvider.Attach(myStringMessageSender13, "ChannelA_3");
-            
-            aConnectionProvider.Attach(myStringMessageSender22, "ChannelA_2");
+            myStringMessageSender22.AttachDuplexOutputChannel(myMessagingSystemFactory.CreateDuplexOutputChannel("ChannelA_2"));
 
-            aConnectionProvider.Attach(myStringMessageReceiver1, "ChannelB_1");
-            aConnectionProvider.Attach(myStringMessageReceiver2, "ChannelB_2");
-            aConnectionProvider.Attach(myStringMessageReceiver3, "ChannelB_3");
+            myStringMessageReceiver1.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelB_1"));
+            myStringMessageReceiver2.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelB_2"));
+            myStringMessageReceiver3.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelB_3"));
 
             myDuplexDispatcher.AddDuplexOutputChannel("ChannelB_1");
             myDuplexDispatcher.AddDuplexOutputChannel("ChannelB_2");
@@ -216,17 +213,14 @@ namespace Eneter.MessagingUnitTests.Nodes.Dispatcher
         //[Test]
         public void GetAssociatedResponseReceiverId()
         {
-            IConnectionProviderFactory aConnectionProviderFactory = new ConnectionProviderFactory();
-            IConnectionProvider aConnectionProvider = aConnectionProviderFactory.CreateConnectionProvider(myMessagingSystemFactory);
+            myDuplexDispatcher.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelA_1"));
+            myDuplexDispatcher.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelA_2"));
 
-            aConnectionProvider.Attach(myDuplexDispatcher, "ChannelA_1");
-            aConnectionProvider.Attach(myDuplexDispatcher, "ChannelA_2");
+            myStringMessageSender11.AttachDuplexOutputChannel(myMessagingSystemFactory.CreateDuplexOutputChannel("ChannelA_1"));
+            myStringMessageSender12.AttachDuplexOutputChannel(myMessagingSystemFactory.CreateDuplexOutputChannel("ChannelA_2"));
 
-            aConnectionProvider.Attach(myStringMessageSender11, "ChannelA_1");
-            aConnectionProvider.Attach(myStringMessageSender12, "ChannelA_2");
-
-            aConnectionProvider.Attach(myStringMessageReceiver1, "ChannelB_1");
-            aConnectionProvider.Attach(myStringMessageReceiver2, "ChannelB_2");
+            myStringMessageReceiver1.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelB_1"));
+            myStringMessageReceiver2.AttachDuplexInputChannel(myMessagingSystemFactory.CreateDuplexInputChannel("ChannelB_2"));
 
             myDuplexDispatcher.AddDuplexOutputChannel("ChannelB_1");
             myDuplexDispatcher.AddDuplexOutputChannel("ChannelB_2");

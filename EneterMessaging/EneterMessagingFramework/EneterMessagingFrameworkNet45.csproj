@@ -128,11 +128,6 @@
     <Compile Include="Infrastructure\Attachable\IAttachableDuplexOutputChannel.cs" />
     <Compile Include="Infrastructure\Attachable\IAttachableMultipleDuplexInputChannels.cs" />
     <Compile Include="Infrastructure\Attachable\_NamespaceDoc.cs" />
-    <Compile Include="Infrastructure\ConnectionProvider\ConnectionProvider.cs" />
-    <Compile Include="Infrastructure\ConnectionProvider\ConnectionProviderFactory.cs" />
-    <Compile Include="Infrastructure\ConnectionProvider\IConnectionProvider.cs" />
-    <Compile Include="Infrastructure\ConnectionProvider\IConnectionProviderFactory.cs" />
-    <Compile Include="Infrastructure\ConnectionProvider\_NamespaceDoc.cs" />
     <Compile Include="Infrastructure\_NamespaceDoc.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbCableMessagingFactory.cs" />
     <Compile Include="MessagingSystems\AndroidUsbCableMessagingSystem\AndroidUsbDuplexOutputChannel.cs" />

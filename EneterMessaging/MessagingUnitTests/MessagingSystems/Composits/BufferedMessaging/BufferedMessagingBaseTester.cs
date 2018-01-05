@@ -376,14 +376,18 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             };
 
             AutoResetEvent aOnlineIsRaised = new AutoResetEvent(false);
+            bool aOnlineStateAfterOnline = false;
             aDuplexOutputChannel.ConnectionOnline += (x, y) =>
             {
+                aOnlineStateAfterOnline = aDuplexOutputChannel.IsOnline;
                 aOnlineIsRaised.Set();
             };
 
             AutoResetEvent aOfflineIsRaised = new AutoResetEvent(false);
+            bool aOnlineStateAfterOffline = false;
             aDuplexOutputChannel.ConnectionOffline += (x, y) =>
             {
+                aOnlineStateAfterOffline = aDuplexOutputChannel.IsOnline;
                 aOfflineIsRaised.Set();
             };
 
@@ -395,8 +399,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 {
                     Assert.Fail("Offline event was not raised.");
                 }
-
-                Assert.IsFalse(aDuplexOutputChannel.IsOnline);
+                Assert.IsFalse(aOnlineStateAfterOffline);
 
                 // start listening
                 aDuplexInputChannel.StartListening();
@@ -405,7 +408,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 {
                     Assert.Fail("Online event was not raised.");
                 }
-                Assert.IsTrue(aDuplexOutputChannel.IsOnline);
+                Assert.IsTrue(aOnlineStateAfterOnline);
 
                 if (!aResponseReceiverOnline.WaitOne(1000))
                 {
@@ -425,7 +428,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 {
                     Assert.Fail("Offline event was not raised after disconnection.");
                 }
-                Assert.IsFalse(aDuplexOutputChannel.IsOnline);
+                Assert.IsFalse(aOnlineStateAfterOffline);
 
                 if (aResponseReceiverOffline.WaitOne(500))
                 {
@@ -441,7 +444,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 {
                     Assert.Fail("Online event was not raised after reconnection.");
                 }
-                Assert.IsTrue(aDuplexOutputChannel.IsOnline);
+                Assert.IsTrue(aOnlineStateAfterOnline);
 
                 if (!aResponseReceiverOnline.WaitOne(1000))
                 {
@@ -461,7 +464,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
                 {
                     Assert.Fail("Offline event shall NOT be raised after CloseConnection().");
                 }
-                Assert.IsFalse(aDuplexOutputChannel.IsOnline);
+                Assert.IsFalse(aOnlineStateAfterOffline);
 
             }
             finally
