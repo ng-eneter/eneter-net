@@ -39,11 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -325,12 +321,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Eneter.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="EneterMessagingFrameworkNet40.csproj">
-      <Project>{8884B886-FCFA-44EA-BE93-F884CCFB7AF2}</Project>
-      <Name>EneterMessagingFrameworkNet40</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
