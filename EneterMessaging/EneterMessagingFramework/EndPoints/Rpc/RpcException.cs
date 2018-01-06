@@ -17,7 +17,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
     /// When the client receives the exception from the service it creates RpcException and stores there all details
     /// about original service exception. The RpcException is then thrown and can be processed by the client.  
     /// </remarks>
-    public class RpcException : Exception
+    public sealed class RpcException : Exception
     {
         internal RpcException(string message, string serviceExceptionType, string serviceExceptionDetails)
             :base(message)

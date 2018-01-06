@@ -64,7 +64,7 @@ namespace Eneter.Messaging.Diagnostic
     /// </code>
     /// </example>
     /// </remarks>
-    public class EneterTrace : IDisposable
+    public sealed class EneterTrace : IDisposable
     {
         /// <summary>
         /// Detail level of the trace.
