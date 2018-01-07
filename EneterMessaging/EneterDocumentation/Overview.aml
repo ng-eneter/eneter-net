@@ -3,7 +3,7 @@
   <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
     <summary>
       <para>
-       Welcome to the Eneter.Messaging.Framework, the cross-platform message oriented middleware.
+       Welcome to the Eneter.Messaging.Framework.
       </para>
     </summary>
     <introduction>
@@ -27,13 +27,11 @@
         </para>
 		    <list class="bullet">
 		      <listItem><para>.NET 3.5, 4.0, 4.5</para></listItem>
-		      <listItem><para>Windows Phone 7.0, 7.1, 8.0, 8.1</para></listItem>
-		      <listItem><para>Silverlight 3, 4, 5</para></listItem>
-		      <listItem><para>Compact Framework 2.0, 3.5</para></listItem>
-		      <listItem><para>Mono 2.6.4</para></listItem>
+		      <listItem><para>Xamarin for Android and iOS</para></listItem>
+		      <listItem><para>Xamarin for iOS</para></listItem>
 		      <listItem><para>Java 6</para></listItem>
-		      <listItem><para>Android 2.3.3 (or later)</para></listItem>
-          <listItem><para>HTML5 Javascript</para></listItem>
+		      <listItem><para>Java for Android 2.3.3 (or later)</para></listItem>
+          	  <listItem><para>HTML5 Javascript</para></listItem>
 		    </list>
       </content>
     </section>
@@ -48,10 +46,9 @@
 		      <listItem><para><legacyItalic>TCP</legacyItalic> - for communication between processes running on different machines. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.TcpMessagingSystem</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>WebSocket</legacyItalic> - for communication between processes running on different machines. It provides bi-directional, full-duplex communication in environments which block non-standard Internet connections using a firewall.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>HTTP</legacyItalic> - for communication between processes running on different machines. It works in environments blocking non-standard Internet connections using a firewall.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.HttpMessagingSystem</codeEntityReference></para></listItem>
-          <listItem><para><legacyItalic>UDP</legacyItalic> - for communication between processes running on different machines. For short and fast messaging. Delivery of packets is not guaranteed. It also supports multicast and broadcast communication.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.UdpMessagingSystem</codeEntityReference></para></listItem>
+              <listItem><para><legacyItalic>UDP</legacyItalic> - for communication between processes running on different machines. For short and fast messaging. Delivery of packets is not guaranteed. It also supports multicast and broadcast communication.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.UdpMessagingSystem</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Shared Memory</legacyItalic> - for very fast communication between processes running on the same machine. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.SharedMemoryMessagingSystem</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Named Pipes</legacyItalic> - for communication between processes running on the same machine. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem</codeEntityReference></para></listItem>
-		      <listItem><para><legacyItalic>Silverlight Messaging</legacyItalic> - for communication between Silverlight applications. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.SilverlightMessagingSystem</codeEntityReference></para></listItem>
 		      <listItem><para><legacyItalic>Android USB Cable</legacyItalic> - for communication between computer and Android device connected via the USB cable.<codeEntityReference>N:Eneter.Messaging.MessagingSystems.AndroidUsbCableMessagingSystem</codeEntityReference></para></listItem>
           <listItem><para><legacyItalic>Thread Messaging</legacyItalic> - for communication between threads running in the same process. <codeEntityReference>N:Eneter.Messaging.MessagingSystems.ThreadMessagingSystem</codeEntityReference></para></listItem>
 		    </list>

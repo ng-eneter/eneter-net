@@ -1,5 +1,30 @@
 Release Notes
 
+Version 8.0
+
+Release Date: 2018-01-07
+
+Supported Platforms:
+
+    Java 6 and Java for Android
+    .Net 3.5, 4.0, 4.5
+    .Xamarin for Android
+    .Xamarin for iOS
+    HTML 5 (Javascript)
+
+New Features:
+
+    Possibility to restrict number of clients which can connect via TCP, WebSockets and UDP unicast.
+    Buffered messaging indicates if it is in online or offline state.
+
+Changes in behavior:
+
+    The following platforms are not supported anymore: Compact Framework, Silverlight and Windwos Phone Silverlight.
+
+Fixed bugs:
+    Serialization / deserialization works along the 'Instant Run' feature in Android Studio.
+
+
 Version 7.0
 
 Release Date: 2016-01-02
