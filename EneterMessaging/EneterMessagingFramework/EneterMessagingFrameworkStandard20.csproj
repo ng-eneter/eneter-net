@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Eneter.Messaging.Framework.Standard20</AssemblyName>
+    <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <RootNamespace>Eneter.Messaging</RootNamespace>
     <PackageId>Eneter.Messaging.Framework</PackageId>
-    <Version>8.0.1</Version>
+    <Version>8.0.4</Version>
     <Authors>Ondrej Uzovic</Authors>
     <Product>Eneter.Messaging.Framework</Product>
     <Description>Lightweight library for interprocess communication. Easy to use and works on multiple platforms (.NET, Android, Java and HTML5 Javascript).</Description>
@@ -13,18 +13,21 @@
     <PackageLicenseUrl>http://www.eneter.net/LicenseAgreement.htm#EneterNonCommercialLicense</PackageLicenseUrl>
     <PackageProjectUrl>http://www.eneter.net/ProductInfo.htm</PackageProjectUrl>
     <PackageTags>interprocess communication crossplatform messages network tcp udp WebSocket sharedmemory rpc request-response publish-subscribe middleware</PackageTags>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Eneter.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>bin\Standard20\Debug\</OutputPath>
-    <DocumentationFile>bin\Standard20\Debug\Eneter.Messaging.Framework.Standard20.xml</DocumentationFile>
+    <DocumentationFile>bin\Standard20\Debug\Eneter.Messaging.Framework.xml</DocumentationFile>
     <CodeAnalysisRuleSet />
     <DefineConstants>TRACE;NETSTANDARD20</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>bin\Standard20\Release\</OutputPath>
-    <DocumentationFile>bin\Standard20\Release\Eneter.Messaging.Framework.Standard20.xml</DocumentationFile>
+    <DocumentationFile>bin\Standard20\Release\Eneter.Messaging.Framework.xml</DocumentationFile>
     <CodeAnalysisRuleSet />
     <DefineConstants>TRACE;NETSTANDARD20</DefineConstants>
   </PropertyGroup>

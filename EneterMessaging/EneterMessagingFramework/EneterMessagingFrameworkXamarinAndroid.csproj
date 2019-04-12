@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Eneter.Messaging</RootNamespace>
-    <AssemblyName>Eneter.Messaging.Framework.AndroidXamarin</AssemblyName>
+    <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -25,7 +25,7 @@
     <DefineConstants>TRACE;DEBUG;XAMARIN; XAMARIN_ANDROID</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\XamarinAndroid\Debug\Eneter.Messaging.Framework.XamarinAndroid.XML</DocumentationFile>
+    <DocumentationFile>bin\XamarinAndroid\Debug\Eneter.Messaging.Framework.XML</DocumentationFile>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -35,7 +35,7 @@
     <DefineConstants>TRACE;XAMARIN; XAMARIN_ANDROID</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\XamarinAndroid\Release\Eneter.Messaging.Framework.XamarinAndroid.XML</DocumentationFile>
+    <DocumentationFile>bin\XamarinAndroid\Release\Eneter.Messaging.Framework.XML</DocumentationFile>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>

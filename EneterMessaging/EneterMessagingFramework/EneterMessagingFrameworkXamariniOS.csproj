@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Eneter.Messaging</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>Eneter.Messaging.Framework.XamariniOS</AssemblyName>
+    <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\XamariniOS\Debug\Eneter.Messaging.Framework.XamariniOS.XML</DocumentationFile>
+    <DocumentationFile>bin\XamariniOS\Debug\Eneter.Messaging.Framework.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -30,7 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\XamariniOS\Release\Eneter.Messaging.Framework.XamariniOS.XML</DocumentationFile>
+    <DocumentationFile>bin\XamariniOS\Release\Eneter.Messaging.Framework.xml</DocumentationFile>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;XAMARIN; XAMARIN_IOS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppStore|AnyCPU'">
