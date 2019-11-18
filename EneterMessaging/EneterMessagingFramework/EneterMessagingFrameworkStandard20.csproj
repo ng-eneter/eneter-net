@@ -5,7 +5,7 @@
     <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <RootNamespace>Eneter.Messaging</RootNamespace>
     <PackageId>Eneter.Messaging.Framework</PackageId>
-    <Version>8.0.4</Version>
+    <Version>8.0.5</Version>
     <Authors>Ondrej Uzovic</Authors>
     <Product>Eneter.Messaging.Framework</Product>
     <Description>Lightweight library for interprocess communication. Easy to use and works on multiple platforms (.NET, Android, Java and HTML5 Javascript).</Description>

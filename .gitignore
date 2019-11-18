@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/EneterMessaging/.vs/EneterMessaging_Dev_VS2013/DesignTimeBuild
+/EneterMessaging/.vs/EneterMessaging_Dev_VS2013
+/EneterMessaging/EneterMessagingFramework/obj
+/EneterMessaging/MessagingUnitTests/obj
+/EneterMessaging/EneterMessagingFramework/bin/Standard20
