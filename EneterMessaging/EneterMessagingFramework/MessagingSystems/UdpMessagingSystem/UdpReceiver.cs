@@ -106,12 +106,16 @@ namespace Eneter.Messaging.MessagingSystems.UdpMessagingSystem
 
                         if (myEndPointToBind != null)
                         {
-                            // Avoid getting exception when some UDP client disconnects.
-                            // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
-                            const int SIO_UDP_CONNRESET = -1744830452;
-                            byte[] inValue = new byte[] { 0 };
-                            byte[] outValue = new byte[] { 0 };
-                            mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
+                            // Windows platform specific setting.
+                            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                            {
+                                // Avoid getting exception when some UDP client disconnects.
+                                // Note: http://stackoverflow.com/questions/10332630/connection-reset-on-receiving-packet-in-udp-server
+                                const int SIO_UDP_CONNRESET = -1744830452;
+                                byte[] inValue = new byte[] { 0 };
+                                byte[] outValue = new byte[] { 0 };
+                                mySocket.IOControl(SIO_UDP_CONNRESET, inValue, outValue);
+                            }
 
                             mySocket.Bind(myEndPointToBind);
 
