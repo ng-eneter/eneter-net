@@ -1,5 +1,45 @@
 Release Notes
 
+
+Version 8.0.4
+
+Release Date: 2019-11-18
+
+Supported Platforms:
+
+    Java 6 and Java for Android
+    .Net 3.5, 4.0, 4.5
+    .Net Standard 2.0
+    .Xamarin for Android
+    .Xamarin for iOS
+    HTML 5 (Javascript)
+
+Fixed bugs:
+    Socket.IOControl handles Windows-specific control codes and is not supported on this platform.
+
+
+Version 8.0.4
+
+Release Date: 2019-04-12
+
+Supported Platforms:
+
+    Java 6 and Java for Android
+    .Net 3.5, 4.0, 4.5
+    .Net Standard 2.0
+    .Xamarin for Android
+    .Xamarin for iOS
+    HTML 5 (Javascript)
+
+New Features:
+
+    Eneter compiled for .NET Standard 2.0
+
+Changes in behavior:
+
+    All C# based assemblies have the same name Eneter.Messaging.Framework.dll (i.e. the name of the platform is not the part of the assembly name.)
+
+
 Version 8.0
 
 Release Date: 2018-01-07
