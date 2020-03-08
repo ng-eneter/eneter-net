@@ -9,3 +9,11 @@
 /EneterMessaging/MessagingUnitTests/obj
 /EneterMessaging/EneterMessagingFramework/bin/Standard20
 EneterMessaging/EneterMessagingFramework/bin/
+/EneterMessaging/.vs/EneterMessaging_Dev/DesignTimeBuild
+/EneterMessaging/.vs
+/EneterMessaging/EneterMessagingFramework/EneterMessagingFrameworkNet45.csproj.user
+/EneterMessaging/EneterMessagingFramework/EneterMessagingFrameworkNet40.csproj.user
+/EneterMessaging/EneterMessagingFramework/EneterMessagingFrameworkNet35.csproj.user
+/EneterMessaging/EneterMessagingFramework/EneterMessagingFramework.csproj.user
+/EneterMessaging/MessagingUnitTests/bin/Debug
+/EneterMessaging/packages

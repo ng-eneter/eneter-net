@@ -118,7 +118,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     EneterTrace.Error(httpAddress + ErrorHandler.InvalidUriAddress, err);
                     throw;
                 }
-                myHttpListenerProvider = new HttpListenerProvider(aUri.AbsoluteUri);
+                myHttpListenerProvider = new HttpServer(aUri.AbsoluteUri);
 
                 myProtocolFormatter = protocolFormatter;
                 myResponseReceiverInactivityTimeout = responseReceiverInactivityTimeout;
@@ -270,15 +270,15 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             }
         }
 
-        private void HandleConnection(HttpRequestContext httpRequestContext)
+        private void HandleConnection(HttpListenerContext httpRequestContext)
         {
             using (EneterTrace.Entering())
             {
                 // If polling. (when client polls to get response messages)
-                if (httpRequestContext.HttpMethod == "GET")
+                if (httpRequestContext.Request.HttpMethod.ToUpperInvariant() == "GET")
                 {
                     // Get responseReceiverId.
-                    string[] aQueryItems = httpRequestContext.Uri.Query.Split('&');
+                    string[] aQueryItems = httpRequestContext.Request.Url.Query.Split('&');
                     if (aQueryItems.Length > 0)
                     {
                         string aResponseReceiverId = aQueryItems[0].Substring(4);
@@ -296,7 +296,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                             byte[] aMessages = aClientContext.DequeueCollectedMessages();
                             if (aMessages != null)
                             {
-                                httpRequestContext.Response(aMessages);
+                                httpRequestContext.SendResponseMessage(aMessages);
                             }
                         }
                         else
@@ -311,7 +311,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         EneterTrace.Warning("Incorrect query format detected for HTTP GET request.");
 
                         // The request was not processed.
-                        httpRequestContext.ResponseError(404);
+                        httpRequestContext.Response.StatusCode = 404;
                     }
                 }
                 else
@@ -319,7 +319,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                 {
                     byte[] aMessage = httpRequestContext.GetRequestMessage();
 
-                    IPEndPoint anEndPoint = httpRequestContext.RemoteEndPoint as IPEndPoint;
+                    IPEndPoint anEndPoint = httpRequestContext.Request.RemoteEndPoint;
                     string aClientIp = (anEndPoint != null) ? anEndPoint.Address.ToString() : "";
 
                     ProtocolMessage aProtocolMessage = myProtocolFormatter.DecodeMessage(aMessage);
@@ -389,7 +389,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     if (!anIsProcessingOk)
                     {
                         // The request was not processed.
-                        httpRequestContext.ResponseError(404);
+                        httpRequestContext.Response.StatusCode = 404;
                     }
                 }
             }
@@ -493,7 +493,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
 
         private IProtocolFormatter myProtocolFormatter;
-        private HttpListenerProvider myHttpListenerProvider;
+        private HttpServer myHttpListenerProvider;
         private Action<MessageContext> myMessageHandler;
         private object myListeningManipulatorLock = new object();
         private Timer myResponseReceiverInactivityTimer;

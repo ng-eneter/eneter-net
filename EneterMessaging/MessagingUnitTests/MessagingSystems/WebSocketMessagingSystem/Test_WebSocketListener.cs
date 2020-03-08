@@ -350,7 +350,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void TwoSameListeners()
         {
             Uri anAddress = new Uri("ws://127.0.0.1:8087/MyService/");
@@ -364,7 +363,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
                 aService1.StartListening(x => { });
 
                 // Start the second listener to the same path -> exception is expected.
-                aService2.StartListening(x => { });
+                Assert.Throws<InvalidOperationException>(() => aService2.StartListening(x => { }));
             }
             finally
             {
@@ -404,7 +403,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
         }
 
         [Test]
-        [ExpectedException(typeof(IOException))]
         public void MaxAmountOfClients()
         {
             Uri anAddress = new Uri("ws://127.0.0.1:8087/MyService/");
@@ -425,7 +423,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
                 aClient2.OpenConnection();
 
                 // This opening shall fail with the exception.
-                aClient3.OpenConnection();
+                Assert.Throws<IOException>(() => aClient3.OpenConnection());
             }
             finally
             {

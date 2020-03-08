@@ -33,19 +33,19 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.UdpMessagingSystem
         // Some disconnections e.g. input channel suddenly stopps are not detectable.
 
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public override void Duplex_03_Send1_10MB()
         {
         }
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public override void Duplex_07_OpenConnection_if_InputChannelNotStarted()
         {
         }
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public override void Duplex_09_StopListening_SendMessage()
         {

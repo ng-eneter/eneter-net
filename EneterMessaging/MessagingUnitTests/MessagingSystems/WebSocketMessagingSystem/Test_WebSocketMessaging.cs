@@ -29,7 +29,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
 
 
         [Test]
-        [ExpectedException(typeof(TimeoutException))]
         public void ConnectionTimeout()
         {
             IMessagingSystemFactory aMessaging = new WebSocketMessagingSystemFactory()
@@ -63,8 +62,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
 
                 if (aConnectionCompleted.WaitOne(1500))
                 {
-                    throw anException;
                 }
+
+                Assert.AreEqual(typeof(TimeoutException), anException);
             }
             finally
             {
@@ -148,7 +148,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
         }
 
         [Test]
-        [ExpectedException(typeof(IOException))]
         public void MaxAmountOfConnections()
         {
             IMessagingSystemFactory aMessaging = new WebSocketMessagingSystemFactory()
@@ -173,16 +172,16 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.WebSocketMessagingSystem
                 anInputChannel.StartListening();
                 anOutputChannel1.OpenConnection();
                 anOutputChannel2.OpenConnection();
-                anOutputChannel3.OpenConnection();
+
+                Assert.IsTrue(anOutputChannel1.IsConnected);
+                Assert.IsTrue(anOutputChannel2.IsConnected);
+
+                Assert.Throws<IOException>(() => anOutputChannel3.OpenConnection());
 
                 if (!aConnectionClosed.WaitOne(1000))
                 {
                     Assert.Fail("Third connection was not closed.");
                 }
-
-                Assert.IsTrue(anOutputChannel1.IsConnected);
-                Assert.IsTrue(anOutputChannel2.IsConnected);
-                Assert.IsFalse(anOutputChannel3.IsConnected);
             }
             finally
             {

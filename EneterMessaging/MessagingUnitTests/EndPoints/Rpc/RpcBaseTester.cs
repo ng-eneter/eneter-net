@@ -219,7 +219,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         }
 
         [Test]
-        [ExpectedException(typeof(RpcException))]
         public void RpcCallError()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
@@ -233,7 +232,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
 
                 IHello aServiceProxy = anRpcClient.Proxy;
-                aServiceProxy.Fail();
+                Assert.Throws<RpcException>(() => aServiceProxy.Fail());
             }
             finally
             {
@@ -254,7 +253,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         //       because synchronous messaging is a sequence within one thread and so the remote call
         //       does not wait.
         [Test]
-        [ExpectedException(typeof(TimeoutException))]
         public virtual void RpcTimeout()
         {
             RpcFactory anRpcFactory = new RpcFactory(mySerializer);
@@ -270,7 +268,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
 
 
                 IHello aServiceProxy = anRpcClient.Proxy;
-                aServiceProxy.Timeout();
+                Assert.Throws<TimeoutException>(() => aServiceProxy.Timeout());
             }
             finally
             {
@@ -1001,11 +999,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void NoInterfaceTypeProvided()
         {
             RpcFactory anRpcFactory = new RpcFactory();
-            anRpcFactory.CreateClient<OpenArgs>();
+            Assert.Throws<InvalidOperationException>(() => anRpcFactory.CreateClient<OpenArgs>());
         }
 
         [Test]

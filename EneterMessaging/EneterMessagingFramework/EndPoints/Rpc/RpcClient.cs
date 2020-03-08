@@ -82,7 +82,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 mySerializer = serializer;
                 myRpcTimeout = rpcTimeout;
 
-#if !XAMARIN_IOS && !NETSTANDARD20
+#if !XAMARIN_IOS && !NETSTANDARD
                 ServiceInterfaceChecker.CheckForClient<TServiceInterface>();
 
                 // Dynamically implement and instantiate the given interface as the proxy.

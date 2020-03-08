@@ -39,7 +39,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void ConnectionClosedDuringWaitingForResponse()
         {
             IDuplexTypedMessageReceiver<int, int> aReceiver = DuplexTypedMessagesFactory.CreateDuplexTypedMessageReceiver<int, int>();
@@ -56,10 +55,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
                 aReceiver.AttachDuplexInputChannel(InputChannel);
                 aSender.AttachDuplexOutputChannel(OutputChannel);
 
-                int aResult = aSender.SendRequestMessage(100);
-
-                // The previous call should raise the exception there we failed if we are here.
-                Assert.Fail();
+                Assert.Throws<InvalidOperationException>(() => aSender.SendRequestMessage(100));
             }
             finally
             {
@@ -114,7 +110,6 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void WaitingForResponseTimeouted()
         {
             IDuplexTypedMessageReceiver<int, int> aReceiver = DuplexTypedMessagesFactory.CreateDuplexTypedMessageReceiver<int, int>();
@@ -128,7 +123,7 @@ namespace Eneter.MessagingUnitTests.EndPoints.SyncTypedMessages
                 aReceiver.AttachDuplexInputChannel(InputChannel);
                 aSender.AttachDuplexOutputChannel(OutputChannel);
 
-                aSender.SendRequestMessage(100);
+                Assert.Throws<InvalidOperationException>(() => aSender.SendRequestMessage(100));
             }
             finally
             {

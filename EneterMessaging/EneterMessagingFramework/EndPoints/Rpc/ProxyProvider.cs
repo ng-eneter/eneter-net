@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !XAMARIN_IOS && !NETSTANDARD20
+#if !XAMARIN_IOS && !NETSTANDARD
 
 using System;
 using System.Collections.Generic;

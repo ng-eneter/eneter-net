@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !XAMARIN && !NETSTANDARD20
+#if !XAMARIN && !NETSTANDARD
 
 using System;
 using System.IO;

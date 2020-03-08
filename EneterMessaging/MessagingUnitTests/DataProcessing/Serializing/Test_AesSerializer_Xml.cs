@@ -21,7 +21,6 @@ namespace Eneter.MessagingUnitTests.DataProcessing.Serializing
         }
 
         [Test]
-        [ExpectedException(typeof(CryptographicException))]
         public void IncorrectPassword()
         {
             string aData = "Hello world.";
@@ -33,7 +32,7 @@ namespace Eneter.MessagingUnitTests.DataProcessing.Serializing
             ISerializer anIncorrectSerializer = new AesSerializer("mytestpassword1");
 
             // Try to deserialize.
-            string aDeserializedData = anIncorrectSerializer.Deserialize<string>(aSerializedData);
+            Assert.Throws<CryptographicException>(() => anIncorrectSerializer.Deserialize<string>(aSerializedData));
         }
     }
 }

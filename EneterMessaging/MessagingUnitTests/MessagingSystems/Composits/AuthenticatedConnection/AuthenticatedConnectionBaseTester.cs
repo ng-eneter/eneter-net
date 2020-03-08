@@ -10,7 +10,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
     public abstract class AuthenticatedConnectionBaseTester : BaseTester
     {
         [Test]
-        [ExpectedException(typeof(TimeoutException))]
         public virtual void AuthenticationTimeout()
         {
             IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
@@ -23,7 +22,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
                 anInputChannel.StartListening();
 
                 // Client opens the connection.
-                anOutputChannel.OpenConnection();
+                Assert.Throws<TimeoutException>(() => anOutputChannel.OpenConnection());
             }
             finally
             {
@@ -35,7 +34,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public virtual void ConnectionNotGranted()
         {
             IDuplexInputChannel anInputChannel = MessagingSystemFactory.CreateDuplexInputChannel(ChannelId);
@@ -48,7 +46,7 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.AuthenticatedConn
                 anInputChannel.StartListening();
 
                 // Client opens the connection.
-                anOutputChannel.OpenConnection();
+                Assert.Throws<InvalidOperationException>(() => anOutputChannel.OpenConnection());
             }
             finally
             {

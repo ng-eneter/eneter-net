@@ -39,7 +39,6 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
         //}
 
         [Test]
-        [ExpectedException(typeof(TimeoutException))]
         public void ConnectionTimeout()
         {
             IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory()
@@ -73,8 +72,9 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.TcpMessagingSystem
 
                 if (aConnectionCompleted.WaitOne(1500))
                 {
-                    throw anException;
                 }
+
+                Assert.AreEqual(typeof(TimeoutException), anException);
             }
             finally
             {

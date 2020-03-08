@@ -246,6 +246,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpInputConnector.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerContextExt.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpListenerProvider.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -253,9 +254,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpOutputConnector.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestContext.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\HttpMessagingSystem\HttpRequestInvoker.cs" />
     <Compile Include="MessagingSystems\HttpMessagingSystem\_NamespaceDoc.cs">
       <SubType>Code</SubType>

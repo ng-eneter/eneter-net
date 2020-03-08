@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if NET4 || NET45
+#if !NET35 && NETFRAMEWORK
 
 using System;
 using System.Collections.Generic;

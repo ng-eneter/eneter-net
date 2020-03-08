@@ -6,7 +6,7 @@
 */
 
 
-#if !NET35 && !XAMARIN && !NETSTANDARD20
+#if !NET35 && NETFRAMEWORK
 
 using System;
 using System.Threading;
