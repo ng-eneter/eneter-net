@@ -17,19 +17,27 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
     /// <summary>
     /// HTTP server.
     /// </summary>
-    internal class HttpWebServer
+    internal class HttpServer
     {
         /// <summary>
         /// Constructs the HTTP server.
         /// </summary>
         /// <param name="absoluteUri">The root HTTP address to be listened.</param>
-        public HttpWebServer(string absoluteUri)
+        public HttpServer(string absoluteUri)
         {
             using (EneterTrace.Entering())
             {
                 myAbsoluteUri = absoluteUri;
             }
         }
+
+        /// <summary>
+        /// Allows to set the custom factory method for the underlying HttpListner.
+        /// </summary>
+        /// <remarks>
+        /// If it is null then HttpListener is created by a default way.
+        /// </remarks>
+        public Func<HttpListener> HttpListenerFactory { get; set; }
 
         /// <summary>
         /// Starts the listening.
@@ -61,8 +69,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         myConnectionHandler = connectionHandler;
 
                         // Start listening for incoming Http requests
-                        myListener = new HttpListener();
-                        myListener.Prefixes.Add(myAbsoluteUri);
+                        myListener = HttpListenerFactory != null ? HttpListenerFactory() : CreateHttpListener();
                         myListener.Start();
 
                         // Do listening loop in another thread
@@ -239,8 +246,20 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             }
         }
 
+        /// <summary>
+        /// Default factory method for HttpListener.
+        /// </summary>
+        /// <returns></returns>
+        private HttpListener CreateHttpListener()
+        {
+            HttpListener aHttpListener = new HttpListener();
+            aHttpListener.Prefixes.Add(myAbsoluteUri);
+            return aHttpListener;
+        }
+
 
         private string myAbsoluteUri;
+        private Func<HttpListener> myHttpListenerFactoryMethod;
         private Action<HttpListenerContext> myConnectionHandler;
 
         private HttpListener myListener;
