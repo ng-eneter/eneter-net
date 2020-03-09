@@ -5635,6 +5635,14 @@
             </summary>
             <param name="absoluteUri">The root HTTP address to be listened.</param>
         </member>
+        <member name="P:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.HttpListenerFactory">
+            <summary>
+            Allows to set the custom factory method for the underlying HttpListner.
+            </summary>
+            <remarks>
+            If it is null then HttpListener is created by a default way.
+            </remarks>
+        </member>
         <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.StartListening(System.Action{System.Net.HttpListenerContext})">
             <summary>
             Starts the listening.
@@ -5655,6 +5663,12 @@
             <summary>
             Loop for the main listening thread.
             </summary>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.CreateHttpListener">
+            <summary>
+            Default factory method for HttpListener.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.NamespaceDoc">
             <summary>
