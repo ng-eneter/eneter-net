@@ -118,7 +118,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                     EneterTrace.Error(httpAddress + ErrorHandler.InvalidUriAddress, err);
                     throw;
                 }
-                myHttpListenerProvider = new HttpServer(aUri.AbsoluteUri);
+                myHttpListenerProvider = new HttpWebServer(aUri.AbsoluteUri);
 
                 myProtocolFormatter = protocolFormatter;
                 myResponseReceiverInactivityTimeout = responseReceiverInactivityTimeout;
@@ -493,7 +493,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
 
         private IProtocolFormatter myProtocolFormatter;
-        private HttpServer myHttpListenerProvider;
+        private HttpWebServer myHttpListenerProvider;
         private Action<MessageContext> myMessageHandler;
         private object myListeningManipulatorLock = new object();
         private Timer myResponseReceiverInactivityTimer;

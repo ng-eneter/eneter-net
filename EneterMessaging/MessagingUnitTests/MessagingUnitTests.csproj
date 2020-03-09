@@ -185,8 +185,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\Composits\MessageBusMessaging\Test_MessageBusMessaging_Tcp_Interop.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpClient.cs" />
-    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpServer.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpWebClient.cs" />
+    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpWebServer.cs" />
     <Compile Include="MessagingSystems\ServiceMock.cs" />
     <Compile Include="MessagingSystems\Composits\AuthenticatedConnection\AuthenticatedConnectionBaseTester.cs">
       <SubType>Code</SubType>

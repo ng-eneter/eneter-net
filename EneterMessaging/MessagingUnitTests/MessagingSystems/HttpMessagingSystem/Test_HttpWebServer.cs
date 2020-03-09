@@ -4,12 +4,12 @@ using NUnit.Framework;
 namespace Eneter.MessagingUnitTests.MessagingSystems.HttpMessagingSystem
 {
     [TestFixture]
-    public class Test_HttpServer
+    public class Test_HttpWebServer
     {
         [Test]
         public void StartListening()
         {
-            HttpServer aHttpListener = new HttpServer("http://127.0.0.1:8094/");
+            HttpWebServer aHttpListener = new HttpWebServer("http://127.0.0.1:8094/");
             try
             {
                 aHttpListener.StartListening(x =>

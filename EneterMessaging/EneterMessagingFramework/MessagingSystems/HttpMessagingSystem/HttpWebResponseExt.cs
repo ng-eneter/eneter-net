@@ -1,8 +1,13 @@
-﻿using Eneter.Messaging.DataProcessing.Streaming;
-using System;
-using System.Collections.Generic;
+﻿/*
+ * Project: Eneter.Messaging.Framework
+ * Author:  Ondrej Uzovic
+ * 
+ * Copyright (c) Ondrej Uzovic 2020
+*/
+
+using Eneter.Messaging.DataProcessing.Streaming;
+using Eneter.Messaging.Diagnostic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -20,9 +25,12 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// <returns></returns>
         public static string GetResponseMessageStr(this HttpWebResponse httpResponse)
         {
-            byte[] aBytes = httpResponse.GetResponseMessage();
-            string aResult = Encoding.UTF8.GetString(aBytes);
-            return aResult;
+            using (EneterTrace.Entering())
+            {
+                byte[] aBytes = httpResponse.GetResponseMessage();
+                string aResult = Encoding.UTF8.GetString(aBytes);
+                return aResult;
+            }
         }
 
         /// <summary>
@@ -32,17 +40,18 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         /// <returns>The response message in bytes.</returns>
         public static byte[] GetResponseMessage(this HttpWebResponse httpResponse)
         {
-            byte[] aResult = null;
-
-            Stream aWebResponseStream = httpResponse.GetResponseStream();
-            if (aWebResponseStream != null)
+            using (EneterTrace.Entering())
             {
-                aResult = StreamUtil.ReadToEnd(httpResponse.GetResponseStream());
+                byte[] aResult = null;
+
+                Stream aWebResponseStream = httpResponse.GetResponseStream();
+                if (aWebResponseStream != null)
+                {
+                    aResult = StreamUtil.ReadToEnd(httpResponse.GetResponseStream());
+                }
+
+                return aResult;
             }
-
-            return aResult;
         }
-
-        
     }
 }

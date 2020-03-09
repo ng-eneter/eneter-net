@@ -106,7 +106,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
             using (EneterTrace.Entering())
             {
                 byte[] aMessage = (byte[])message;
-                HttpClient.Post(myUri, aMessage);
+                HttpWebClient.Post(myUri, aMessage);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         if (!myStopReceivingRequestedFlag)
                         {
                             // Send poll request to get messages from the service.
-                            WebResponse anHttpResponse = HttpClient.Get(aPollingUri);
+                            WebResponse anHttpResponse = HttpWebClient.Get(aPollingUri);
 
                             // Convert the response to the fast memory stream
                             using (MemoryStream aBufferedResponse = new MemoryStream())

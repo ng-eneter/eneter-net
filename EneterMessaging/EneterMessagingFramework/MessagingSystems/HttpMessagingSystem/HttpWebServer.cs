@@ -17,13 +17,13 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
     /// <summary>
     /// HTTP server.
     /// </summary>
-    internal class HttpServer
+    internal class HttpWebServer
     {
         /// <summary>
         /// Constructs the HTTP server.
         /// </summary>
         /// <param name="absoluteUri">The root HTTP address to be listened.</param>
-        public HttpServer(string absoluteUri)
+        public HttpWebServer(string absoluteUri)
         {
             using (EneterTrace.Entering())
             {

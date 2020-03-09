@@ -5375,11 +5375,6 @@
             </ul>
             </remarks>
         </member>
-        <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpClient">
-            <summary>
-            HTTP client.
-            </summary>
-        </member>
         <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpListenerContextExt">
             <summary>
             Extends HttpListenerContext by helper methods.
@@ -5525,37 +5520,90 @@
             Defines how often the client poll the server for response messages.
             </summary>
         </member>
-        <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpServer">
+        <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient">
             <summary>
-            HTTP server.
+            HTTP client.
             </summary>
         </member>
-        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpServer.#ctor(System.String)">
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Get(System.Uri)">
             <summary>
-            Constructs the HTTP server.
+            Sends the GET request to the HTTP server.
             </summary>
-            <param name="absoluteUri">The root HTTP address to be listened.</param>
+            <param name="uri">The address including the input parameters.</param>
+            <returns>Response from the HTTP server.</returns>
         </member>
-        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpServer.StartListening(System.Action{System.Net.HttpListenerContext})">
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Post(System.Uri,System.String)">
             <summary>
-            Starts the listening.
+            Sends the POST request to the HTTP server.
             </summary>
-            <param name="connectionHandler">Callback to be called when a request is received.</param>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">Data for the post request.</param>
+            <returns>Response from the HTTP server.</returns>
         </member>
-        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpServer.StopListening">
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Post(System.Uri,System.Byte[])">
             <summary>
-            Stops the listening.
+            Sends the POST request to the HTTP server.
             </summary>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">Data for the post request.</param>
+            <returns>Response from the HTTP server.</returns>
         </member>
-        <member name="P:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpServer.IsListening">
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Put(System.Uri,System.String)">
             <summary>
-            Returns true if the listening is active.
+            Sends the PUT request to the HTTP server.
             </summary>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">Data for the put request.</param>
+            <returns>Response from the HTTP server.</returns>
         </member>
-        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpServer.DoListening">
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Put(System.Uri,System.Byte[])">
             <summary>
-            Loop for the main listening thread.
+            Sends the PUT request to the HTTP server.
             </summary>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">Data for the put request.</param>
+            <returns>Response from the HTTP server.</returns>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Patch(System.Uri,System.String)">
+            <summary>
+            Sends the PATCH request to the HTTP server.
+            </summary>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">Data for the patch request.</param>
+            <returns>Response from the HTTP server.</returns>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Patch(System.Uri,System.Byte[])">
+            <summary>
+            Sends the PATCH request to the HTTP server.
+            </summary>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">Data for the patch request.</param>
+            <returns>Response from the HTTP server.</returns>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Delete(System.Uri)">
+            <summary>
+            Sends the DELETE request to the HTTP server.
+            </summary>
+            <param name="uri">The address including the input parameters.</param>
+            <returns>Response from the HTTP server.</returns>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Request(System.String,System.Uri,System.String)">
+            <summary>
+            Sends a request to the HTTP server.
+            </summary>
+            <param name="httpMethod">HTTP method specifying the request.</param>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">The request data.</param>
+            <returns>Response from the HTTP server.</returns>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebClient.Request(System.String,System.Uri,System.Byte[])">
+            <summary>
+            Sends a request to the HTTP server.
+            </summary>
+            <param name="httpMethod">HTTP method specifying the request.</param>
+            <param name="uri">The address including the input parameters.</param>
+            <param name="body">The request data.</param>
+            <returns>Response from the HTTP server.</returns>
         </member>
         <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebResponseExt">
             <summary>
@@ -5575,6 +5623,38 @@
             </summary>
             <param name="httpResponse">A response received from the HTTP server.</param>
             <returns>The response message in bytes.</returns>
+        </member>
+        <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer">
+            <summary>
+            HTTP server.
+            </summary>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.#ctor(System.String)">
+            <summary>
+            Constructs the HTTP server.
+            </summary>
+            <param name="absoluteUri">The root HTTP address to be listened.</param>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.StartListening(System.Action{System.Net.HttpListenerContext})">
+            <summary>
+            Starts the listening.
+            </summary>
+            <param name="connectionHandler">Callback to be called when a request is received.</param>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.StopListening">
+            <summary>
+            Stops the listening.
+            </summary>
+        </member>
+        <member name="P:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.IsListening">
+            <summary>
+            Returns true if the listening is active.
+            </summary>
+        </member>
+        <member name="M:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.HttpWebServer.DoListening">
+            <summary>
+            Loop for the main listening thread.
+            </summary>
         </member>
         <member name="T:Eneter.Messaging.MessagingSystems.HttpMessagingSystem.NamespaceDoc">
             <summary>
