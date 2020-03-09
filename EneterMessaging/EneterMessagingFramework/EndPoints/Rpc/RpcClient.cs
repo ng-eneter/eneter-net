@@ -82,7 +82,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 mySerializer = serializer;
                 myRpcTimeout = rpcTimeout;
 
-#if !XAMARIN_IOS && !NETSTANDARD
+#if !NETSTANDARD
                 ServiceInterfaceChecker.CheckForClient<TServiceInterface>();
 
                 // Dynamically implement and instantiate the given interface as the proxy.
@@ -117,8 +117,9 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
+#if !NETSTANDARD
         public TServiceInterface Proxy { get; private set; }
-
+#endif
         public void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler)
             where TEventArgs : EventArgs
         {

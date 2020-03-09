@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2013
 */
 
-#if !XAMARIN
+#if !NETSTANDARD
 
 using System;
 using System.IO.Pipes;

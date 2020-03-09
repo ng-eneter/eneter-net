@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Net.Security;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Eneter.Messaging.Diagnostic;
 
@@ -78,7 +79,17 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
                 try
                 {
                     SslStream anSslStream = new SslStream(source, false, myUserCertificateValidationCallback, myUserCertificateSelectionCallback);
-                    anSslStream.AuthenticateAsServer(myCertificate, myIsClientCertificateRequired, System.Security.Authentication.SslProtocols.Default, true);
+
+                    SslProtocols aAcceptedProtocols = SslProtocols.Ssl3 | SslProtocols.Tls;
+
+#if NETSTANDARD || NET472
+                    aAcceptedProtocols |= SslProtocols.Tls11 | SslProtocols.Tls12;
+#endif
+#if MONOANDROID || XAMARIN_IOS
+                    aAcceptedProtocols |= SslProtocols.Tls13;
+#endif
+
+                    anSslStream.AuthenticateAsServer(myCertificate, myIsClientCertificateRequired, aAcceptedProtocols, true);
                     return anSslStream;
                 }
                 catch (Exception err)

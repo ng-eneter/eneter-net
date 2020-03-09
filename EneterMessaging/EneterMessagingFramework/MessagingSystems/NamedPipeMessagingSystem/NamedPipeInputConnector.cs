@@ -6,7 +6,7 @@
 */
 
 
-#if !XAMARIN && !NETSTANDARD
+#if !NETSTANDARD
 
 using System;
 using System.Collections.Generic;

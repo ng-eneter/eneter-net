@@ -5,8 +5,6 @@
  * Copyright © Ondrej Uzovic 2010
 */
 
-#if !XAMARIN
-
 using System.Runtime.CompilerServices;
 
 namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
@@ -19,5 +17,3 @@ namespace Eneter.Messaging.MessagingSystems.NamedPipeMessagingSystem
     {
     }
 }
-
-#endif

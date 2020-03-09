@@ -5,7 +5,7 @@
  * Copyright © Ondrej Uzovic 2016
 */
 
-#if XAMARIN_ANDROID
+#if MONOANDROID
 
 using Android.OS;
 using Eneter.Messaging.Diagnostic;

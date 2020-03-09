@@ -1,12 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net472;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net35;net40;net472;netstandard2.0;netstandard2.1;MonoAndroid80;Xamarin.iOS10</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Eneter.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
     <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <RootNamespace>Eneter.Messaging</RootNamespace>
+    <Version>8.0.6</Version>
+    <Authors>Ondrej Uzovic</Authors>
+    <Company />
+    <Description>Cross-platform framework for the interprocess communication.</Description>
+    <Copyright>Ondrej Uzovic</Copyright>
+    <PackageProjectUrl>http://eneter.net/</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
@@ -29,6 +36,7 @@
 
   <ItemGroup>
     <Reference Include="WindowsBase" />
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
 </Project>
