@@ -15,7 +15,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
     /// <summary>
     /// Extends HttpListenerContext by helper methods.
     /// </summary>
-    internal static class HttpListenerContextExt
+    public static class HttpListenerContextExt
     {
         /// <summary>
         /// Gets all request message data in string.
