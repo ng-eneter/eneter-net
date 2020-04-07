@@ -9,6 +9,7 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Utils.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,6 @@ namespace Eneter.Messaging.Nodes.Broker
                 ReceiverId = receiverId;
             }
 
-            // MessageTypeId or regular expression used to recognize matching message type id.
             public string MessageTypeId { get; private set; }
             public string ReceiverId { get; private set; }
         }
@@ -35,8 +35,10 @@ namespace Eneter.Messaging.Nodes.Broker
         public event EventHandler<SubscribeInfoEventArgs> ClientUnsubscribed;
         public event EventHandler<BrokerMessageReceivedEventArgs> BrokerMessageReceived;
 
-        public DuplexBroker(bool isPublisherNotified, ISerializer serializer,
-            AuthorizeBrokerRequestCallback validateBrokerRequestCallback)
+        public DuplexBroker(ISerializer serializer,
+            AuthorizeBrokerRequestCallback validateBrokerRequestCallback,
+            bool isPublisherNotified,
+            bool isSubscribeAllAllowed)
         {
             using (EneterTrace.Entering())
             {
@@ -47,9 +49,10 @@ namespace Eneter.Messaging.Nodes.Broker
                     throw new ArgumentNullException(anError);
                 }
 
-                myIsPublisherSelfnotified = isPublisherNotified;
                 mySerializer = serializer;
                 myValidateBrokerRequestCallback = validateBrokerRequestCallback;
+                myIsPublisherSelfnotified = isPublisherNotified;
+                myIsSubscribeAllAllowed = isSubscribeAllAllowed;
             }
         }
 
@@ -236,23 +239,23 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                List<TSubscription> anIdetifiedSubscriptions = new List<TSubscription>();
+                List<TSubscription> aIdentifiedSubscriptions = new List<TSubscription>();
 
                 using (ThreadLock.Lock(mySubscribtions))
                 {
                     foreach (TSubscription aMessageSubscription in mySubscribtions)
                     {
                         if ((myIsPublisherSelfnotified || aMessageSubscription.ReceiverId != publisherResponseReceiverId) &&
-                            aMessageSubscription.MessageTypeId == message.MessageTypes[0])
+                            (aMessageSubscription.MessageTypeId == message.MessageTypes[0] || (myIsSubscribeAllAllowed && aMessageSubscription.MessageTypeId == "*")))
                         {
-                            anIdetifiedSubscriptions.Add(aMessageSubscription);
+                            aIdentifiedSubscriptions.Add(aMessageSubscription);
                         }
                     }
                 }
 
                 Dictionary<string, IEnumerable<string>> aFailedSubscribers = new Dictionary<string, IEnumerable<string>>();
                 int aNumberOfSentSubscribers = 0;
-                foreach (TSubscription aSubscription in anIdetifiedSubscriptions)
+                foreach (TSubscription aSubscription in aIdentifiedSubscriptions)
                 {
                     if (aSubscription.ReceiverId == myLocalReceiverId)
                     {
@@ -363,15 +366,14 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                List<string> aMessagesToSubscribe = new List<string>(messageTypes);
+                HashSet<string> aMessagesToSubscribe = new HashSet<string>(messageTypes);
 
                 using (ThreadLock.Lock(mySubscribtions))
                 {
                     // Subscribe only messages that are not subscribed yet.
                     foreach (TSubscription aSubscription in mySubscribtions)
                     {
-                        if (aSubscription.ReceiverId == responseReceiverId &&
-                            aMessagesToSubscribe.Contains(aSubscription.MessageTypeId))
+                        if (aSubscription.ReceiverId == responseReceiverId)
                         {
                             aMessagesToSubscribe.Remove(aSubscription.MessageTypeId);
                         }
@@ -403,7 +405,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                List<string> anUnsubscribedMessages = new List<string>();
+                List<string> aUnsubscribedMessages = new List<string>();
                 using (ThreadLock.Lock(mySubscribtions))
                 {
                     // If unsubscribe from all messages
@@ -413,21 +415,22 @@ namespace Eneter.Messaging.Nodes.Broker
                             {
                                 if (x.ReceiverId == responseReceiverId)
                                 {
-                                    anUnsubscribedMessages.Add(x.MessageTypeId);
+                                    aUnsubscribedMessages.Add(x.MessageTypeId);
                                     return true;
                                 }
 
                                 return false;
                             });
                     }
-                    // If unsubscribe from specified messages
+                    // If unsubscribe from specific messages.
                     else
                     {
+                        HashSet<string> aMessageTypesToUnsubscribe = new HashSet<string>(messageTypes);
                         mySubscribtions.RemoveWhere(x =>
                             {
-                                if (x.ReceiverId == responseReceiverId && messageTypes.Any(y => x.MessageTypeId == y))
+                                if (x.ReceiverId == responseReceiverId && aMessageTypesToUnsubscribe.Contains(x.MessageTypeId))
                                 {
-                                    anUnsubscribedMessages.Add(x.MessageTypeId);
+                                    aUnsubscribedMessages.Add(x.MessageTypeId);
                                     return true;
                                 }
 
@@ -436,7 +439,7 @@ namespace Eneter.Messaging.Nodes.Broker
                     }
                 }
 
-                return anUnsubscribedMessages;
+                return aUnsubscribedMessages;
             }
         }
 
@@ -459,14 +462,14 @@ namespace Eneter.Messaging.Nodes.Broker
             }
         }
 
-        private HashSet<TSubscription> mySubscribtions = new HashSet<TSubscription>();
+        private List<TSubscription> mySubscribtions = new List<TSubscription>();
         private bool myIsPublisherSelfnotified;
+        private bool myIsSubscribeAllAllowed;
         private ISerializer mySerializer;
         private AuthorizeBrokerRequestCallback myValidateBrokerRequestCallback;
 
         private readonly string myLocalReceiverId = "Eneter.Broker.LocalReceiver";
 
         protected override string TracedObject { get { return GetType().Name + " "; } }
-
     }
 }

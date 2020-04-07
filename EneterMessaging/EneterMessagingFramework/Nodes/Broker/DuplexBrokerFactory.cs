@@ -129,7 +129,7 @@ namespace Eneter.Messaging.Nodes.Broker
         {
             using (EneterTrace.Entering())
             {
-                return new DuplexBroker(IsPublisherNotified, Serializer, BrokerRequestAuthorizer);
+                return new DuplexBroker(Serializer, BrokerRequestAuthorizer, IsPublisherNotified, IsSubscribeAllAllowed);
             }
         }
 
@@ -204,5 +204,13 @@ namespace Eneter.Messaging.Nodes.Broker
         /// published the message.
         /// </remarks>
         public bool IsPublisherNotified { get; set; }
+
+        /// <summary>
+        /// Sets the flag whether a subscription to all published messages is allowed.
+        /// </summary>
+        /// <remarks>
+        /// If true the broker client can subscribe to be notified about all messages.
+        /// </remarks>
+        public bool IsSubscribeAllAllowed { get; set; }
     }
 }
