@@ -259,7 +259,6 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 
 
         private string myAbsoluteUri;
-        private Func<HttpListener> myHttpListenerFactoryMethod;
         private Action<HttpListenerContext> myConnectionHandler;
 
         private HttpListener myListener;
