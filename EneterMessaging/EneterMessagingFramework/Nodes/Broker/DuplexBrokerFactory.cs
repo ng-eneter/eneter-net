@@ -201,7 +201,8 @@ namespace Eneter.Messaging.Nodes.Broker
         /// In case the DuplexBrokerClient is subscribed to the same message the broker will notify it if the flag
         /// IsBublisherNotified is set to true.
         /// If it is set to false then the broker will not forward the message to the DuplexBrokerClient which
-        /// published the message.
+        /// published the message.<br/>
+        /// Default value is true.
         /// </remarks>
         public bool IsPublisherNotified { get; set; }
 

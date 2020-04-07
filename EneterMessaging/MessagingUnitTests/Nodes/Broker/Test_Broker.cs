@@ -201,6 +201,251 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
         }
 
         [Test]
+        public void SubscribeAll()
+        {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+
+            // Create channels
+            IMessagingSystemFactory aMessagingSystem = new SynchronousMessagingSystemFactory();
+
+            IDuplexInputChannel aBrokerInputChannel = aMessagingSystem.CreateDuplexInputChannel("BrokerChannel");
+            IDuplexOutputChannel aSubscriber1ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
+            IDuplexOutputChannel aSubscriber2ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
+
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory()
+            {
+                IsSubscribeAllAllowed = true,
+                IsPublisherNotified = false,
+            };
+
+            IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
+            BrokerMessageReceivedEventArgs aBrokerReceivedMessage = null;
+            aBroker.BrokerMessageReceived += (x, y) =>
+            {
+                aBrokerReceivedMessage = y;
+            };
+            aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
+
+            IDuplexBrokerClient aBrokerClient1 = aBrokerFactory.CreateBrokerClient();
+            BrokerMessageReceivedEventArgs aClient1ReceivedMessage = null;
+            aBrokerClient1.BrokerMessageReceived += (x, y) =>
+            {
+                aClient1ReceivedMessage = y;
+            };
+            aBrokerClient1.AttachDuplexOutputChannel(aSubscriber1ClientOutputChannel);
+
+            IDuplexBrokerClient aBrokerClient2 = aBrokerFactory.CreateBrokerClient();
+            BrokerMessageReceivedEventArgs aClient2ReceivedMessage = null;
+            aBrokerClient2.BrokerMessageReceived += (x, y) =>
+            {
+                aClient2ReceivedMessage = y;
+            };
+            aBrokerClient2.AttachDuplexOutputChannel(aSubscriber2ClientOutputChannel);
+
+
+            // Subscribe for all messages.
+            aBrokerClient1.Subscribe("*");
+            aBrokerClient2.Subscribe("TypeA");
+            aBroker.Subscribe("TypeA");
+
+            aBroker.SendMessage("TypeA", "Hello");
+
+            Assert.AreEqual("TypeA", aClient1ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient1ReceivedMessage.Message);
+            Assert.IsNull(aClient1ReceivedMessage.ReceivingError);
+
+            Assert.AreEqual("TypeA", aClient2ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient2ReceivedMessage.Message);
+            Assert.IsNull(aClient2ReceivedMessage.ReceivingError);
+
+            Assert.IsNull(aBrokerReceivedMessage);
+
+
+            aClient1ReceivedMessage = null;
+            aClient2ReceivedMessage = null;
+            aBrokerReceivedMessage = null;
+
+
+            aBroker.SendMessage("TypeBlaBla", "Hello");
+
+            Assert.AreEqual("TypeBlaBla", aClient1ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient1ReceivedMessage.Message);
+            Assert.IsNull(aClient1ReceivedMessage.ReceivingError);
+
+            Assert.IsNull(aClient2ReceivedMessage);
+            Assert.IsNull(aBrokerReceivedMessage);
+
+
+            aClient1ReceivedMessage = null;
+            aClient2ReceivedMessage = null;
+            aBrokerReceivedMessage = null;
+
+
+            aBrokerClient1.SendMessage("XYZ", "Hello");
+
+            Assert.IsNull(aClient1ReceivedMessage);
+            Assert.IsNull(aClient2ReceivedMessage);
+            Assert.IsNull(aBrokerReceivedMessage);
+        }
+
+        [Test]
+        public void SubscribeAll_SelfNotified()
+        {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+
+            // Create channels
+            IMessagingSystemFactory aMessagingSystem = new SynchronousMessagingSystemFactory();
+
+            IDuplexInputChannel aBrokerInputChannel = aMessagingSystem.CreateDuplexInputChannel("BrokerChannel");
+            IDuplexOutputChannel aSubscriber1ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
+            IDuplexOutputChannel aSubscriber2ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
+
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory()
+            {
+                IsSubscribeAllAllowed = true,
+                IsPublisherNotified = true,
+            };
+
+            IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
+            BrokerMessageReceivedEventArgs aBrokerReceivedMessage = null;
+            aBroker.BrokerMessageReceived += (x, y) =>
+            {
+                aBrokerReceivedMessage = y;
+            };
+            aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
+
+            IDuplexBrokerClient aBrokerClient1 = aBrokerFactory.CreateBrokerClient();
+            BrokerMessageReceivedEventArgs aClient1ReceivedMessage = null;
+            aBrokerClient1.BrokerMessageReceived += (x, y) =>
+            {
+                aClient1ReceivedMessage = y;
+            };
+            aBrokerClient1.AttachDuplexOutputChannel(aSubscriber1ClientOutputChannel);
+
+            IDuplexBrokerClient aBrokerClient2 = aBrokerFactory.CreateBrokerClient();
+            BrokerMessageReceivedEventArgs aClient2ReceivedMessage = null;
+            aBrokerClient2.BrokerMessageReceived += (x, y) =>
+            {
+                aClient2ReceivedMessage = y;
+            };
+            aBrokerClient2.AttachDuplexOutputChannel(aSubscriber2ClientOutputChannel);
+
+
+            // Subscribe for all messages.
+            aBrokerClient1.Subscribe("*");
+            aBrokerClient2.Subscribe("TypeA");
+            aBroker.Subscribe("TypeA");
+
+            aBroker.SendMessage("TypeA", "Hello");
+
+            Assert.AreEqual("TypeA", aClient1ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient1ReceivedMessage.Message);
+            Assert.IsNull(aClient1ReceivedMessage.ReceivingError);
+
+            Assert.AreEqual("TypeA", aClient2ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient2ReceivedMessage.Message);
+            Assert.IsNull(aClient2ReceivedMessage.ReceivingError);
+
+            Assert.AreEqual("TypeA", aBrokerReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aBrokerReceivedMessage.Message);
+            Assert.IsNull(aBrokerReceivedMessage.ReceivingError);
+
+
+            aClient1ReceivedMessage = null;
+            aClient2ReceivedMessage = null;
+            aBrokerReceivedMessage = null;
+
+
+            aBroker.SendMessage("TypeBlaBla", "Hello");
+
+            Assert.AreEqual("TypeBlaBla", aClient1ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient1ReceivedMessage.Message);
+            Assert.IsNull(aClient1ReceivedMessage.ReceivingError);
+
+            Assert.IsNull(aClient2ReceivedMessage);
+            Assert.IsNull(aBrokerReceivedMessage);
+
+
+            aClient1ReceivedMessage = null;
+            aClient2ReceivedMessage = null;
+            aBrokerReceivedMessage = null;
+
+
+            aBrokerClient1.SendMessage("XYZ", "Hello");
+
+            Assert.AreEqual("XYZ", aClient1ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient1ReceivedMessage.Message);
+            Assert.IsNull(aClient1ReceivedMessage.ReceivingError);
+
+            Assert.IsNull(aClient2ReceivedMessage);
+            Assert.IsNull(aBrokerReceivedMessage);
+        }
+
+        [Test]
+        public void SubscribeAll_NotAllowed()
+        {
+            //EneterTrace.DetailLevel = EneterTrace.EDetailLevel.Debug;
+            //EneterTrace.TraceLog = new StreamWriter("d:/tracefile.txt");
+
+            // Create channels
+            IMessagingSystemFactory aMessagingSystem = new SynchronousMessagingSystemFactory();
+
+            IDuplexInputChannel aBrokerInputChannel = aMessagingSystem.CreateDuplexInputChannel("BrokerChannel");
+            IDuplexOutputChannel aSubscriber1ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
+            IDuplexOutputChannel aSubscriber2ClientOutputChannel = aMessagingSystem.CreateDuplexOutputChannel("BrokerChannel");
+
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory()
+            {
+                IsSubscribeAllAllowed = false,
+                IsPublisherNotified = true,
+            };
+
+            IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
+            BrokerMessageReceivedEventArgs aBrokerReceivedMessage = null;
+            aBroker.BrokerMessageReceived += (x, y) =>
+            {
+                aBrokerReceivedMessage = y;
+            };
+            aBroker.AttachDuplexInputChannel(aBrokerInputChannel);
+
+            IDuplexBrokerClient aBrokerClient1 = aBrokerFactory.CreateBrokerClient();
+            BrokerMessageReceivedEventArgs aClient1ReceivedMessage = null;
+            aBrokerClient1.BrokerMessageReceived += (x, y) =>
+            {
+                aClient1ReceivedMessage = y;
+            };
+            aBrokerClient1.AttachDuplexOutputChannel(aSubscriber1ClientOutputChannel);
+
+            IDuplexBrokerClient aBrokerClient2 = aBrokerFactory.CreateBrokerClient();
+            BrokerMessageReceivedEventArgs aClient2ReceivedMessage = null;
+            aBrokerClient2.BrokerMessageReceived += (x, y) =>
+            {
+                aClient2ReceivedMessage = y;
+            };
+            aBrokerClient2.AttachDuplexOutputChannel(aSubscriber2ClientOutputChannel);
+
+
+            // Subscribe for all messages.
+            aBrokerClient1.Subscribe("*");
+            aBrokerClient2.Subscribe("TypeA");
+            aBroker.Subscribe("TypeA");
+
+            aBroker.SendMessage("TypeA", "Hello");
+
+            Assert.IsNull(aClient1ReceivedMessage);
+
+            Assert.AreEqual("TypeA", aClient2ReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aClient2ReceivedMessage.Message);
+            Assert.IsNull(aClient2ReceivedMessage.ReceivingError);
+
+            Assert.AreEqual("TypeA", aBrokerReceivedMessage.MessageTypeId);
+            Assert.AreEqual("Hello", (string)aBrokerReceivedMessage.Message);
+            Assert.IsNull(aBrokerReceivedMessage.ReceivingError);
+        }
+
+        [Test]
         public void DoNotNotifyPublisher()
         {
             // Create channels
@@ -249,6 +494,7 @@ namespace Eneter.MessagingUnitTests.Nodes.Broker
             Assert.AreEqual("TypeA", aClient1ReceivedMessage[0].MessageTypeId);
             Assert.AreEqual("Message A", (String)aClient1ReceivedMessage[0].Message);
         }
+
 
         [Test]
         public void Notify_50000()
