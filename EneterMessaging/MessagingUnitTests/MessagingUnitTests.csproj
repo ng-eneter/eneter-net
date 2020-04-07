@@ -200,9 +200,6 @@
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\BufferedMessagingBaseTester.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Http.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MessagingSystems\Composits\BufferedMessaging\Test_BufferedMessaging_Sync.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -223,12 +220,6 @@
     </Compile>
     <Compile Include="MessagingSystems\ConnectionProtocols\Test_EneterConnectionProtocol.cs" />
     <Compile Include="MessagingSystems\BaseTester.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\HttpMessagingSystemBaseTester.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MessagingSystems\HttpMessagingSystem\Test_HttpMessagingSystem_Synchronous.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MessagingSystems\NamedPipeMessagingSystem\NamedPipeMessagingSystemBaseTester.cs">
