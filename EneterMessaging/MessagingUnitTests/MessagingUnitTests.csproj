@@ -295,6 +295,7 @@
     <Compile Include="SyncEvent.cs" />
     <Compile Include="TestExtension.cs" />
     <Compile Include="Threading\Dispatching\Test_WindowsDispatching.cs" />
+    <Compile Include="Utils\Collections\Test_ListExt.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
