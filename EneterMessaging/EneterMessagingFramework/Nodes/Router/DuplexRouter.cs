@@ -10,6 +10,7 @@ using System.Linq;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.Nodes.Router
 {
@@ -112,6 +113,6 @@ namespace Eneter.Messaging.Nodes.Router
             }
         }
 
-        private HashSet<TConnection> myConnections = new HashSet<TConnection>();
+        private List<TConnection> myConnections = new List<TConnection>();
     }
 }

@@ -12,6 +12,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
 {
@@ -462,7 +463,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.BufferedMessagingComposit
         private bool myMaxOfflineCheckerRequestedToStop;
         private IDuplexInputChannel myInputChannel;
 
-        private HashSet<TBufferedResponseReceiver> myResponseReceivers = new HashSet<TBufferedResponseReceiver>();
+        private List<TBufferedResponseReceiver> myResponseReceivers = new List<TBufferedResponseReceiver>();
         private List<TBroadcast> myBroadcasts = new List<TBroadcast>();
 
 

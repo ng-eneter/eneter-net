@@ -12,6 +12,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Utils.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -701,8 +702,8 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MessageBus
 
         private object myAttachDetachLock = new object();
         private object myConnectionLock = new object();
-        private HashSet<TServiceContext> myConnectedServices = new HashSet<TServiceContext>();
-        private HashSet<TClientContext> myConnectedClients = new HashSet<TClientContext>();
+        private List<TServiceContext> myConnectedServices = new List<TServiceContext>();
+        private List<TClientContext> myConnectedClients = new List<TClientContext>();
 
         private ISerializer mySerializer;
         private TConnector myServiceConnector;

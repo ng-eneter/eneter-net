@@ -14,6 +14,7 @@ using System.Threading;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.ConnectionProtocols;
 using Eneter.Messaging.MessagingSystems.SimpleMessagingSystemBase;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
 {
@@ -333,15 +334,20 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         {
                             using (ThreadLock.Lock(myConnectedClients))
                             {
-                                HttpResponseSender aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
-                                if (aClientContext != null && aClientContext.IsDisposed)
+                                HttpResponseSender aClientContext = null;
+                                int aClientIdx = myConnectedClients.FindIndex(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
+                                if (aClientIdx > -1)
                                 {
-                                    // The client with the same id exists but was closed and disposed.
-                                    // It is just that the timer did not remove it. So delete it now.
-                                    myConnectedClients.Remove(aClientContext);
+                                    aClientContext = myConnectedClients[aClientIdx];
+                                    if (aClientContext != null && aClientContext.IsDisposed)
+                                    {
+                                        // The client with the same id exists but was closed and disposed.
+                                        // It is just that the timer did not remove it. So delete it now.
+                                        myConnectedClients.RemoveAt(aClientIdx);
 
-                                    // Indicate the new client context shall be created.
-                                    aClientContext = null;
+                                        // Indicate the new client context shall be created.
+                                        aClientContext = null;
+                                    }
                                 }
 
                                 if (aClientContext == null)
@@ -367,15 +373,16 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
                         {
                             using (ThreadLock.Lock(myConnectedClients))
                             {
-                                HttpResponseSender aClientContext = myConnectedClients.FirstOrDefault(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
-
-                                if (aClientContext != null)
+                                int aClientIdx = myConnectedClients.FindIndex(x => x.ResponseReceiverId == aProtocolMessage.ResponseReceiverId);
+                                if (aClientIdx > -1)
                                 {
+                                    HttpResponseSender aClientContext = myConnectedClients[aClientIdx];
+
                                     // Note: the disconnection comes from the client.
                                     //       It means the client closed the connection and will not poll anymore.
                                     //       Therefore the client context can be removed.
-                                    myConnectedClients.Remove(aClientContext);
-                                    aClientContext.Dispose();
+                                    myConnectedClients.RemoveAt(aClientIdx);
+                                    aClientContext?.Dispose();
                                 }
                             }
                         }
@@ -498,7 +505,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
         private object myListeningManipulatorLock = new object();
         private Timer myResponseReceiverInactivityTimer;
         private int myResponseReceiverInactivityTimeout;
-        private HashSet<HttpResponseSender> myConnectedClients = new HashSet<HttpResponseSender>();
+        private List<HttpResponseSender> myConnectedClients = new List<HttpResponseSender>();
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }

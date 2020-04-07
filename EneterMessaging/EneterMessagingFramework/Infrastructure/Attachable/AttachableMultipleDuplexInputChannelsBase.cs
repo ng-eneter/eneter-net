@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.Infrastructure.Attachable
 {
@@ -51,13 +52,13 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         {
             public TDuplexInputChannelContext(IDuplexInputChannel attachedDuplexInputChannel)
             {
-                OpenConnections = new HashSet<TConnection>();
+                OpenConnections = new List<TConnection>();
 
                 AttachedDuplexInputChannel = attachedDuplexInputChannel;
             }
 
             public IDuplexInputChannel AttachedDuplexInputChannel { get; private set; }
-            public HashSet<TConnection> OpenConnections { get; private set; }
+            public List<TConnection> OpenConnections { get; private set; }
         }
 
         public virtual void AttachDuplexInputChannel(IDuplexInputChannel duplexInputChannel)
@@ -323,6 +324,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
             {
                 using (ThreadLock.Lock(myDuplexInputChannelContextManipulatorLock))
                 {
+                    // Find the requested input channel.
                     TDuplexInputChannelContext aDuplexInputChannelContext = myDuplexInputChannelContexts.FirstOrDefault(x => x.AttachedDuplexInputChannel.ChannelId == duplexInputChannelId);
                     if (aDuplexInputChannelContext == null)
                     {
@@ -331,26 +333,27 @@ namespace Eneter.Messaging.Infrastructure.Attachable
                         throw new InvalidOperationException(anError);
                     }
 
+                    // Try to find the requested output channel among open connections.
                     TConnection aConnection = aDuplexInputChannelContext.OpenConnections.FirstOrDefault(x => x.ResponseReceiverId == responseReceiverId && x.ConnectedDuplexOutputChannel.ChannelId == duplexOutputChannelId);
                     if (aConnection == null)
                     {
-                        IDuplexOutputChannel anAssociatedDuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(duplexOutputChannelId);
+                        IDuplexOutputChannel aAssociatedDuplexOutputChannel = MessagingSystemFactory.CreateDuplexOutputChannel(duplexOutputChannelId);
 
                         try
                         {
-                            anAssociatedDuplexOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
-                            anAssociatedDuplexOutputChannel.OpenConnection();
+                            aAssociatedDuplexOutputChannel.ResponseMessageReceived += OnResponseMessageReceived;
+                            aAssociatedDuplexOutputChannel.OpenConnection();
                         }
                         catch (Exception err)
                         {
-                            anAssociatedDuplexOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
+                            aAssociatedDuplexOutputChannel.ResponseMessageReceived -= OnResponseMessageReceived;
 
                             EneterTrace.Error(TracedObject + "failed to open connection for the duplex output channel '" + duplexOutputChannelId + "'.", err);
                             throw;
                         }
 
 
-                        aConnection = new TConnection(responseReceiverId, anAssociatedDuplexOutputChannel);
+                        aConnection = new TConnection(responseReceiverId, aAssociatedDuplexOutputChannel);
                         aDuplexInputChannelContext.OpenConnections.Add(aConnection);
                     }
 
@@ -410,7 +413,7 @@ namespace Eneter.Messaging.Infrastructure.Attachable
         protected IMessagingSystemFactory MessagingSystemFactory { get; set; }
 
         private object myDuplexInputChannelContextManipulatorLock = new object();
-        private HashSet<TDuplexInputChannelContext> myDuplexInputChannelContexts = new HashSet<TDuplexInputChannelContext>();
+        private List<TDuplexInputChannelContext> myDuplexInputChannelContexts = new List<TDuplexInputChannelContext>();
 
 
         protected virtual string TracedObject { get { return GetType().Name + ' '; } }

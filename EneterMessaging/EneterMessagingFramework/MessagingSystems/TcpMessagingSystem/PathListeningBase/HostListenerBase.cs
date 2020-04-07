@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Sockets;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
 {
@@ -131,7 +132,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.PathListeningBase
         protected ISecurityFactory SecurityFactory { get; private set; }
         private TcpListenerProvider myTcpListener;
 
-        protected HashSet<KeyValuePair<Uri, object>> myHandlers = new HashSet<KeyValuePair<Uri, object>>();
+        protected List<KeyValuePair<Uri, object>> myHandlers = new List<KeyValuePair<Uri, object>>();
         protected abstract string TracedObject { get; }
     }
 }

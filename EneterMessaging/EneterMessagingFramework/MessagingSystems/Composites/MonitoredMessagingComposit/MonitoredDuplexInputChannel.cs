@@ -10,6 +10,7 @@ using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using Eneter.Messaging.Threading;
 using Eneter.Messaging.Threading.Dispatching;
+using Eneter.Messaging.Utils.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -389,7 +390,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
         private int myPingFrequency;
         private int myReceiveTimeout;
         private EneterTimer myCheckTimer;
-        private HashSet<TResponseReceiverContext> myResponseReceiverContexts = new HashSet<TResponseReceiverContext>();
+        private List<TResponseReceiverContext> myResponseReceiverContexts = new List<TResponseReceiverContext>();
 
         private object myPreserializedPingMessage;
 

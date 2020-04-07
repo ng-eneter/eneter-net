@@ -12,6 +12,7 @@ using Eneter.Messaging.DataProcessing.Serializing;
 using Eneter.Messaging.Diagnostic;
 using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.Nodes.ChannelWrapper
 {
@@ -257,7 +258,7 @@ namespace Eneter.Messaging.Nodes.ChannelWrapper
         private IMessagingSystemFactory myOutputMessagingFactory;
         private ISerializer mySerializer;
 
-        private HashSet<TDuplexConnection> myConnections = new HashSet<TDuplexConnection>();
+        private List<TDuplexConnection> myConnections = new List<TDuplexConnection>();
 
         protected override string TracedObject
         {

@@ -205,12 +205,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
 
                     using (ThreadLock.Lock(myServiceEvents))
                     {
-                        if (!myServiceEvents.Add(anEventContext))
-                        {
-                            string anErrorMessage = TracedObject + "failed to attach the output channel because it failed to create the event '" + anEventInfo.Name + "' because the event already exists.";
-                            EneterTrace.Error(anErrorMessage);
-                            throw new InvalidOperationException(anErrorMessage);
-                        }
+                        myServiceEvents.Add(anEventContext);
                     }
                 }
             }
@@ -429,7 +424,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         private ISerializer mySerializer;
 
         private TServiceInterface myService;
-        private HashSet<EventContext> myServiceEvents = new HashSet<EventContext>();
+        private List<EventContext> myServiceEvents = new List<EventContext>();
         private Dictionary<string, ServiceMethod> myServiceMethods = new Dictionary<string, ServiceMethod>();
         private IDuplexInputChannel myInputChannel;
 

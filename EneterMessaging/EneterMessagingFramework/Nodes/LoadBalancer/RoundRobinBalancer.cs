@@ -13,6 +13,7 @@ using Eneter.Messaging.Infrastructure.Attachable;
 using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
 using System.Threading;
 using Eneter.Messaging.Threading;
+using Eneter.Messaging.Utils.Collections;
 
 namespace Eneter.Messaging.Nodes.LoadBalancer
 {
@@ -430,7 +431,7 @@ namespace Eneter.Messaging.Nodes.LoadBalancer
         private IMessagingSystemFactory myOutputMessagingFactory;
         private List<string> myAvailableReceivers = new List<string>();
         private int myCurrentAvailableReceiverIdx;
-        private HashSet<TConnection> myOpenConnections = new HashSet<TConnection>();
+        private List<TConnection> myOpenConnections = new List<TConnection>();
 
         protected override string TracedObject
         {
