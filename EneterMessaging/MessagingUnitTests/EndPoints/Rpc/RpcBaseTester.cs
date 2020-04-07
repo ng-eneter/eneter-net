@@ -1035,10 +1035,10 @@ namespace Eneter.MessagingUnitTests.EndPoints.Rpc
                 anRpcClient1.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
                 anRpcClient2.AttachDuplexOutputChannel(myMessaging.CreateDuplexOutputChannel(myChannelId));
 
-                aClient2Connected.WaitOne(1000);
-
                 string aServiceId1 = anRpcClient1.Proxy.GetInstanceId();
                 string aServiceId2 = anRpcClient2.Proxy.GetInstanceId();
+
+                Assert.IsTrue(aClient2Connected.WaitOne(1000));
 
                 Assert.IsFalse(string.IsNullOrEmpty(aServiceId1));
                 Assert.IsFalse(string.IsNullOrEmpty(aService1IdFromEvent));
