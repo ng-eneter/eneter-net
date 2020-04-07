@@ -283,6 +283,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
 
                             if (aCurrentTime - x.LastPingSentTime >= TimeSpan.FromMilliseconds(myPingFrequency))
                             {
+                                // Store the response receiver to send the ping.
                                 aPingNeededReceivers.Add(x);
                             }
 
@@ -326,7 +327,7 @@ namespace Eneter.Messaging.MessagingSystems.Composites.MonitoredMessagingComposi
                     Dispatcher.Invoke(() => NotifyGeneric(ResponseReceiverDisconnected, e, false));
                 }
 
-                // If the timer chall continue.
+                // If the timer shall continue.
                 if (aContinueTimerFlag)
                 {
                     myCheckTimer.Change(myPingFrequency);

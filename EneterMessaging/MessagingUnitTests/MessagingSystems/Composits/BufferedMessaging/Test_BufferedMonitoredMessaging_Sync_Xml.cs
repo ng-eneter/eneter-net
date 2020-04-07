@@ -25,7 +25,11 @@ namespace Eneter.MessagingUnitTests.MessagingSystems.Composits.BufferedMessaging
             ChannelId = "Channel_1";
             IMessagingSystemFactory anUnderlyingMessaging = new SynchronousMessagingSystemFactory();
             TimeSpan aMaxOfflineTime = TimeSpan.FromMilliseconds(1000);
-            MessagingSystem = new BufferedMonitoredMessagingFactory(anUnderlyingMessaging, aMaxOfflineTime, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(50));
+            TimeSpan aPingFrequency = TimeSpan.FromMilliseconds(50);
+            TimeSpan aPingResponseTimeout = TimeSpan.FromMilliseconds(300);
+            MessagingSystem = new BufferedMonitoredMessagingFactory(
+                anUnderlyingMessaging,
+                aMaxOfflineTime, aPingFrequency, aPingResponseTimeout);
             ConnectionInterruptionFrequency = 5;
         }
     }
