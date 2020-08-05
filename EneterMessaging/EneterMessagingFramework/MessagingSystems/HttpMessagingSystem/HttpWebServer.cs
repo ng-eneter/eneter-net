@@ -17,7 +17,7 @@ namespace Eneter.Messaging.MessagingSystems.HttpMessagingSystem
     /// <summary>
     /// HTTP server.
     /// </summary>
-    internal class HttpWebServer
+    public class HttpWebServer
     {
         /// <summary>
         /// Constructs the HTTP server.

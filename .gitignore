@@ -17,3 +17,4 @@ EneterMessaging/EneterMessagingFramework/bin/
 /EneterMessaging/EneterMessagingFramework/EneterMessagingFramework.csproj.user
 /EneterMessaging/MessagingUnitTests/bin/Debug
 /EneterMessaging/packages
+/EneterMessaging/MessagingUnitTests/bin/Release

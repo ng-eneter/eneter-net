@@ -1,0 +1,68 @@
+Software License Agreement
+
+This license is a legal agreement between Ondrej Uzovic and you for the software product 'Eneter.Messaging.Framework version 8.0'.
+
+The software is licensed, not sold. To work with the product you must be bound with one of the following non-exclusive and non-transferable licenses:
+
+•	Non-Commercial License
+•	Commercial License
+
+
+Non-Commercial License
+This license is royalty-free, and you can obtain it by downloading, installing or using the product, if you agree to be bound by the following terms and conditions.
+
+DO NOT download, install and use the product, if you do not agree with the terms.
+
+Definitions:
+Non-commercial software product is a software product that does not produce any direct or indirect financial profit.
+
+Non-commercial organization  is an organization that is not intended to create any financial profit.
+
+1. Grant of License
+•	You may use the product for evaluation purposes to test its functionality.
+•	Non-commercial organizations or individual persons may integrate the product binary files into non-commercial software products.
+•	Non-commercial organizations or individual persons may distribute the necessary product binary files to end users as an integrated part of their non-commercial software products in accordance with terms of this license.
+
+2. License Limitations
+•	Commercial organizations CANNOT use this product other than for evaluation purposes.
+•	You CANNOT use this product for any commercial purposes. All commercial use is forbidden.
+•	You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.
+•	You CANNOT provide the product binary files to any third party, unless they are integrated with your non-commercial software solution.
+•	You are not allowed to reverse engineer, disassemble or attempt to get any source files.
+
+3. Copyright
+•	Title and copyrights in and to the Software (including the copyrights in the Software and including, but not limited to, any images, photographs, animations, video, audio, music, text, and "applets" incorporated into the Software), the accompanying printed materials (if any), and any copies of the Software are owned by Ondrej Uzovic. The Software is protected by copyright laws and international treaty provisions. Except as permitted by applicable law and this License, you may not modify, rent, lease, loan, sublicense, or create derivative works from the Software.
+
+4. Disclaimer of Warranty on Software
+•	THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+5. Termination
+•	This license lasts as long as you use the product in compliance with this license. If you fail to comply with any of terms of this license it will result in automatic termination of this agreement. In such case you agree to remove and destroy all copies of this product including source codes.
+
+
+
+Commercial License
+To obtain this license you must purchase it.
+By purchasing the license you agree to be bound by the following terms and conditions:
+(DO NOT purchase this license, if you do not agree with the terms.)
+
+1. Grant of License
+•	You may integrate the product binary files into your software products.
+•	You may distribute the necessary product binary files to your end users as an integrated part of your software products in accordance with terms of this license.
+•	You may use the product source codes for debugging or investigation purposes during development and maintainance of your own software product.
+•	You may modify the product source code in order to adjust the behavior of the product.
+
+2. License Limitations
+•	You CANNOT use this product as a basis of development of derivative products or as a basis of development of other communication framework.
+•	You CANNOT provide the product source code or a part of the source code or a modified version of the source code to any third party.
+•	You CANNOT provide the product binary files to any third party, unless they are integrated with your software solution.
+
+3. Copyright
+•	Title and copyrights in and to the Software (including the copyrights in the Software and including, but not limited to, any images, photographs, animations, video, audio, music, text, and "applets" incorporated into the Software), the accompanying printed materials (if any), and any copies of the Software are owned by Ondrej Uzovic. The Software is protected by copyright laws and international treaty provisions. Except as permitted by applicable law and this License, you may not modify, rent, lease, loan, sublicense, or create derivative works from the Software.
+
+4. Disclaimer of Warranty on Software
+•	THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+5. Termination
+•	This license lasts as long as you use the product in compliance with this license. If you fail to comply with any of terms of this license it will result in automatic termination of this agreement. In such case you agree to remove and destroy all copies of this product including source codes.
+

@@ -14,6 +14,9 @@
     <Copyright>Ondrej Uzovic</Copyright>
     <PackageProjectUrl>http://eneter.net/</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>LicenseAgreement.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
@@ -28,6 +31,10 @@
     <Compile Remove="Resources\**" />
     <EmbeddedResource Remove="Resources\**" />
     <None Remove="Resources\**" />
+    <None Include="..\LicenseAgreement.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

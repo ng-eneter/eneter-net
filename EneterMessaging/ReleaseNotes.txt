@@ -1,7 +1,24 @@
 Release Notes
 
 
-Version 8.0.4
+Version 8.0.6
+
+Release Date: 2020-08-05
+
+Supported Platforms:
+
+    Java 6 and Java for Android
+    .Net 3.5, 4.0, 4.5, 4.7.2
+    .Net Standard 2.0, 2.1
+    .Xamarin for Android
+    .Xamarin for iOS
+    HTML 5 (Javascript)
+
+New Features:
+    HttpWebClient-HttpWebService for the REST API communication.
+
+
+Version 8.0.5
 
 Release Date: 2019-11-18
 
