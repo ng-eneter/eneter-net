@@ -1,7 +1,7 @@
 Release Notes
 
 
-Version 8.0.6
+Version 8.0.7
 
 Release Date: 2020-08-05
 
@@ -16,6 +16,7 @@ Supported Platforms:
 
 New Features:
     HttpWebClient-HttpWebService for the REST API communication.
+    Possibility to explicitly set the version of SSL/TLS protocol.
 
 
 Version 8.0.5

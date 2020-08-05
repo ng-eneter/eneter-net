@@ -7,7 +7,7 @@
     <DelaySign>false</DelaySign>
     <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <RootNamespace>Eneter.Messaging</RootNamespace>
-    <Version>8.0.6</Version>
+    <Version>8.0.7</Version>
     <Authors>Ondrej Uzovic</Authors>
     <Company />
     <Description>Cross-platform framework for the interprocess communication.</Description>
@@ -17,6 +17,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>LicenseAgreement.txt</PackageLicenseFile>
+    <AssemblyVersion>8.0.7.0</AssemblyVersion>
+    <FileVersion>8.0.7.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">

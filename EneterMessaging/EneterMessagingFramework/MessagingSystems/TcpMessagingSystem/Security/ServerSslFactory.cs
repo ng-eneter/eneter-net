@@ -60,12 +60,26 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
                     throw new ArgumentNullException(anError);
                 }
 
+                AcceptedProtocols = SslProtocols.Ssl3 | SslProtocols.Tls;
+
+#if NETSTANDARD || NET472
+                    AcceptedProtocols |= SslProtocols.Tls11 | SslProtocols.Tls12;
+#endif
+#if MONOANDROID || XAMARIN_IOS
+                    AcceptedProtocols |= SslProtocols.Tls11 | SslProtocols.Tls12 |SslProtocols.Tls13;
+#endif
+
                 myCertificate = certificate;
                 myIsClientCertificateRequired = isClientCertificateRequired;
                 myUserCertificateValidationCallback = userCertificateValidationCallback;
                 myUserCertificateSelectionCallback = userCertificateSelectionCallback;
             }
         }
+
+        /// <summary>
+        /// Sets or gets accepted versions of SSL/TLS protocols.
+        /// </summary>
+        public SslProtocols AcceptedProtocols { get; set; }
 
         /// <summary>
         /// Creates the security stream and performs the authentication as client.
@@ -79,17 +93,7 @@ namespace Eneter.Messaging.MessagingSystems.TcpMessagingSystem.Security
                 try
                 {
                     SslStream anSslStream = new SslStream(source, false, myUserCertificateValidationCallback, myUserCertificateSelectionCallback);
-
-                    SslProtocols aAcceptedProtocols = SslProtocols.Ssl3 | SslProtocols.Tls;
-
-#if NETSTANDARD || NET472
-                    aAcceptedProtocols |= SslProtocols.Tls11 | SslProtocols.Tls12;
-#endif
-#if MONOANDROID || XAMARIN_IOS
-                    aAcceptedProtocols |= SslProtocols.Tls13;
-#endif
-
-                    anSslStream.AuthenticateAsServer(myCertificate, myIsClientCertificateRequired, aAcceptedProtocols, true);
+                    anSslStream.AuthenticateAsServer(myCertificate, myIsClientCertificateRequired, AcceptedProtocols, true);
                     return anSslStream;
                 }
                 catch (Exception err)
