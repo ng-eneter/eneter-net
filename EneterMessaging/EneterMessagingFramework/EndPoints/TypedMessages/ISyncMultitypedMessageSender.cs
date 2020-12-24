@@ -1,9 +1,4 @@
-﻿/*
- * Project: Eneter.Messaging.Framework
- * Author:  Ondrej Uzovic
- * 
- * Copyright © Ondrej Uzovic 2015
-*/
+﻿
 
 using System;
 using Eneter.Messaging.Infrastructure.Attachable;

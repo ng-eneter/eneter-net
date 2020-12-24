@@ -1,9 +1,4 @@
-﻿/*
- * Project: Eneter.Messaging.Framework
- * Author:  Ondrej Uzovic
- * 
- * Copyright © Ondrej Uzovic 2010
-*/
+﻿
 
 
 namespace Eneter.Messaging.MessagingSystems.MessagingSystemBase

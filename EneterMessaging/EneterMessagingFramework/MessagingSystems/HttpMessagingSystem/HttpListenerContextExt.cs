@@ -1,9 +1,4 @@
-﻿/*
- * Project: Eneter.Messaging.Framework
- * Author:  Ondrej Uzovic
- * 
- * Copyright (c) Ondrej Uzovic 2020
-*/
+﻿
 
 using Eneter.Messaging.DataProcessing.Streaming;
 using Eneter.Messaging.Diagnostic;
