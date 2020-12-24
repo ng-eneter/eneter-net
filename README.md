@@ -3,6 +3,8 @@ Lightweight but comprehensive framework for interprocess communication.
 
 Here is a summary of features provided by the framework:
 
+![Communication Scheme](https://github.com/ng-eneter/eneter-net/blob/master/enetercomponents.svg)
+
 ## Supported Communication Protocols and Transportation Mechanisms
 To connect applications, the framework supports following protocols and transportation mechanisms:
 * _TCP_ - for communication between applications running on different machines.
