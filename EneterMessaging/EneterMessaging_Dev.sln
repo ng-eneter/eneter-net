@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EneterMessagingFramework", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingUnitTests", "MessagingUnitTests\MessagingUnitTests.csproj", "{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}"
 EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "EneterDocumentation", "EneterDocumentation\EneterDocumentation.shfbproj", "{BFF0B995-A32C-4B50-BA4B-3C7C2547BE75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA3A0FF1-FDD6-4F4F-8AF9-B9D84FA9910D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFF0B995-A32C-4B50-BA4B-3C7C2547BE75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFF0B995-A32C-4B50-BA4B-3C7C2547BE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFF0B995-A32C-4B50-BA4B-3C7C2547BE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFF0B995-A32C-4B50-BA4B-3C7C2547BE75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

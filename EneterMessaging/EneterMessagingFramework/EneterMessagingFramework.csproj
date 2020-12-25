@@ -13,7 +13,7 @@
     <Description>Cross-platform framework for the interprocess communication.</Description>
     <Copyright>Ondrej Uzovic</Copyright>
     <PackageProjectUrl>http://eneter.net/</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>LicenseAgreement.txt</PackageLicenseFile>
