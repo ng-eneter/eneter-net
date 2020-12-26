@@ -2,7 +2,7 @@
 Lightweight but comprehensive framework for interprocess communication.
 
 ## Useful Links
-* [API Documentation](http://eneter.net/OnlineHelp/EneterMessagingFramework/index.html)
+* [API Documentation](https://ng-eneter.github.io/eneter-net/)
 * [Nuget Package](https://www.nuget.org/packages/Eneter.Messaging.Framework/)
 
 ## Summary
