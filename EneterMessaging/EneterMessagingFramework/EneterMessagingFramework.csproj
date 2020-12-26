@@ -15,9 +15,12 @@
     <PackageProjectUrl>https://github.com/ng-eneter/eneter-net</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AssemblyVersion>8.0.8.0</AssemblyVersion>
     <FileVersion>8.0.8.0</FileVersion>
+    <RepositoryUrl>https://github.com/ng-eneter/eneter-net</RepositoryUrl>
+    <PackageTags>messaging, rpc, interprocess communication</PackageTags>
+    <PackageReleaseNotes>Eneter goes opensource.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
