@@ -1,9 +1,20 @@
 # eneter-net
 Lightweight but comprehensive framework for interprocess communication.
 
-## Useful Links
 * [API Documentation](https://ng-eneter.github.io/eneter-net/)
 * [Nuget Package](https://www.nuget.org/packages/Eneter.Messaging.Framework/)
+
+Examples:
+* [Xamarin: Simple Client Service Communication](http://eneter.blogspot.com/2016/05/xamarin-simple-client-service.html)
+* [Authenticated and Encrypted RPC](http://eneter.blogspot.com/2016/06/authenticated-and-encrypted-rpc.html)
+* [Discovering Service within Network](http://eneter.blogspot.com/2016/03/discovering-service-within-network.html)
+* [Communication using Secure Remote Password protocol](http://eneter.blogspot.com/2016/02/communication-using-secure-remote.html)
+* [Simple Authentication when Connecting Service](http://eneter.blogspot.com/2014/12/simple-client-authentication-when.html)
+* [Remote Procedure Calls between .NET and Java using TCP](http://eneter.blogspot.com/2014/06/remote-procedure-calls-between-net-and.html)
+* [SImple Request-Response Communication using TCP](http://eneter.blogspot.com/2012/01/simple-request-response-communication.html)
+* [Service Listening to TCP, HTTP and Named Pipe at the same Time](http://eneter.blogspot.com/2011/05/service-listening-to-tcp-http-and-named.html)
+* [Multiple Publishers - Multiple Subscribers Communication](http://eneter.blogspot.com/2010/10/multiple-publishers-multiple.html)
+
 
 ## Summary
 Features provided by the framework:
