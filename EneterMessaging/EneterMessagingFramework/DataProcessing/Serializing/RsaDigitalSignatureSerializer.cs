@@ -48,6 +48,16 @@ namespace Eneter.Messaging.DataProcessing.Serializing
     /// </remarks>
     public class RsaDigitalSignatureSerializer : ISerializer
     {
+        const string OID_RSA = "1.2.840.113549.1.1.1";
+        const string OID_DSA = "1.2.840.10040.4.1";
+        const string OID_ECC = "1.2.840.10045.2.1";
+
+        private ISerializer myUnderlyingSerializer;
+        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
+        private byte[] myPublicCertificate;
+        private X509Certificate2 mySignerCertificate;
+        private Func<X509Certificate2, bool> myVerifySignerCertificate;
+
         /// <summary>
         /// Constructs the serializer with default parameters.
         /// </summary>
@@ -79,16 +89,11 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         {
             using (EneterTrace.Entering())
             {
-                // If the serializer shall be used for serialization too.
-                if (signerCertificate != null && signerCertificate.PrivateKey as RSACryptoServiceProvider == null)
-                {
-                    throw new ArgumentException("The input parameter X509Certificate2 does not contain the private key of type RSACryptoServiceProvider.");
-                }
                 mySignerCertificate = signerCertificate;
 
                 myPublicCertificate = signerCertificate.Export(X509ContentType.Cert);
 
-                myVerifySignerCertificate = (verifySignerCertificate == null) ? VerifySignerCertificate : verifySignerCertificate;
+                myVerifySignerCertificate = verifySignerCertificate ?? VerifySignerCertificate;
                 myUnderlyingSerializer = underlyingSerializer;
             }
         }
@@ -125,8 +130,34 @@ namespace Eneter.Messaging.DataProcessing.Serializing
 
                 // Sign the hash.
                 // Note: The signature is the hash encrypted with the private key.
+#if NET35 || NET40
                 RSACryptoServiceProvider aPrivateKey = (RSACryptoServiceProvider)mySignerCertificate.PrivateKey;
                 aSignedData[2] = aPrivateKey.SignHash(aHash, CryptoConfig.MapNameToOID("SHA1"));
+#else
+                switch (mySignerCertificate.PublicKey.Oid.Value)
+                {
+                    case OID_RSA:
+                        {
+                            var privateKey = mySignerCertificate.GetRSAPrivateKey();
+                            aSignedData[2] = privateKey.SignHash(aHash, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
+                            break;
+                        }
+#if !NETSTANDARD2_0
+                    case OID_DSA:
+                        {
+                            var privateKey = mySignerCertificate.GetDSAPrivateKey();
+                            aSignedData[2] = privateKey.SignData(aHash, HashAlgorithmName.SHA1);
+                            break;
+                        }
+#endif
+                    case OID_ECC:
+                        {
+                            var privateKey = mySignerCertificate.GetECDsaPrivateKey();
+                            aSignedData[2] = privateKey.SignHash(aHash);
+                            break;
+                        }
+                }
+#endif
 
                 // Store the public certificate.
                 aSignedData[1] = myPublicCertificate;
@@ -162,11 +193,43 @@ namespace Eneter.Messaging.DataProcessing.Serializing
                 byte[] aHash = aSha1.ComputeHash(aSignedData[0]);
 
                 // Verify the signature.
+#if NET35 || NET40
                 RSACryptoServiceProvider aCryptoServiceProvider = (RSACryptoServiceProvider)aCertificate.PublicKey.Key;
                 if (!aCryptoServiceProvider.VerifyHash(aHash, CryptoConfig.MapNameToOID("SHA1"), aSignedData[2]))
                 {
                     throw new InvalidOperationException(TracedObject + "failed to deserialize data because the signature verification failed.");
                 }
+#else
+                bool isVerified = false;
+                switch (mySignerCertificate.PublicKey.Oid.Value)
+                {
+                    case OID_RSA:
+                        {
+                            var publicKey = mySignerCertificate.GetRSAPublicKey();
+                            isVerified = publicKey.VerifyHash(aHash, aSignedData[2], HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
+                            break;
+                        }
+#if !NETSTANDARD2_0
+                    case OID_DSA:
+                        {
+                            var publicKey = mySignerCertificate.GetDSAPublicKey();
+                            isVerified = publicKey.VerifyData(aHash, aSignedData[2], HashAlgorithmName.SHA1);
+                            break;
+                        }
+#endif
+                    case OID_ECC:
+                        {
+                            var publicKey = mySignerCertificate.GetECDsaPublicKey();
+                            isVerified = publicKey.VerifyHash(aHash, aSignedData[2]);
+                            break;
+                        }
+                }
+
+                if (!isVerified)
+                {
+                    throw new InvalidOperationException(TracedObject + "failed to deserialize data because the signature verification failed.");
+                }
+#endif
 
                 using (MemoryStream aDeserializedDataStream = new MemoryStream(aSignedData[0], 0, aSignedData[0].Length))
                 {
@@ -181,12 +244,6 @@ namespace Eneter.Messaging.DataProcessing.Serializing
         {
             return signerCertificate.Verify();
         }
-
-        private ISerializer myUnderlyingSerializer;
-        private EncoderDecoder myEncoderDecoder = new EncoderDecoder();
-        private byte[] myPublicCertificate;
-        private X509Certificate2 mySignerCertificate;
-        private Func<X509Certificate2, bool> myVerifySignerCertificate;
 
         private string TracedObject { get { return GetType().Name + ' '; } }
     }
