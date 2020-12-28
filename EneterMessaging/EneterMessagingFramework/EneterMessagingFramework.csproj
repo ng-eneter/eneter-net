@@ -7,20 +7,20 @@
     <DelaySign>false</DelaySign>
     <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <RootNamespace>Eneter.Messaging</RootNamespace>
-    <Version>8.0.8</Version>
+    <Version>8.0.9</Version>
     <Authors>Ondrej Uzovic</Authors>
     <Company />
-    <Description>Cross-platform framework for the interprocess communication.</Description>
+    <Description>Cross-platform framework for interprocess communication.</Description>
     <Copyright>Ondrej Uzovic</Copyright>
     <PackageProjectUrl>https://github.com/ng-eneter/eneter-net</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>8.0.8.0</AssemblyVersion>
-    <FileVersion>8.0.8.0</FileVersion>
+    <AssemblyVersion>8.0.9.0</AssemblyVersion>
+    <FileVersion>8.0.9.0</FileVersion>
     <RepositoryUrl>https://github.com/ng-eneter/eneter-net</RepositoryUrl>
     <PackageTags>messaging, rpc, interprocess communication</PackageTags>
-    <PackageReleaseNotes>Eneter goes opensource.</PackageReleaseNotes>
+    <PackageReleaseNotes>RsaDisgitalSignatureSerializer fixed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
