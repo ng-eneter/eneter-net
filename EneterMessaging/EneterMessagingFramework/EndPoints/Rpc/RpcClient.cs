@@ -77,7 +77,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 mySerializer = serializer;
                 myRpcTimeout = rpcTimeout;
 
-#if !NETSTANDARD
+#if !NETSTANDARD2_0
                 ServiceInterfaceChecker.CheckForClient<TServiceInterface>();
 
                 // Dynamically implement and instantiate the given interface as the proxy.
@@ -112,7 +112,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
             }
         }
 
-#if !NETSTANDARD
+#if !NETSTANDARD2_0
         public TServiceInterface Proxy { get; private set; }
 #endif
         public void SubscribeRemoteEvent<TEventArgs>(string eventName, EventHandler<TEventArgs> eventHandler)

@@ -1,6 +1,6 @@
 ﻿
 
-#if !NETSTANDARD
+#if !NETSTANDARD2_0
 
 using System;
 using System.Collections.Generic;
@@ -48,12 +48,20 @@ namespace Eneter.Messaging.EndPoints.Rpc
                 {
                     // Create the assembly
                     AssemblyName anAssemblyName = new AssemblyName("tmp_" + interfaceType.Name + "_" + Guid.NewGuid().ToString());
+
+#if NETSTANDARD2_1
+                    AssemblyBuilder anAssemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(anAssemblyName, AssemblyBuilderAccess.Run);
+
+                    // Create the module = the logical collection of code.
+                    ModuleBuilder aModuleBuilder = anAssemblyBuilder.DefineDynamicModule(anAssemblyName.Name);
+#else
                     AppDomain anAppDomain = AppDomain.CurrentDomain;
-                    AssemblyBuilder anAssemblyBuilder = anAppDomain.DefineDynamicAssembly(anAssemblyName,
-                        AssemblyBuilderAccess.Run);
+                    AssemblyBuilder anAssemblyBuilder = anAppDomain.DefineDynamicAssembly(anAssemblyName, AssemblyBuilderAccess.Run);
 
                     // Create the module = the logical collection of code.
                     ModuleBuilder aModuleBuilder = anAssemblyBuilder.DefineDynamicModule(anAssemblyName.Name, false);
+#endif
+
 
                     // Create the type.
                     string aDerivedClassName = interfaceType.Namespace;

@@ -26,7 +26,7 @@ namespace Eneter.Messaging.EndPoints.Rpc
         /// </summary>
         event EventHandler<DuplexChannelEventArgs> ConnectionClosed;
 
-#if !NETSTANDARD
+#if !NETSTANDARD2_0
         /// <summary>
         /// Returns service proxy instance.
         /// </summary>
