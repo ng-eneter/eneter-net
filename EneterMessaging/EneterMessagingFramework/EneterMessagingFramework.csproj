@@ -7,7 +7,7 @@
     <DelaySign>false</DelaySign>
     <AssemblyName>Eneter.Messaging.Framework</AssemblyName>
     <RootNamespace>Eneter.Messaging</RootNamespace>
-    <Version>8.0.9</Version>
+    <Version>8.0.10</Version>
     <Authors>Ondrej Uzovic</Authors>
     <Company />
     <Description>Cross-platform framework for interprocess communication.</Description>
@@ -16,11 +16,11 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>8.0.9.0</AssemblyVersion>
-    <FileVersion>8.0.9.0</FileVersion>
+    <AssemblyVersion>8.0.10.0</AssemblyVersion>
+    <FileVersion>8.0.10.0</FileVersion>
     <RepositoryUrl>https://github.com/ng-eneter/eneter-net</RepositoryUrl>
     <PackageTags>messaging, rpc, interprocess communication</PackageTags>
-    <PackageReleaseNotes>RsaDisgitalSignatureSerializer fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>RpcClient.Proxy is available for .NET Standard 2.1 too.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net35|AnyCPU'">
-    <DocumentationFile>c:\eneter_net\EneterMessaging\EneterMessagingFramework\EneterMessagingFramework.xml</DocumentationFile>
+    <DocumentationFile>c:\Ondrej\Source\Repos\eneter-net\EneterMessaging\EneterMessagingFramework\Eneter.Messaging.Framework.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
